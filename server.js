@@ -28,6 +28,7 @@ const {
   renderMergeFields
 } = require('./lib/mergeFields');
 const { createN8nBridge } = require('./integrations/n8nBridge');
+const { createTavilyClient, formatSearchForWhatsApp } = require('./integrations/tavilyClient');
 
 function loadLocalEnv() {
   const envPath = path.join(__dirname, '.env');
@@ -14524,6 +14525,111 @@ app.get('/api/health', (req, res) => {
       }
     });
   });
+
+function buildTavilyClientFromSettings() {
+  return createTavilyClient({
+    apiKey: settings.tavily_api_key || process.env.TAVILY_API_KEY,
+    searchDepth: settings.tavily_search_depth || process.env.TAVILY_SEARCH_DEPTH || 'advanced',
+    maxResults: settings.tavily_max_results || process.env.TAVILY_MAX_RESULTS || 8
+  });
+}
+
+app.get('/api/web-intel/status', (req, res) => {
+  const client = buildTavilyClientFromSettings();
+  res.json({
+    success: true,
+    configured: client.isConfigured(),
+    searchDepth: settings.tavily_search_depth || process.env.TAVILY_SEARCH_DEPTH || 'advanced',
+    maxResults: Number(settings.tavily_max_results || process.env.TAVILY_MAX_RESULTS || 8),
+    useCases: ['scholarships', 'ai_tools_deals', 'website_extract', 'competitor_monitor', 'channel_content_research']
+  });
+});
+
+app.post('/api/web-intel/search', async (req, res) => {
+  try {
+    const client = buildTavilyClientFromSettings();
+    const query = String(req.body?.query || '').trim();
+    const response = await client.search(query, {
+      maxResults: req.body?.maxResults,
+      searchDepth: req.body?.searchDepth,
+      includeAnswer: req.body?.includeAnswer !== false,
+      includeImages: req.body?.includeImages === true,
+      includeRawContent: req.body?.includeRawContent === true,
+      topic: req.body?.topic,
+      days: req.body?.days
+    });
+    res.json({
+      success: true,
+      query,
+      response,
+      whatsappText: formatSearchForWhatsApp(query, response)
+    });
+  } catch (error) {
+    console.error('Tavily search failed:', error.message);
+    res.status(error.status || 500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/web-intel/extract', async (req, res) => {
+  try {
+    const client = buildTavilyClientFromSettings();
+    const urls = req.body?.urls || req.body?.url;
+    const response = await client.extract(urls, {
+      extractDepth: req.body?.extractDepth,
+      includeImages: req.body?.includeImages === true,
+      format: req.body?.format || 'markdown'
+    });
+    res.json({ success: true, response });
+  } catch (error) {
+    console.error('Tavily extract failed:', error.message);
+    res.status(error.status || 500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/web-intel/scholarships', async (req, res) => {
+  try {
+    const query = String(req.body?.query || 'latest fully funded scholarships for Pakistani students').trim();
+    const country = String(req.body?.country || '').trim();
+    const level = String(req.body?.level || '').trim();
+    const composedQuery = [query, country, level, 'deadline eligibility official link'].filter(Boolean).join(' ');
+    const client = buildTavilyClientFromSettings();
+    const response = await client.search(composedQuery, {
+      maxResults: req.body?.maxResults || 8,
+      searchDepth: req.body?.searchDepth || 'advanced',
+      includeAnswer: true
+    });
+    res.json({
+      success: true,
+      query: composedQuery,
+      response,
+      whatsappText: formatSearchForWhatsApp('Scholarship Updates', response)
+    });
+  } catch (error) {
+    console.error('Tavily scholarship search failed:', error.message);
+    res.status(error.status || 500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/web-intel/deals', async (req, res) => {
+  try {
+    const query = String(req.body?.query || 'latest AI tools giveaway free trial credits').trim();
+    const client = buildTavilyClientFromSettings();
+    const response = await client.search(`${query} official`, {
+      maxResults: req.body?.maxResults || 8,
+      searchDepth: req.body?.searchDepth || 'advanced',
+      includeAnswer: true
+    });
+    res.json({
+      success: true,
+      query,
+      response,
+      whatsappText: formatSearchForWhatsApp('AI Tools Deals / Giveaways', response)
+    });
+  } catch (error) {
+    console.error('Tavily deals search failed:', error.message);
+    res.status(error.status || 500).json({ success: false, error: error.message });
+  }
+});
 
 app.get('/api/watchdog/status', (req, res) => {
   res.json({
