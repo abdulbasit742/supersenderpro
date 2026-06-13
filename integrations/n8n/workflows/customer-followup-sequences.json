@@ -1,0 +1,195 @@
+{
+  "name": "SuperSender - Customer Follow-up Sequences",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "supersender-followup-sequence",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "Webhook_Followup_Sequence",
+      "name": "Webhook - Follow-up Sequence",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        220,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": false,
+        "values": {
+          "string": [
+            {
+              "name": "orderId",
+              "value": "={{$json.body.payload.orderId}}"
+            },
+            {
+              "name": "customerNumber",
+              "value": "={{$json.body.payload.customerNumber}}"
+            },
+            {
+              "name": "customerName",
+              "value": "={{$json.body.payload.customerName || 'Customer'}}"
+            },
+            {
+              "name": "followupType",
+              "value": "={{$json.body.payload.followupType || 'renewal'}}"
+            }
+          ]
+        }
+      },
+      "id": "Set_Followup_Data",
+      "name": "Set Follow-up Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        460,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 5,
+        "unit": "minutes"
+      },
+      "id": "Wait_Followup_Buffer",
+      "name": "Wait Buffer",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        700,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": "={{$env.GOOGLE_SHEETS_ID}}",
+        "sheetName": "Followups",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{$now}}",
+            "Order ID": "={{$json.orderId}}",
+            "Customer": "={{$json.customerName}}",
+            "Customer Number": "={{$json.customerNumber}}",
+            "Follow-up Type": "={{$json.followupType}}"
+          }
+        }
+      },
+      "id": "Google_Sheets_Followups",
+      "name": "Google Sheets - Followups",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        940,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPERSENDER_API_URL}}/api/n8n/webhook",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { event: 'dashboard_update', dashboardState: { lastFollowupOrderId: $json.orderId, lastFollowupType: $json.followupType, lastFollowupAt: $now } } }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-n8n-secret",
+              "value": "={{$env.SUPERSENDER_N8N_SECRET}}"
+            }
+          ]
+        }
+      },
+      "id": "Followup_Dashboard_Update",
+      "name": "Follow-up Dashboard Update",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1180,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: true, workflow: 'customer-followup-sequences', orderId: $json.orderId, followupType: $json.followupType } }}"
+      },
+      "id": "Respond_Followup_Webhook",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1420,
+        320
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook - Follow-up Sequence": {
+      "main": [
+        [
+          {
+            "node": "Set Follow-up Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Follow-up Data": {
+      "main": [
+        [
+          {
+            "node": "Wait Buffer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait Buffer": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Followups",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Followups": {
+      "main": [
+        [
+          {
+            "node": "Follow-up Dashboard Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Follow-up Dashboard Update": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "versionId": "customer-followup-sequences-v1"
+}

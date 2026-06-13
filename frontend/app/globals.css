@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --color-ink: 245 247 250;
+  --color-panel: 255 255 255;
+  --color-card: 239 244 248;
+  --color-line: 209 219 229;
+  --color-mint: 18 163 127;
+}
+
+html.dark {
+  color-scheme: dark;
+  --color-ink: 11 17 23;
+  --color-panel: 17 25 35;
+  --color-card: 28 39 51;
+  --color-line: 43 58 72;
+  --color-mint: 21 197 155;
+}
+
+body {
+  margin: 0;
+  background: rgb(var(--color-ink));
+  color: #0f172a;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html.dark body {
+  color: #ecf4f1;
+}
+
+.input {
+  @apply w-full rounded-lg border border-line bg-ink px-3 py-2 text-sm text-slate-900 outline-none placeholder:text-slate-500 focus:border-mint dark:text-slate-100 dark:placeholder:text-slate-500;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center rounded-lg border border-line bg-card px-3 py-2 text-sm font-semibold text-slate-900 hover:border-mint dark:text-slate-100;
+}
+
+.btn-primary {
+  @apply border-mint bg-mint text-black hover:bg-emerald-300;
+}
+
+.badge {
+  @apply inline-flex rounded-full px-2 py-1 text-xs font-semibold;
+}
+
+.table-th {
+  @apply px-3 py-2 text-left text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400;
+}
+
+.table-td {
+  @apply border-t border-line px-3 py-3 text-sm;
+}

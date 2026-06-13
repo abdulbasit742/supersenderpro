@@ -1,0 +1,220 @@
+{
+  "name": "SuperSender - Dealer Rate Auto Collection",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "supersender-dealer-rate",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "Webhook_Dealer_Rates",
+      "name": "Webhook - Dealer Rates",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        220,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body || {};\nconst payload = body.payload || {};\nconst rows = Array.isArray(payload.parsedRows) ? payload.parsedRows : [];\nreturn rows.map((row) => ({ json: {\n  event: body.event,\n  dealerNumber: payload.dealerNumber,\n  dealerName: payload.dealerName || '',\n  dealerCode: payload.dealerCode || '',\n  groupName: payload.groupName || '',\n  trustStatus: payload.trustStatus || 'pending',\n  toolSlug: row.toolSlug,\n  toolName: row.toolName,\n  planSlug: row.planSlug,\n  planName: row.planName,\n  price: row.price,\n  timestamp: body.generatedAt || new Date().toISOString()\n} }));"
+      },
+      "id": "Code_Flatten_Rates",
+      "name": "Code - Flatten Rates",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        460,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": "={{$env.GOOGLE_SHEETS_ID}}",
+        "sheetName": "Dealer Rates",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{$json.timestamp}}",
+            "Dealer Number": "={{$json.dealerNumber}}",
+            "Dealer Name": "={{$json.dealerName}}",
+            "Dealer Code": "={{$json.dealerCode}}",
+            "Group": "={{$json.groupName}}",
+            "Trust Status": "={{$json.trustStatus}}",
+            "Tool": "={{$json.toolName}}",
+            "Plan": "={{$json.planName}}",
+            "Price": "={{$json.price}}"
+          }
+        }
+      },
+      "id": "Google_Sheets_Dealer_Rates",
+      "name": "Google Sheets - Dealer Rates",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        720,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.trustStatus}}",
+              "operation": "equal",
+              "value2": "pending"
+            }
+          ]
+        }
+      },
+      "id": "IF_Pending_Dealer",
+      "name": "IF Pending Dealer",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        960,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "post",
+        "channel": "={{$env.SLACK_ADMIN_CHANNEL || '#dealer-alerts'}}",
+        "text": "=Pending dealer rate detected\\nDealer: {{$json.dealerNumber}} {{$json.dealerName}}\\nTool: {{$json.toolName}} {{$json.planName}}\\nPrice: Rs {{$json.price}}"
+      },
+      "id": "Slack_Pending_Dealer",
+      "name": "Slack - Pending Dealer Alert",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [
+        1200,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPERSENDER_API_URL}}/api/n8n/webhook",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { event: 'dashboard_update', dashboardState: { dealerRatesLastSyncAt: $now, lastDealerRateTool: $json.toolName, lastDealerRatePrice: $json.price } } }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-n8n-secret",
+              "value": "={{$env.SUPERSENDER_N8N_SECRET}}"
+            }
+          ]
+        }
+      },
+      "id": "Dashboard_Rate_Update",
+      "name": "Dashboard Rate Update",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1200,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: true, workflow: 'dealer-rate-auto-collection', rows: $items().length } }}"
+      },
+      "id": "Respond_Dealer_Rates",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1440,
+        320
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook - Dealer Rates": {
+      "main": [
+        [
+          {
+            "node": "Code - Flatten Rates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Flatten Rates": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Dealer Rates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Dealer Rates": {
+      "main": [
+        [
+          {
+            "node": "IF Pending Dealer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Pending Dealer": {
+      "main": [
+        [
+          {
+            "node": "Slack - Pending Dealer Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Dashboard Rate Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack - Pending Dealer Alert": {
+      "main": [
+        [
+          {
+            "node": "Dashboard Rate Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dashboard Rate Update": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "versionId": "dealer-rate-auto-collection-v1"
+}

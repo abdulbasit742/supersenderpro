@@ -12,6 +12,11 @@ uploads/
 logs/
 backups/
 _backups/
+data/*.json
+data/*.csv
+data/*.md
+!data/README.md
+!data/*.example.json
 .git/
 .wa-auth/
 .baileys-auth/

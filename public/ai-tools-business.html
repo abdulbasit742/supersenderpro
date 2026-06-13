@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Tools Business System</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: Inter, Segoe UI, Arial, sans-serif;
+    background: #0b1117;
+    color: #ecf4f1;
+  }
+  header {
+    height: 72px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 28px;
+    border-bottom: 1px solid #2b3a48;
+    background: #111923;
+  }
+  .brand { display: flex; gap: 12px; align-items: center; }
+  .logo { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 12px; background: #15c59b; color: #07100d; font-size: 22px; }
+  main { padding: 28px; max-width: 1180px; margin: 0 auto; }
+  .grid { display: grid; gap: 16px; grid-template-columns: repeat(3, 1fr); }
+  .card { border: 1px solid #2b3a48; background: #1c2733; border-radius: 14px; padding: 20px; }
+  .title { margin: 0 0 6px; font-size: 18px; }
+  .muted { color: #94a3b8; font-size: 14px; line-height: 1.55; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 11px 14px; border-radius: 10px; border: 1px solid #2b3a48; background: #111923; color: #fff; text-decoration: none; font-weight: 700; cursor: pointer; }
+  .primary { background: #15c59b; color: #07100d; border-color: #15c59b; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+  code { background: #0b1117; padding: 3px 6px; border-radius: 6px; color: #9ee7d7; }
+  pre { white-space: pre-wrap; background: #0b1117; border: 1px solid #2b3a48; border-radius: 12px; padding: 14px; color: #dbeafe; overflow: auto; }
+  .status { padding: 4px 9px; border-radius: 999px; font-size: 12px; font-weight: 800; background: #374151; }
+  .ok { background: #064e3b; color: #9ee7d7; }
+  .bad { background: #7f1d1d; color: #fecaca; }
+  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } header { height: auto; padding: 16px; align-items: flex-start; flex-direction: column; gap: 12px; } main { padding: 16px; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="logo">🧾</div>
+    <div>
+      <strong>AI Tools Subscription Business System</strong>
+      <div class="muted">Dealer rates, profit intelligence, stock, sales, WhatsApp bot, and Sheets sync</div>
+    </div>
+  </div>
+  <div id="status" class="status">Checking...</div>
+</header>
+<main>
+  <div class="grid">
+    <section class="card">
+      <h2 class="title">1. Backend API</h2>
+      <p class="muted">Express + Prisma + Socket.io + Baileys runs on <code>4100</code>.</p>
+      <div class="row">
+        <a class="btn primary" href="http://localhost:4100/api/health" target="_blank">Open Health</a>
+        <button class="btn" onclick="checkStatus()">Refresh Status</button>
+      </div>
+    </section>
+    <section class="card">
+      <h2 class="title">2. Dashboard</h2>
+      <p class="muted">Next.js dashboard runs on <code>4101</code>. Use it for rates, dealers, purchases, sales, stock and analytics.</p>
+      <div class="row">
+        <a class="btn primary" href="http://localhost:4101/dashboard" target="_blank">Open Dashboard</a>
+      </div>
+    </section>
+    <section class="card">
+      <h2 class="title">3. WhatsApp Bot</h2>
+      <p class="muted">Baileys multi-device sessions can monitor dealer groups, parse rates and auto-reply to customers.</p>
+      <div class="row">
+        <button class="btn" onclick="connectWa()">Connect WA Session</button>
+      </div>
+    </section>
+  </div>
+
+  <section class="card" style="margin-top:16px">
+    <h2 class="title">Run Commands</h2>
+    <p class="muted">Open two terminals in this project folder.</p>
+    <pre>cd "C:\Users\bsphy2304\Documents\New project\supersender-pro-final\backend"
+npm install
+copy .env.example .env
+npm run prisma:generate
+npm run prisma:migrate
+npm run seed
+npm run dev
+
+cd "C:\Users\bsphy2304\Documents\New project\supersender-pro-final\frontend"
+npm install
+copy .env.example .env.local
+npm run dev</pre>
+  </section>
+
+  <section class="card" style="margin-top:16px">
+    <h2 class="title">What is included</h2>
+    <p class="muted">✅ Dealer rate CRM ✅ Profit suggestions ✅ Scammer warnings ✅ Stock alerts ✅ Sales/Purchase P&L ✅ WhatsApp parser ✅ Google Sheets sync ✅ Realtime Socket.io updates ✅ Excel exports ✅ bilingual operational UI.</p>
+  </section>
+</main>
+<script>
+async function checkStatus() {
+  const el = document.getElementById('status');
+  el.textContent = 'Checking...';
+  el.className = 'status';
+  try {
+    const res = await fetch('http://localhost:4100/api/health');
+    const json = await res.json();
+    el.textContent = json.status === 'ok' ? 'Backend Connected' : 'Backend Issue';
+    el.className = 'status ' + (json.status === 'ok' ? 'ok' : 'bad');
+  } catch (e) {
+    el.textContent = 'Backend Offline';
+    el.className = 'status bad';
+  }
+}
+async function connectWa() {
+  try {
+    await fetch('http://localhost:4100/api/whatsapp/connect', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionKey: 'main' })
+    });
+    alert('WhatsApp session starting. Open backend logs or /api/whatsapp/qr/main for QR.');
+  } catch (e) {
+    alert('Backend not running yet.');
+  }
+}
+checkStatus();
+</script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Real Estate Bot - Sign Up</title>
+<style>
+  *{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:Segoe UI,Arial,sans-serif;background:#071016;color:#f5fbff;display:grid;place-items:center;padding:24px}
+  .shell{width:min(980px,100%);display:grid;grid-template-columns:1fr 1.05fr;gap:24px;align-items:stretch}
+  .hero,.card{background:#13212b;border:1px solid #254252;border-radius:8px;box-shadow:0 18px 45px rgba(0,0,0,.25)}
+  .hero{padding:34px;display:flex;flex-direction:column;justify-content:space-between;min-height:560px;background:linear-gradient(160deg,#10242f,#101922)}
+  .badge{display:inline-flex;width:max-content;background:#123b31;color:#5df5ae;border:1px solid #19634f;border-radius:999px;padding:7px 12px;font-size:12px;font-weight:800}
+  h1{font-size:42px;line-height:1.05;margin:18px 0 12px;letter-spacing:0}p{color:#b9c8d2;line-height:1.6}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:22px}.feature{background:#0b1720;border:1px solid #243b4a;border-radius:8px;padding:13px;color:#dff7ec;font-weight:700;font-size:14px}
+  .card{padding:28px}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{margin-bottom:14px}label{display:block;color:#9fb4c2;font-size:12px;font-weight:800;text-transform:uppercase;margin-bottom:7px}
+  input,select{width:100%;background:#08131b;color:#fff;border:1px solid #2a4656;border-radius:8px;padding:13px 14px;font-size:15px}input:focus,select:focus{outline:2px solid #12c99b;border-color:#12c99b}
+  button,.linkbtn{width:100%;border:0;border-radius:8px;background:#11c99a;color:#04110d;font-weight:900;padding:14px 16px;cursor:pointer;text-align:center;text-decoration:none;display:inline-block}
+  button:disabled{opacity:.55}.muted{font-size:13px;color:#91a5b3;text-align:center;margin-top:14px}.muted a{color:#62d6ff}.error{color:#ff7a7a;font-size:13px;min-height:19px;text-align:center}
+  #result{display:none;background:#0d211d;border:1px solid #168f68;border-radius:8px;padding:18px;margin-top:14px}.token{font-family:Consolas,monospace;word-break:break-all;background:#071016;border:1px dashed #168f68;border-radius:8px;padding:10px;color:#62ffc6;font-size:12px;margin:8px 0 12px}
+  @media(max-width:820px){.shell{grid-template-columns:1fr}.hero{min-height:auto}.row,.grid{grid-template-columns:1fr}h1{font-size:34px}}
+</style>
+</head>
+<body>
+<main class="shell">
+  <section class="hero">
+    <div>
+      <span class="badge">Real Estate WhatsApp Bot</span>
+      <h1>Apni agency ka bot khud launch karein.</h1>
+      <p>Self sign-up ke baad aapko tenant dashboard, property listings, RSS import, visit booking aur WhatsApp bot start link mil jayega.</p>
+      <div class="grid">
+        <div class="feature">Property Search</div><div class="feature">Lead Capture</div>
+        <div class="feature">Visit Booking</div><div class="feature">RSS Import</div>
+        <div class="feature">Agent Contact</div><div class="feature">Dashboard</div>
+      </div>
+    </div>
+    <p>Bot start command: <b>RE tenantId</b>. Dashboard se shareable WhatsApp link copy ho jayega.</p>
+  </section>
+  <section class="card">
+    <h2>Free Account</h2>
+    <form id="signupForm">
+      <div class="field"><label>Business / Agency Name *</label><input id="businessName" required placeholder="Al-Rehman Properties"></div>
+      <div class="row">
+        <div class="field"><label>Owner Name</label><input id="ownerName" placeholder="Abdul Basit"></div>
+        <div class="field"><label>City</label><select id="city"><option>Rawalpindi</option><option>Islamabad</option><option>Lahore</option><option>Karachi</option><option>Peshawar</option><option>Multan</option><option>Faisalabad</option><option>Other</option></select></div>
+      </div>
+      <div class="field"><label>WhatsApp Number *</label><input id="phone" required placeholder="03001234567"></div>
+      <div class="field"><label>Agent Contact Number</label><input id="agentNumber" placeholder="03001234567"></div>
+      <div class="field"><label>Email</label><input id="email" type="email" placeholder="you@example.com"></div>
+      <div class="field"><label>Password *</label><input id="password" type="password" required placeholder="Dashboard password"></div>
+      <div class="field"><label>Plan</label><select id="plan"><option value="starter">Starter - Free 30 day trial</option><option value="business">Business - Rs. 2,500/month</option><option value="pro">Pro - Rs. 5,000/month</option></select></div>
+      <button id="submitBtn" type="submit">Create Account</button>
+      <div class="error" id="errorMsg"></div>
+    </form>
+    <div id="result">
+      <h3>Account Ready</h3>
+      <p>Tenant ID</p><div class="token" id="tenantBox"></div>
+      <p>Access Token</p><div class="token" id="tokenBox"></div>
+      <a id="dashLink" class="linkbtn">Open Dashboard</a>
+    </div>
+    <div class="muted">Already registered? <a href="/re-login.html">Login</a></div>
+  </section>
+</main>
+<script>
+const form=document.getElementById('signupForm'),btn=document.getElementById('submitBtn'),err=document.getElementById('errorMsg');
+form.addEventListener('submit',async e=>{
+  e.preventDefault();btn.disabled=true;btn.textContent='Creating...';err.textContent='';
+  const data={businessName:businessName.value,ownerName:ownerName.value,phone:phone.value,agentNumber:agentNumber.value,email:email.value,city:city.value,password:password.value,plan:plan.value};
+  try{
+    const res=await fetch('/api/re/signup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    const json=await res.json(); if(!res.ok) throw new Error(json.error||'Signup failed');
+    tenantBox.textContent=json.tenantId; tokenBox.textContent=json.token; dashLink.href=json.dashboardUrl;
+    result.style.display='block'; form.style.display='none';
+  }catch(ex){err.textContent=ex.message;btn.disabled=false;btn.textContent='Create Account';}
+});
+</script>
+</body>
+</html>

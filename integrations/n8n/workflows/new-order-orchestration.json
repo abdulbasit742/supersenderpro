@@ -1,0 +1,213 @@
+{
+  "name": "SuperSender - New Order Orchestration",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "supersender-order-created",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "Webhook_New_Order",
+      "name": "Webhook - New Order",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        220,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": false,
+        "values": {
+          "string": [
+            {
+              "name": "event",
+              "value": "={{$json.body.event}}"
+            },
+            {
+              "name": "orderId",
+              "value": "={{$json.body.payload.orderId}}"
+            },
+            {
+              "name": "customerName",
+              "value": "={{$json.body.payload.customerName || 'Customer'}}"
+            },
+            {
+              "name": "customerNumber",
+              "value": "={{$json.body.payload.customerNumber}}"
+            },
+            {
+              "name": "toolName",
+              "value": "={{$json.body.payload.item?.name || 'AI Tools Plan'}}"
+            },
+            {
+              "name": "accountType",
+              "value": "={{$json.body.payload.item?.accountTypeLabel || 'N/A'}}"
+            }
+          ],
+          "number": [
+            {
+              "name": "orderTotal",
+              "value": "={{Number($json.body.payload.total || 0)}}"
+            }
+          ]
+        }
+      },
+      "id": "Set_Order_Data",
+      "name": "Set Order Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        460,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": "={{$env.GOOGLE_SHEETS_ID}}",
+        "sheetName": "Orders",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{$now}}",
+            "Order ID": "={{$json.orderId}}",
+            "Customer Name": "={{$json.customerName}}",
+            "Customer Number": "={{$json.customerNumber}}",
+            "Tool": "={{$json.toolName}}",
+            "Account Type": "={{$json.accountType}}",
+            "Amount": "={{$json.orderTotal}}"
+          }
+        }
+      },
+      "id": "Google_Sheets_Orders",
+      "name": "Google Sheets - Orders",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        700,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "post",
+        "channel": "={{$env.SLACK_ADMIN_CHANNEL || '#sales-alerts'}}",
+        "text": "=New AI Tools order received\\nOrder: {{$json.orderId}}\\nCustomer: {{$json.customerName}} ({{$json.customerNumber}})\\nTool: {{$json.toolName}}\\nType: {{$json.accountType}}\\nAmount: Rs {{$json.orderTotal}}"
+      },
+      "id": "Slack_Admin_Alert",
+      "name": "Slack - Admin Alert",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [
+        940,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPERSENDER_API_URL}}/api/n8n/webhook",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { event: 'dashboard_update', dashboardState: { lastOrderId: $json.orderId, lastOrderCustomer: $json.customerName, lastOrderAmount: $json.orderTotal, lastOrderAt: $now } } }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-n8n-secret",
+              "value": "={{$env.SUPERSENDER_N8N_SECRET}}"
+            }
+          ]
+        }
+      },
+      "id": "Update_Dashboard_API",
+      "name": "Update Dashboard API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1180,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: true, workflow: 'new-order-orchestration', orderId: $json.orderId } }}"
+      },
+      "id": "Respond_To_Webhook",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1420,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook - New Order": {
+      "main": [
+        [
+          {
+            "node": "Set Order Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Order Data": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Orders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Orders": {
+      "main": [
+        [
+          {
+            "node": "Slack - Admin Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack - Admin Alert": {
+      "main": [
+        [
+          {
+            "node": "Update Dashboard API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Dashboard API": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "versionId": "new-order-orchestration-v1"
+}

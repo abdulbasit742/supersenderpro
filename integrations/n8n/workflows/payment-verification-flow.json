@@ -1,0 +1,227 @@
+{
+  "name": "SuperSender - Payment Verification Flow",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "supersender-payment-verification",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "Webhook_Payment_Verification",
+      "name": "Webhook - Payment Verification",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        220,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": false,
+        "values": {
+          "string": [
+            {
+              "name": "orderId",
+              "value": "={{$json.body.payload.orderId}}"
+            },
+            {
+              "name": "customerName",
+              "value": "={{$json.body.payload.customerName || 'Customer'}}"
+            },
+            {
+              "name": "customerNumber",
+              "value": "={{$json.body.payload.customerNumber}}"
+            },
+            {
+              "name": "status",
+              "value": "={{$json.body.payload.status || $json.body.meta.stage}}"
+            },
+            {
+              "name": "paymentScreenshot",
+              "value": "={{$json.body.payload.paymentScreenshot || ''}}"
+            }
+          ]
+        }
+      },
+      "id": "Set_Payment_Data",
+      "name": "Set Payment Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        460,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": "={{$env.GOOGLE_SHEETS_ID}}",
+        "sheetName": "Payment Verification",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{$now}}",
+            "Order ID": "={{$json.orderId}}",
+            "Customer": "={{$json.customerName}}",
+            "Number": "={{$json.customerNumber}}",
+            "Status": "={{$json.status}}",
+            "Screenshot": "={{$json.paymentScreenshot}}"
+          }
+        }
+      },
+      "id": "Google_Sheets_Payments",
+      "name": "Google Sheets - Payments",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        700,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "post",
+        "channel": "={{$env.SLACK_ADMIN_CHANNEL || '#payments'}}",
+        "text": "=Payment verification required\\nOrder: {{$json.orderId}}\\nCustomer: {{$json.customerName}} ({{$json.customerNumber}})\\nStatus: {{$json.status}}\\nScreenshot: {{$json.paymentScreenshot}}"
+      },
+      "id": "Slack_Payment_Alert",
+      "name": "Slack - Payment Alert",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [
+        940,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 15,
+        "unit": "minutes"
+      },
+      "id": "Wait_For_Approval",
+      "name": "Wait for Approval",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1180,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPERSENDER_API_URL}}/api/n8n/webhook",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { event: 'dashboard_update', dashboardState: { lastPaymentCheckOrderId: $json.orderId, lastPaymentCheckAt: $now, paymentVerificationStatus: $json.status } } }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-n8n-secret",
+              "value": "={{$env.SUPERSENDER_N8N_SECRET}}"
+            }
+          ]
+        }
+      },
+      "id": "Payment_Dashboard_Update",
+      "name": "Payment Dashboard Update",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1420,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: true, workflow: 'payment-verification-flow', orderId: $json.orderId } }}"
+      },
+      "id": "Respond_Payment_Webhook",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1660,
+        320
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook - Payment Verification": {
+      "main": [
+        [
+          {
+            "node": "Set Payment Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Payment Data": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Payments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Payments": {
+      "main": [
+        [
+          {
+            "node": "Slack - Payment Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack - Payment Alert": {
+      "main": [
+        [
+          {
+            "node": "Wait for Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for Approval": {
+      "main": [
+        [
+          {
+            "node": "Payment Dashboard Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Payment Dashboard Update": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "versionId": "payment-verification-flow-v1"
+}

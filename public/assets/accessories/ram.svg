@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <rect width="1200" height="800" fill="#111827"/>
+  <rect x="160" y="260" width="880" height="250" rx="28" fill="#14532d" stroke="#bbf7d0" stroke-width="14"/>
+  <g fill="#22c55e">
+    <rect x="235" y="320" width="90" height="95" rx="10"/>
+    <rect x="355" y="320" width="90" height="95" rx="10"/>
+    <rect x="475" y="320" width="90" height="95" rx="10"/>
+    <rect x="635" y="320" width="90" height="95" rx="10"/>
+    <rect x="755" y="320" width="90" height="95" rx="10"/>
+    <rect x="875" y="320" width="90" height="95" rx="10"/>
+  </g>
+  <g fill="#facc15">
+    <rect x="245" y="510" width="34" height="60"/>
+    <rect x="315" y="510" width="34" height="60"/>
+    <rect x="385" y="510" width="34" height="60"/>
+    <rect x="455" y="510" width="34" height="60"/>
+    <rect x="525" y="510" width="34" height="60"/>
+    <rect x="595" y="510" width="34" height="60"/>
+    <rect x="665" y="510" width="34" height="60"/>
+    <rect x="735" y="510" width="34" height="60"/>
+    <rect x="805" y="510" width="34" height="60"/>
+    <rect x="875" y="510" width="34" height="60"/>
+  </g>
+  <text x="600" y="180" text-anchor="middle" font-family="Arial, sans-serif" font-size="96" font-weight="800" fill="#f8fafc">DDR4 RAM</text>
+  <text x="600" y="650" text-anchor="middle" font-family="Arial, sans-serif" font-size="46" fill="#bbf7d0">Memory Upgrade</text>
+</svg>

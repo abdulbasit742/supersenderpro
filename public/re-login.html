@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Real Estate Bot - Login</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:#071016;color:#f5fbff;font-family:Segoe UI,Arial,sans-serif;display:grid;place-items:center;padding:24px}.card{width:min(420px,100%);background:#13212b;border:1px solid #254252;border-radius:8px;padding:30px;box-shadow:0 18px 45px rgba(0,0,0,.25)}h1{margin:0 0 6px}p{color:#9fb4c2}label{display:block;color:#9fb4c2;font-size:12px;font-weight:800;text-transform:uppercase;margin:16px 0 7px}input{width:100%;background:#08131b;color:#fff;border:1px solid #2a4656;border-radius:8px;padding:13px 14px;font-size:15px}button{width:100%;margin-top:18px;border:0;border-radius:8px;background:#11c99a;color:#04110d;font-weight:900;padding:14px 16px;cursor:pointer}.muted{text-align:center;font-size:13px;margin-top:14px;color:#91a5b3}.muted a{color:#62d6ff}.error{color:#ff7a7a;text-align:center;font-size:13px;min-height:19px;margin-top:10px}
+</style>
+</head>
+<body>
+<section class="card">
+  <h1>Real Estate Bot</h1><p>Dashboard login</p>
+  <form id="loginForm">
+    <label>WhatsApp Number</label><input id="phone" required placeholder="03001234567">
+    <label>Password</label><input id="password" type="password" required placeholder="Password">
+    <button id="loginBtn">Login</button><div class="error" id="errorMsg"></div>
+  </form>
+  <div class="muted">New account? <a href="/re-signup.html">Free Sign Up</a></div>
+</section>
+<script>
+loginForm.addEventListener('submit',async e=>{
+  e.preventDefault();loginBtn.disabled=true;loginBtn.textContent='Checking...';errorMsg.textContent='';
+  try{
+    const res=await fetch('/api/re/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:phone.value,password:password.value})});
+    const json=await res.json(); if(!res.ok) throw new Error(json.error||'Login failed');
+    location.href=json.dashboardUrl;
+  }catch(ex){errorMsg.textContent=ex.message;loginBtn.disabled=false;loginBtn.textContent='Login';}
+});
+</script>
+</body>
+</html>

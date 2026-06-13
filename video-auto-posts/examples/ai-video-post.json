@@ -1,0 +1,10 @@
+{
+  "provider": "auto",
+  "platforms": ["facebook", "instagram", "linkedin"],
+  "title": "AI tools promo reel",
+  "prompt": "Create a short vertical promotional video for AI Tools Store showing ChatGPT Plus, Claude Pro, Cursor Pro, and Gemini Advanced plans with clean motion graphics.",
+  "message": "AI Tools Store update: ChatGPT Plus, Claude Pro, Cursor Pro aur Gemini Advanced available hain. DM for today rates.",
+  "durationSeconds": 8,
+  "aspectRatio": "9:16",
+  "scheduledAt": ""
+}

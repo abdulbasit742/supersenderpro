@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Paperclip Agents — SuperSender Pro</title>
+  <style>
+    :root {
+      --bg: #0f141c;
+      --panel: #1a2430;
+      --panel-2: #202c39;
+      --line: #314150;
+      --text: #e8eef4;
+      --muted: #8fa4b6;
+      --green: #25d366;
+      --green-2: #149b50;
+      --danger: #ff6b6b;
+      --shadow: 0 16px 40px rgba(0, 0, 0, 0.32);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, Segoe UI, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(37, 211, 102, 0.09), transparent 24%),
+        linear-gradient(180deg, #10161f 0%, #0f141c 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    a { color: inherit; text-decoration: none; }
+    .shell {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 20px;
+      background: rgba(26, 36, 48, 0.9);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 12px;
+      z-index: 5;
+      backdrop-filter: blur(10px);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+    .brand-mark {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, rgba(37, 211, 102, 0.24), rgba(37, 211, 102, 0.08));
+      border: 1px solid rgba(37, 211, 102, 0.35);
+      color: var(--green);
+      font-size: 22px;
+    }
+    .brand h1 {
+      margin: 0;
+      font-size: 20px;
+      line-height: 1.1;
+    }
+    .brand p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .status-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: #18212c;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    .pill strong { color: var(--text); }
+    .pill.ok { border-color: rgba(37, 211, 102, 0.35); color: #b8f5cf; }
+    .pill.bad { border-color: rgba(255, 107, 107, 0.45); color: #ffc0c0; }
+    .hero {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 18px;
+      margin-top: 18px;
+    }
+    .panel {
+      background: rgba(26, 36, 48, 0.94);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .panel-head {
+      padding: 18px 20px;
+      border-bottom: 1px solid rgba(49, 65, 80, 0.75);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .panel-head h2 {
+      margin: 0;
+      font-size: 16px;
+      letter-spacing: .2px;
+    }
+    .panel-head small {
+      color: var(--muted);
+      display: block;
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+    .panel-body { padding: 18px 20px 20px; }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .metric {
+      background: linear-gradient(180deg, rgba(32, 44, 57, 0.95), rgba(24, 33, 44, 0.95));
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      min-height: 96px;
+    }
+    .metric .label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 10px;
+    }
+    .metric .value {
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+    .metric .sub {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .btn {
+      appearance: none;
+      border: 1px solid transparent;
+      border-radius: 14px;
+      padding: 13px 14px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform .15s ease, opacity .15s ease, border-color .15s ease, background .15s ease;
+      color: #fff;
+      background: var(--panel-2);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: center;
+      min-height: 48px;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn.primary {
+      background: linear-gradient(135deg, var(--green), var(--green-2));
+      color: #07210f;
+    }
+    .btn.secondary {
+      border-color: rgba(37, 211, 102, 0.28);
+      color: #bff0ce;
+    }
+    .btn.ghost {
+      border-color: var(--line);
+      color: var(--text);
+      background: #18212c;
+    }
+    .section {
+      margin-top: 18px;
+    }
+    .section-title {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 0 0 12px;
+      flex-wrap: wrap;
+    }
+    .section-title h3 {
+      margin: 0;
+      font-size: 15px;
+    }
+    .section-title span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .agent-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .agent-card {
+      background: rgba(26, 36, 48, 0.96);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+      min-height: 220px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .agent-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .agent-name {
+      font-size: 16px;
+      font-weight: 700;
+      margin: 0 0 4px;
+    }
+    .agent-meta {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    .agent-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(37, 211, 102, 0.25);
+      background: rgba(37, 211, 102, 0.08);
+      color: #bff0ce;
+      font-size: 12px;
+      white-space: nowrap;
+      text-transform: capitalize;
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 4px rgba(37, 211, 102, 0.12);
+    }
+    .agent-desc {
+      color: var(--text);
+      line-height: 1.6;
+      font-size: 14px;
+      margin: 0;
+    }
+    .agent-list {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 13px;
+    }
+    .agent-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: auto;
+    }
+    .log-box {
+      background: #121922;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+      min-height: 320px;
+      max-height: 460px;
+      overflow: auto;
+    }
+    .log-item {
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(49, 65, 80, 0.55);
+    }
+    .log-item:last-child { border-bottom: 0; }
+    .log-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+    .log-text {
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--text);
+      word-break: break-word;
+    }
+    .empty {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+      padding: 12px 0;
+    }
+    .footer {
+      margin: 20px 0 8px;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+    }
+    @media (max-width: 1080px) {
+      .hero,
+      .agent-grid { grid-template-columns: 1fr; }
+      .controls,
+      .grid-2 { grid-template-columns: 1fr; }
+      .topbar { position: static; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-mark">📎</div>
+        <div>
+          <h1>Paperclip Agents</h1>
+          <p>SuperSender Pro orchestration layer</p>
+        </div>
+      </div>
+      <div class="status-row">
+        <a class="pill" href="/">← Back to SuperSender</a>
+        <span class="pill" id="enabled-pill">Enabled: <strong>--</strong></span>
+        <span class="pill" id="sync-pill">Auto Sync: <strong>--</strong></span>
+        <span class="pill" id="conn-pill"><span class="dot" id="conn-dot"></span><strong id="conn-text">Checking</strong></span>
+      </div>
+    </div>
+
+    <div class="hero">
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>Connection & Controls</h2>
+            <small>Deploy agents, sync catalog, trigger sales, and request reports from one screen.</small>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="grid-2">
+            <div class="metric">
+              <div class="label">Paperclip URL</div>
+              <div class="value" id="paperclip-url">--</div>
+              <div class="sub" id="company-name">Company: --</div>
+            </div>
+            <div class="metric">
+              <div class="label">Agent Count</div>
+              <div class="value" id="agent-count">0</div>
+              <div class="sub" id="agent-summary">No agents loaded yet.</div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-title">
+              <h3>Quick Actions</h3>
+              <span>Action buttons call `/api/paperclip/trigger`</span>
+            </div>
+            <div class="controls">
+              <button class="btn primary" onclick="triggerAction('deploy', {}, this)">📦 Deploy All Agents</button>
+              <button class="btn secondary" onclick="triggerAction('sales', { goal: 'Find new WhatsApp bot clients in Pakistan' }, this)">🚀 Trigger Sales Agent</button>
+              <button class="btn ghost" onclick="triggerAction('sync', {}, this)">🛍️ Sync Product Catalog</button>
+              <button class="btn ghost" onclick="triggerAction('report', {}, this)">📊 Get Daily Report</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>Connection Status</h2>
+            <small>Live state, auto sync preference, and recent activity feed.</small>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="metric" style="margin-bottom:12px;">
+            <div class="label">Paperclip Status</div>
+            <div class="value" id="status-value">--</div>
+            <div class="sub" id="status-detail">Waiting for server response.</div>
+          </div>
+          <div class="metric">
+            <div class="label">Recent Activity</div>
+            <div class="sub" id="activity-summary">No activity loaded yet.</div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="section">
+      <div class="section-title">
+        <h3>4 Agent Cards</h3>
+        <span>Statuses are merged from Paperclip and SuperSender defaults</span>
+      </div>
+      <div class="agent-grid" id="agent-grid">
+        <div class="agent-card">
+          <div class="empty">Loading agents...</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-title">
+        <h3>Live Log</h3>
+        <span>Recent Paperclip activity and webhook events</span>
+      </div>
+      <div class="log-box" id="log-box">
+        <div class="empty">Loading activity log...</div>
+      </div>
+    </section>
+
+    <div class="footer">Paperclip AI bridge connected to SuperSender Pro</div>
+  </div>
+
+  <script>
+    const state = {
+      status: null
+    };
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, (ch) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[ch]));
+    }
+
+    function renderStatus(data) {
+      const connection = data?.connection || {};
+      const connected = !!connection.connected;
+      document.getElementById('paperclip-url').textContent = connection.url || '--';
+      document.getElementById('company-name').textContent = `Company: ${data?.company?.name || '--'}`;
+      document.getElementById('enabled-pill').innerHTML = `Enabled: <strong>${data?.enabled ? 'Yes' : 'No'}</strong>`;
+      document.getElementById('sync-pill').innerHTML = `Auto Sync: <strong>${data?.autoSync ? 'Yes' : 'No'}</strong>`;
+      document.getElementById('conn-text').textContent = connected ? 'Connected' : 'Disconnected';
+      document.getElementById('conn-pill').className = `pill ${connected ? 'ok' : 'bad'}`;
+      document.getElementById('status-value').textContent = connected ? 'Connected' : 'Disconnected';
+      document.getElementById('status-detail').textContent = connected
+        ? 'Paperclip health endpoint responded successfully.'
+        : (connection.error || 'Could not reach Paperclip right now.');
+
+      const agents = Array.isArray(data?.declaredAgents) ? data.declaredAgents : [];
+      const remote = Array.isArray(data?.agents) ? data.agents : [];
+      document.getElementById('agent-count').textContent = String(agents.length || remote.length || 0);
+      document.getElementById('agent-summary').textContent = `${remote.length} remote agent record(s) found, ${agents.length} configured card(s).`;
+
+      const remoteMap = new Map(remote.map((agent) => {
+        const key = String(agent.metadata?.slug || agent.name || agent.title || '').toLowerCase();
+        return [key, agent];
+      }));
+
+      const grid = document.getElementById('agent-grid');
+      if (!agents.length) {
+        grid.innerHTML = '<div class="agent-card"><div class="empty">No declared agents were returned from the server.</div></div>';
+        return;
+      }
+
+      grid.innerHTML = agents.map((agent) => {
+        const key = String(agent.slug || agent.name || '').toLowerCase();
+        const live = remoteMap.get(key) || remoteMap.get(String(agent.name || '').toLowerCase()) || {};
+        const status = live.status || agent.status || 'idle';
+        const statusText = String(status).toLowerCase();
+        const skills = Array.isArray(agent.desiredSkills) ? agent.desiredSkills : [];
+        const reports = agent.metadata?.reportsToLabel || agent.metadata?.reportsToRole || 'CEO';
+        return `
+          <article class="agent-card">
+            <div class="agent-top">
+              <div>
+                <div class="agent-name">${escapeHtml(agent.name || 'Agent')}</div>
+                <div class="agent-meta">
+                  Role: <strong>${escapeHtml(agent.role || 'general')}</strong><br>
+                  Reports to: <strong>${escapeHtml(reports)}</strong>
+                </div>
+              </div>
+              <div class="agent-status">
+                <span class="dot" style="background:${statusText === 'running' ? '#25d366' : statusText === 'active' ? '#6ee7a8' : statusText === 'error' ? '#ff6b6b' : '#7d8fa3'}"></span>
+                ${escapeHtml(statusText)}
+              </div>
+            </div>
+            <p class="agent-desc">${escapeHtml(agent.capabilities || 'No capability description set.')}</p>
+            <ul class="agent-list">
+              ${skills.length ? skills.map((skill) => `<li>${escapeHtml(skill)}</li>`).join('') : '<li>No skills listed</li>'}
+            </ul>
+            <div class="agent-actions">
+              <span class="pill">Slug: <strong>${escapeHtml(agent.slug || 'n/a')}</strong></span>
+              <span class="pill">Paperclip: <strong>${escapeHtml(live.id || 'n/a')}</strong></span>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function renderLogs(logs) {
+      const box = document.getElementById('log-box');
+      if (!Array.isArray(logs) || !logs.length) {
+        box.innerHTML = '<div class="empty">No recent Paperclip activity yet.</div>';
+        document.getElementById('activity-summary').textContent = 'No recent activity.';
+        return;
+      }
+      document.getElementById('activity-summary').textContent = `${logs.length} recent item(s) available.`;
+      box.innerHTML = logs.map((item) => {
+        const body = item.payload ? JSON.stringify(item.payload, null, 2) : (item.error || item.message || item.note || '');
+        return `
+          <div class="log-item">
+            <div class="log-head">
+              <span>${escapeHtml(item.type || 'event')}</span>
+              <span>${escapeHtml((item.timestamp || '').replace('T', ' ').replace('Z', ''))}</span>
+            </div>
+            <div class="log-text">${escapeHtml(body || 'No details')}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function loadStatus() {
+      try {
+        const res = await fetch('/api/paperclip/status', { headers: { 'Accept': 'application/json' } });
+        const data = await res.json();
+        state.status = data;
+        renderStatus(data);
+        renderLogs(data.recentLogs || []);
+      } catch (error) {
+        document.getElementById('status-value').textContent = 'Disconnected';
+        document.getElementById('status-detail').textContent = error.message || 'Failed to fetch status.';
+        document.getElementById('conn-text').textContent = 'Disconnected';
+        document.getElementById('conn-pill').className = 'pill bad';
+        document.getElementById('agent-grid').innerHTML = '<div class="agent-card"><div class="empty">Could not load Paperclip status.</div></div>';
+        document.getElementById('log-box').innerHTML = '<div class="empty">Could not load activity log.</div>';
+      }
+    }
+
+    async function triggerAction(action, data = {}, button = null) {
+      const labelMap = {
+        deploy: 'Deploying agents...',
+        sales: 'Triggering sales agent...',
+        sync: 'Syncing catalog...',
+        report: 'Generating report...'
+      };
+      if (button) button.disabled = true;
+      try {
+        const res = await fetch('/api/paperclip/trigger', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action, data })
+        });
+        const json = await res.json();
+        if (!res.ok || json.success === false) {
+          throw new Error(json.error || 'Action failed');
+        }
+        await loadStatus();
+        const hint = {
+          deploy: 'Agents deployed successfully.',
+          sales: 'Sales goal sent to Paperclip.',
+          sync: 'Product catalog sync sent.',
+          report: 'Daily report requested.'
+        }[action] || 'Triggered.';
+        document.getElementById('status-detail').textContent = hint;
+      } catch (error) {
+        document.getElementById('status-detail').textContent = error.message || 'Action failed.';
+      } finally {
+        if (button) button.disabled = false;
+      }
+    }
+
+    loadStatus();
+    setInterval(loadStatus, 10000);
+  </script>
+</body>
+</html>

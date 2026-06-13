@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Infinity Touch Store | Premium Laptops & AI Solutions</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet"/>
+<style>
+  :root { --bg: #030712; --card: #111827; --text: #f9fafb; --muted: #9ca3af; --accent: #3b82f6; --green: #10b981; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+  
+  /* Navbar */
+  nav { padding: 20px 5%; display: flex; justify-content: space-between; align-items: center; background: rgba(17, 24, 39, 0.8); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .logo { font-size: 24px; font-weight: 800; color: #fff; background: linear-gradient(90deg, var(--accent), var(--green)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .nav-links { display: flex; gap: 20px; }
+  .nav-links a { color: var(--text); text-decoration: none; font-weight: 600; transition: 0.3s; }
+  .nav-links a:hover { color: var(--accent); }
+  
+  /* Hero */
+  .hero { text-align: center; padding: 100px 5%; background: radial-gradient(circle at top, rgba(59,130,246,0.1) 0%, transparent 50%); }
+  .hero h1 { font-size: 56px; font-weight: 800; margin-bottom: 20px; line-height: 1.1; }
+  .hero p { font-size: 18px; color: var(--muted); max-width: 600px; margin: 0 auto 30px; }
+  .btn { display: inline-block; padding: 12px 28px; background: var(--accent); color: #fff; text-decoration: none; border-radius: 8px; font-weight: 600; transition: 0.3s; border: none; cursor: pointer; }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(59,130,246,0.3); }
+  .btn-green { background: var(--green); }
+  .btn-green:hover { box-shadow: 0 10px 20px rgba(16,185,129,0.3); }
+
+  /* Sections */
+  .section { padding: 80px 5%; }
+  .section-title { font-size: 32px; font-weight: 800; margin-bottom: 40px; text-align: center; }
+  
+  /* Grid */
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+  
+  /* Cards */
+  .card { background: var(--card); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 24px; transition: 0.3s; display: flex; flex-direction: column; }
+  .card:hover { transform: translateY(-5px); border-color: rgba(255,255,255,0.1); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+  
+  /* Product */
+  .product-img { width: 100%; height: 200px; background: rgba(255,255,255,0.02); border-radius: 8px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; font-size: 40px; }
+  .product-title { font-size: 20px; font-weight: 600; margin-bottom: 10px; }
+  .product-desc { font-size: 14px; color: var(--muted); margin-bottom: 20px; flex: 1; }
+  .product-price { font-size: 24px; font-weight: 800; color: var(--green); margin-bottom: 20px; }
+  
+  /* Plan */
+  .plan-card { text-align: center; position: relative; overflow: hidden; }
+  .plan-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--accent); }
+  .plan-name { font-size: 24px; font-weight: 800; margin-bottom: 15px; }
+  .plan-price { font-size: 40px; font-weight: 800; margin-bottom: 20px; color: var(--text); }
+  .plan-price span { font-size: 16px; color: var(--muted); }
+  .plan-features { list-style: none; margin-bottom: 30px; text-align: left; }
+  .plan-features li { margin-bottom: 10px; font-size: 15px; color: var(--muted); display: flex; gap: 10px; }
+  .plan-features li::before { content: '?'; color: var(--green); font-weight: bold; }
+
+  footer { text-align: center; padding: 40px; border-top: 1px solid rgba(255,255,255,0.05); color: var(--muted); font-size: 14px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Infinity Touch</div>
+  <div class="nav-links">
+    <a href="#laptops">Laptops</a>
+    <a href="#software">Software Plans</a>
+    <a href="#contact">Contact</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <h1>Next-Gen Tech & Automation</h1>
+  <p>Discover our premium selection of laptops or automate your entire business with our AI-powered SuperSender software subscriptions.</p>
+  <a href="#laptops" class="btn">Shop Laptops</a>
+  <a href="#software" class="btn btn-green" style="margin-left: 10px">View Software</a>
+</div>
+
+<div class="section" id="laptops">
+  <h2 class="section-title">Premium Laptops Inventory</h2>
+  <div class="grid" id="products-grid">
+    <div style="text-align:center;color:var(--muted);width:100%">Loading inventory...</div>
+  </div>
+</div>
+
+<div class="section" id="software" style="background: rgba(255,255,255,0.02)">
+  <h2 class="section-title">SuperSender Automation Plans</h2>
+  <div class="grid" id="plans-grid">
+    <div style="text-align:center;color:var(--muted);width:100%">Loading plans...</div>
+  </div>
+</div>
+
+<footer>
+  <p>© 2026 Infinity Touch Store. Powered by SuperSender Pro.</p>
+</footer>
+
+<script>
+  // Fetch settings to get owner WhatsApp number
+  let waNumber = '923000000000'; // Default fallback
+  
+  async function init() {
+    try {
+      const settingsReq = await fetch('/api/settings');
+      if(settingsReq.ok) {
+        const settings = await settingsReq.json();
+        if(settings.owner_whatsapp) waNumber = settings.owner_whatsapp.replace(/\D/g,'');
+      }
+
+      // Fetch Products
+      const prodReq = await fetch('/api/products');
+      if(prodReq.ok) {
+        const products = await prodReq.json();
+        const grid = document.getElementById('products-grid');
+        if(products.length === 0) {
+          grid.innerHTML = '<div style="color:var(--muted);text-align:center;width:100%">No laptops available right now.</div>';
+        } else {
+          grid.innerHTML = products.map(p => `
+            <div class="card">
+              <div class="product-img">??</div>
+              <div class="product-title">${p.name}</div>
+              <div class="product-desc">${p.description.substring(0, 100)}...</div>
+              <div class="product-price">Rs. ${p.price.toLocaleString()}</div>
+              <a href="https://wa.me/${waNumber}?text=Hi! I want to buy the ${encodeURIComponent(p.name)} for Rs. ${p.price}" target="_blank" class="btn btn-green" style="text-align:center;width:100%">Buy via WhatsApp</a>
+            </div>
+          `).join('');
+        }
+      }
+
+      // Fetch Plans
+      const planReq = await fetch('/api/plans');
+      if(planReq.ok) {
+        const plans = await planReq.json();
+        const grid = document.getElementById('plans-grid');
+        grid.innerHTML = plans.map(p => `
+          <div class="card plan-card">
+            <div class="plan-name">${p.name}</div>
+            <div class="plan-price">Rs. ${p.price.toLocaleString()} <span>/month</span></div>
+            <ul class="plan-features">
+              ${p.features.map(f => `<li>${f}</li>`).join('')}
+            </ul>
+            <a href="https://wa.me/${waNumber}?text=Hi! I want to subscribe to the ${encodeURIComponent(p.name)} Software Plan for Rs. ${p.price}" target="_blank" class="btn" style="text-align:center;margin-top:auto">Subscribe Now</a>
+          </div>
+        `).join('');
+      }
+
+    } catch(e) {
+      console.error('Failed to load store data:', e);
+    }
+  }
+
+  init();
+</script>
+</body>
+</html>

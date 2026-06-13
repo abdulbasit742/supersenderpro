@@ -1,0 +1,26 @@
+{
+  "name": "wa-sales-bot",
+  "version": "1.0.0",
+  "description": "Complete WhatsApp sales automation bot for AI tools reseller business using Baileys",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "check": "node --check index.js && node --check apiServer.js && node --check bot/messageHandler.js && node --check bot/admin/commands.js && node --check bot/scheduler/cron.js && node --check bot/schedulers/dealerCron.js && node --check bot/flows/availability.js && node --check bot/flows/issue.js && node --check bot/flows/followup.js && node --check bot/aiAgent/classifier.js && node --check bot/aiAgent/knowledgeBase.js && node --check bot/dealerIntelligence/groupMonitor.js && node --check bot/dealerIntelligence/dealerParser.js && node --check bot/dealerIntelligence/trustManager.js && node --check bot/dealerIntelligence/stockManager.js && node --check bot/dealerIntelligence/priceAnalytics.js && node --check bot/dealerIntelligence/dealerAccess.js && node --check db/database.js && node --check db/queries.js && node --check utils/rateParser.js && node --check utils/formatter.js && node --check utils/invoiceGen.js && node --check utils/policyChecker.js && node --check utils/warrantyChecker.js"
+  },
+  "dependencies": {
+    "@whiskeysockets/baileys": "^7.0.0-rc.9",
+    "better-sqlite3": "^11.7.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "node-cron": "^3.0.3",
+    "pino": "^9.6.0",
+    "qrcode-terminal": "^0.12.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

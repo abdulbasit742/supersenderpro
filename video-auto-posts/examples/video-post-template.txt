@@ -1,0 +1,8 @@
+provider: auto
+platforms: facebook, instagram, linkedin
+durationSeconds: 8
+aspectRatio: 9:16
+message: AI Tools Store update. DM for today rates.
+scheduledAt:
+---
+Create a clean vertical AI tools promo video with ChatGPT, Claude, Cursor, Gemini names, fast delivery, and trusted support.

@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "supersender-pro": {
+      "command": "C:\\Users\\bsphy2304\\Documents\\New project\\supersender-pro-final\\node-local.exe",
+      "args": [
+        "C:\\Users\\bsphy2304\\Documents\\New project\\supersender-pro-final\\mcp\\supersender-mcp.js"
+      ],
+      "env": {
+        "SUPERSENDER_API_BASE": "http://localhost:3001"
+      }
+    }
+  }
+}

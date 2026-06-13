@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Real Estate Dashboard - SuperSender Pro</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #111827;
+    color: #eef7fb;
+    font-family: "Segoe UI", Arial, sans-serif;
+  }
+  .shell { min-height: 100vh; background: #111827; }
+  header {
+    background: #1a1a2e;
+    border-bottom: 1px solid #27364d;
+    padding: 18px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
+  .brand h1 { margin: 0; font-size: 22px; }
+  .brand p { margin: 4px 0 0; color: #95a4b8; font-size: 13px; }
+  .pills { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+  .pill {
+    border: 1px solid #25d366;
+    color: #25d366;
+    background: rgba(37, 211, 102, .08);
+    border-radius: 999px;
+    padding: 7px 11px;
+    font-size: 12px;
+    font-weight: 800;
+  }
+  main { padding: 22px; max-width: 1280px; margin: 0 auto; }
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .card, .panel {
+    background: #1a1a2e;
+    border: 1px solid #27364d;
+    border-radius: 10px;
+    box-shadow: 0 16px 40px rgba(0,0,0,.18);
+  }
+  .card { padding: 18px; }
+  .card b { display: block; font-size: 30px; color: #fff; }
+  .card span { color: #95a4b8; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; font-weight: 800; }
+  .panel { padding: 18px; margin-bottom: 16px; }
+  .panel h2 { margin: 0 0 14px; font-size: 17px; }
+  button, .btn {
+    border: 0;
+    border-radius: 8px;
+    padding: 11px 14px;
+    font-weight: 900;
+    cursor: pointer;
+    background: #25d366;
+    color: #06130c;
+    text-decoration: none;
+  }
+  .btn-secondary { background: #243246; color: #e5edf7; border: 1px solid #34465f; }
+  .btn-danger { background: #421b25; color: #ffb0bc; border: 1px solid #7b3442; }
+  .btn-small { padding: 8px 10px; font-size: 12px; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 12px 10px; border-bottom: 1px solid #27364d; text-align: left; vertical-align: top; }
+  th { color: #9fb4c8; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+  td { color: #f4f8fb; font-size: 14px; }
+  .muted { color: #95a4b8; font-size: 13px; }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .status {
+    display: inline-flex;
+    border-radius: 999px;
+    padding: 4px 9px;
+    font-size: 12px;
+    font-weight: 800;
+    background: #243246;
+    color: #cbd8e6;
+  }
+  .status.active { background: rgba(37, 211, 102, .12); color: #25d366; }
+  .status.pending_review { background: rgba(255, 193, 7, .13); color: #ffd166; }
+  .empty { color: #95a4b8; padding: 16px; background: #121a2a; border-radius: 8px; }
+  .modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.65);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    z-index: 20;
+  }
+  .modal.open { display: flex; }
+  .modal-card {
+    width: min(840px, 100%);
+    max-height: 92vh;
+    overflow: auto;
+    background: #1a1a2e;
+    border: 1px solid #27364d;
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .modal-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 12px; }
+  .modal-head h2 { margin: 0; }
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  label { display: block; margin: 12px 0 7px; color: #9fb4c8; font-size: 12px; font-weight: 800; text-transform: uppercase; }
+  input, select, textarea {
+    width: 100%;
+    background: #0f1724;
+    border: 1px solid #31445f;
+    color: #fff;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 14px;
+  }
+  textarea { min-height: 88px; resize: vertical; }
+  .error-box {
+    display: none;
+    background: #421b25;
+    border: 1px solid #7b3442;
+    color: #ffd6dc;
+    padding: 14px;
+    border-radius: 8px;
+    margin-bottom: 14px;
+  }
+  .ok { color: #25d366; margin-top: 10px; font-size: 13px; }
+  .bad { color: #ffb0bc; margin-top: 10px; font-size: 13px; }
+  @media (max-width: 900px) {
+    header, .toolbar { align-items: flex-start; flex-direction: column; }
+    .stats, .grid, .grid3 { grid-template-columns: 1fr; }
+    table, thead, tbody, th, td, tr { display: block; }
+    thead { display: none; }
+    tr { border: 1px solid #27364d; border-radius: 8px; margin-bottom: 10px; padding: 8px; }
+    td { border: 0; padding: 7px; }
+    td::before { content: attr(data-label); display: block; color: #95a4b8; font-size: 11px; text-transform: uppercase; margin-bottom: 3px; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <header>
+    <div class="brand">
+      <h1 id="businessName">Real Estate Dashboard</h1>
+      <p id="tenantMeta">Loading tenant...</p>
+    </div>
+    <div class="pills">
+      <span class="pill" id="planPill">Plan</span>
+      <span class="pill" id="expiryPill">Expiry</span>
+    </div>
+  </header>
+
+  <main>
+    <div id="errorBox" class="error-box"></div>
+    <div class="toolbar">
+      <div>
+        <h2 style="margin:0">Properties & Visits</h2>
+        <div class="muted">Self-signup real estate tenant dashboard</div>
+      </div>
+      <div class="actions">
+        <button onclick="openPropertyModal()">+ Add Property</button>
+        <button class="btn-secondary" onclick="loadAll()">Refresh</button>
+      </div>
+    </div>
+
+    <section class="stats">
+      <div class="card"><b id="totalProperties">0</b><span>Total Properties</span></div>
+      <div class="card"><b id="activeListings">0</b><span>Active Listings</span></div>
+      <div class="card"><b id="pendingReview">0</b><span>Pending Review</span></div>
+      <div class="card"><b id="totalVisits">0</b><span>Total Visits</span></div>
+    </section>
+
+    <section class="panel">
+      <h2>Property Listings</h2>
+      <div id="propertiesWrap"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Recent Visit Bookings</h2>
+      <div id="visitsWrap"></div>
+    </section>
+  </main>
+</div>
+
+<div class="modal" id="propertyModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2 id="modalTitle">Add Property</h2>
+      <button class="btn-secondary btn-small" onclick="closePropertyModal()">Close</button>
+    </div>
+    <input type="hidden" id="propId">
+    <div class="grid">
+      <div><label>Title</label><input id="title" placeholder="5 Marla House DHA Phase 2"></div>
+      <div><label>Status</label><select id="status"><option value="active">Active</option><option value="pending_review">Pending Review</option><option value="sold">Sold</option><option value="rented">Rented</option></select></div>
+    </div>
+    <div class="grid3">
+      <div><label>Type</label><select id="type"><option value="house">House</option><option value="apartment">Apartment / Flat</option><option value="plot">Plot / Land</option><option value="commercial">Commercial</option><option value="farmhouse">Farmhouse / Villa</option></select></div>
+      <div><label>Purpose</label><select id="purpose"><option value="sale">Sale</option><option value="rent">Rent</option></select></div>
+      <div><label>Price</label><input id="price" type="number" placeholder="7500000"></div>
+    </div>
+    <div class="grid3">
+      <div><label>Area</label><input id="area" placeholder="Bahria Town"></div>
+      <div><label>City</label><input id="city" placeholder="Rawalpindi"></div>
+      <div><label>Size</label><input id="size" placeholder="5 Marla"></div>
+    </div>
+    <div class="grid3">
+      <div><label>Contact</label><input id="contactNumber" placeholder="923001234567"></div>
+      <div><label>Bedrooms</label><input id="bedrooms" type="number"></div>
+      <div><label>Bathrooms</label><input id="bathrooms" type="number"></div>
+    </div>
+    <label>Image URL</label><input id="image" placeholder="https://...">
+    <label>Features</label><textarea id="features" placeholder="Corner, park facing, gas available"></textarea>
+    <div class="actions" style="margin-top:14px">
+      <button onclick="saveProperty()">Save Property</button>
+      <button class="btn-secondary" onclick="clearForm()">Clear</button>
+    </div>
+    <div id="formMsg"></div>
+  </div>
+</div>
+
+<script>
+const params = new URLSearchParams(location.search);
+const tenantId = params.get('tenant');
+const token = params.get('token');
+let tenant = null;
+let properties = [];
+
+if (!tenantId || !token) location.href = '/re-login.html';
+
+function headers() {
+  return { 'Content-Type': 'application/json', 'x-tenant-token': token };
+}
+
+function showError(message) {
+  const box = document.getElementById('errorBox');
+  box.textContent = message;
+  box.style.display = 'block';
+}
+
+async function api(url, options = {}) {
+  const res = await fetch(url, { ...options, headers: { ...headers(), ...(options.headers || {}) } });
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    if (res.status === 401) {
+      showError('Session invalid. Redirecting to login...');
+      setTimeout(() => location.href = '/re-login.html', 900);
+    }
+    throw new Error(json.error || 'Request failed');
+  }
+  return json;
+}
+
+function money(value) {
+  const amount = Number(value || 0);
+  return amount ? `Rs. ${amount.toLocaleString()}` : 'Contact';
+}
+
+function statusBadge(status) {
+  const s = status || 'active';
+  return `<span class="status ${s}">${s.replace('_', ' ')}</span>`;
+}
+
+function propertyRows(list) {
+  if (!list.length) return '<div class="empty">No properties yet. Add your first listing.</div>';
+  return `<table><thead><tr><th>Title</th><th>Area</th><th>Size</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead><tbody>${list.map(p => `
+    <tr>
+      <td data-label="Title"><b>${escapeHtml(p.title || 'Property')}</b><div class="muted">${escapeHtml(p.type || '')} / ${escapeHtml(p.purpose || '')}</div></td>
+      <td data-label="Area">${escapeHtml(p.area || '-')}<div class="muted">${escapeHtml(p.city || '')}</div></td>
+      <td data-label="Size">${escapeHtml(p.size || (p.sizeMarla ? `${p.sizeMarla} Marla` : '-'))}</td>
+      <td data-label="Price">${money(p.price || p.amount)}</td>
+      <td data-label="Status">${statusBadge(p.status)}</td>
+      <td data-label="Actions"><div class="actions">
+        <button class="btn-small btn-secondary" onclick="editProperty('${escapeAttr(p.id)}')">Edit</button>
+        ${(p.status !== 'active') ? `<button class="btn-small" onclick="approveProperty('${escapeAttr(p.id)}')">Approve</button>` : ''}
+        <button class="btn-small btn-danger" onclick="deleteProperty('${escapeAttr(p.id)}')">Delete</button>
+      </div></td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+function visitRows(list) {
+  if (!list.length) return '<div class="empty">No visit bookings yet.</div>';
+  return `<table><thead><tr><th>Name</th><th>Phone</th><th>Property</th><th>Date</th></tr></thead><tbody>${list.map(v => `
+    <tr>
+      <td data-label="Name">${escapeHtml(v.name || 'Customer')}</td>
+      <td data-label="Phone">${escapeHtml(v.phone || '-')}</td>
+      <td data-label="Property">${escapeHtml(v.property || '-')}</td>
+      <td data-label="Date">${escapeHtml(v.date || v.bookedAt || '-')}</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+async function loadAll() {
+  try {
+    const data = await api(`/api/re/dashboard/${encodeURIComponent(tenantId)}?token=${encodeURIComponent(token)}`);
+    tenant = data.tenant;
+    businessName.textContent = tenant.businessName || 'Real Estate Dashboard';
+    tenantMeta.textContent = `${tenant.ownerName || 'Owner'} | ${tenant.city || 'Pakistan'} | ${tenant.tenantId}`;
+    planPill.textContent = `${tenant.plan || 'starter'} plan`;
+    expiryPill.textContent = tenant.expiresAt ? `Expiry: ${new Date(tenant.expiresAt).toLocaleDateString()}` : 'No expiry';
+    totalProperties.textContent = data.stats.totalProperties || 0;
+    activeListings.textContent = data.stats.activeListings || 0;
+    pendingReview.textContent = data.stats.pendingReview || 0;
+    totalVisits.textContent = data.stats.totalVisits || 0;
+    properties = data.recentProperties || [];
+    propertiesWrap.innerHTML = propertyRows(properties);
+    visitsWrap.innerHTML = visitRows(data.stats.recentVisits || []);
+  } catch (error) {
+    showError(error.message);
+  }
+}
+
+async function refreshProperties() {
+  const data = await api(`/api/re/properties/${encodeURIComponent(tenantId)}?token=${encodeURIComponent(token)}`);
+  properties = data.properties || [];
+  propertiesWrap.innerHTML = propertyRows(properties);
+}
+
+function openPropertyModal() {
+  clearForm();
+  propertyModal.classList.add('open');
+}
+
+function closePropertyModal() {
+  propertyModal.classList.remove('open');
+}
+
+function clearForm() {
+  modalTitle.textContent = 'Add Property';
+  formMsg.textContent = '';
+  ['propId','title','price','area','city','size','contactNumber','bedrooms','bathrooms','image','features'].forEach(id => document.getElementById(id).value = '');
+  status.value = 'active';
+  type.value = 'house';
+  purpose.value = 'sale';
+}
+
+function editProperty(id) {
+  const p = properties.find(item => item.id === id);
+  if (!p) return;
+  modalTitle.textContent = 'Edit Property';
+  propId.value = p.id || '';
+  title.value = p.title || '';
+  status.value = p.status || 'active';
+  type.value = p.type || 'house';
+  purpose.value = p.purpose || 'sale';
+  price.value = p.price || '';
+  area.value = p.area || '';
+  city.value = p.city || '';
+  size.value = p.size || (p.sizeMarla ? `${p.sizeMarla} Marla` : '');
+  contactNumber.value = p.contactNumber || '';
+  bedrooms.value = p.bedrooms || '';
+  bathrooms.value = p.bathrooms || '';
+  image.value = p.image || '';
+  features.value = Array.isArray(p.features) ? p.features.join(', ') : (p.features || '');
+  propertyModal.classList.add('open');
+}
+
+function collectProperty() {
+  return {
+    title: title.value.trim(),
+    status: status.value,
+    type: type.value,
+    purpose: purpose.value,
+    area: area.value.trim(),
+    city: city.value.trim(),
+    size: size.value.trim(),
+    price: Number(price.value || 0),
+    contactNumber: contactNumber.value.trim(),
+    bedrooms: Number(bedrooms.value || 0),
+    bathrooms: Number(bathrooms.value || 0),
+    image: image.value.trim(),
+    features: features.value.split(',').map(v => v.trim()).filter(Boolean)
+  };
+}
+
+async function saveProperty() {
+  try {
+    formMsg.className = 'muted';
+    formMsg.textContent = 'Saving...';
+    const body = JSON.stringify(collectProperty());
+    if (propId.value) {
+      await api(`/api/re/properties/${encodeURIComponent(tenantId)}/${encodeURIComponent(propId.value)}?token=${encodeURIComponent(token)}`, { method: 'PUT', body });
+    } else {
+      await api(`/api/re/properties/${encodeURIComponent(tenantId)}?token=${encodeURIComponent(token)}`, { method: 'POST', body });
+    }
+    formMsg.className = 'ok';
+    formMsg.textContent = 'Saved successfully.';
+    closePropertyModal();
+    await loadAll();
+  } catch (error) {
+    formMsg.className = 'bad';
+    formMsg.textContent = error.message;
+  }
+}
+
+async function approveProperty(id) {
+  await api(`/api/re/properties/${encodeURIComponent(tenantId)}/${encodeURIComponent(id)}?token=${encodeURIComponent(token)}`, {
+    method: 'PUT',
+    body: JSON.stringify({ status: 'active' })
+  });
+  await loadAll();
+}
+
+async function deleteProperty(id) {
+  if (!confirm('Delete this property?')) return;
+  await api(`/api/re/properties/${encodeURIComponent(tenantId)}/${encodeURIComponent(id)}?token=${encodeURIComponent(token)}`, { method: 'DELETE' });
+  await loadAll();
+}
+
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, ch => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[ch]));
+}
+
+function escapeAttr(value) {
+  return escapeHtml(value).replace(/`/g, '&#96;');
+}
+
+loadAll();
+</script>
+</body>
+</html>

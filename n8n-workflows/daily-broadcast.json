@@ -1,0 +1,48 @@
+{
+  "name": "Daily Broadcast",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "cronExpression", "expression": "0 10 * * *" }]
+        }
+      },
+      "id": "schedule",
+      "name": "10 AM Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "url": "={{$env.BACKEND_URL || 'http://ai-tools-backend:4100'}}/api/dealer-intelligence/price-summary"
+      },
+      "id": "price-summary",
+      "name": "Get Price Summary",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [240, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.BACKEND_URL || 'http://ai-tools-backend:4100'}}/api/broadcast/send",
+        "sendBody": true,
+        "jsonBody": "={{ { title: 'Daily AI Tools Rates', message: JSON.stringify($json).slice(0, 3500), groupIds: [] } }}"
+      },
+      "id": "broadcast",
+      "name": "Send Broadcast",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [480, 0]
+    }
+  ],
+  "connections": {
+    "10 AM Schedule": {
+      "main": [[{ "node": "Get Price Summary", "type": "main", "index": 0 }]]
+    },
+    "Get Price Summary": {
+      "main": [[{ "node": "Send Broadcast", "type": "main", "index": 0 }]]
+    }
+  }
+}

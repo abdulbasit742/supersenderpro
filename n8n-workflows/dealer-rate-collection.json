@@ -1,0 +1,49 @@
+{
+  "name": "Dealer Rate Collection",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "supersender-dealer-rate",
+        "httpMethod": "POST",
+        "responseMode": "responseNode"
+      },
+      "id": "dealer-rate-webhook",
+      "name": "Dealer Rate Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.BACKEND_URL || 'http://ai-tools-backend:4100'}}/api/dealer-intelligence/parse-message",
+        "sendBody": true,
+        "jsonBody": "={{$json.payload || $json}}"
+      },
+      "id": "save-rate",
+      "name": "Save Dealer Rate",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [240, 0]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: true, saved: $json } }}"
+      },
+      "id": "respond",
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [480, 0]
+    }
+  ],
+  "connections": {
+    "Dealer Rate Webhook": {
+      "main": [[{ "node": "Save Dealer Rate", "type": "main", "index": 0 }]]
+    },
+    "Save Dealer Rate": {
+      "main": [[{ "node": "Respond", "type": "main", "index": 0 }]]
+    }
+  }
+}

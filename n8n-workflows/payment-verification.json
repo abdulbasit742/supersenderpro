@@ -1,0 +1,49 @@
+{
+  "name": "Payment Verification",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "supersender-payment-verification",
+        "httpMethod": "POST",
+        "responseMode": "responseNode"
+      },
+      "id": "payment-webhook",
+      "name": "Payment Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.BACKEND_URL || 'http://ai-tools-backend:4100'}}/api/n8n/webhook",
+        "sendBody": true,
+        "jsonBody": "={{ { event: 'payment_verification', payload: $json.payload || $json } }}"
+      },
+      "id": "notify-backend",
+      "name": "Notify Backend",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [240, 0]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: true } }}"
+      },
+      "id": "respond",
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [480, 0]
+    }
+  ],
+  "connections": {
+    "Payment Webhook": {
+      "main": [[{ "node": "Notify Backend", "type": "main", "index": 0 }]]
+    },
+    "Notify Backend": {
+      "main": [[{ "node": "Respond", "type": "main", "index": 0 }]]
+    }
+  }
+}

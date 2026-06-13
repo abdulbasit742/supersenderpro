@@ -1,0 +1,724 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  SALES
+  VIEWER
+}
+
+enum RateSource {
+  WHATSAPP_GROUP
+  MANUAL
+  CSV_IMPORT
+  API
+}
+
+enum PaymentStatus {
+  PAID
+  PENDING
+  PARTIAL
+  REFUNDED
+}
+
+enum DeliveryStatus {
+  PENDING
+  DELIVERED
+  FAILED
+  CANCELLED
+}
+
+enum GroupType {
+  DEALER
+  CUSTOMER
+  INTERNAL
+}
+
+enum BroadcastStatus {
+  DRAFT
+  SCHEDULED
+  SENT
+  FAILED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         UserRole @default(SALES)
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([role])
+}
+
+model Dealer {
+  id               String     @id @default(cuid())
+  name             String
+  whatsappNumber   String     @unique
+  groupName        String?
+  toolsAvailable   Json?
+  avgRate          Float?
+  reliabilityScore Int        @default(70)
+  priority         Boolean    @default(false)
+  isScammer        Boolean    @default(false)
+  scamNotes        String?
+  totalOrders      Int        @default(0)
+  totalAmount      Float      @default(0)
+  lastOrderDate    DateTime?
+  notes            String?
+  tags             Json?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  rates            RateEntry[]
+  purchases        Purchase[]
+
+  @@index([priority, reliabilityScore])
+  @@index([isScammer])
+  @@index([name])
+}
+
+model Tool {
+  id          String      @id @default(cuid())
+  name        String
+  slug        String      @unique
+  category    String      @default("AI Tool")
+  active      Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  plans       ToolPlan[]
+  rates       RateEntry[]
+  purchases   Purchase[]
+  sales       Sale[]
+  stockItems  StockItem[]
+  pricing     Pricing[]
+  orders      BusinessOrder[]
+  notifyMe    NotifyMe[]
+
+  @@index([active])
+}
+
+model ToolPlan {
+  id                 String      @id @default(cuid())
+  toolId             String
+  name               String
+  slug               String
+  defaultSellPrice   Float       @default(0)
+  desiredMarginPct   Float       @default(20)
+  lowStockThreshold  Int         @default(2)
+  active             Boolean     @default(true)
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+  tool               Tool        @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  rates              RateEntry[]
+  purchases          Purchase[]
+  sales              Sale[]
+  stockItems         StockItem[]
+  pricing            Pricing[]
+  orders             BusinessOrder[]
+  notifyMe           NotifyMe[]
+
+  @@unique([toolId, slug])
+  @@index([active])
+}
+
+model AccountType {
+  id                   String          @id @default(cuid())
+  name                 String          @unique
+  label                String
+  policyText           String
+  policySummary        String
+  maxIssueResolutions  Int             @default(0)
+  maxReplacements      Int             @default(0)
+  sharedLogin          Boolean         @default(false)
+  sortOrder            Int             @default(0)
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+  pricing              Pricing[]
+  orders               BusinessOrder[]
+
+  @@index([sortOrder])
+}
+
+model Pricing {
+  id              String      @id @default(cuid())
+  toolId          String
+  planId          String
+  accountTypeId   String
+  price           Float
+  isLimitedTime   Boolean     @default(false)
+  limitedLabel    String?
+  policySummary   String?
+  manualSlots     Int         @default(0)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  tool            Tool        @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  plan            ToolPlan    @relation(fields: [planId], references: [id], onDelete: Cascade)
+  accountType     AccountType @relation(fields: [accountTypeId], references: [id], onDelete: Cascade)
+
+  @@unique([toolId, planId, accountTypeId])
+  @@index([planId, accountTypeId])
+  @@index([isLimitedTime])
+}
+
+model RateEntry {
+  id        String     @id @default(cuid())
+  dealerId  String
+  toolId    String
+  planId    String?
+  toolName  String
+  planName  String
+  buyPrice  Float
+  sellPrice Float?
+  source    RateSource @default(MANUAL)
+  groupId   String?
+  messageId String?
+  rawText   String?
+  rateDate  DateTime   @default(now())
+  createdAt DateTime   @default(now())
+  dealer    Dealer     @relation(fields: [dealerId], references: [id], onDelete: Cascade)
+  tool      Tool       @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  plan      ToolPlan?  @relation(fields: [planId], references: [id], onDelete: SetNull)
+
+  @@index([toolId, planId, rateDate])
+  @@index([dealerId, rateDate])
+  @@index([buyPrice])
+}
+
+model Customer {
+  id          String   @id @default(cuid())
+  name        String
+  whatsapp    String   @unique
+  totalOrders Int      @default(0)
+  totalSpent  Float    @default(0)
+  firstOrder  DateTime?
+  lastOrder   DateTime?
+  isVip       Boolean  @default(false)
+  scammerFlag Boolean  @default(false)
+  priorityScore Int    @default(0)
+  notes       String?
+  tags        Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  sales       Sale[]
+  orders      BusinessOrder[]
+  notifyMe    NotifyMe[]
+  memory      CustomerMemory?
+  timelineEvents CustomerTimelineEvent[]
+  automationTasks AutomationTask[]
+
+  @@index([isVip])
+  @@index([scammerFlag])
+  @@index([priorityScore])
+  @@index([name])
+}
+
+model BusinessOrder {
+  id                        String       @id @default(cuid())
+  orderId                   String       @unique
+  customerId                String
+  toolId                    String
+  planId                    String
+  accountTypeId             String?
+  quantity                  Int          @default(1)
+  sellPrice                 Float        @default(0)
+  buyPrice                  Float        @default(0)
+  profit                    Float        @default(0)
+  status                    String       @default("awaiting_payment")
+  paymentScreenshot         String?
+  paymentMethod             String?
+  paymentTxnHash            String?      @unique
+  paymentTxnLast4           String?
+  paymentSenderNumber       String?
+  paymentReceivedAt         DateTime?
+  paymentVerifiedAt         DateTime?
+  deliveryDate              DateTime?
+  renewalDate               DateTime?
+  policySnapshot            String?
+  nonWarrantyAcceptedAt     DateTime?
+  nonWarrantyAcceptanceText String?
+  warrantyReplacementsUsed  Int          @default(0)
+  warrantyIssuesResolved    Int          @default(0)
+  notes                     String?
+  createdAt                 DateTime     @default(now())
+  updatedAt                 DateTime     @updatedAt
+  customer                  Customer     @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  tool                      Tool         @relation(fields: [toolId], references: [id])
+  plan                      ToolPlan     @relation(fields: [planId], references: [id])
+  accountType               AccountType? @relation(fields: [accountTypeId], references: [id], onDelete: SetNull)
+  issues                    Issue[]
+  timelineEvents            CustomerTimelineEvent[]
+  automationTasks           AutomationTask[]
+
+  @@map("orders")
+  @@index([status, createdAt])
+  @@index([paymentReceivedAt])
+  @@index([customerId, createdAt])
+  @@index([toolId, planId])
+}
+
+model Issue {
+  id          String        @id @default(cuid())
+  orderId     String
+  description String
+  status      String        @default("open")
+  resolution  String?
+  aiNotes     String?
+  createdAt   DateTime      @default(now())
+  resolvedAt  DateTime?
+  order       BusinessOrder @relation(fields: [orderId], references: [orderId], onDelete: Cascade)
+
+  @@map("issues")
+  @@index([orderId, status])
+}
+
+model NotifyMe {
+  id          String    @id @default(cuid())
+  customerId  String?
+  phone       String
+  toolId      String
+  planId      String?
+  accountType String?
+  status      String    @default("waiting")
+  notifiedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  customer    Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  tool        Tool      @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  plan        ToolPlan? @relation(fields: [planId], references: [id], onDelete: SetNull)
+
+  @@map("notify_me")
+  @@index([phone, status])
+  @@index([toolId, planId, accountType, status])
+}
+
+model Scammer {
+  id              String   @id @default(cuid())
+  number          String   @unique
+  reason          String?
+  evidenceMessage String?
+  flaggedDate     DateTime @default(now())
+  addedDate       DateTime @default(now())
+
+  @@map("scammers")
+  @@index([flaggedDate])
+}
+
+model AdminAlert {
+  id        String   @id @default(cuid())
+  type      String
+  title     String
+  message   String
+  severity  String   @default("info")
+  payload   Json?
+  sentTo    String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@map("admin_alerts")
+  @@index([read, createdAt])
+}
+
+model PaymentNotification {
+  id             String   @id @default(cuid())
+  txnHash        String   @unique
+  txnReferenceMasked String
+  amount         Float
+  senderMobile   String?
+  paymentMethod  String
+  paidAt         DateTime?
+  emailFrom      String?
+  emailSubject   String?
+  rawSnippet     String?
+  status         String   @default("pending")
+  matchedOrderId String?
+  fraudScore     Int      @default(0)
+  reviewReason   String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("payment_notifications")
+  @@index([status, createdAt])
+  @@index([senderMobile, createdAt])
+  @@index([matchedOrderId])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actor     String
+  action    String
+  entity    String?
+  entityId  String?
+  ip        String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@map("audit_logs")
+  @@index([actor, createdAt])
+  @@index([action, createdAt])
+  @@index([entity, entityId])
+}
+
+model Warranty {
+  id               String   @id @default(cuid())
+  orderId          String   @unique
+  replacementCount Int      @default(0)
+  issueCount       Int      @default(0)
+  expiryDate       DateTime
+  status           String   @default("active")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@map("warranties")
+  @@index([status, expiryDate])
+}
+
+model Conversation {
+  id             String   @id @default(cuid())
+  customerNumber String   @unique
+  state          String   @default("IDLE")
+  context        Json?
+  lastUpdated    DateTime @default(now())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("conversations")
+  @@index([state, lastUpdated])
+}
+
+model Purchase {
+  id            String   @id @default(cuid())
+  dealerId      String
+  toolId        String
+  planId        String?
+  plan          String
+  quantity      Int
+  buyPriceEach  Float
+  totalCost     Float
+  purchaseDate  DateTime @default(now())
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  dealer        Dealer   @relation(fields: [dealerId], references: [id])
+  tool          Tool     @relation(fields: [toolId], references: [id])
+  toolPlan      ToolPlan? @relation(fields: [planId], references: [id], onDelete: SetNull)
+
+  @@index([purchaseDate])
+  @@index([dealerId])
+  @@index([toolId, planId])
+}
+
+model Sale {
+  id               String         @id @default(cuid())
+  customerId       String?
+  customerName     String
+  customerWhatsapp String
+  toolId           String
+  planId           String?
+  plan             String
+  quantity         Int
+  sellPriceEach    Float
+  totalRevenue     Float
+  costEach         Float          @default(0)
+  profit           Float
+  saleDate         DateTime       @default(now())
+  paymentStatus    PaymentStatus  @default(PENDING)
+  deliveryStatus   DeliveryStatus @default(PENDING)
+  buyReasonTags    Json?
+  lostReason       String?
+  notes            String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  customer         Customer?      @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  tool             Tool           @relation(fields: [toolId], references: [id])
+  toolPlan         ToolPlan?      @relation(fields: [planId], references: [id], onDelete: SetNull)
+
+  @@index([saleDate])
+  @@index([paymentStatus])
+  @@index([deliveryStatus])
+  @@index([toolId, planId])
+}
+
+model StockItem {
+  id             String   @id @default(cuid())
+  toolId         String
+  planId         String?
+  plan           String
+  availableQty   Int      @default(0)
+  reservedQty    Int      @default(0)
+  avgCost        Float    @default(0)
+  stockValue     Float    @default(0)
+  sourceDealerId String?
+  lowThreshold   Int      @default(2)
+  updatedAt      DateTime @updatedAt
+  tool           Tool     @relation(fields: [toolId], references: [id])
+  planRef        ToolPlan? @relation(fields: [planId], references: [id], onDelete: SetNull)
+
+  @@unique([toolId, plan])
+  @@index([availableQty])
+}
+
+model WhatsAppAccount {
+  id           String   @id @default(cuid())
+  label        String
+  phone        String?
+  sessionKey   String   @unique
+  status       String   @default("DISCONNECTED")
+  lastQr       String?
+  lastSeenAt   DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model WhatsAppGroup {
+  id          String    @id @default(cuid())
+  waGroupId   String    @unique
+  name        String
+  type        GroupType @default(CUSTOMER)
+  monitorRates Boolean  @default(false)
+  broadcastEnabled Boolean @default(false)
+  settings    Json?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model MessageTemplate {
+  id        String   @id @default(cuid())
+  name      String
+  key       String   @unique
+  body      String
+  category  String   @default("general")
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Broadcast {
+  id          String          @id @default(cuid())
+  title       String
+  message     String
+  targetType  String          @default("groups")
+  targetIds   Json?
+  scheduledAt DateTime?
+  sentAt      DateTime?
+  status      BroadcastStatus @default(DRAFT)
+  result      Json?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+model Alert {
+  id        String   @id @default(cuid())
+  type      String
+  title     String
+  message   String
+  severity  String   @default("info")
+  read      Boolean  @default(false)
+  meta      Json?
+  createdAt DateTime @default(now())
+
+  @@index([read, createdAt])
+}
+
+model Setting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Json
+  updatedAt DateTime @updatedAt
+
+  @@map("system_settings")
+}
+
+model DealerRateIntelligence {
+  id           String   @id @default(cuid())
+  dealerNumber String
+  dealerName   String?
+  dealerCode   String?
+  toolSlug     String
+  planSlug     String?
+  planName     String
+  price        Float
+  groupId      String?
+  groupName    String?
+  messageText  String?
+  trustStatus  String   @default("trusted")
+  parsedAt     DateTime @default(now())
+  createdAt    DateTime @default(now())
+
+  @@index([toolSlug, planSlug, parsedAt])
+  @@index([dealerNumber, parsedAt])
+  @@index([trustStatus, parsedAt])
+}
+
+model TrustPending {
+  id             String   @id @default(cuid())
+  dealerNumber   String
+  dealerName     String?
+  toolsMentioned Json?
+  firstSeen      DateTime @default(now())
+  yesVotes       Int      @default(0)
+  noVotes        Int      @default(0)
+  voters         Json?
+  status         String   @default("pending")
+  groupId        String?
+  groupName      String?
+  evidenceMessage String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([dealerNumber, status])
+  @@index([groupId, status])
+}
+
+model TrustedDealer {
+  id              String   @id @default(cuid())
+  dealerNumber    String   @unique
+  dealerName      String?
+  dealerCode      String   @unique
+  toolsList       Json?
+  avgPrice        Float    @default(0)
+  lowestPrice     Float    @default(0)
+  trustScore      Float    @default(50)
+  yesVotes        Int      @default(0)
+  noVotes         Int      @default(0)
+  ordersCompleted Int      @default(0)
+  accuracyScore   Float    @default(80)
+  addedDate       DateTime @default(now())
+  lastActive      DateTime?
+  responseTimeAvg Float    @default(0)
+  notes           String?
+  tags            Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([dealerCode, trustScore])
+  @@index([lastActive])
+}
+
+model StockInventory {
+  id               String   @id @default(cuid())
+  toolSlug         String
+  planSlug         String
+  accountType      String
+  quantityAvailable Int     @default(0)
+  quantityTotal    Int      @default(0)
+  primaryDealerCode String?
+  backupDealerCode String?
+  lastRestockedDate DateTime?
+  lastRestockedBy  String?
+  lowStockThreshold Int     @default(3)
+  autoReorder      Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@unique([toolSlug, planSlug, accountType])
+  @@index([quantityAvailable])
+}
+
+model StockKey {
+  id            String   @id @default(cuid())
+  toolSlug      String
+  planSlug      String
+  accountType   String
+  credentials   Json
+  credentialsEncrypted String?
+  dealerCode    String?
+  isUsed        Boolean  @default(false)
+  usedByOrderId String?
+  addedDate     DateTime @default(now())
+  expiryDate    DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([toolSlug, planSlug, accountType, isUsed])
+  @@index([dealerCode])
+}
+
+model PriceHistory {
+  id             String   @id @default(cuid())
+  toolSlug       String
+  planSlug       String
+  summaryDate    DateTime
+  lowestPrice    Float    @default(0)
+  highestPrice   Float    @default(0)
+  averagePrice   Float    @default(0)
+  bestDealerCode String?
+  bestDealerName String?
+  spreadPct      Float    @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([toolSlug, planSlug, summaryDate])
+  @@index([toolSlug, planSlug, summaryDate])
+}
+
+model CustomerMemory {
+  id                     String   @id @default(cuid())
+  customerId             String   @unique
+  communicationStyle     String   @default("mixed")
+  preferredPaymentMethod String?
+  preferredTools         Json?
+  scoreTier              String   @default("Bronze")
+  lastIntent             String?
+  lastPositiveAt         DateTime?
+  lastNegativeAt         DateTime?
+  promotionSentThisWeek  Int      @default(0)
+  lastPromotionalAt      DateTime?
+  metadata               Json?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+  customer               Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@map("customer_memory")
+  @@index([scoreTier])
+  @@index([lastPromotionalAt])
+}
+
+model CustomerTimelineEvent {
+  id         String         @id @default(cuid())
+  customerId String?
+  orderId    String?
+  eventType  String
+  channel    String         @default("whatsapp")
+  summary    String
+  sentAt     DateTime?
+  response   String?
+  metadata   Json?
+  createdAt  DateTime       @default(now())
+  customer   Customer?      @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  order      BusinessOrder? @relation(fields: [orderId], references: [orderId], onDelete: SetNull)
+
+  @@map("customer_timeline_events")
+  @@index([customerId, eventType, createdAt])
+  @@index([orderId, eventType])
+}
+
+model AutomationTask {
+  id          String         @id @default(cuid())
+  taskKey     String         @unique
+  type        String
+  customerId  String?
+  orderId     String?
+  status      String         @default("scheduled")
+  scheduledAt DateTime
+  executedAt  DateTime?
+  attempts    Int            @default(0)
+  lastError   String?
+  payload     Json?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  customer    Customer?      @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  order       BusinessOrder? @relation(fields: [orderId], references: [orderId], onDelete: SetNull)
+
+  @@map("automation_tasks")
+  @@index([type, status, scheduledAt])
+  @@index([customerId, status])
+  @@index([orderId, status])
+}

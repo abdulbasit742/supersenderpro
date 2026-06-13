@@ -1,0 +1,8 @@
+platforms: facebook, linkedin
+image: offer.jpg
+scheduledAt:
+---
+Assalam o Alaikum!
+
+Aaj ke AI tools plans available hain.
+Reply for ChatGPT, Claude, Cursor, Gemini rates.

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <rect width="1200" height="800" fill="#0f172a"/>
+  <rect x="150" y="235" width="900" height="330" rx="42" fill="#1f2937" stroke="#38bdf8" stroke-width="16"/>
+  <g fill="#e5e7eb">
+    <rect x="215" y="305" width="70" height="50" rx="10"/>
+    <rect x="305" y="305" width="70" height="50" rx="10"/>
+    <rect x="395" y="305" width="70" height="50" rx="10"/>
+    <rect x="485" y="305" width="70" height="50" rx="10"/>
+    <rect x="575" y="305" width="70" height="50" rx="10"/>
+    <rect x="665" y="305" width="70" height="50" rx="10"/>
+    <rect x="755" y="305" width="70" height="50" rx="10"/>
+    <rect x="845" y="305" width="70" height="50" rx="10"/>
+    <rect x="255" y="385" width="70" height="50" rx="10"/>
+    <rect x="345" y="385" width="70" height="50" rx="10"/>
+    <rect x="435" y="385" width="70" height="50" rx="10"/>
+    <rect x="525" y="385" width="250" height="50" rx="10"/>
+    <rect x="795" y="385" width="70" height="50" rx="10"/>
+    <rect x="885" y="385" width="70" height="50" rx="10"/>
+  </g>
+  <path d="M520 170 C575 120 625 120 680 170" fill="none" stroke="#38bdf8" stroke-width="18" stroke-linecap="round"/>
+  <path d="M475 125 C555 45 645 45 725 125" fill="none" stroke="#38bdf8" stroke-width="12" stroke-linecap="round" opacity=".65"/>
+  <text x="600" y="665" text-anchor="middle" font-family="Arial, sans-serif" font-size="58" font-weight="800" fill="#f8fafc">Wireless Keyboard</text>
+</svg>

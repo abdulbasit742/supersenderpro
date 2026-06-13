@@ -1,0 +1,156 @@
+{
+  "name": "SuperSender - Daily Broadcast Scheduling",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 10 * * *"
+            }
+          ]
+        }
+      },
+      "id": "Schedule_Daily_Broadcast",
+      "name": "Schedule - Daily Broadcast",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        220,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": false,
+        "values": {
+          "string": [
+            {
+              "name": "message",
+              "value": "*Daily AI Tools Rates*\\nReply *1* for latest prices or *2* for availability."
+            }
+          ]
+        }
+      },
+      "id": "Set_Broadcast_Message",
+      "name": "Set Broadcast Message",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        460,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPERSENDER_API_URL}}/api/groups/broadcast-all",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { message: $json.message } }}"
+      },
+      "id": "HTTP_Send_Broadcast",
+      "name": "HTTP - Send Broadcast",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        700,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPERSENDER_API_URL}}/api/n8n/webhook",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { event: 'dashboard_update', dashboardState: { lastBroadcastAt: $now, lastBroadcastType: 'daily_rates' } } }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-n8n-secret",
+              "value": "={{$env.SUPERSENDER_N8N_SECRET}}"
+            }
+          ]
+        }
+      },
+      "id": "HTTP_Dashboard_Broadcast_Update",
+      "name": "HTTP - Dashboard Broadcast Update",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        940,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "post",
+        "channel": "={{$env.SLACK_ADMIN_CHANNEL || '#sales-alerts'}}",
+        "text": "=Daily rate broadcast sent at {{$now}}"
+      },
+      "id": "Slack_Broadcast_Alert",
+      "name": "Slack - Broadcast Alert",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [
+        1180,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule - Daily Broadcast": {
+      "main": [
+        [
+          {
+            "node": "Set Broadcast Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Broadcast Message": {
+      "main": [
+        [
+          {
+            "node": "HTTP - Send Broadcast",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP - Send Broadcast": {
+      "main": [
+        [
+          {
+            "node": "HTTP - Dashboard Broadcast Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP - Dashboard Broadcast Update": {
+      "main": [
+        [
+          {
+            "node": "Slack - Broadcast Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "versionId": "daily-broadcast-scheduling-v1"
+}
