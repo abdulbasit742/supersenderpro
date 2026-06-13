@@ -1,0 +1,61 @@
+﻿{
+    "createdAt":  "2026-06-13T13:40:46.4173232+05:00",
+    "warning":  "Encrypted private backup chunks. Password is NOT in this repo.",
+    "algorithm":  "AES-256-CBC PBKDF2",
+    "iterations":  150000,
+    "originalFile":  "supersenderpro-PRIVATE-full-backup-with-env-git-auth-20260613-084024.zip",
+    "originalSize":  885034649,
+    "originalSha256":  "91A1E299D261F735FAF7B433AF86A2112B65D205F30CC8FEA476E2A5761725EF",
+    "parts":  [
+                  {
+                      "file":  "supersender-private-everything.part001.enc",
+                      "size":  94371900,
+                      "sha256":  "511CE0C204FAE64EF169B77C731385FEEED6B2BF5BEA178C275020B9495F7709"
+                  },
+                  {
+                      "file":  "supersender-private-everything.part002.enc",
+                      "size":  94371900,
+                      "sha256":  "3DF109A9CD65B5FEB34B371665C5710BB95349AA537ECF7362CDA762FC9ABD4E"
+                  },
+                  {
+                      "file":  "supersender-private-everything.part003.enc",
+                      "size":  94371900,
+                      "sha256":  "E0F0BEB84FAE8AF6CD303841AF7551D538CFFDF25E83FEFFA5DEAEB1180E3E07"
+                  },
+                  {
+                      "file":  "supersender-private-everything.part004.enc",
+                      "size":  94371900,
+                      "sha256":  "F49B98C2236FE73C9891B796FE5EB817FFDE32F37B17E32E22ABA0652BE06783"
+                  },
+                  {
+                      "file":  "supersender-private-everything.part005.enc",
+                      "size":  94371900,
+                      "sha256":  "519F7E228F02D159BB933D68C29382C707613DFDF28AA28556AC572F176EF7B5"
+                  },
+                  {
+                      "file":  "supersender-private-everything.part006.enc",
+                      "size":  94371900,
+                      "sha256":  "A0BBE8E517B821C6B2085FB954C11C9E7BF03ABA807EF810A2098E914CF05CDA"
+                  },
+                  {
+                      "file":  "supersender-private-everything.part007.enc",
+                      "size":  94371900,
+                      "sha256":  "603E4612C6F63DAE3C228D89F02EF979D721129DB5FF3234431890CA995AEC3B"
+                  },
+                  {
+                      "file":  "supersender-private-everything.part008.enc",
+                      "size":  94371900,
+                      "sha256":  "D311671D795E6755126F78B00B1AD69E93D2C687B3E5A81E35AA6901F846F051"
+                  },
+                  {
+                      "file":  "supersender-private-everything.part009.enc",
+                      "size":  94371900,
+                      "sha256":  "09BBD1D3EFD68DF15B600CE7DE0837ECE9FE9093D096C3222F8D668252E1383B"
+                  },
+                  {
+                      "file":  "supersender-private-everything.part010.enc",
+                      "size":  35688140,
+                      "sha256":  "C57E6171721EDF1705E8A9CE0F6A7395965A9BB7950B09E11DE9DD9578CA18F8"
+                  }
+              ]
+}
