@@ -1,0 +1,7 @@
+﻿SuperSender Pro Final backup
+Created: 2026-05-10T17:40:58.3967981+05:00
+Source: C:\Users\bsphy2304\Documents\New project\supersender-pro-final
+
+Included: application source, public UI, data JSON, docs, scripts, package files, workflows, uploads metadata/files if present.
+Excluded for safety/size: node_modules, .git, WhatsApp auth sessions, Cloudflare tokens, .env secrets, lock/cache DB files, generated zip backups.
+Restore: unzip, run npm install, copy .env.example to .env or restore your private .env manually, then run node-local.exe server.js.

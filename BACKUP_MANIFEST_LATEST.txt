@@ -1,0 +1,114 @@
+﻿SuperSender Pro complete backup manifest
+Created: 2026-05-14T10:02:46.8233702+05:00
+Source: C:\Users\bsphy2304\Documents\New project\supersender-pro-final
+Zip: C:\Users\bsphy2304\Documents\New project\supersender-pro-final-COMPLETE-BACKUP-20260514-100246.zip
+Included: code, data, public assets, .env, MCP, auth/session folders, configs.
+Excluded only locked/regenerated runtime files: CrashpadMetrics*.pma, DevToolsActivePort, browser Singleton* locks, current live logs if inaccessible.
+
+FullName                                                                                  Length   LastWriteTime       
+--------                                                                                  ------   -------------       
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.baileys-auth                       5/12/2026 8:17:02 PM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.wa-auth                            5/12/2026 8:18:02 PM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.wwebjs_cache                       5/14/2026 7:46:44 AM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\ai                                  5/3/2026 11:53:54 AM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\automations                         5/4/2026 7:52:41 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\backend                             5/7/2026 8:48:54 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\bots                                5/4/2026 10:29:07 AM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\cloudflare                          5/9/2026 5:34:02 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\data                                5/13/2026 8:29:09 AM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\deploy                              5/7/2026 11:09:26 AM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\frontend                            5/7/2026 8:48:54 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\integrations                        5/8/2026 7:15:52 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\lib                                 5/5/2026 7:22:30 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\logs                                5/5/2026 11:23:15 AM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\mcp                                 5/12/2026 8:23:44 PM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\n8n-workflows                       5/7/2026 5:36:43 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\nginx                               5/7/2026 5:04:39 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\node_modules                        5/2/2026 8:40:52 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\public                              5/7/2026 11:19:16 AM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\saas                                5/4/2026 10:30:58 AM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\scripts                             5/9/2026 6:19:03 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\social-auto-posts                   5/8/2026 5:58:08 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\tools                               5/10/2026 5:45:34 PM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\uploads                             5/7/2026 8:58:34 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\video-auto-posts                    5/8/2026 7:20:54 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\wa-sales-bot                        5/7/2026 11:00:27 AM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\whatsapp-ai-tools-bot               5/6/2026 8:55:27 AM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.cloudflare-tunnel-token   184      5/10/2026 4:58:59 PM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.env                       1070     5/12/2026 10:14:1...
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.env.example               3483     5/8/2026 8:12:40 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-err-10.log         4381     5/3/2026 10:00:00 PM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-err-11.log         0        5/3/2026 10:21:32 PM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-err-12.log         0        5/3/2026 10:25:50 PM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-err-13.log         0        5/3/2026 10:28:05 PM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-err-14.log         0        5/3/2026 10:31:19 PM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-err-15.log         0        5/3/2026 10:33:08 PM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-err-16.log         78       5/3/2026 10:39:32 PM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-err-17.log         8042     5/4/2026 12:04:50 AM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-err-2.log          0        5/3/2026 6:40:07 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-err-3.log          983      5/3/2026 7:18:18 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-err-4.log          0        5/3/2026 7:25:03 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-err-5.log          3523     5/3/2026 8:21:50 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-err-6.log          0        5/3/2026 8:23:52 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-err-7.log          0        5/3/2026 8:31:59 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-err-8.log          2648     5/3/2026 9:00:06 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-err-9.log          106      5/3/2026 9:10:02 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-err-aihub.log      3684     5/4/2026 10:01:00 AM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-err-bottest.log    106      5/4/2026 8:04:06 AM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-err-check.log      0        5/4/2026 7:42:33 AM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-err-friendly.log   674      5/4/2026 8:28:15 AM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-out-10.log         829      5/3/2026 9:37:02 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-out-11.log         247      5/3/2026 10:22:53 PM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-out-12.log         247      5/3/2026 10:25:58 PM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-out-13.log         247      5/3/2026 10:28:14 PM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-out-14.log         247      5/3/2026 10:31:27 PM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-out-15.log         247      5/3/2026 10:33:16 PM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-out-16.log         115      5/3/2026 10:39:22 PM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-out-17.log         247      5/3/2026 10:42:58 PM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-out-2.log          56       5/3/2026 6:40:08 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-out-3.log          56       5/3/2026 7:17:10 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-out-4.log          56       5/3/2026 7:25:04 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-out-5.log          1819     5/3/2026 8:21:50 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-out-6.log          247      5/3/2026 8:25:46 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-out-7.log          247      5/3/2026 8:32:53 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-out-8.log          247      5/3/2026 8:52:01 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-out-9.log          411      5/3/2026 9:10:00 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-out-aihub.log      303      5/4/2026 9:12:09 AM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-out-bottest.log    430      5/4/2026 8:10:23 AM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-out-check.log      0        5/4/2026 7:42:33 AM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\.server-out-friendly.log   445      5/4/2026 8:32:07 AM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\BACKUP_MANIFEST.txt        556      5/10/2026 5:40:58 PM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\BACKUP_MANIFEST_LATEST.txt 498      5/14/2026 10:02:4...
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\cloudflare-token.txt.txt   216      5/9/2026 5:50:13 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\cloudflared-dns.err.log    0        5/9/2026 6:19:31 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\cloudflared-dns.out.log    46       5/9/2026 7:06:18 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\cloudflared-live.err.log   3927     5/10/2026 5:03:46 PM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\cloudflared-live.out.log   0        5/10/2026 5:02:35 PM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\cloudflared.err.log        3648     5/9/2026 7:07:53 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\cloudflared.out.log        0        5/9/2026 6:20:35 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\deploy.sh                  1135     5/7/2026 6:12:54 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\docker-compose.yml         2199     5/7/2026 8:28:58 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\Dockerfile                 477      5/2/2026 4:18:52 AM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\health_report.json         130      5/14/2026 7:57:30 AM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\nginx.conf                 4206     5/7/2026 6:09:11 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\node-local.exe             91380224 4/25/2026 1:41:26 PM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\package-lock.json          211026   5/2/2026 5:16:38 AM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\package.json               1426     5/12/2026 8:23:08 PM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\README.md                  15301    5/9/2026 10:14:51 AM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\README_DEPLOY.md           1298     5/2/2026 9:08:12 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\server-live.err            4557     5/14/2026 7:57:38 AM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\server-live.err.log        2085     5/13/2026 12:00:0...
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\server-live.out            3526     5/14/2026 9:48:48 AM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\server-live.out.log        556      5/13/2026 12:00:0...
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\server-runtime.err.log     0        5/8/2026 8:15:15 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\server-runtime.log         821      5/8/2026 4:21:32 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\server-runtime.out.log     0        5/8/2026 8:15:15 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\server.err.log             35948    5/7/2026 9:00:24 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\server.js                  954792   5/14/2026 7:56:22 AM
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\server.out.log             1510     5/7/2026 7:51:29 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\server.restart.err.log     68       5/7/2026 1:37:55 PM 
+C:\Users\bsphy2304\Documents\New project\supersender-pro-final\server.restart.out.log     309      5/7/2026 1:37:56 PM 
+
+
+Robocopy had locked runtime/cache skips; staging folder packaged from: C:\Users\bsphy2304\Documents\New project\_backup_stage_20260514-100246
+Staged file count: 12492

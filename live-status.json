@@ -1,0 +1,18 @@
+﻿{
+    "generatedAt":  "2026-05-14T20:29:01",
+    "local":  {
+                  "ok":  true,
+                  "url":  "http://localhost:3001",
+                  "health":  "{\"ok\":true,\"app\":\"SuperSender Pro\",\"uptime\":138,\"memoryMb\":122,\"db\":{\"type\":\"json\",\"ok\":true,\"path\":\"C:\\\\Users\\\\bsphy2304\\\\Documents\\\\New project\\\\supersender-pro-final\\\\data\"},\"whatsapp\":{\"connected\":false,\"status\":\"qr\",\"message\":\"Scan now\",\"error\":\"\",\"hasSession\":true}}"
+              },
+    "public":  {
+                   "ok":  false,
+                   "url":  "https://app.pakentrepreneur.me",
+                   "error":  "The remote server returned an error: (530) \u003cnone\u003e."
+               },
+    "nextStep":  "Local server is live. Public tunnel needs working Cloudflare network path; switch to mobile hotspot or fix LAN proxy/DNS, then run scripts\\go-live.ps1.",
+    "logs":  {
+                 "cloudflared":  "cloudflared.err.log",
+                 "dns":  "cloudflared-dns.err.log"
+             }
+}
