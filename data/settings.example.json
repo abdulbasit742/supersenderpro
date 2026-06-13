@@ -31,5 +31,8 @@
   "n8n_enabled": false,
   "n8n_base_url": "http://localhost:5678",
   "google_sheets_id": "",
+  "tavily_api_key": "",
+  "tavily_search_depth": "advanced",
+  "tavily_max_results": 8,
   "low_stock_threshold": 3
 }
