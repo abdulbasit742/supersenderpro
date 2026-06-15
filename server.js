@@ -6718,6 +6718,100 @@ async function shareWhatsAppChannelContentToFacebook({ message = '', mediaUrl = 
   };
 }
 
+function channelRelayBoostScore(row = {}) {
+  const text = `${row.title || ''}\n${row.message || row.preview || ''}`.toLowerCase();
+  const priorityKeywords = channelPriorityKeywords().map(item => String(item || '').toLowerCase()).filter(Boolean);
+  const keywordHits = priorityKeywords.filter(keyword => keyword && text.includes(keyword)).length;
+  const status = String(row.status || '').toLowerCase();
+  const ageHours = Math.max(0, (Date.now() - (Date.parse(row.updatedAt || row.createdAt || 0) || Date.now())) / 36e5);
+  const recencyBoost = Math.max(0, 18 - Math.min(18, ageHours));
+  const statusBoost = status === 'published' ? 4 : ['pending', 'draft', 'manual_required', 'failed'].includes(status) ? 14 : 0;
+  const mediaBoost = row.mediaUrl ? 8 : 0;
+  const priorityBoost = row.priority === true ? 18 : 0;
+  return Math.round(
+    Number(row.viralScore || 0) * 1.35 +
+    Number(row.engagementScore || 0) +
+    priorityBoost +
+    keywordHits * 7 +
+    mediaBoost +
+    statusBoost +
+    recencyBoost
+  );
+}
+
+function selectChannelBoostCandidate({ includePublished = true, relayId = '' } = {}) {
+  const rows = Array.isArray(channelRelayInbox) ? channelRelayInbox : [];
+  if (relayId) return rows.find(row => String(row.id) === String(relayId)) || null;
+  const boostedRecently = new Set((Array.isArray(logs) ? logs : [])
+    .filter(row => row.type === 'whatsapp_channel_boost' && Date.now() - (Date.parse(row.time || 0) || 0) < 24 * 60 * 60 * 1000)
+    .map(row => String(row.relayId || ''))
+    .filter(Boolean));
+  const allowedStatuses = includePublished
+    ? ['pending', 'draft', 'failed', 'manual_required', 'published']
+    : ['pending', 'draft', 'failed', 'manual_required'];
+  return rows
+    .filter(row => allowedStatuses.includes(String(row.status || '').toLowerCase()))
+    .filter(row => String(row.message || row.preview || row.title || row.mediaUrl || '').trim())
+    .filter(row => !boostedRecently.has(String(row.id || '')))
+    .sort((a, b) =>
+      channelRelayBoostScore(b) - channelRelayBoostScore(a) ||
+      Date.parse(b.updatedAt || b.createdAt || 0) - Date.parse(a.updatedAt || a.createdAt || 0)
+    )[0] || rows
+      .filter(row => allowedStatuses.includes(String(row.status || '').toLowerCase()))
+      .filter(row => String(row.message || row.preview || row.title || row.mediaUrl || '').trim())
+      .sort((a, b) => channelRelayBoostScore(b) - channelRelayBoostScore(a))[0] || null;
+}
+
+async function runChannelBoostEngine({ dryRun = true, facebook = true, whatsapp = false, relayId = '', message = '', mediaUrl = '' } = {}) {
+  const customMessage = String(message || '').trim();
+  const customMedia = String(mediaUrl || '').trim();
+  const candidate = customMessage || customMedia ? null : selectChannelBoostCandidate({ includePublished: true, relayId });
+  if (!candidate && !customMessage && !customMedia) throw new Error('No channel relay found to boost');
+  const boostMessage = applyChannelBrandingToText(customMessage || candidate?.message || candidate?.preview || candidate?.title || 'WhatsApp Channel update');
+  const boostMedia = customMedia || candidate?.mediaUrl || candidate?.mediaPath || '';
+  const score = candidate ? channelRelayBoostScore(candidate) : 80;
+  if (dryRun) {
+    return {
+      success: true,
+      dryRun: true,
+      action: 'preview',
+      relay: candidate ? channelRelayPublic(candidate) : null,
+      score,
+      facebookReady: !!((settings.fb_page_access_token || settings.facebook_page_access_token || process.env.FB_PAGE_ACCESS_TOKEN) && (settings.facebook_page_id || process.env.FACEBOOK_PAGE_ID)),
+      whatsappTargets: getConfiguredWhatsAppChannels().length,
+      message: boostMessage,
+      mediaUrl: boostMedia,
+      recommendation: score >= 120 ? 'Post now. High boost score.' : score >= 80 ? 'Good candidate. Post when channel is active.' : 'Average candidate. Keep in queue or improve caption.'
+    };
+  }
+  const results = {};
+  if (whatsapp && candidate) {
+    results.whatsapp = await publishChannelRelayDraft(candidate.id, { delayMs: candidate.priority ? 500 : 1200 });
+  }
+  if (facebook) {
+    results.facebook = await shareWhatsAppChannelContentToFacebook({
+      relayId: candidate?.id || '',
+      message: customMessage,
+      mediaUrl: boostMedia
+    });
+  }
+  logs.push({
+    id: uuid(),
+    type: 'whatsapp_channel_boost',
+    status: Object.values(results).some(item => item?.success !== false) ? 'sent' : 'failed',
+    relayId: candidate?.id || '',
+    score,
+    facebook,
+    whatsapp,
+    message: boostMessage,
+    mediaUrl: boostMedia,
+    results,
+    time: new Date().toISOString()
+  });
+  saveJSON('logs.json', logs);
+  return { success: true, dryRun: false, relay: candidate ? channelRelayPublic(candidate) : null, score, results };
+}
+
 async function postChannelWebhook(url = '', payload = {}, headers = {}) {
   const target = String(url || '').trim();
   if (!target) return { skipped: true, reason: 'webhook missing' };
@@ -15747,6 +15841,8 @@ app.get('/wa-channel-qr', (req, res) => {
       <input id="telegramChannelChatId" class="input" placeholder="Telegram channel/chat ID e.g. @yourchannel" style="width:100%">
       <div class="toolbar">
         <button class="btn secondary" onclick="shareLatestToFacebook()">Share latest relay to Facebook</button>
+        <button class="btn secondary" onclick="boostBestRelayPreview()">Preview boost candidate</button>
+        <button class="btn secondary" onclick="boostBestRelayNow()">Boost to Facebook now</button>
         <span id="facebookBridgeStatus" class="muted">Facebook status loading...</span>
       </div>
     </div>
@@ -16103,6 +16199,22 @@ async function shareLatestToFacebook(){
   }catch(e){
     setLog('Facebook share failed: '+e.message+'\\nMeta Page connect/token check karein, aur image/video ke liye public URL required hota hai.');
   }
+}
+async function boostBestRelayPreview(){
+  try{
+    setLog('Finding best relay to boost...');
+    const data=await jsonFetch('/api/wa/channels/boost',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dryRun:true})});
+    setLog('Boost preview\\nScore: '+data.score+'\\nFacebook ready: '+data.facebookReady+'\\nRelay: '+(data.relay?.id||'custom')+'\\nRecommendation: '+data.recommendation+'\\n\\n'+String(data.message||'').slice(0,900));
+  }catch(e){setLog('Boost preview failed: '+e.message);}
+}
+async function boostBestRelayNow(){
+  try{
+    if(!confirm('Best relay Facebook par publish karna hai?')) return;
+    setLog('Boosting best relay to Facebook...');
+    const data=await jsonFetch('/api/wa/channels/boost',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dryRun:false,facebook:true,whatsapp:false})});
+    setLog('Boost done\\nScore: '+data.score+'\\nRelay: '+(data.relay?.id||'custom')+'\\nFacebook: '+(data.results?.facebook?.result?.response?.id||data.results?.facebook?.result?.externalId||'sent'));
+    await loadActivity();
+  }catch(e){setLog('Boost failed: '+e.message);}
 }
 async function saveSourceLinks(){
   const data=await jsonFetch('/api/wa/channels/source-links',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({links:document.getElementById('sourceLinks').value})});
@@ -16627,6 +16739,24 @@ app.post('/api/wa/channels/share-facebook', async (req, res) => {
     res.json(result);
   } catch (error) {
     logs.push({ id: uuid(), type: 'whatsapp_channel_facebook_bridge', status: 'failed', error: error.message, time: new Date().toISOString() });
+    saveJSON('logs.json', logs);
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/wa/channels/boost', async (req, res) => {
+  try {
+    const result = await runChannelBoostEngine({
+      dryRun: req.body?.dryRun !== false,
+      facebook: req.body?.facebook !== false,
+      whatsapp: req.body?.whatsapp === true,
+      relayId: req.body?.relayId || req.body?.id || '',
+      message: req.body?.message || req.body?.text || '',
+      mediaUrl: req.body?.mediaUrl || req.body?.imageUrl || req.body?.videoUrl || ''
+    });
+    res.json(result);
+  } catch (error) {
+    logs.push({ id: uuid(), type: 'whatsapp_channel_boost', status: 'failed', error: error.message, time: new Date().toISOString() });
     saveJSON('logs.json', logs);
     res.status(400).json({ success: false, error: error.message });
   }
@@ -26120,6 +26250,8 @@ Use:
 *!channelnow best-deals*
 *!channelfb*
 *!channelfb Your Facebook post*
+*!channelboost*
+*!channelboost now*
 *!channelpost Your text*`);
       return true;
     }
@@ -26539,6 +26671,41 @@ Publish:
 Relay: *${result.relayId || 'custom'}*
 Facebook: *sent*
 Post ID: *${result.result?.response?.id || result.result?.externalId || 'created'}*`);
+      return true;
+    }
+
+    if (command === '!channelboost') {
+      const mode = String(args[1] || 'preview').trim().toLowerCase();
+      const publishNow = ['now', 'send', 'publish', 'facebook', 'fb', 'both'].includes(mode);
+      const includeWhatsApp = mode === 'both' || String(args[2] || '').toLowerCase() === 'both' || String(args[2] || '').toLowerCase() === 'whatsapp';
+      const relayId = String(args[2] || '').includes('-') ? String(args[2] || '').trim() : '';
+      const result = await runChannelBoostEngine({
+        dryRun: !publishNow,
+        facebook: true,
+        whatsapp: includeWhatsApp,
+        relayId
+      });
+      if (result.dryRun) {
+        await reply(`🚀 *Channel Boost Preview*
+Score: *${result.score}*
+Facebook ready: *${result.facebookReady ? 'YES' : 'NO'}*
+WhatsApp targets: *${result.whatsappTargets}*
+Relay: *${result.relay?.id || 'custom'}*
+Advice: ${result.recommendation}
+
+${String(result.message || '').slice(0, 1200)}
+
+Publish:
+*!channelboost now*
+Facebook + WhatsApp:
+*!channelboost both*`);
+        return true;
+      }
+      await reply(`✅ *Channel Boost Done*
+Score: *${result.score}*
+Relay: *${result.relay?.id || 'custom'}*
+Facebook: *${result.results?.facebook ? 'sent' : 'skipped'}*
+WhatsApp: *${result.results?.whatsapp ? `${result.results.whatsapp.result?.sent || 0} sent` : 'skipped'}*`);
       return true;
     }
 
