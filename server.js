@@ -1655,7 +1655,7 @@ let settings = loadJSON('settings.json', {
   whatsapp_channel_ai_caption_provider_enabled: false,
   whatsapp_channel_ai_caption_cta: 'DM for details / today rates.',
   whatsapp_channel_bridge_enabled: true,
-  whatsapp_channel_bridge_platforms: ['telegram', 'instagram'],
+  whatsapp_channel_bridge_platforms: ['telegram', 'instagram', 'facebook'],
   telegram_channel_chat_id: '',
   whatsapp_channel_source_links: [],
   whatsapp_channel_max_sources: 60,
@@ -1893,7 +1893,7 @@ settings.whatsapp_channel_ai_caption_cta = settings.whatsapp_channel_ai_caption_
 settings.whatsapp_channel_bridge_enabled = settings.whatsapp_channel_bridge_enabled !== false;
 settings.whatsapp_channel_bridge_platforms = Array.isArray(settings.whatsapp_channel_bridge_platforms) && settings.whatsapp_channel_bridge_platforms.length
   ? settings.whatsapp_channel_bridge_platforms.map(item => normalizeSocialPlatform(item === 'telegram' ? 'telegram' : item) || String(item || '').trim().toLowerCase()).filter(Boolean)
-  : String(process.env.WHATSAPP_CHANNEL_BRIDGE_PLATFORMS || 'telegram,instagram').split(',').map(item => String(item || '').trim().toLowerCase()).filter(Boolean);
+  : String(process.env.WHATSAPP_CHANNEL_BRIDGE_PLATFORMS || 'telegram,instagram,facebook').split(',').map(item => String(item || '').trim().toLowerCase()).filter(Boolean);
 settings.telegram_channel_chat_id = settings.telegram_channel_chat_id || process.env.TELEGRAM_CHANNEL_CHAT_ID || '';
 settings.whatsapp_channel_source_links = Array.isArray(settings.whatsapp_channel_source_links) ? settings.whatsapp_channel_source_links : [];
 settings.whatsapp_channel_max_sources = Math.max(1, Math.min(250, Number(settings.whatsapp_channel_max_sources || 60)));
@@ -6652,9 +6652,10 @@ async function sendTelegramBridgePost({ message = '', mediaUrl = '', parseMode =
   return data;
 }
 
-async function bridgeWhatsAppChannelContent({ message = '', mediaUrl = '', kind = 'custom' } = {}) {
+async function bridgeWhatsAppChannelContent({ message = '', mediaUrl = '', kind = 'custom', platforms: forcedPlatforms = null } = {}) {
   if (settings.whatsapp_channel_bridge_enabled !== true) return { skipped: true, reason: 'bridge disabled' };
-  const platforms = (Array.isArray(settings.whatsapp_channel_bridge_platforms) ? settings.whatsapp_channel_bridge_platforms : [])
+  const sourcePlatforms = Array.isArray(forcedPlatforms) && forcedPlatforms.length ? forcedPlatforms : settings.whatsapp_channel_bridge_platforms;
+  const platforms = (Array.isArray(sourcePlatforms) ? sourcePlatforms : [])
     .map(item => String(item || '').trim().toLowerCase())
     .filter(Boolean);
   if (!platforms.length) return { skipped: true, reason: 'no bridge platforms' };
@@ -6688,6 +6689,33 @@ async function bridgeWhatsAppChannelContent({ message = '', mediaUrl = '', kind 
   logs.push({ id: uuid(), type: 'whatsapp_channel_bridge', status: results.some(r => r.success) ? 'sent' : 'partial', kind, results, time: new Date().toISOString() });
   saveJSON('logs.json', logs);
   return { success: true, results };
+}
+
+async function shareWhatsAppChannelContentToFacebook({ message = '', mediaUrl = '', relayId = '' } = {}) {
+  const relay = relayId
+    ? (Array.isArray(channelRelayInbox) ? channelRelayInbox : []).find(row => String(row.id) === String(relayId))
+    : (Array.isArray(channelRelayInbox) ? channelRelayInbox : []).find(row => ['pending', 'draft', 'manual_required', 'failed', 'published'].includes(String(row.status || '').toLowerCase()));
+  const rawMessage = String(message || relay?.message || relay?.preview || relay?.title || '').trim();
+  const rawMedia = String(mediaUrl || relay?.mediaUrl || relay?.mediaPath || '').trim();
+  if (!rawMessage && !rawMedia) throw new Error('Message/media or relayId is required for Facebook sharing');
+  const finalMessage = applyChannelBrandingToText(rawMessage || 'WhatsApp Channel update');
+  const result = await bridgeWhatsAppChannelContent({
+    message: finalMessage,
+    mediaUrl: rawMedia,
+    kind: 'facebook-bridge',
+    platforms: ['facebook']
+  });
+  const facebookResult = (result.results || []).find(row => row.platform === 'facebook');
+  if (!facebookResult?.success) {
+    throw new Error(facebookResult?.error || facebookResult?.reason || 'Facebook bridge did not publish');
+  }
+  return {
+    success: true,
+    relayId: relay?.id || '',
+    message: finalMessage,
+    mediaUrl: rawMedia,
+    result: facebookResult
+  };
 }
 
 async function postChannelWebhook(url = '', payload = {}, headers = {}) {
@@ -15717,6 +15745,10 @@ app.get('/wa-channel-qr', (req, res) => {
         <label><input class="bridgePlatform" type="checkbox" value="linkedin"> LinkedIn</label>
       </div>
       <input id="telegramChannelChatId" class="input" placeholder="Telegram channel/chat ID e.g. @yourchannel" style="width:100%">
+      <div class="toolbar">
+        <button class="btn secondary" onclick="shareLatestToFacebook()">Share latest relay to Facebook</button>
+        <span id="facebookBridgeStatus" class="muted">Facebook status loading...</span>
+      </div>
     </div>
     <div class="row">
       <strong>Source Link Watchlist</strong>
@@ -15847,6 +15879,8 @@ async function loadAddons(){
     document.getElementById('makeWebhookUrl').value=data.makeWebhookUrl||'';
     const set=new Set(data.bridgePlatforms||[]);
     document.querySelectorAll('.bridgePlatform').forEach(el=>{el.checked=set.has(el.value);});
+    const fbStatus=document.getElementById('facebookBridgeStatus');
+    if(fbStatus) fbStatus.textContent=data.facebookReady?'Facebook ready':'Facebook token/page not connected';
   }catch(e){setLog('Add-ons load failed: '+e.message);}
 }
 async function channelControl(action){
@@ -16059,6 +16093,16 @@ async function saveAddons(){
   const data=await jsonFetch('/api/wa/channels/addons',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
   setLog('Add-ons saved. Branding: '+data.settings.brandingEnabled+' | Bridge: '+data.settings.bridgeEnabled+' | Platforms: '+(data.settings.bridgePlatforms||[]).join(', '));
   await channelControl('mode');
+}
+async function shareLatestToFacebook(){
+  try{
+    setLog('Sharing latest channel relay to Facebook...');
+    const data=await jsonFetch('/api/wa/channels/share-facebook',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({})});
+    setLog('Facebook shared successfully. Relay: '+(data.relayId||'manual')+' | Post: '+(data.result?.response?.id||data.result?.externalId||'sent'));
+    await loadActivity();
+  }catch(e){
+    setLog('Facebook share failed: '+e.message+'\\nMeta Page connect/token check karein, aur image/video ke liye public URL required hota hai.');
+  }
 }
 async function saveSourceLinks(){
   const data=await jsonFetch('/api/wa/channels/source-links',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({links:document.getElementById('sourceLinks').value})});
@@ -16366,6 +16410,7 @@ app.get('/api/wa/channels/addons', (_req, res) => {
       telegramChannelChatId: settings.telegram_channel_chat_id || settings.telegram_chat_id || '',
       telegramReady: !!(settings.telegram_token && (settings.telegram_channel_chat_id || settings.telegram_chat_id)),
       instagramReady: !!(settings.instagram_access_token && settings.instagram_ig_user_id),
+      facebookReady: !!((settings.fb_page_access_token || settings.facebook_page_access_token || process.env.FB_PAGE_ACCESS_TOKEN) && (settings.facebook_page_id || process.env.FACEBOOK_PAGE_ID)),
       sourceLinks: settings.whatsapp_channel_source_links || [],
       autoSourceAllFollowed: settings.whatsapp_channel_auto_source_all_followed === true,
       sourceCooldownSeconds: settings.whatsapp_channel_source_cooldown_seconds || 90,
@@ -16551,6 +16596,38 @@ app.post('/api/wa/channels/addons', (req, res) => {
       }
     });
   } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/wa/channels/share-facebook', async (req, res) => {
+  try {
+    if (req.body?.dryRun === true) {
+      const relayId = req.body?.relayId || req.body?.id || '';
+      const relay = relayId
+        ? (Array.isArray(channelRelayInbox) ? channelRelayInbox : []).find(row => String(row.id) === String(relayId))
+        : (Array.isArray(channelRelayInbox) ? channelRelayInbox : []).find(row => ['pending', 'draft', 'manual_required', 'failed', 'published'].includes(String(row.status || '').toLowerCase()));
+      const message = applyChannelBrandingToText(String(req.body?.message || req.body?.text || relay?.message || relay?.preview || relay?.title || 'WhatsApp Channel update').trim());
+      const mediaUrl = String(req.body?.mediaUrl || req.body?.imageUrl || req.body?.videoUrl || relay?.mediaUrl || relay?.mediaPath || '').trim();
+      return res.json({
+        success: true,
+        dryRun: true,
+        facebookReady: !!((settings.fb_page_access_token || settings.facebook_page_access_token || process.env.FB_PAGE_ACCESS_TOKEN) && (settings.facebook_page_id || process.env.FACEBOOK_PAGE_ID)),
+        relayId: relay?.id || '',
+        message,
+        mediaUrl,
+        publicMediaUrl: channelMediaPublicUrl(mediaUrl)
+      });
+    }
+    const result = await shareWhatsAppChannelContentToFacebook({
+      relayId: req.body?.relayId || req.body?.id || '',
+      message: req.body?.message || req.body?.text || '',
+      mediaUrl: req.body?.mediaUrl || req.body?.imageUrl || req.body?.videoUrl || ''
+    });
+    res.json(result);
+  } catch (error) {
+    logs.push({ id: uuid(), type: 'whatsapp_channel_facebook_bridge', status: 'failed', error: error.message, time: new Date().toISOString() });
+    saveJSON('logs.json', logs);
     res.status(400).json({ success: false, error: error.message });
   }
 });
@@ -26041,6 +26118,8 @@ Use:
 *!channelnow stock*
 *!channelnow seller-rates*
 *!channelnow best-deals*
+*!channelfb*
+*!channelfb Your Facebook post*
 *!channelpost Your text*`);
       return true;
     }
@@ -26430,6 +26509,36 @@ ${status.schedule.map(slot => `${slot.time} — ${slot.kind}`).join('\n')}`);
       await reply(`📣 *Channel sent now*
 Sent: *${result.results?.[0]?.result?.sent ?? result.sent ?? 0}*
 Failed: *${result.results?.[0]?.result?.failed ?? result.failed ?? 0}*`);
+      return true;
+    }
+
+    if (command === '!channelfb' || command === '!channel2fb') {
+      const mode = String(args[1] || '').trim().toLowerCase();
+      const custom = ['preview', 'dryrun', 'test'].includes(mode)
+        ? args.slice(2).join(' ').trim()
+        : args.slice(1).join(' ').trim();
+      if (['preview', 'dryrun', 'test'].includes(mode)) {
+        const relay = (Array.isArray(channelRelayInbox) ? channelRelayInbox : []).find(row => ['pending', 'draft', 'manual_required', 'failed', 'published'].includes(String(row.status || '').toLowerCase()));
+        const message = applyChannelBrandingToText(custom || relay?.message || relay?.preview || relay?.title || 'WhatsApp Channel update');
+        await reply(`🔎 *Facebook Preview*
+Ready: *${((settings.fb_page_access_token || settings.facebook_page_access_token || process.env.FB_PAGE_ACCESS_TOKEN) && (settings.facebook_page_id || process.env.FACEBOOK_PAGE_ID)) ? 'YES' : 'NO'}*
+Relay: *${relay?.id || 'custom'}*
+
+${message.slice(0, 1200)}
+
+Publish:
+*!channelfb ${custom ? custom.slice(0, 80) : ''}*`);
+        return true;
+      }
+      const result = await shareWhatsAppChannelContentToFacebook({
+        message: custom,
+        mediaUrl: '',
+        relayId: ''
+      });
+      await reply(`✅ *Channel → Facebook shared*
+Relay: *${result.relayId || 'custom'}*
+Facebook: *sent*
+Post ID: *${result.result?.response?.id || result.result?.externalId || 'created'}*`);
       return true;
     }
 
