@@ -5315,6 +5315,133 @@ function cleanOutgoingText(text = '') {
   return decodePossibleMojibake(value);
 }
 
+const UNICODE_REPAIR_DATA_FILES = [
+  'plans.json',
+  'laptop_products.json',
+  'templates.json',
+  'carousel_templates.json',
+  'group_message_templates.json',
+  'whatsapp_catalogs.json',
+  'whatsapp_channel_templates.json',
+  'whatsapp_channel_posts.json',
+  'whatsapp_channel_discoveries.json',
+  'channel_relay_inbox.json',
+  'channel_content_library.json',
+  'scheduled_messages.json',
+  'scholarship_website_posts.json',
+  'social_auto_posts.json',
+  'social_posts.json',
+  'video_auto_posts.json'
+];
+
+function textHasLikelyMojibake(text = '') {
+  return /(?:ðŸ|â€|âœ|â|âš|â¬|â­|âŒ|â”|Ã¢|Ã©|Ã±|ï¸|âƒ£|�)/.test(String(text || ''));
+}
+
+function repairUnicodeString(value = '') {
+  let next = cleanOutgoingText(value);
+  const replacements = [
+    [/Ã¢â‚¬â€œ/g, '—'],
+    [/Ã¢â‚¬â€/g, '—'],
+    [/Ã¢â‚¬Ëœ/g, '‘'],
+    [/Ã¢â‚¬â„¢/g, '’'],
+    [/Ã¢â‚¬Å“/g, '“'],
+    [/Ã¢â‚¬Â/g, '”'],
+    [/Ã¢â‚¬Â¢/g, '•'],
+    [/Ã¢Å“â€¦/g, '✅'],
+    [/Ã¢ÂÅ’/g, '❌'],
+    [/Ã°Å¸/g, ''],
+    [/Â([ -~])/g, '$1']
+  ];
+  for (const [bad, good] of replacements) next = next.replace(bad, good);
+  return next;
+}
+
+function repairUnicodeInValue(value, pathParts = [], samples = []) {
+  if (typeof value === 'string') {
+    const repaired = repairUnicodeString(value);
+    if (repaired !== value && (textHasLikelyMojibake(value) || value.includes('Â'))) {
+      if (samples.length < 20) {
+        samples.push({
+          path: pathParts.join('.') || '$',
+          before: value.slice(0, 160),
+          after: repaired.slice(0, 160)
+        });
+      }
+      return { value: repaired, changed: 1 };
+    }
+    return { value, changed: 0 };
+  }
+  if (Array.isArray(value)) {
+    let changed = 0;
+    const arr = value.map((item, index) => {
+      const result = repairUnicodeInValue(item, [...pathParts, String(index)], samples);
+      changed += result.changed;
+      return result.value;
+    });
+    return { value: arr, changed };
+  }
+  if (value && typeof value === 'object') {
+    let changed = 0;
+    const obj = {};
+    for (const [key, item] of Object.entries(value)) {
+      const result = repairUnicodeInValue(item, [...pathParts, key], samples);
+      changed += result.changed;
+      obj[key] = result.value;
+    }
+    return { value: obj, changed };
+  }
+  return { value, changed: 0 };
+}
+
+function runUnicodeRepair({ write = false, files = UNICODE_REPAIR_DATA_FILES } = {}) {
+  const requested = Array.isArray(files) && files.length ? files : UNICODE_REPAIR_DATA_FILES;
+  const safeFiles = requested
+    .map(name => path.basename(String(name || '').trim()))
+    .filter(name => UNICODE_REPAIR_DATA_FILES.includes(name));
+  const backupDir = path.join(dataDir, 'backups', 'unicode-repair', new Date().toISOString().replace(/[:.]/g, '-'));
+  const results = [];
+  let totalChanges = 0;
+  for (const fileName of safeFiles) {
+    const filePath = path.join(dataDir, fileName);
+    if (!fs.existsSync(filePath)) {
+      results.push({ file: fileName, exists: false, changed: 0, samples: [] });
+      continue;
+    }
+    try {
+      const raw = fs.readFileSync(filePath, 'utf8');
+      const parsed = JSON.parse(raw || 'null');
+      const samples = [];
+      const repaired = repairUnicodeInValue(parsed, [fileName], samples);
+      totalChanges += repaired.changed;
+      if (write && repaired.changed > 0) {
+        fs.mkdirSync(backupDir, { recursive: true });
+        fs.copyFileSync(filePath, path.join(backupDir, fileName));
+        fs.writeFileSync(filePath, JSON.stringify(repaired.value, null, 2));
+      }
+      results.push({
+        file: fileName,
+        exists: true,
+        changed: repaired.changed,
+        samples
+      });
+    } catch (error) {
+      results.push({ file: fileName, exists: true, changed: 0, error: error.message, samples: [] });
+    }
+  }
+  const response = {
+    success: true,
+    mode: write ? 'write' : 'preview',
+    files: results.length,
+    totalChanges,
+    backupDir: write && totalChanges ? backupDir : '',
+    results
+  };
+  logs.push({ id: uuid(), type: 'unicode_repair', status: write ? 'applied' : 'preview', totalChanges, time: new Date().toISOString() });
+  saveJSON('logs.json', logs);
+  return response;
+}
+
 async function sendDirect(number, text, options = {}) {
   const { accountId, inst } = resolveOutboundWAInstance(options || {});
   if (!number) throw new Error('number is required');
@@ -16762,6 +16889,24 @@ app.post('/api/wa/channels/boost', async (req, res) => {
   }
 });
 
+app.get('/api/text/unicode-repair/preview', (_req, res) => {
+  try {
+    res.json(runUnicodeRepair({ write: false }));
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/text/unicode-repair/run', (req, res) => {
+  try {
+    const files = req.body?.files || req.body?.file || [];
+    const result = runUnicodeRepair({ write: true, files: Array.isArray(files) ? files : String(files || '').split(/[,\n|]+/) });
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 app.post('/api/wa/channels/source-links', (req, res) => {
   try {
     const links = addWhatsAppChannelSourceLinks(req.body?.links || req.body?.url || req.body?.sourceLinks || '');
@@ -25579,6 +25724,8 @@ Server:
 *!backup create* â€” fresh data backup
 *!backup list* â€” recent backups
 *!backup stats* â€” backup storage
+*!repairtext* â€” preview broken emoji/text repair
+*!repairtext run* â€” apply repair with backup
 
 Web Bridge:
 *!webfetch URL* â€” website se data fetch
@@ -26127,6 +26274,27 @@ async function handleWhatsAppSocialAdminCommand(ctx = {}) {
       await reply(backup
         ? `💾 *Latest Backup*\n\n${backup.full}\nSize: *${backup.sizeMb} MB*\nUpdated: ${backup.mtime.toLocaleString('en-PK', { timeZone: 'Asia/Karachi' })}\n\nCommands: *!backup create*, *!backup list*, *!backup stats*`
         : '💾 Backup zip abhi nahi mila. *!backup create* bhej kar data backup bana lein.');
+      return true;
+    }
+
+    if (command === '!repairtext') {
+      const mode = String(args[1] || 'preview').toLowerCase();
+      const shouldWrite = ['run', 'fix', 'apply', 'write'].includes(mode);
+      const result = runUnicodeRepair({ write: shouldWrite });
+      const changedFiles = (result.results || []).filter(row => row.changed > 0);
+      const sampleLines = changedFiles
+        .flatMap(row => (row.samples || []).slice(0, 2).map(sample => `• *${row.file}* ${sample.path}\n  Before: ${sample.before}\n  After: ${sample.after}`))
+        .slice(0, 8)
+        .join('\n');
+      await reply(`🧼 *Unicode Repair ${shouldWrite ? 'Applied' : 'Preview'}*
+
+Files scanned: *${result.files}*
+Text fixes found: *${result.totalChanges}*
+Changed files: *${changedFiles.length}*
+${result.backupDir ? `Backup: ${result.backupDir}\n` : ''}
+${sampleLines || 'No broken emoji/text found in safe content files.'}
+
+${shouldWrite ? 'Done. Server replies/dashboard data should look cleaner now.' : 'Apply repair: *!repairtext run*'}`);
       return true;
     }
 
