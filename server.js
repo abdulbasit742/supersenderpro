@@ -6939,6 +6939,172 @@ async function runChannelBoostEngine({ dryRun = true, facebook = true, whatsapp 
   return { success: true, dryRun: false, relay: candidate ? channelRelayPublic(candidate) : null, score, results };
 }
 
+function channelBridgeConfiguredPlatforms() {
+  const source = Array.isArray(settings.whatsapp_channel_bridge_platforms)
+    ? settings.whatsapp_channel_bridge_platforms
+    : String(settings.whatsapp_channel_bridge_platforms || '').split(/[,\n|]+/);
+  const platforms = source.map(item => normalizeSocialPlatform(String(item || '').trim().toLowerCase())).filter(Boolean);
+  return Array.from(new Set(platforms.length ? platforms : ['telegram', 'instagram', 'facebook']));
+}
+
+function getChannelBridgePlatformReadiness(platform = '') {
+  const key = normalizeSocialPlatform(platform);
+  if (key === 'telegram') {
+    const token = String(settings.telegram_token || process.env.TELEGRAM_TOKEN || '').trim();
+    const chatId = String(settings.telegram_channel_chat_id || process.env.TELEGRAM_CHANNEL_CHAT_ID || settings.telegram_chat_id || process.env.TELEGRAM_CHAT_ID || '').trim();
+    return { ready: !!(token && chatId), missing: [!token && 'Telegram token', !chatId && 'Telegram channel/chat ID'].filter(Boolean) };
+  }
+  if (key === 'facebook') {
+    const token = String(settings.fb_page_access_token || settings.facebook_page_access_token || process.env.FB_PAGE_ACCESS_TOKEN || '').trim();
+    const pageId = String(settings.facebook_page_id || process.env.FACEBOOK_PAGE_ID || '').trim();
+    return { ready: !!(token && pageId), missing: [!token && 'Facebook page token', !pageId && 'Facebook page ID'].filter(Boolean) };
+  }
+  if (key === 'instagram') {
+    const token = String(settings.instagram_access_token || process.env.INSTAGRAM_ACCESS_TOKEN || settings.fb_page_access_token || process.env.FB_PAGE_ACCESS_TOKEN || '').trim();
+    const igId = String(settings.instagram_ig_user_id || settings.instagram_business_account_id || process.env.INSTAGRAM_IG_USER_ID || '').trim();
+    return { ready: !!(token && igId), missing: [!token && 'Instagram token', !igId && 'Instagram business account ID'].filter(Boolean) };
+  }
+  if (key === 'linkedin') {
+    const token = String(settings.linkedin_access_token || process.env.LINKEDIN_ACCESS_TOKEN || '').trim();
+    const owner = String(settings.linkedin_owner_urn || process.env.LINKEDIN_OWNER_URN || '').trim();
+    return { ready: !!(token && owner), missing: [!token && 'LinkedIn token', !owner && 'LinkedIn owner/profile/org URN'].filter(Boolean) };
+  }
+  if (key === 'tiktok') {
+    const token = String(settings.tiktok_access_token || process.env.TIKTOK_ACCESS_TOKEN || '').trim();
+    return { ready: !!token, missing: [!token && 'TikTok token'].filter(Boolean) };
+  }
+  if (key === 'whatsapp') {
+    return { ready: getConfiguredWhatsAppChannels().length > 0, missing: getConfiguredWhatsAppChannels().length ? [] : ['WhatsApp target channels'] };
+  }
+  return { ready: false, missing: ['Unsupported platform'] };
+}
+
+function pushBridgeAttempt(stats, platform = '', attempt = {}) {
+  const key = normalizeSocialPlatform(platform) || String(platform || 'unknown').toLowerCase() || 'unknown';
+  if (!stats[key]) {
+    stats[key] = { platform: key, ready: false, missing: [], total: 0, success: 0, failed: 0, skipped: 0, lastSuccessAt: '', lastFailureAt: '', lastError: '' };
+  }
+  const row = stats[key];
+  row.total += 1;
+  const time = attempt.time || '';
+  if (attempt.skipped) {
+    row.skipped += 1;
+    row.lastError = attempt.reason || row.lastError;
+    row.lastFailureAt = time || row.lastFailureAt;
+    return;
+  }
+  if (attempt.success) {
+    row.success += 1;
+    row.lastSuccessAt = time || row.lastSuccessAt;
+    return;
+  }
+  row.failed += 1;
+  row.lastFailureAt = time || row.lastFailureAt;
+  row.lastError = attempt.error || attempt.reason || row.lastError;
+}
+
+function buildChannelBridgeHealthReport({ limit = 80 } = {}) {
+  const configuredPlatforms = channelBridgeConfiguredPlatforms();
+  const stats = {};
+  for (const platform of configuredPlatforms) {
+    const readiness = getChannelBridgePlatformReadiness(platform);
+    stats[platform] = {
+      platform,
+      ready: readiness.ready,
+      missing: readiness.missing,
+      total: 0,
+      success: 0,
+      failed: 0,
+      skipped: 0,
+      lastSuccessAt: '',
+      lastFailureAt: '',
+      lastError: ''
+    };
+  }
+  const bridgeLogTypes = new Set(['whatsapp_channel_bridge', 'whatsapp_channel_facebook_bridge', 'whatsapp_channel_boost', 'telegram_bridge_post']);
+  const recent = (Array.isArray(logs) ? logs : [])
+    .filter(row => bridgeLogTypes.has(String(row.type || '')))
+    .slice(-Math.max(1, Number(limit || 80)))
+    .reverse();
+
+  for (const row of recent) {
+    const time = row.time || row.createdAt || '';
+    if (row.type === 'telegram_bridge_post') {
+      pushBridgeAttempt(stats, 'telegram', { success: String(row.status || '').toLowerCase() === 'sent', error: row.error || '', time });
+      continue;
+    }
+    if (row.type === 'whatsapp_channel_facebook_bridge') {
+      pushBridgeAttempt(stats, 'facebook', { success: String(row.status || '').toLowerCase() === 'sent', error: row.error || '', time });
+      continue;
+    }
+    if (row.type === 'whatsapp_channel_boost') {
+      if (row.results?.facebook) pushBridgeAttempt(stats, 'facebook', { success: row.results.facebook?.success !== false, error: row.results.facebook?.error || '', time });
+      if (row.results?.whatsapp) pushBridgeAttempt(stats, 'whatsapp', { success: row.results.whatsapp?.success !== false, error: row.results.whatsapp?.error || '', time });
+      continue;
+    }
+    const resultRows = Array.isArray(row.results) ? row.results : [];
+    for (const result of resultRows) {
+      pushBridgeAttempt(stats, result.platform, {
+        success: result.success === true,
+        skipped: result.skipped === true,
+        error: result.error || '',
+        reason: result.reason || '',
+        time
+      });
+    }
+  }
+
+  for (const platform of Object.keys(stats)) {
+    const readiness = getChannelBridgePlatformReadiness(platform);
+    stats[platform].ready = readiness.ready;
+    stats[platform].missing = readiness.missing;
+  }
+  const platformRows = Object.values(stats).sort((a, b) => configuredPlatforms.indexOf(a.platform) - configuredPlatforms.indexOf(b.platform));
+  const recommendations = [];
+  if (settings.whatsapp_channel_bridge_enabled !== true) recommendations.push('Bridge OFF hai. Dashboard se Bridge ON karein ya !channelcopy auto on use karein.');
+  for (const row of platformRows) {
+    if (!row.ready) recommendations.push(`${row.platform}: ${row.missing.join(', ')} set karein.`);
+    if (row.failed > 0 && row.lastError) recommendations.push(`${row.platform}: last error check karein - ${row.lastError}`);
+    if (row.platform === 'instagram' && row.skipped > 0) recommendations.push('Instagram posts ke liye public image/video URL lazmi hota hai.');
+  }
+  return {
+    success: true,
+    generatedAt: new Date().toISOString(),
+    bridgeEnabled: settings.whatsapp_channel_bridge_enabled === true,
+    configuredPlatforms,
+    whatsappTargets: getConfiguredWhatsAppChannels().length,
+    relayQueue: (Array.isArray(channelRelayInbox) ? channelRelayInbox : []).filter(row => ['pending', 'draft', 'manual_required', 'failed'].includes(String(row.status || '').toLowerCase())).length,
+    lastBridgeLogs: recent.slice(0, 10).map(row => ({ id: row.id, type: row.type, status: row.status, time: row.time, error: row.error || '', results: row.results || null })),
+    platforms: platformRows,
+    recommendations: recommendations.slice(0, 8)
+  };
+}
+
+function formatChannelBridgeHealthReply(report = buildChannelBridgeHealthReport()) {
+  const platformLines = (report.platforms || []).map(row => {
+    const status = row.ready ? 'READY' : 'SETUP NEEDED';
+    const last = row.lastSuccessAt || row.lastFailureAt || 'none';
+    const err = row.lastError ? `\n   Last error: ${row.lastError.slice(0, 120)}` : '';
+    return `• *${row.platform}* — ${status}\n   Sent: ${row.success}/${row.total} | Failed: ${row.failed} | Skipped: ${row.skipped}\n   Last: ${last}${err}`;
+  }).join('\n\n');
+  const tips = (report.recommendations || []).length
+    ? '\n\n*Next fixes:*\n' + report.recommendations.map(item => `- ${item}`).join('\n')
+    : '\n\n✅ Bridge healthy lag raha hai.';
+  return `📡 *Channel Bridge Health*
+
+Bridge: *${report.bridgeEnabled ? 'ON' : 'OFF'}*
+Platforms: *${(report.configuredPlatforms || []).join(', ') || 'none'}*
+WhatsApp targets: *${report.whatsappTargets || 0}*
+Relay queue: *${report.relayQueue || 0}*
+
+${platformLines || 'No platform activity yet.'}${tips}
+
+Commands:
+*!channelboost* - best post preview
+*!channelboost now* - Facebook par post
+*!channelfb preview* - Facebook preview`;
+}
+
 async function postChannelWebhook(url = '', payload = {}, headers = {}) {
   const target = String(url || '').trim();
   if (!target) return { skipped: true, reason: 'webhook missing' };
@@ -15970,6 +16136,7 @@ app.get('/wa-channel-qr', (req, res) => {
         <button class="btn secondary" onclick="shareLatestToFacebook()">Share latest relay to Facebook</button>
         <button class="btn secondary" onclick="boostBestRelayPreview()">Preview boost candidate</button>
         <button class="btn secondary" onclick="boostBestRelayNow()">Boost to Facebook now</button>
+        <button class="btn secondary" onclick="checkBridgeReport()">Bridge Health</button>
         <span id="facebookBridgeStatus" class="muted">Facebook status loading...</span>
       </div>
     </div>
@@ -16342,6 +16509,13 @@ async function boostBestRelayNow(){
     setLog('Boost done\\nScore: '+data.score+'\\nRelay: '+(data.relay?.id||'custom')+'\\nFacebook: '+(data.results?.facebook?.result?.response?.id||data.results?.facebook?.result?.externalId||'sent'));
     await loadActivity();
   }catch(e){setLog('Boost failed: '+e.message);}
+}
+async function checkBridgeReport(){
+  try{
+    const data=await jsonFetch('/api/wa/channels/bridge-health');
+    const rows=(data.platforms||[]).map(p=>p.platform+': '+(p.ready?'READY':'SETUP NEEDED')+' | sent '+p.success+'/'+p.total+' | failed '+p.failed+(p.lastError?' | '+p.lastError:'')).join('\\n');
+    setLog('Bridge Health\\nBridge: '+(data.bridgeEnabled?'ON':'OFF')+'\\nPlatforms: '+(data.configuredPlatforms||[]).join(', ')+'\\nWhatsApp targets: '+data.whatsappTargets+'\\nRelay queue: '+data.relayQueue+'\\n\\n'+rows+'\\n\\nNext fixes:\\n'+((data.recommendations||[]).join('\\n')||'All good.'));
+  }catch(e){setLog('Bridge health failed: '+e.message);}
 }
 async function saveSourceLinks(){
   const data=await jsonFetch('/api/wa/channels/source-links',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({links:document.getElementById('sourceLinks').value})});
@@ -16886,6 +17060,14 @@ app.post('/api/wa/channels/boost', async (req, res) => {
     logs.push({ id: uuid(), type: 'whatsapp_channel_boost', status: 'failed', error: error.message, time: new Date().toISOString() });
     saveJSON('logs.json', logs);
     res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/wa/channels/bridge-health', (_req, res) => {
+  try {
+    res.json(buildChannelBridgeHealthReport({ limit: 120 }));
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
@@ -24752,7 +24934,7 @@ function splitSocialCommandArgs(text = '') {
 }
 
 function isWhatsAppSocialCommand(text = '') {
-  return /^!(social|connect|post|draft|approvepost|sharepost|poststatus|comment|control|admin|menuadmin|server|status|health|watchdog|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
+  return /^!(social|connect|post|draft|approvepost|sharepost|poststatus|comment|control|admin|menuadmin|server|status|health|watchdog|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
 }
 
 function adminNumberCandidates() {
@@ -25769,6 +25951,7 @@ WhatsApp Channel:
 *!channelnow seller-rates* â€” seller group rates update
 *!channelnow best-deals* â€” best collected deals update
 *!channelnow giveaway* â€” giveaway update
+*!bridgereport* â€” social bridge health + last errors
 *!sharechannel products* â€” share product update
 *!sharechannel rates* â€” share AI rates
 *!sharechannel message Your text* â€” custom channel post
@@ -26420,6 +26603,7 @@ Use:
 *!channelfb Your Facebook post*
 *!channelboost*
 *!channelboost now*
+*!bridgereport*
 *!channelpost Your text*`);
       return true;
     }
@@ -26874,6 +27058,11 @@ Score: *${result.score}*
 Relay: *${result.relay?.id || 'custom'}*
 Facebook: *${result.results?.facebook ? 'sent' : 'skipped'}*
 WhatsApp: *${result.results?.whatsapp ? `${result.results.whatsapp.result?.sent || 0} sent` : 'skipped'}*`);
+      return true;
+    }
+
+    if (command === '!bridgereport' || command === '!bridgehealth') {
+      await reply(formatChannelBridgeHealthReply(buildChannelBridgeHealthReport({ limit: 120 })));
       return true;
     }
 
