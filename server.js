@@ -8629,6 +8629,87 @@ Quick commands:
 *!bridgereport*`;
 }
 
+async function runWhatsAppChannelAutoFix({ preset = 'fast', runCopy = true, share = false, limit = null } = {}) {
+  const startedAt = new Date().toISOString();
+  const before = buildWhatsAppChannelCommandCenter();
+  const applied = applyWhatsAppChannelAutomationPreset(preset || 'fast');
+  const doctor = runChannelSourceDoctor({ autoPause: true });
+  const cleaner = runChannelQueueCleaner({ force: true });
+  const copyLimit = Math.max(1, Math.min(25, Number(limit || settings.whatsapp_channel_copy_poll_limit || 10)));
+  let copySweep = null;
+  if (runCopy !== false) {
+    copySweep = await runWhatsAppChannelMaxAutomation({
+      limit: copyLimit,
+      discover: true,
+      copySweep: true,
+      share: share === true
+    });
+  }
+  const after = buildWhatsAppChannelCommandCenter({ preset: applied.preset || preset || 'fast' });
+  const result = {
+    success: true,
+    startedAt,
+    finishedAt: new Date().toISOString(),
+    preset: applied.preset || preset || 'fast',
+    before: {
+      status: before.status,
+      readyScore: before.readyScore,
+      blockers: before.blockers || []
+    },
+    after: {
+      status: after.status,
+      readyScore: after.readyScore,
+      blockers: after.blockers || [],
+      nextActions: after.nextActions || []
+    },
+    doctor: doctor.summary || {},
+    cleaner: cleaner.stats || {},
+    copySweep: copySweep ? {
+      scanned: copySweep.copySweep?.scanned || 0,
+      drafted: copySweep.copySweep?.drafted || 0,
+      published: copySweep.copySweep?.published || 0,
+      manualPacketsAfter: copySweep.manualPacketsAfter || 0,
+      errors: (copySweep.errors || []).length
+    } : null,
+    commandCenter: after
+  };
+  logs.push({ id: uuid(), type: 'whatsapp_channel_autofix', status: 'done', result, time: result.finishedAt });
+  saveJSON('logs.json', logs);
+  return result;
+}
+
+function formatWhatsAppChannelAutoFixReply(result = {}) {
+  const doctor = result.doctor || {};
+  const cleaner = result.cleaner || {};
+  const sweep = result.copySweep || {};
+  const next = result.after?.nextActions?.length
+    ? result.after.nextActions.slice(0, 5).map(item => `- ${item}`).join('\n')
+    : '- System ready. Keep automation running.';
+  return `🛠️ *Channel Auto-Fix Complete*
+
+Preset: *${result.preset || 'fast'}*
+Ready score: *${result.before?.readyScore || 0}/100 → ${result.after?.readyScore || 0}/100*
+Status: *${result.after?.status || 'unknown'}*
+
+Source Doctor:
+Active: *${doctor.active || 0}* | Silent: *${doctor.silent || 0}* | Dead: *${doctor.dead || 0}*
+Auto-paused: *${doctor.autoPaused || 0}*
+
+Queue Cleaner:
+Rejected: *${cleaner.totalRejected || 0}*
+Open after: *${cleaner.openAfter || 0}*
+
+Copy Sweep:
+Scanned: *${sweep.scanned || 0}*
+Drafted: *${sweep.drafted || 0}*
+Published: *${sweep.published || 0}*
+Manual packets: *${sweep.manualPacketsAfter || 0}*
+Errors: *${sweep.errors || 0}*
+
+Next:
+${next}`;
+}
+
 function markWhatsAppChannelManualPacketDone(packetId = '', note = '') {
   const id = String(packetId || '').trim();
   if (!id) throw new Error('packetId is required');
@@ -16168,6 +16249,7 @@ app.get('/wa-channel-qr', (req, res) => {
     <button class="btn" onclick="applyChannelPreset('fast')">Fast Mode</button>
     <button class="btn warn" onclick="applyChannelPreset('max')">Max Automation</button>
     <button class="btn secondary" onclick="loadCommandCenter()">Refresh Summary</button>
+    <button class="btn warn" onclick="runAutoFix()">Auto-Fix + Sweep</button>
     <button class="btn" onclick="runChannelAutomation()">Run Copy Now</button>
   </div>
   <div id="commandCards" class="list"></div>
@@ -16442,6 +16524,19 @@ async function applyChannelPreset(preset){
     await loadAddons();
     await loadChannels();
   }catch(e){setLog('Preset failed: '+e.message);}
+}
+async function runAutoFix(){
+  try{
+    const preset=(document.getElementById('pollSeconds').value && Number(document.getElementById('pollSeconds').value)<=25)?'max':'fast';
+    setLog('Auto-Fix running... preset '+preset+' | dead sources auto-pause | queue clean | copy sweep');
+    const data=await jsonFetch('/api/wa/channels/autofix',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({preset,runCopy:true,share:false,limit:Number(document.getElementById('pollLimit').value||10)})});
+    renderCommandCenter(data.commandCenter||{});
+    const d=data.doctor||{}, c=data.cleaner||{}, s=data.copySweep||{};
+    setLog('Auto-Fix complete\\nReady score: '+(data.before?.readyScore||0)+' → '+(data.after?.readyScore||0)+'\\nSource doctor: active '+(d.active||0)+', silent '+(d.silent||0)+', dead '+(d.dead||0)+', auto-paused '+(d.autoPaused||0)+'\\nQueue cleaner: rejected '+(c.totalRejected||0)+', open after '+(c.openAfter||0)+'\\nCopy sweep: scanned '+(s.scanned||0)+', drafted '+(s.drafted||0)+', published '+(s.published||0)+', errors '+(s.errors||0)+'\\n\\nNext:\\n'+((data.after?.nextActions||[]).join('\\n')||'System ready.'));
+    await loadChannels();
+    await loadSourceIntelligence();
+    await loadActivity();
+  }catch(e){setLog('Auto-Fix failed: '+e.message);}
 }
 function renderChannels(data){
   const targetSet = new Set((data.copy?.targets||[]).map(x=>x.channelId||x));
@@ -16948,6 +17043,22 @@ app.post('/api/wa/channels/preset', (req, res) => {
     const preset = String(req.body?.preset || req.body?.mode || 'fast').toLowerCase();
     res.json(applyWhatsAppChannelAutomationPreset(preset));
   } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/wa/channels/autofix', async (req, res) => {
+  try {
+    const result = await runWhatsAppChannelAutoFix({
+      preset: req.body?.preset || 'fast',
+      runCopy: req.body?.runCopy !== false,
+      share: req.body?.share === true,
+      limit: req.body?.limit
+    });
+    res.json(result);
+  } catch (error) {
+    logs.push({ id: uuid(), type: 'whatsapp_channel_autofix', status: 'failed', error: error.message, time: new Date().toISOString() });
+    saveJSON('logs.json', logs);
     res.status(400).json({ success: false, error: error.message });
   }
 });
@@ -25186,7 +25297,7 @@ function splitSocialCommandArgs(text = '') {
 }
 
 function isWhatsAppSocialCommand(text = '') {
-  return /^!(social|connect|post|draft|approvepost|sharepost|poststatus|comment|control|admin|menuadmin|server|status|health|watchdog|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
+  return /^!(social|connect|post|draft|approvepost|sharepost|poststatus|comment|control|admin|menuadmin|server|status|health|watchdog|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelfix|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
 }
 
 function adminNumberCandidates() {
@@ -26197,6 +26308,7 @@ WhatsApp Channel:
 *!channelcopy scan 5* â€” source channels recent posts draft
 *!channelcenter* â€” easy automation summary
 *!channelpreset safe/fast/max* â€” one-click automation preset
+*!channelfix* â€” auto-fix sources + queue + sweep
 *!channelrun* â€” scan/copy now
 *!channelset CHANNEL_ID* â€” save channel
 *!channelauto on* â€” daily auto updates on
@@ -26847,6 +26959,7 @@ ${schedule}
 Use:
 *!channelcenter*
 *!channelpreset fast*
+*!channelfix*
 *!channelrun*
 *!channelcatch*
 *!channeluse 1,2*
@@ -27249,6 +27362,20 @@ ${status.schedule.map(slot => `${slot.time} — ${slot.kind}`).join('\n')}`);
       const preset = String(args[1] || 'fast').toLowerCase();
       const result = applyWhatsAppChannelAutomationPreset(preset);
       await reply(`✅ *Channel preset applied: ${preset}*\n\n${formatWhatsAppChannelCommandCenterReply(result)}`);
+      return true;
+    }
+
+    if (command === '!channelfix') {
+      const preset = String(args[1] || 'fast').toLowerCase();
+      const share = ['share', 'publish', 'send'].includes(String(args[2] || '').toLowerCase());
+      await reply(`🛠️ Channel Auto-Fix start ho gaya...\nPreset: *${preset}*\nPublish mode: *${share ? 'ON' : 'OFF / draft only'}*`);
+      const result = await runWhatsAppChannelAutoFix({
+        preset,
+        runCopy: true,
+        share,
+        limit: settings.whatsapp_channel_copy_poll_limit || 10
+      });
+      await reply(formatWhatsAppChannelAutoFixReply(result));
       return true;
     }
 
