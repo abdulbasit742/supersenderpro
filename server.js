@@ -8469,6 +8469,166 @@ function whatsAppChannelAutomationHealth() {
   };
 }
 
+const CHANNEL_AUTOMATION_PRESETS = {
+  safe: {
+    label: 'Safe Mode',
+    description: 'Stable autoposting with slower pace, strong filters, and branding.',
+    pollSeconds: 90,
+    pollLimit: 5,
+    sourceCooldownSeconds: 180,
+    duplicateWindowHours: 72,
+    maxMediaMb: 18,
+    forwardingMode: 'priority',
+    bridgeEnabled: false
+  },
+  fast: {
+    label: 'Fast Mode',
+    description: 'Best daily setting: fast source scan, auto-publish, branding, duplicate guard.',
+    pollSeconds: 30,
+    pollLimit: 10,
+    sourceCooldownSeconds: 60,
+    duplicateWindowHours: 48,
+    maxMediaMb: 25,
+    forwardingMode: 'priority',
+    bridgeEnabled: true
+  },
+  max: {
+    label: 'Max Automation',
+    description: 'Aggressive monitoring for many source channels with queue protection.',
+    pollSeconds: 20,
+    pollLimit: 18,
+    sourceCooldownSeconds: 25,
+    duplicateWindowHours: 36,
+    maxMediaMb: 35,
+    forwardingMode: 'weighted',
+    bridgeEnabled: true
+  }
+};
+
+function applyWhatsAppChannelAutomationPreset(presetName = 'fast') {
+  const key = String(presetName || 'fast').toLowerCase();
+  const preset = CHANNEL_AUTOMATION_PRESETS[key];
+  if (!preset) throw new Error(`Unknown preset. Use: ${Object.keys(CHANNEL_AUTOMATION_PRESETS).join(', ')}`);
+  settings.whatsapp_channel_copy_enabled = true;
+  settings.whatsapp_channel_relay_auto_publish = true;
+  settings.whatsapp_channel_auto_share_enabled = true;
+  settings.whatsapp_channel_auto_share_new_plans = true;
+  settings.whatsapp_channel_auto_source_all_followed = true;
+  settings.whatsapp_channel_branding_enabled = true;
+  settings.whatsapp_channel_watermark_images = settings.whatsapp_channel_watermark_images !== false;
+  settings.whatsapp_channel_keyword_alert_enabled = true;
+  settings.whatsapp_channel_content_pipeline_enabled = true;
+  settings.whatsapp_channel_auto_download_media = true;
+  settings.whatsapp_channel_auto_compress_images = true;
+  settings.whatsapp_channel_auto_resize_images = true;
+  settings.whatsapp_channel_media_dedup_enabled = true;
+  settings.whatsapp_channel_queue_cleaner_enabled = true;
+  settings.whatsapp_channel_drip_enabled = true;
+  settings.whatsapp_channel_daily_digest_enabled = true;
+  settings.whatsapp_channel_bridge_enabled = preset.bridgeEnabled === true;
+  settings.whatsapp_channel_bridge_platforms = channelBridgeConfiguredPlatforms();
+  settings.whatsapp_channel_copy_poll_seconds = preset.pollSeconds;
+  settings.whatsapp_channel_copy_poll_limit = preset.pollLimit;
+  settings.whatsapp_channel_copy_retry_limit = preset.pollLimit;
+  settings.whatsapp_channel_source_cooldown_seconds = preset.sourceCooldownSeconds;
+  settings.whatsapp_channel_duplicate_window_hours = preset.duplicateWindowHours;
+  settings.whatsapp_channel_max_media_mb = preset.maxMediaMb;
+  settings.whatsapp_channel_forwarding_mode = preset.forwardingMode;
+  settings.whatsapp_channel_scrub_phone_numbers = true;
+  settings.whatsapp_channel_scrub_links = settings.whatsapp_channel_scrub_links === true;
+  settings.whatsapp_channel_nsfw_filter_enabled = true;
+  settings.whatsapp_channel_selected_preset = key;
+  settings.whatsapp_channel_last_preset_applied_at = new Date().toISOString();
+  saveJSON('settings.json', settings);
+  return buildWhatsAppChannelCommandCenter({ preset: key });
+}
+
+function buildWhatsAppChannelCommandCenter(extra = {}) {
+  const health = whatsAppChannelAutomationHealth();
+  const bridge = buildChannelBridgeHealthReport({ limit: 60 });
+  const sourceDoctor = runChannelSourceDoctor({ autoPause: false });
+  const automation = channelAutomationStatus();
+  const blockers = [];
+  if (!health.publisherReady) blockers.push('Channel publisher WhatsApp session not connected');
+  if (!health.defaultWhatsAppReady) blockers.push('Default WhatsApp session not connected');
+  if (!health.targets.length) blockers.push('Target channel missing');
+  if (!health.effectiveSourceCount) blockers.push('Source channel missing');
+  if (!health.copyEnabled) blockers.push('Copy pipeline OFF');
+  if (!health.autoPublish) blockers.push('Auto publish OFF');
+  if (health.activeManualPackets > 0) blockers.push(`${health.activeManualPackets} manual packets pending`);
+  const nextActions = [];
+  if (!health.publisherReady) nextActions.push('Open /wa-channel-qr and scan publisher QR');
+  if (!health.targets.length) nextActions.push('Select target channel and click Save Target Channels');
+  if (!health.effectiveSourceCount) nextActions.push('Scan followed channels, then Save Source Channels');
+  if (!health.copyEnabled || !health.autoPublish) nextActions.push('Click Fast Mode or run !channelpreset fast');
+  if (health.activeManualPackets > 0) nextActions.push('Run Queue Cleaner or publish pending relay manually');
+  if (bridge.recommendations?.length) nextActions.push(...bridge.recommendations.slice(0, 3));
+  if (!nextActions.length) nextActions.push('System healthy. Use Run Copy Now or keep automation running.');
+  return {
+    success: true,
+    preset: extra.preset || settings.whatsapp_channel_selected_preset || '',
+    generatedAt: new Date().toISOString(),
+    readyScore: Math.max(0, 100 - blockers.length * 14 - Math.min(24, health.lastErrors.length * 6)),
+    status: blockers.length ? 'needs_attention' : 'ready',
+    blockers,
+    nextActions: nextActions.slice(0, 8),
+    summary: {
+      publisherReady: health.publisherReady,
+      defaultWhatsAppReady: health.defaultWhatsAppReady,
+      targets: health.targets.length,
+      sources: health.effectiveSourceCount,
+      configuredSources: health.sources.length,
+      discoveredSources: health.discoveredSourceCount,
+      pendingRelay: health.pendingRelay,
+      manualPackets: health.activeManualPackets,
+      copyEnabled: health.copyEnabled,
+      autoPublish: health.autoPublish,
+      bridgeEnabled: bridge.bridgeEnabled,
+      bridgePlatforms: bridge.configuredPlatforms,
+      sourceDoctor: sourceDoctor.summary || {},
+      pollSeconds: settings.whatsapp_channel_copy_poll_seconds || 30,
+      pollLimit: settings.whatsapp_channel_copy_poll_limit || 8,
+      forwardingMode: settings.whatsapp_channel_forwarding_mode || 'priority'
+    },
+    health,
+    bridge,
+    presets: Object.entries(CHANNEL_AUTOMATION_PRESETS).map(([id, row]) => ({ id, ...row })),
+    automation
+  };
+}
+
+function formatWhatsAppChannelCommandCenterReply(report = buildWhatsAppChannelCommandCenter()) {
+  const s = report.summary || {};
+  const blockerText = report.blockers?.length ? report.blockers.map(item => `- ${item}`).join('\n') : 'No blocker. Automation ready.';
+  const nextText = report.nextActions?.length ? report.nextActions.map(item => `- ${item}`).join('\n') : '- Run Copy Now';
+  return `📡 *Channel Automation Center*
+
+Status: *${report.status}*
+Ready score: *${report.readyScore}/100*
+Preset: *${report.preset || 'custom'}*
+
+Targets: *${s.targets || 0}*
+Sources: *${s.sources || 0}*
+Pending relay: *${s.pendingRelay || 0}*
+Manual packets: *${s.manualPackets || 0}*
+Poll: *${s.pollSeconds || 30}s*
+Mode: *${s.forwardingMode || 'priority'}*
+Bridge: *${s.bridgeEnabled ? 'ON' : 'OFF'}* (${(s.bridgePlatforms || []).join(', ') || 'none'})
+
+*Blockers:*
+${blockerText}
+
+*Next actions:*
+${nextText}
+
+Quick commands:
+*!channelpreset safe*
+*!channelpreset fast*
+*!channelpreset max*
+*!channelrun*
+*!bridgereport*`;
+}
+
 function markWhatsAppChannelManualPacketDone(packetId = '', note = '') {
   const id = String(packetId || '').trim();
   if (!id) throw new Error('packetId is required');
@@ -15996,6 +16156,33 @@ app.get('/wa-channel-qr', (req, res) => {
   </section>
 </div>
 <section class="card">
+  <div class="top">
+    <div>
+      <h2>Quick Start Command Center</h2>
+      <p class="muted">Simple mode: preset choose karein, source/target save karein, phir Run Copy Now. Advanced settings neeche hain.</p>
+    </div>
+    <div id="commandScore" class="pill">Loading...</div>
+  </div>
+  <div class="toolbar">
+    <button class="btn secondary" onclick="applyChannelPreset('safe')">Safe Mode</button>
+    <button class="btn" onclick="applyChannelPreset('fast')">Fast Mode</button>
+    <button class="btn warn" onclick="applyChannelPreset('max')">Max Automation</button>
+    <button class="btn secondary" onclick="loadCommandCenter()">Refresh Summary</button>
+    <button class="btn" onclick="runChannelAutomation()">Run Copy Now</button>
+  </div>
+  <div id="commandCards" class="list"></div>
+  <div class="grid" style="grid-template-columns:1fr 1fr">
+    <div class="row">
+      <strong>Next Actions</strong>
+      <div id="commandNext" class="muted">Loading...</div>
+    </div>
+    <div class="row">
+      <strong>Blockers</strong>
+      <div id="commandBlockers" class="muted">Loading...</div>
+    </div>
+  </div>
+</section>
+<section class="card">
   <h2>Followed Channels: choose Source and Target</h2>
   <p class="muted">Source = jahan se post copy hogi. Target = aapke Aria/Stickers channels jahan post publish hogi. Same channel ko source aur target dono mat rakhein.</p>
   <div id="channelList" class="list"></div>
@@ -16208,6 +16395,54 @@ let channels = [];
 function escHtml(v){return String(v||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function setLog(text){document.getElementById('runResult').textContent = text;}
 async function jsonFetch(url, options){const res=await fetch(url, options);const data=await res.json().catch(()=>({}));if(!res.ok||data.success===false)throw new Error(data.error||data.message||res.statusText);return data;}
+function renderCommandCenter(data){
+  const score=document.getElementById('commandScore');
+  if(score){
+    score.className='pill '+(data.status==='ready'?'ok':'warn');
+    score.textContent='Ready score: '+(data.readyScore??0)+'/100';
+  }
+  const s=data.summary||{};
+  const cards=[
+    ['Targets',s.targets||0,'Saved destination channels'],
+    ['Sources',s.sources||0,'Followed/source channels'],
+    ['Queue',s.pendingRelay||0,'Pending copied posts'],
+    ['Manual',s.manualPackets||0,'Manual packets waiting'],
+    ['Poll',String(s.pollSeconds||30)+'s','Scan interval'],
+    ['Bridge',s.bridgeEnabled?'ON':'OFF',(s.bridgePlatforms||[]).join(', ')||'No social bridge']
+  ];
+  const cardBox=document.getElementById('commandCards');
+  if(cardBox){
+    cardBox.innerHTML=cards.map(([title,value,note])=>'<div class="row"><strong>'+escHtml(title)+'</strong><h2 style="margin:0">'+escHtml(value)+'</h2><span class="muted">'+escHtml(note)+'</span></div>').join('');
+  }
+  const next=document.getElementById('commandNext');
+  if(next) next.innerHTML=(data.nextActions||[]).map(item=>'<div>• '+escHtml(item)+'</div>').join('')||'System healthy.';
+  const blockers=document.getElementById('commandBlockers');
+  if(blockers) blockers.innerHTML=(data.blockers||[]).map(item=>'<div class="warn">• '+escHtml(item)+'</div>').join('')||'<span class="ok">No blocker. Ready.</span>';
+}
+async function loadCommandCenter(){
+  try{
+    const data=await jsonFetch('/api/wa/channels/command-center');
+    renderCommandCenter(data);
+    return data;
+  }catch(e){
+    const score=document.getElementById('commandScore');
+    if(score){score.className='pill bad';score.textContent='Command center failed';}
+    setLog('Command center failed: '+e.message);
+    return null;
+  }
+}
+async function applyChannelPreset(preset){
+  try{
+    setLog('Applying '+preset+' preset...');
+    const data=await jsonFetch('/api/wa/channels/preset',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({preset})});
+    renderCommandCenter(data);
+    document.getElementById('pollSeconds').value=data.summary?.pollSeconds||30;
+    document.getElementById('pollLimit').value=data.summary?.pollLimit||10;
+    setLog('Preset applied: '+preset+'\\nReady score: '+data.readyScore+'/100\\nNext:\\n'+(data.nextActions||[]).join('\\n'));
+    await loadAddons();
+    await loadChannels();
+  }catch(e){setLog('Preset failed: '+e.message);}
+}
 function renderChannels(data){
   const targetSet = new Set((data.copy?.targets||[]).map(x=>x.channelId||x));
   const sourceSet = new Set((data.copy?.sources||[]).map(x=>x.channelId||x));
@@ -16221,7 +16456,7 @@ function renderChannels(data){
   }).join('');
 }
 async function loadChannels(){
-  try{const data=await jsonFetch('/api/wa/channels');renderChannels(data);setLog('Loaded. Targets: '+(data.copy?.targets||[]).length+' | Sources: '+(data.copy?.sources||[]).length+' | Discovered: '+(data.discovered||[]).length);}
+  try{const data=await jsonFetch('/api/wa/channels');renderChannels(data);setLog('Loaded. Targets: '+(data.copy?.targets||[]).length+' | Sources: '+(data.copy?.sources||[]).length+' | Discovered: '+(data.discovered||[]).length);await loadCommandCenter();}
   catch(e){setLog('Load failed: '+e.message);}
 }
 async function loadAddons(){
@@ -16525,12 +16760,12 @@ async function saveSourceLinks(){
 async function connectPublisher(){setLog('Starting channel publisher...');await jsonFetch('/api/wa/channel-publisher/connect',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});location.reload();}
 async function scanChannels(){setLog('Scanning followed channels from WhatsApp...');const data=await jsonFetch('/api/wa/channels/discover',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({accountId:'default',save:true,autoConfigure:false})});setLog('Scan done. Found: '+(data.channels?.length||data.found?.length||0));await loadChannels();}
 function selected(cls){return Array.from(document.querySelectorAll('.'+cls+':checked')).map(x=>x.value);}
-async function saveTargets(){const ids=selected('targetBox');if(!ids.length)return setLog('Select at least one target channel.');setLog('Saving target channels...');await jsonFetch('/api/wa/channels/configure-discovered',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({channelIds:ids})});setLog('Targets saved: '+ids.length);await loadChannels();}
-async function saveSources(){const ids=selected('sourceBox');if(!ids.length)return setLog('Select at least one source channel.');setLog('Saving source channels...');await jsonFetch('/api/wa/channels/copy/sources',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({channelIds:ids})});await jsonFetch('/api/wa/channels/copy/automation',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({enabled:true,autoPublish:true,pollSeconds:Number(document.getElementById('pollSeconds').value||30),pollLimit:Number(document.getElementById('pollLimit').value||10),retryLimit:Number(document.getElementById('pollLimit').value||10)})});setLog('Sources saved: '+ids.length+' and auto-publish ON');await loadChannels();}
-async function saveSpeed(){const pollSeconds=Number(document.getElementById('pollSeconds').value||30);const pollLimit=Number(document.getElementById('pollLimit').value||10);const data=await jsonFetch('/api/wa/channels/copy/automation',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({enabled:true,autoPublish:true,pollSeconds,pollLimit,retryLimit:pollLimit})});setLog('Speed saved. Poll: '+data.pollSeconds+'s | Limit: '+data.pollLimit+'. Restart already uses new interval on next boot; Run Now works instantly.');}
-async function enableFastMode(){const data=await jsonFetch('/api/wa/channels/automation/fast-mode',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pollSeconds:30,pollLimit:10,retryLimit:10})});document.getElementById('pollSeconds').value=data.pollSeconds;document.getElementById('pollLimit').value=data.pollLimit;setLog(data.message+' Poll '+data.pollSeconds+'s. Health: '+data.health.status);}
+async function saveTargets(){const ids=selected('targetBox');if(!ids.length)return setLog('Select at least one target channel.');setLog('Saving target channels...');await jsonFetch('/api/wa/channels/configure-discovered',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({channelIds:ids})});setLog('Targets saved: '+ids.length);await loadChannels();await loadCommandCenter();}
+async function saveSources(){const ids=selected('sourceBox');if(!ids.length)return setLog('Select at least one source channel.');setLog('Saving source channels...');await jsonFetch('/api/wa/channels/copy/sources',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({channelIds:ids})});await jsonFetch('/api/wa/channels/copy/automation',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({enabled:true,autoPublish:true,pollSeconds:Number(document.getElementById('pollSeconds').value||30),pollLimit:Number(document.getElementById('pollLimit').value||10),retryLimit:Number(document.getElementById('pollLimit').value||10)})});setLog('Sources saved: '+ids.length+' and auto-publish ON');await loadChannels();await loadCommandCenter();}
+async function saveSpeed(){const pollSeconds=Number(document.getElementById('pollSeconds').value||30);const pollLimit=Number(document.getElementById('pollLimit').value||10);const data=await jsonFetch('/api/wa/channels/copy/automation',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({enabled:true,autoPublish:true,pollSeconds,pollLimit,retryLimit:pollLimit})});setLog('Speed saved. Poll: '+data.pollSeconds+'s | Limit: '+data.pollLimit+'. Restart already uses new interval on next boot; Run Now works instantly.');await loadCommandCenter();}
+async function enableFastMode(){const data=await jsonFetch('/api/wa/channels/automation/fast-mode',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pollSeconds:30,pollLimit:10,retryLimit:10})});document.getElementById('pollSeconds').value=data.pollSeconds;document.getElementById('pollLimit').value=data.pollLimit;setLog(data.message+' Poll '+data.pollSeconds+'s. Health: '+data.health.status);await loadCommandCenter();}
 async function checkHealth(){const data=await jsonFetch('/api/wa/channels/automation/health');document.getElementById('healthBadge').className=data.ok?'ok':'warn';document.getElementById('healthBadge').textContent='Health: '+data.status;setLog('Health: '+data.status+'\\nPublisher ready: '+data.publisherReady+'\\nWhatsApp ready: '+data.defaultWhatsAppReady+'\\nTargets: '+(data.targets||[]).length+'\\nSources: '+(data.sources||[]).length+'\\nPending relay: '+data.pendingRelay+'\\nManual packets: '+data.activeManualPackets+'\\nLast sent: '+((data.lastSuccess||[])[0]?.time||'none')+'\\nErrors: '+(data.lastErrors||[]).length);}
-async function runChannelAutomation(){setLog('Running copy now...');const data=await jsonFetch('/api/wa/channels/automation/run-max',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({limit:Number(document.getElementById('pollLimit').value||10),discover:true,copySweep:true,share:false})});setLog('Done\\nScanned: '+(data.copySweep?.scanned||0)+'\\nDrafted: '+(data.copySweep?.drafted||0)+'\\nPublished: '+(data.copySweep?.published||0)+'\\nErrors: '+(data.errors||[]).length+'\\nManual packets: '+(data.manualPacketsAfter||0));await loadChannels();}
+async function runChannelAutomation(){setLog('Running copy now...');const data=await jsonFetch('/api/wa/channels/automation/run-max',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({limit:Number(document.getElementById('pollLimit').value||10),discover:true,copySweep:true,share:false})});setLog('Done\\nScanned: '+(data.copySweep?.scanned||0)+'\\nDrafted: '+(data.copySweep?.drafted||0)+'\\nPublished: '+(data.copySweep?.published||0)+'\\nErrors: '+(data.errors||[]).length+'\\nManual packets: '+(data.manualPacketsAfter||0));await loadChannels();await loadCommandCenter();}
 async function loadConditionalRules(){
   try{
     const data=await jsonFetch('/api/wa/channels/conditional-rules');
@@ -16549,7 +16784,7 @@ async function deleteConditionalRule(id){
   try{await jsonFetch('/api/wa/channels/conditional-rules/'+encodeURIComponent(id),{method:'DELETE'});setLog('Conditional rule deleted.');await loadConditionalRules();}
   catch(e){setLog('Rule delete failed: '+e.message);}
 }
-loadChannels(); loadAddons(); loadSourceIntelligence(); loadActivity(); loadAutomationPack(); loadConditionalRules(); setInterval(checkHealth, 15000); setInterval(loadActivity, 30000); setInterval(loadAutomationPack, 60000);
+loadChannels(); loadCommandCenter(); loadAddons(); loadSourceIntelligence(); loadActivity(); loadAutomationPack(); loadConditionalRules(); setInterval(checkHealth, 15000); setInterval(loadCommandCenter, 20000); setInterval(loadActivity, 30000); setInterval(loadAutomationPack, 60000);
 </script>
 </body></html>`);
 });
@@ -16697,6 +16932,23 @@ app.get('/api/wa/channels/automation/status', (_req, res) => {
     });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/wa/channels/command-center', (_req, res) => {
+  try {
+    res.json(buildWhatsAppChannelCommandCenter());
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/wa/channels/preset', (req, res) => {
+  try {
+    const preset = String(req.body?.preset || req.body?.mode || 'fast').toLowerCase();
+    res.json(applyWhatsAppChannelAutomationPreset(preset));
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
   }
 });
 
@@ -24934,7 +25186,7 @@ function splitSocialCommandArgs(text = '') {
 }
 
 function isWhatsAppSocialCommand(text = '') {
-  return /^!(social|connect|post|draft|approvepost|sharepost|poststatus|comment|control|admin|menuadmin|server|status|health|watchdog|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
+  return /^!(social|connect|post|draft|approvepost|sharepost|poststatus|comment|control|admin|menuadmin|server|status|health|watchdog|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
 }
 
 function adminNumberCandidates() {
@@ -25943,6 +26195,9 @@ WhatsApp Channel:
 *!channelcopy sourceresume SOURCE_ID* - one source resume
 *!channelcopy pack status/run* - automation pack status/run
 *!channelcopy scan 5* â€” source channels recent posts draft
+*!channelcenter* â€” easy automation summary
+*!channelpreset safe/fast/max* â€” one-click automation preset
+*!channelrun* â€” scan/copy now
 *!channelset CHANNEL_ID* â€” save channel
 *!channelauto on* â€” daily auto updates on
 *!channelauto off* â€” auto updates off
@@ -26590,6 +26845,9 @@ Schedule:
 ${schedule}
 
 Use:
+*!channelcenter*
+*!channelpreset fast*
+*!channelrun*
 *!channelcatch*
 *!channeluse 1,2*
 *!channelsource 2,3*
@@ -26638,7 +26896,7 @@ Published attempts: *${result.shares.length}*
 Manual packets: *${result.manualPacketsAfter}*
 Errors: *${result.errors.length}*
 
-Status: http://localhost:3001/api/wa/channels/automation/status`);
+${formatWhatsAppChannelCommandCenterReply(buildWhatsAppChannelCommandCenter()).slice(0, 1200)}`);
       return true;
     }
 
@@ -26979,6 +27237,18 @@ New plans — auto-post ON`);
       await reply(`✅ WhatsApp Channel automation is now *${status.enabled ? 'ON' : 'OFF'}*.
 Schedule:
 ${status.schedule.map(slot => `${slot.time} — ${slot.kind}`).join('\n')}`);
+      return true;
+    }
+
+    if (command === '!channelcenter') {
+      await reply(formatWhatsAppChannelCommandCenterReply(buildWhatsAppChannelCommandCenter()));
+      return true;
+    }
+
+    if (command === '!channelpreset') {
+      const preset = String(args[1] || 'fast').toLowerCase();
+      const result = applyWhatsAppChannelAutomationPreset(preset);
+      await reply(`✅ *Channel preset applied: ${preset}*\n\n${formatWhatsAppChannelCommandCenterReply(result)}`);
       return true;
     }
 
