@@ -8648,6 +8648,7 @@ Quick commands:
 *!channelpreset max*
 *!channelwatch run*
 *!channelrun*
+*!next50*
 *!bridgereport*`;
 }
 
@@ -8889,6 +8890,51 @@ Commands:
 *!channelwatch on*
 *!channelwatch off*
 *!channelwatch run*`;
+}
+
+function readAntigravityNext50Plan() {
+  const filePath = path.join(__dirname, 'ANTIGRAVITY_NEXT_50.md');
+  let markdown = '';
+  try {
+    markdown = fs.readFileSync(filePath, 'utf8');
+  } catch {
+    markdown = '# SuperSender Pro - Antigravity Next 50 Steps\n\nPlan file missing. Pull latest repo and check ANTIGRAVITY_NEXT_50.md.';
+  }
+  const steps = markdown
+    .split(/\r?\n/)
+    .map(line => line.trim())
+    .filter(line => /^\d+\.\s+/.test(line))
+    .map(line => {
+      const match = line.match(/^(\d+)\.\s+(.+)$/);
+      return { number: Number(match?.[1] || 0), text: match?.[2] || line };
+    })
+    .filter(row => row.number > 0);
+  return {
+    success: true,
+    title: 'SuperSender Pro - Antigravity Next 50 Steps',
+    file: filePath,
+    total: steps.length,
+    steps,
+    markdown,
+    updatedAt: new Date().toISOString()
+  };
+}
+
+function formatAntigravityNext50Reply(limit = 20) {
+  const plan = readAntigravityNext50Plan();
+  const shown = plan.steps.slice(0, Math.max(5, Math.min(50, Number(limit || 20))));
+  return `*Antigravity Next ${plan.total} Steps*
+
+${shown.map(step => `${step.number}. ${step.text}`).join('\n')}
+
+Full file:
+ANTIGRAVITY_NEXT_50.md
+
+Browser:
+http://localhost:3001/antigravity-next-50
+
+Git:
+https://github.com/abdulbasit742/supersenderpro.git`;
 }
 
 function markWhatsAppChannelManualPacketDone(packetId = '', note = '') {
@@ -17303,6 +17349,37 @@ app.post('/api/wa/channels/watchdog', async (req, res) => {
   }
 });
 
+app.get('/api/project/antigravity-next-50', (_req, res) => {
+  try {
+    res.json(readAntigravityNext50Plan());
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/antigravity-next-50', (_req, res) => {
+  try {
+    const plan = readAntigravityNext50Plan();
+    res.type('html').send(`<!doctype html><html><head><meta charset="utf-8"><title>${plan.title}</title>
+<style>
+body{font-family:Inter,Arial,sans-serif;background:#0f1720;color:#e8f3ff;margin:0;padding:32px;line-height:1.55}
+main{max-width:980px;margin:auto;background:#17232e;border:1px solid #284052;border-radius:14px;padding:28px}
+h1{margin-top:0}.muted{color:#96aabd}.steps{display:grid;gap:10px}.step{background:#0d1720;border:1px solid #243746;border-radius:10px;padding:12px}
+.num{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:#10b981;color:#06120d;font-weight:800;margin-right:10px}
+a{color:#5eead4}.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}.btn{background:#10b981;color:#06120d;padding:10px 14px;border-radius:8px;text-decoration:none;font-weight:700}
+pre{white-space:pre-wrap;background:#081018;border-radius:10px;padding:14px;overflow:auto}
+</style></head><body><main>
+<h1>${plan.title}</h1>
+<p class="muted">Use this page in Antigravity or another laptop as the continuation checklist.</p>
+<div class="toolbar"><a class="btn" href="/api/project/antigravity-next-50">JSON API</a><a class="btn" href="/">Dashboard</a><a class="btn" href="/wa-channel-qr">Channel Dashboard</a></div>
+<section class="steps">${plan.steps.map(step => `<div class="step"><span class="num">${step.number}</span>${String(step.text || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}</div>`).join('')}</section>
+<h2>Raw Markdown</h2><pre>${String(plan.markdown || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}</pre>
+</main></body></html>`);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
 app.get('/api/wa/channels/automation/health', (_req, res) => {
   try {
     res.json(whatsAppChannelAutomationHealth());
@@ -25537,7 +25614,7 @@ function splitSocialCommandArgs(text = '') {
 }
 
 function isWhatsAppSocialCommand(text = '') {
-  return /^!(social|connect|post|draft|approvepost|sharepost|poststatus|comment|control|admin|menuadmin|server|status|health|watchdog|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelfix|channelwatch|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
+  return /^!(social|connect|post|draft|approvepost|sharepost|poststatus|comment|control|admin|menuadmin|server|status|health|watchdog|next50|antigravity|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelfix|channelwatch|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
 }
 
 function adminNumberCandidates() {
@@ -26551,6 +26628,7 @@ WhatsApp Channel:
 *!channelfix* â€” auto-fix sources + queue + sweep
 *!channelwatch on/off/run* â€” watchdog auto health guard
 *!channelrun* â€” scan/copy now
+*!next50* â€” Antigravity next 50 steps
 *!channelset CHANNEL_ID* â€” save channel
 *!channelauto on* â€” daily auto updates on
 *!channelauto off* â€” auto updates off
@@ -27592,6 +27670,12 @@ New plans — auto-post ON`);
       await reply(`✅ WhatsApp Channel automation is now *${status.enabled ? 'ON' : 'OFF'}*.
 Schedule:
 ${status.schedule.map(slot => `${slot.time} — ${slot.kind}`).join('\n')}`);
+      return true;
+      }
+
+    if (command === '!next50' || command === '!antigravity') {
+      const limit = Math.max(5, Math.min(50, Number(args[1] || 20)));
+      await reply(formatAntigravityNext50Reply(limit));
       return true;
     }
 
