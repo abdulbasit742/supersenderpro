@@ -1709,6 +1709,12 @@ let settings = loadJSON('settings.json', {
   whatsapp_channel_currency_rate_enabled: true,
   whatsapp_channel_queue_stuck_minutes: 60,
   whatsapp_channel_low_queue_threshold: 2,
+  whatsapp_channel_watchdog_enabled: true,
+  whatsapp_channel_watchdog_interval_minutes: 10,
+  whatsapp_channel_watchdog_min_ready_score: 65,
+  whatsapp_channel_watchdog_auto_fix: true,
+  whatsapp_channel_watchdog_alerts: true,
+  whatsapp_channel_watchdog_share: false,
   whatsapp_channel_drip_enabled: true,
   whatsapp_channel_drip_minutes: 120,
   whatsapp_channel_daily_digest_enabled: true,
@@ -8588,10 +8594,25 @@ function buildWhatsAppChannelCommandCenter(extra = {}) {
       sourceDoctor: sourceDoctor.summary || {},
       pollSeconds: settings.whatsapp_channel_copy_poll_seconds || 30,
       pollLimit: settings.whatsapp_channel_copy_poll_limit || 8,
-      forwardingMode: settings.whatsapp_channel_forwarding_mode || 'priority'
+      forwardingMode: settings.whatsapp_channel_forwarding_mode || 'priority',
+      watchdogEnabled: settings.whatsapp_channel_watchdog_enabled !== false,
+      watchdogAutoFix: settings.whatsapp_channel_watchdog_auto_fix !== false,
+      watchdogLastStatus: channelAutomationState.watchdog?.lastStatus || ''
     },
     health,
     bridge,
+    watchdog: {
+      enabled: settings.whatsapp_channel_watchdog_enabled !== false,
+      autoFix: settings.whatsapp_channel_watchdog_auto_fix !== false,
+      alerts: settings.whatsapp_channel_watchdog_alerts !== false,
+      publishOnFix: settings.whatsapp_channel_watchdog_share === true,
+      intervalMinutes: Math.max(2, Number(settings.whatsapp_channel_watchdog_interval_minutes || 10)),
+      minReadyScore: Math.max(10, Math.min(95, Number(settings.whatsapp_channel_watchdog_min_ready_score || 65))),
+      lastRunAt: channelAutomationState.watchdog?.lastRunAt || '',
+      lastStatus: channelAutomationState.watchdog?.lastStatus || '',
+      lastReasons: Array.isArray(channelAutomationState.watchdog?.lastReasons) ? channelAutomationState.watchdog.lastReasons : [],
+      lastAutoFixAt: channelAutomationState.watchdog?.lastAutoFixAt || ''
+    },
     presets: Object.entries(CHANNEL_AUTOMATION_PRESETS).map(([id, row]) => ({ id, ...row })),
     automation
   };
@@ -8625,6 +8646,7 @@ Quick commands:
 *!channelpreset safe*
 *!channelpreset fast*
 *!channelpreset max*
+*!channelwatch run*
 *!channelrun*
 *!bridgereport*`;
 }
@@ -8708,6 +8730,165 @@ Errors: *${sweep.errors || 0}*
 
 Next:
 ${next}`;
+}
+
+function buildWhatsAppChannelWatchdogStatus(report = null) {
+  const center = report || buildWhatsAppChannelCommandCenter();
+  const state = channelAutomationState.watchdog && typeof channelAutomationState.watchdog === 'object'
+    ? channelAutomationState.watchdog
+    : {};
+  const lastRunAt = state.lastRunAt || '';
+  const intervalMinutes = Math.max(2, Number(settings.whatsapp_channel_watchdog_interval_minutes || 10));
+  const minReadyScore = Math.max(10, Math.min(95, Number(settings.whatsapp_channel_watchdog_min_ready_score || 65)));
+  const lastRunMs = Date.parse(lastRunAt || '');
+  const dueAt = lastRunMs
+    ? new Date(lastRunMs + intervalMinutes * 60 * 1000).toISOString()
+    : new Date().toISOString();
+  const now = Date.now();
+  const due = !lastRunMs || now >= Date.parse(dueAt);
+  return {
+    enabled: settings.whatsapp_channel_watchdog_enabled !== false,
+    autoFix: settings.whatsapp_channel_watchdog_auto_fix !== false,
+    alerts: settings.whatsapp_channel_watchdog_alerts !== false,
+    publishOnFix: settings.whatsapp_channel_watchdog_share === true,
+    intervalMinutes,
+    minReadyScore,
+    lastRunAt,
+    dueAt,
+    due,
+    lastStatus: state.lastStatus || '',
+    lastReasons: Array.isArray(state.lastReasons) ? state.lastReasons : [],
+    lastAutoFixAt: state.lastAutoFixAt || '',
+    lastAutoFixStatus: state.lastAutoFixStatus || '',
+    readyScore: center.readyScore || 0,
+    status: center.status || 'unknown',
+    blockers: center.blockers || [],
+    nextActions: center.nextActions || []
+  };
+}
+
+let whatsAppChannelWatchdogBusy = false;
+
+async function runWhatsAppChannelWatchdog({ force = false, source = 'timer' } = {}) {
+  if (whatsAppChannelWatchdogBusy) return { success: true, skipped: true, reason: 'watchdog already running' };
+  const before = buildWhatsAppChannelCommandCenter();
+  const status = buildWhatsAppChannelWatchdogStatus(before);
+  if (!status.enabled && !force) return { success: true, skipped: true, reason: 'watchdog disabled', status };
+  if (!status.due && !force) return { success: true, skipped: true, reason: 'watchdog not due', status };
+
+  whatsAppChannelWatchdogBusy = true;
+  const startedAt = new Date().toISOString();
+  const reasons = [];
+  const summary = before.summary || {};
+  const doctor = summary.sourceDoctor || {};
+  if ((before.readyScore || 0) < status.minReadyScore) reasons.push(`Ready score below target (${before.readyScore || 0}/${status.minReadyScore})`);
+  if (!summary.defaultWhatsAppReady) reasons.push('Default WhatsApp session not ready');
+  if (!summary.publisherReady) reasons.push('Channel publisher session not ready');
+  if ((summary.manualPackets || 0) > 0) reasons.push(`${summary.manualPackets} manual packets pending`);
+  if ((summary.pendingRelay || 0) > Number(settings.whatsapp_channel_low_queue_threshold || 2) + 10) reasons.push(`${summary.pendingRelay} relay items pending`);
+  if ((doctor.dead || 0) > 0) reasons.push(`${doctor.dead} dead sources found`);
+  if ((doctor.silent || 0) > 3) reasons.push(`${doctor.silent} silent sources found`);
+
+  let autoFix = null;
+  let after = before;
+  try {
+    if (reasons.length && status.autoFix) {
+      autoFix = await runWhatsAppChannelAutoFix({
+        preset: settings.whatsapp_channel_selected_preset || 'fast',
+        runCopy: true,
+        share: status.publishOnFix,
+        limit: settings.whatsapp_channel_copy_poll_limit || 10
+      });
+      after = autoFix.commandCenter || buildWhatsAppChannelCommandCenter();
+    }
+    const result = {
+      success: true,
+      source,
+      startedAt,
+      finishedAt: new Date().toISOString(),
+      action: reasons.length && status.autoFix ? 'autofix' : 'observe',
+      reasons,
+      before: {
+        status: before.status,
+        readyScore: before.readyScore,
+        blockers: before.blockers || []
+      },
+      after: {
+        status: after.status,
+        readyScore: after.readyScore,
+        blockers: after.blockers || [],
+        nextActions: after.nextActions || []
+      },
+      autoFix: autoFix ? {
+        preset: autoFix.preset,
+        status: autoFix.after?.status || '',
+        readyScore: autoFix.after?.readyScore || 0,
+        doctor: autoFix.doctor || {},
+        cleaner: autoFix.cleaner || {},
+        copySweep: autoFix.copySweep || {}
+      } : null,
+      status: buildWhatsAppChannelWatchdogStatus(after)
+    };
+    channelAutomationState.watchdog = {
+      lastRunAt: result.finishedAt,
+      lastStatus: result.after.status,
+      lastReasons: reasons,
+      lastAutoFixAt: autoFix ? result.finishedAt : (channelAutomationState.watchdog?.lastAutoFixAt || ''),
+      lastAutoFixStatus: autoFix ? result.after.status : (channelAutomationState.watchdog?.lastAutoFixStatus || '')
+    };
+    saveChannelAutomationState();
+    logs.push({ id: uuid(), type: 'whatsapp_channel_watchdog', status: result.action, result, time: result.finishedAt });
+    saveJSON('logs.json', logs);
+    if (reasons.length && settings.whatsapp_channel_watchdog_alerts !== false) {
+      createChannelAutomationAlert('watchdog_action', `Channel Watchdog ${result.action}: ${reasons.slice(0, 2).join('; ')}`, {
+        reasons,
+        before: result.before,
+        after: result.after
+      });
+    }
+    return result;
+  } catch (error) {
+    const failedAt = new Date().toISOString();
+    channelAutomationState.watchdog = {
+      ...(channelAutomationState.watchdog || {}),
+      lastRunAt: failedAt,
+      lastStatus: 'failed',
+      lastReasons: [error.message]
+    };
+    saveChannelAutomationState();
+    logs.push({ id: uuid(), type: 'whatsapp_channel_watchdog', status: 'failed', error: error.message, time: failedAt });
+    saveJSON('logs.json', logs);
+    createChannelAutomationAlert('watchdog_failed', error.message);
+    return { success: false, error: error.message, reasons, before: { status: before.status, readyScore: before.readyScore } };
+  } finally {
+    whatsAppChannelWatchdogBusy = false;
+  }
+}
+
+function formatWhatsAppChannelWatchdogReply(result = {}) {
+  const status = result.status || buildWhatsAppChannelWatchdogStatus();
+  const reasons = result.reasons?.length ? result.reasons : status.lastReasons || [];
+  const next = result.after?.nextActions?.length ? result.after.nextActions : status.nextActions || [];
+  return `🛡️ *Channel Watchdog*
+
+Enabled: *${status.enabled ? 'ON' : 'OFF'}*
+Auto-fix: *${status.autoFix ? 'ON' : 'OFF'}*
+Interval: *${status.intervalMinutes} min*
+Target score: *${status.minReadyScore}/100*
+
+Last action: *${result.action || status.lastStatus || 'status'}*
+Ready score: *${result.before?.readyScore ?? status.readyScore}/100 → ${result.after?.readyScore ?? status.readyScore}/100*
+
+Reasons:
+${reasons.length ? reasons.slice(0, 6).map(item => `- ${item}`).join('\n') : '- No issue detected'}
+
+Next:
+${next.length ? next.slice(0, 5).map(item => `- ${item}`).join('\n') : '- Keep automation running'}
+
+Commands:
+*!channelwatch on*
+*!channelwatch off*
+*!channelwatch run*`;
 }
 
 function markWhatsAppChannelManualPacketDone(packetId = '', note = '') {
@@ -16250,6 +16431,9 @@ app.get('/wa-channel-qr', (req, res) => {
     <button class="btn warn" onclick="applyChannelPreset('max')">Max Automation</button>
     <button class="btn secondary" onclick="loadCommandCenter()">Refresh Summary</button>
     <button class="btn warn" onclick="runAutoFix()">Auto-Fix + Sweep</button>
+    <button class="btn" onclick="setWatchdog('on')">Watchdog ON</button>
+    <button class="btn secondary" onclick="setWatchdog('off')">Watchdog OFF</button>
+    <button class="btn warn" onclick="runWatchdog()">Run Watchdog</button>
     <button class="btn" onclick="runChannelAutomation()">Run Copy Now</button>
   </div>
   <div id="commandCards" class="list"></div>
@@ -16490,7 +16674,8 @@ function renderCommandCenter(data){
     ['Queue',s.pendingRelay||0,'Pending copied posts'],
     ['Manual',s.manualPackets||0,'Manual packets waiting'],
     ['Poll',String(s.pollSeconds||30)+'s','Scan interval'],
-    ['Bridge',s.bridgeEnabled?'ON':'OFF',(s.bridgePlatforms||[]).join(', ')||'No social bridge']
+    ['Bridge',s.bridgeEnabled?'ON':'OFF',(s.bridgePlatforms||[]).join(', ')||'No social bridge'],
+    ['Watchdog',s.watchdogEnabled?'ON':'OFF',(data.watchdog?.lastStatus?'Last: '+data.watchdog.lastStatus:'Auto health guard')]
   ];
   const cardBox=document.getElementById('commandCards');
   if(cardBox){
@@ -16537,6 +16722,25 @@ async function runAutoFix(){
     await loadSourceIntelligence();
     await loadActivity();
   }catch(e){setLog('Auto-Fix failed: '+e.message);}
+}
+async function setWatchdog(mode){
+  try{
+    setLog('Channel Watchdog '+mode+'...');
+    const data=await jsonFetch('/api/wa/channels/watchdog',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:mode,intervalMinutes:10,minReadyScore:65,autoFix:true})});
+    setLog((data.message||'Watchdog updated')+'\\nEnabled: '+data.status.enabled+'\\nAuto-fix: '+data.status.autoFix+'\\nInterval: '+data.status.intervalMinutes+' min');
+    await loadCommandCenter();
+  }catch(e){setLog('Watchdog update failed: '+e.message);}
+}
+async function runWatchdog(){
+  try{
+    setLog('Channel Watchdog running health check + auto-fix if needed...');
+    const data=await jsonFetch('/api/wa/channels/watchdog',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'run'})});
+    const reasons=(data.reasons||[]).join('\\n')||'No issue detected';
+    setLog('Watchdog done\\nAction: '+(data.action||'observe')+'\\nReady score: '+(data.before?.readyScore||0)+' → '+(data.after?.readyScore||0)+'\\nReasons:\\n'+reasons+'\\n\\nNext:\\n'+((data.after?.nextActions||[]).join('\\n')||'Keep automation running'));
+    if(data.after) renderCommandCenter(data.commandCenter||data.status?.commandCenter||await loadCommandCenter());
+    await loadChannels();
+    await loadActivity();
+  }catch(e){setLog('Watchdog failed: '+e.message);}
 }
 function renderChannels(data){
   const targetSet = new Set((data.copy?.targets||[]).map(x=>x.channelId||x));
@@ -17058,6 +17262,42 @@ app.post('/api/wa/channels/autofix', async (req, res) => {
     res.json(result);
   } catch (error) {
     logs.push({ id: uuid(), type: 'whatsapp_channel_autofix', status: 'failed', error: error.message, time: new Date().toISOString() });
+    saveJSON('logs.json', logs);
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/wa/channels/watchdog', (_req, res) => {
+  try {
+    res.json({ success: true, status: buildWhatsAppChannelWatchdogStatus() });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/wa/channels/watchdog', async (req, res) => {
+  try {
+    const action = String(req.body?.action || req.body?.mode || 'run').toLowerCase();
+    if (action === 'on' || action === 'enable') {
+      settings.whatsapp_channel_watchdog_enabled = true;
+      if (req.body?.intervalMinutes) settings.whatsapp_channel_watchdog_interval_minutes = Math.max(2, Number(req.body.intervalMinutes));
+      if (req.body?.minReadyScore) settings.whatsapp_channel_watchdog_min_ready_score = Math.max(10, Math.min(95, Number(req.body.minReadyScore)));
+      if (req.body?.autoFix !== undefined) settings.whatsapp_channel_watchdog_auto_fix = req.body.autoFix === true;
+      saveJSON('settings.json', settings);
+      return res.json({ success: true, status: buildWhatsAppChannelWatchdogStatus(), message: 'Channel watchdog enabled.' });
+    }
+    if (action === 'off' || action === 'disable') {
+      settings.whatsapp_channel_watchdog_enabled = false;
+      saveJSON('settings.json', settings);
+      return res.json({ success: true, status: buildWhatsAppChannelWatchdogStatus(), message: 'Channel watchdog disabled.' });
+    }
+    if (action === 'status') {
+      return res.json({ success: true, status: buildWhatsAppChannelWatchdogStatus(), commandCenter: buildWhatsAppChannelCommandCenter() });
+    }
+    const result = await runWhatsAppChannelWatchdog({ force: true, source: 'api' });
+    res.json(result);
+  } catch (error) {
+    logs.push({ id: uuid(), type: 'whatsapp_channel_watchdog', status: 'failed', error: error.message, time: new Date().toISOString() });
     saveJSON('logs.json', logs);
     res.status(400).json({ success: false, error: error.message });
   }
@@ -25297,7 +25537,7 @@ function splitSocialCommandArgs(text = '') {
 }
 
 function isWhatsAppSocialCommand(text = '') {
-  return /^!(social|connect|post|draft|approvepost|sharepost|poststatus|comment|control|admin|menuadmin|server|status|health|watchdog|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelfix|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
+  return /^!(social|connect|post|draft|approvepost|sharepost|poststatus|comment|control|admin|menuadmin|server|status|health|watchdog|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelfix|channelwatch|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
 }
 
 function adminNumberCandidates() {
@@ -26309,6 +26549,7 @@ WhatsApp Channel:
 *!channelcenter* â€” easy automation summary
 *!channelpreset safe/fast/max* â€” one-click automation preset
 *!channelfix* â€” auto-fix sources + queue + sweep
+*!channelwatch on/off/run* â€” watchdog auto health guard
 *!channelrun* â€” scan/copy now
 *!channelset CHANNEL_ID* â€” save channel
 *!channelauto on* â€” daily auto updates on
@@ -26960,6 +27201,7 @@ Use:
 *!channelcenter*
 *!channelpreset fast*
 *!channelfix*
+*!channelwatch run*
 *!channelrun*
 *!channelcatch*
 *!channeluse 1,2*
@@ -27376,6 +27618,31 @@ ${status.schedule.map(slot => `${slot.time} — ${slot.kind}`).join('\n')}`);
         limit: settings.whatsapp_channel_copy_poll_limit || 10
       });
       await reply(formatWhatsAppChannelAutoFixReply(result));
+      return true;
+    }
+
+    if (command === '!channelwatch') {
+      const mode = String(args[1] || 'status').toLowerCase();
+      if (['on', 'enable'].includes(mode)) {
+        settings.whatsapp_channel_watchdog_enabled = true;
+        settings.whatsapp_channel_watchdog_auto_fix = true;
+        saveJSON('settings.json', settings);
+        await reply(formatWhatsAppChannelWatchdogReply({ action: 'enabled', status: buildWhatsAppChannelWatchdogStatus() }));
+        return true;
+      }
+      if (['off', 'disable'].includes(mode)) {
+        settings.whatsapp_channel_watchdog_enabled = false;
+        saveJSON('settings.json', settings);
+        await reply(formatWhatsAppChannelWatchdogReply({ action: 'disabled', status: buildWhatsAppChannelWatchdogStatus() }));
+        return true;
+      }
+      if (['run', 'fix', 'now'].includes(mode)) {
+        await reply('🛡️ Channel Watchdog run kar raha hoon. Health check + auto-fix if needed...');
+        const result = await runWhatsAppChannelWatchdog({ force: true, source: 'whatsapp_command' });
+        await reply(formatWhatsAppChannelWatchdogReply(result));
+        return true;
+      }
+      await reply(formatWhatsAppChannelWatchdogReply({ action: 'status', status: buildWhatsAppChannelWatchdogStatus() }));
       return true;
     }
 
@@ -39335,6 +39602,17 @@ async function runWhatsAppChannelAutomationPackTick(force = false) {
 }
 setInterval(() => runWhatsAppChannelAutomationPackTick(false), 5 * 60 * 1000);
 setTimeout(() => runWhatsAppChannelAutomationPackTick(false), 45000);
+
+setInterval(() => {
+  runWhatsAppChannelWatchdog({ source: 'timer' }).catch(error => {
+    console.error('WhatsApp channel watchdog failed:', error.message);
+  });
+}, 60 * 1000);
+setTimeout(() => {
+  runWhatsAppChannelWatchdog({ source: 'startup' }).catch(error => {
+    console.error('WhatsApp channel watchdog startup failed:', error.message);
+  });
+}, 60000);
 
 ensureSocialAutoPosterDirs();
 let socialAutoPosterBusy = false;
