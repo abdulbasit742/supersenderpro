@@ -33,10 +33,29 @@ Production-ready WhatsApp automation and admin dashboard for AI tools subscripti
 
 - Backend API: `http://localhost:3001`
 - Frontend dashboard: `http://localhost:3000`
+- Lovable/TanStack dashboard: `lovable-app/` via `npm run lovable:dev`
 - n8n: `http://localhost:5678`
 - Nginx reverse proxy: `http://localhost` and `https://localhost`
 - PostgreSQL: internal Docker service `db`
 - Redis: internal Docker service `redis`
+
+## Lovable App
+
+The Lovable-built dashboard is imported in `lovable-app/` as a separate TanStack/Vite app. It contains the richer composer, connections, publisher, channels, inbox, analytics, and scheduling UI.
+
+Run it from the root:
+
+```bash
+npm run lovable:dev
+```
+
+Build it:
+
+```bash
+npm run lovable:build
+```
+
+Copy `lovable-app/.env.example` to `lovable-app/.env` locally and fill Supabase/Lovable values. Never commit real keys. The existing `server.js` remains the source of truth for local WhatsApp runtime, Baileys sessions, channel publisher sessions, and private automation workers.
 
 ## Payment Email Parser
 
