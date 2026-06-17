@@ -8937,6 +8937,214 @@ Git:
 https://github.com/abdulbasit742/supersenderpro.git`;
 }
 
+function getAiAutomationRepoPlan() {
+  const statusRows = loadJSON('aiAutomationStatus.json', {});
+  const rows = [
+    {
+      slug: 'n8n',
+      name: 'n8n',
+      category: 'workflow',
+      integrationType: 'docker-webhook',
+      priority: 1,
+      licenseRisk: 'medium',
+      configured: Boolean(process.env.N8N_WEBHOOK_URL || settings.n8n_webhook_url || settings.n8n_webhook_secret),
+      missingEnv: ['N8N_WEBHOOK_URL', 'N8N_WEBHOOK_SECRET'].filter(key => !process.env[key] && !settings[String(key).toLowerCase()]),
+      bestUse: 'Visual workflows for orders, payments, broadcasts, sheets, alerts, and daily reports.',
+      nextTask: 'Create webhook receiver and workflow templates for order/payment/broadcast events.'
+    },
+    {
+      slug: 'langgraph',
+      name: 'LangGraph',
+      category: 'ai-agent',
+      integrationType: 'external-worker',
+      priority: 2,
+      licenseRisk: 'low',
+      configured: Boolean(process.env.LANGGRAPH_WORKER_URL || settings.langgraph_worker_url),
+      missingEnv: ['LANGGRAPH_WORKER_URL'].filter(key => !process.env[key] && !settings[String(key).toLowerCase()]),
+      bestUse: 'Stateful AI workflows for intent, follow-ups, issue routing, and channel content decisions.',
+      nextTask: 'Add worker adapter with demo mode and queue-backed run-task endpoint.'
+    },
+    {
+      slug: 'browser-use',
+      name: 'Browser Use',
+      category: 'browser-automation',
+      integrationType: 'external-worker',
+      priority: 3,
+      licenseRisk: 'low',
+      configured: Boolean(process.env.BROWSER_USE_WORKER_URL || settings.browser_use_worker_url),
+      missingEnv: ['BROWSER_USE_WORKER_URL'].filter(key => !process.env[key] && !settings[String(key).toLowerCase()]),
+      bestUse: 'Website fetching, scholarship checks, screenshots, and source-channel verification.',
+      nextTask: 'Add browser worker status card and scrape URL task type.'
+    },
+    {
+      slug: 'crewai',
+      name: 'CrewAI',
+      category: 'multi-agent',
+      integrationType: 'external-worker',
+      priority: 4,
+      licenseRisk: 'medium',
+      configured: Boolean(process.env.CREWAI_WORKER_URL || settings.crewai_worker_url),
+      missingEnv: ['CREWAI_WORKER_URL'].filter(key => !process.env[key] && !settings[String(key).toLowerCase()]),
+      bestUse: 'Multi-agent team: research agent, sales agent, compliance agent, caption agent.',
+      nextTask: 'Define agent roles and connect through a single worker endpoint.'
+    },
+    {
+      slug: 'agentic-inbox',
+      name: 'Cloudflare Agentic Inbox',
+      category: 'inbox',
+      integrationType: 'architecture-pattern',
+      priority: 5,
+      licenseRisk: 'low',
+      configured: Boolean(settings.gmail_payment_parser_enabled || process.env.GMAIL_CLIENT_ID || process.env.EMAIL_USER),
+      missingEnv: ['GMAIL_CLIENT_ID', 'GMAIL_CLIENT_SECRET'].filter(key => !process.env[key] && !settings[String(key).toLowerCase()]),
+      bestUse: 'Payment email parsing, inbox triage, draft replies, and human approval loops.',
+      nextTask: 'Map Gmail payment parser and AI inbox events into one timeline.'
+    },
+    {
+      slug: 'claude-task-master',
+      name: 'claude-task-master',
+      category: 'project-management',
+      integrationType: 'internal-dev-tool',
+      priority: 6,
+      licenseRisk: 'high',
+      configured: process.env.TASK_MASTER_ENABLED === 'true' || settings.task_master_enabled === true,
+      missingEnv: ['TASK_MASTER_ENABLED'].filter(key => !process.env[key] && !settings[String(key).toLowerCase()]),
+      bestUse: 'Internal autonomous backlog, task breakdown, and next-step generation.',
+      nextTask: 'Keep as internal planning aid; do not embed paid/customer-facing code.'
+    },
+    {
+      slug: 'awesome-mcp-servers',
+      name: 'awesome-mcp-servers',
+      category: 'mcp',
+      integrationType: 'directory',
+      priority: 7,
+      licenseRisk: 'low',
+      configured: settings.mcp_hub_enabled !== false,
+      missingEnv: [],
+      bestUse: 'Connector directory for GitHub, Sheets, browser, filesystem, Slack, Notion, and custom MCP tools.',
+      nextTask: 'Add MCP Hub page with recommended connectors and setup checklist.'
+    },
+    {
+      slug: 'openhands',
+      name: 'OpenHands',
+      category: 'developer-agent',
+      integrationType: 'inspiration-only',
+      priority: 8,
+      licenseRisk: 'medium',
+      configured: false,
+      missingEnv: [],
+      bestUse: 'Self-hosted coding automation and long-running development control center patterns.',
+      nextTask: 'Use as architecture inspiration for future build-agent dashboard.'
+    },
+    {
+      slug: 'aider',
+      name: 'Aider',
+      category: 'developer-agent',
+      integrationType: 'internal-cli',
+      priority: 9,
+      licenseRisk: 'low',
+      configured: false,
+      missingEnv: [],
+      bestUse: 'Internal code editing workflow, repo-map ideas, tests, and commit discipline.',
+      nextTask: 'Document optional local usage; do not embed in runtime product.'
+    },
+    {
+      slug: 'hermes-agent',
+      name: 'Hermes Agent',
+      category: 'personal-agent',
+      integrationType: 'research',
+      priority: 10,
+      licenseRisk: 'medium',
+      configured: false,
+      missingEnv: [],
+      bestUse: 'Personal autonomous agent/memory ideas for long-running operator mode.',
+      nextTask: 'Review after LangGraph and CrewAI worker are stable.'
+    }
+  ];
+
+  return rows.map(row => ({
+    ...row,
+    status: statusRows[row.slug]?.status || (row.configured ? 'configured' : 'not_configured'),
+    notes: statusRows[row.slug]?.notes || '',
+    updatedAt: statusRows[row.slug]?.updatedAt || null
+  }));
+}
+
+function getAiAutomationStatus() {
+  const repos = getAiAutomationRepoPlan();
+  const tasks = loadJSON('aiAutomationTasks.json', []);
+  const configured = repos.filter(row => row.configured).length;
+  const highPriority = repos.filter(row => Number(row.priority || 99) <= 5);
+  return {
+    success: true,
+    title: 'AI Automation Hub',
+    updatedAt: new Date().toISOString(),
+    totals: {
+      repos: repos.length,
+      configured,
+      missing: repos.length - configured,
+      highPriority: highPriority.length,
+      queuedTasks: tasks.filter(task => task.status === 'queued').length,
+      completedTasks: tasks.filter(task => task.status === 'done').length,
+      failedTasks: tasks.filter(task => task.status === 'failed').length
+    },
+    repos,
+    recentTasks: tasks.slice(-20).reverse(),
+    nextRecommended: repos
+      .filter(row => !row.configured || row.status !== 'done')
+      .sort((a, b) => Number(a.priority || 99) - Number(b.priority || 99))
+      .slice(0, 5)
+      .map(row => ({ repo: row.name, task: row.nextTask, priority: row.priority }))
+  };
+}
+
+function runAiAutomationTask(input = {}) {
+  const repos = getAiAutomationRepoPlan();
+  const repoSlug = String(input.repo || input.slug || '').trim().toLowerCase();
+  const repo = repos.find(row => row.slug === repoSlug || row.name.toLowerCase() === repoSlug);
+  if (!repo) throw new Error('Known repo slug is required.');
+  const tasks = loadJSON('aiAutomationTasks.json', []);
+  const task = {
+    id: uuid(),
+    repo: repo.slug,
+    repoName: repo.name,
+    type: cleanOutgoingText(input.type || 'integration_task'),
+    prompt: cleanOutgoingText(input.prompt || repo.nextTask || ''),
+    status: 'queued',
+    source: cleanOutgoingText(input.source || 'api'),
+    result: 'Queued in SuperSender AI Automation Hub. External worker can pick this task when configured.',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+  tasks.push(task);
+  saveJSON('aiAutomationTasks.json', tasks.slice(-500));
+  return { success: true, task, repo };
+}
+
+function buildAiAutomationHubReply() {
+  const status = getAiAutomationStatus();
+  const lines = status.repos
+    .sort((a, b) => Number(a.priority || 99) - Number(b.priority || 99))
+    .slice(0, 10)
+    .map(row => `${row.priority}. *${row.name}* - ${row.configured ? 'Configured' : 'Missing'}\n   ${row.nextTask}`)
+    .join('\n');
+  return `*AI Automation Hub*
+
+Repos: *${status.totals.repos}*
+Configured: *${status.totals.configured}*
+Missing: *${status.totals.missing}*
+Queued tasks: *${status.totals.queuedTasks}*
+
+Top priorities:
+${lines}
+
+Dashboard:
+http://localhost:3001/ai-automation-hub
+
+API:
+/api/ai-automation/status`;
+}
+
 function markWhatsAppChannelManualPacketDone(packetId = '', note = '') {
   const id = String(packetId || '').trim();
   if (!id) throw new Error('packetId is required');
@@ -17380,6 +17588,88 @@ pre{white-space:pre-wrap;background:#081018;border-radius:10px;padding:14px;over
   }
 });
 
+app.get('/api/ai-automation/repos', (_req, res) => {
+  try {
+    res.json({ success: true, repos: getAiAutomationRepoPlan(), updatedAt: new Date().toISOString() });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/ai-automation/status', (_req, res) => {
+  try {
+    res.json(getAiAutomationStatus());
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/ai-automation/run-task', (req, res) => {
+  try {
+    res.json(runAiAutomationTask({ ...(req.body || {}), source: req.body?.source || 'api' }));
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/ai-automation-hub', (_req, res) => {
+  try {
+    const status = getAiAutomationStatus();
+    const rows = status.repos
+      .sort((a, b) => Number(a.priority || 99) - Number(b.priority || 99))
+      .map(repo => `<tr>
+        <td><b>${htmlEscape(repo.name)}</b><br><small>${htmlEscape(repo.slug)}</small></td>
+        <td>${htmlEscape(repo.category)}<br><small>${htmlEscape(repo.integrationType)}</small></td>
+        <td><span class="pill ${repo.configured ? 'ok' : 'warn'}">${repo.configured ? 'Configured' : 'Not configured'}</span><br><small>${htmlEscape(repo.status || '')}</small></td>
+        <td>${Number(repo.priority || 0)}</td>
+        <td>${htmlEscape(repo.bestUse)}</td>
+        <td>${htmlEscape(repo.nextTask)}${repo.missingEnv?.length ? `<br><small class="warn-text">Missing: ${htmlEscape(repo.missingEnv.join(', '))}</small>` : ''}</td>
+        <td><button onclick="queueTask('${htmlEscape(repo.slug)}')">Queue Task</button></td>
+      </tr>`)
+      .join('');
+    const recent = status.recentTasks.length
+      ? status.recentTasks.map(task => `<tr><td>${htmlEscape(task.repoName || task.repo)}</td><td>${htmlEscape(task.status)}</td><td>${htmlEscape(task.prompt || '')}</td><td>${htmlEscape(task.createdAt || '')}</td></tr>`).join('')
+      : '<tr><td colspan="4" class="muted">No AI automation tasks queued yet.</td></tr>';
+    res.type('html').send(`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI Automation Hub</title>
+<style>
+body{font-family:Inter,Arial,sans-serif;background:#071014;color:#eaf7f3;margin:0;padding:24px;line-height:1.45}
+.top{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap;margin-bottom:18px}
+h1{margin:0}.muted,small{color:#9fb3c8}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:16px 0}
+.card{background:#13212b;border:1px solid #284150;border-radius:14px;padding:16px}.value{font-size:30px;font-weight:900;color:#19c79a}
+table{width:100%;border-collapse:collapse;background:#101d26;border:1px solid #263946;border-radius:14px;overflow:hidden;margin-top:14px}
+th,td{text-align:left;padding:12px;border-bottom:1px solid #263946;vertical-align:top}th{background:#162734;color:#b8d8ee}
+.pill{display:inline-flex;border-radius:999px;padding:4px 9px;font-size:12px;font-weight:800}.ok{background:#063d31;color:#6ee7b7}.warn{background:#3d3210;color:#fde68a}.warn-text{color:#fbbf24}
+button,.btn{background:#10b981;color:#06120d;border:0;border-radius:9px;padding:9px 12px;font-weight:800;text-decoration:none;cursor:pointer}.secondary{background:#223442;color:#d8f3ff}
+pre{white-space:pre-wrap;background:#081018;border-radius:10px;padding:14px;overflow:auto}
+</style></head><body>
+<main>
+  <div class="top"><div><h1>AI Automation Hub</h1><p class="muted">Adapters for n8n, LangGraph, Browser Use, CrewAI, Agentic Inbox, MCP, and developer-agent repos.</p></div><div><a class="btn secondary" href="/">Dashboard</a> <a class="btn secondary" href="/api/ai-automation/status">JSON Status</a></div></div>
+  <section class="grid">
+    <div class="card"><div class="muted">Repos</div><div class="value">${status.totals.repos}</div></div>
+    <div class="card"><div class="muted">Configured</div><div class="value">${status.totals.configured}</div></div>
+    <div class="card"><div class="muted">Missing</div><div class="value">${status.totals.missing}</div></div>
+    <div class="card"><div class="muted">Queued Tasks</div><div class="value">${status.totals.queuedTasks}</div></div>
+  </section>
+  <div class="card"><b>WhatsApp command:</b> <code>!aihub</code><br><span class="muted">If a worker/API key is missing, this hub keeps the project running and marks the adapter as Not configured.</span></div>
+  <table><thead><tr><th>Repo</th><th>Category</th><th>Status</th><th>Priority</th><th>Best use</th><th>Next task</th><th>Action</th></tr></thead><tbody>${rows}</tbody></table>
+  <h2>Recent queued tasks</h2><table><thead><tr><th>Repo</th><th>Status</th><th>Prompt</th><th>Created</th></tr></thead><tbody id="recent">${recent}</tbody></table>
+  <h2>Copy prompt</h2><pre id="prompt">Build the next SuperSender Pro AI Automation adapter from /api/ai-automation/status. Use safe defaults, no secrets in code, preserve the current WhatsApp bot and dashboard, and verify endpoints after each change.</pre>
+  <button onclick="navigator.clipboard.writeText(document.getElementById('prompt').innerText)">Copy Antigravity Prompt</button>
+</main>
+<script>
+async function queueTask(repo){
+  const r = await fetch('/api/ai-automation/run-task',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({repo,source:'dashboard'})});
+  const data = await r.json();
+  alert(data.success ? 'Queued task for '+data.repo.name : data.error);
+  if(data.success) location.reload();
+}
+</script>
+</body></html>`);
+  } catch (error) {
+    res.status(500).send(`AI Automation Hub failed: ${htmlEscape(error.message)}`);
+  }
+});
+
 app.get('/api/wa/channels/automation/health', (_req, res) => {
   try {
     res.json(whatsAppChannelAutomationHealth());
@@ -25614,7 +25904,7 @@ function splitSocialCommandArgs(text = '') {
 }
 
 function isWhatsAppSocialCommand(text = '') {
-  return /^!(social|connect|post|draft|approvepost|sharepost|poststatus|comment|control|admin|menuadmin|server|status|health|watchdog|next50|antigravity|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelfix|channelwatch|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
+  return /^!(social|connect|post|draft|approvepost|sharepost|poststatus|comment|control|admin|menuadmin|server|status|health|watchdog|next50|antigravity|aihub|automationhub|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelfix|channelwatch|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
 }
 
 function adminNumberCandidates() {
@@ -26744,6 +27034,11 @@ async function handleWhatsAppSocialAdminCommand(ctx = {}) {
 
     if (command === '!server' || command === '!status' || command === '!health') {
       await reply(buildServerStatusReply());
+      return true;
+    }
+
+    if (command === '!aihub' || command === '!automationhub') {
+      await reply(buildAiAutomationHubReply());
       return true;
     }
 
