@@ -15,6 +15,9 @@
     "wa-sales-bot": "cd wa-sales-bot && node index.js",
     "ai-tools:backend": "cd backend && npm run dev",
     "ai-tools:frontend": "cd frontend && npm run dev",
+    "lovable:dev": "cd lovable-app && npm run dev",
+    "lovable:build": "cd lovable-app && npm run build",
+    "lovable:preview": "cd lovable-app && npm run preview",
     "postinstall": "node scripts/patch-wwebjs.js"
   },
   "dependencies": {
