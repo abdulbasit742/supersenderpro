@@ -11062,6 +11062,259 @@ Dashboard:
 http://localhost:3001/claw-runtime`;
 }
 
+const PC_AGENT_ROLES = [
+  {
+    id: 'project-architect',
+    title: 'Project Architect',
+    agent: 'zeroclaw',
+    area: 'architecture',
+    goal: 'Audit SuperSender Pro modules and produce a safe build plan with exact files, tests, and rollback steps.'
+  },
+  {
+    id: 'code-writer',
+    title: 'Code Writer',
+    agent: 'nanoclaw',
+    area: 'implementation',
+    goal: 'Draft a small focused code patch for one approved SuperSender feature without touching secrets or runtime data.'
+  },
+  {
+    id: 'test-runner',
+    title: 'Test Runner',
+    agent: 'atombot',
+    area: 'verification',
+    goal: 'Run safe syntax, API, and smoke-test checks, then summarize failures with exact fix commands.'
+  },
+  {
+    id: 'channel-operator',
+    title: 'Channel Operator',
+    agent: 'hermes-agent',
+    area: 'channels',
+    goal: 'Review WhatsApp channel automation queue, dedupe rules, branding, and forwarding readiness in dry-run mode.'
+  },
+  {
+    id: 'scraping-agent',
+    title: 'Scraping Agent',
+    agent: 'nanobot',
+    area: 'web-scraping',
+    goal: 'Plan a safe data-fetch pipeline for scholarships, tools, prices, and ecommerce feeds using dry-run collection first.'
+  },
+  {
+    id: 'social-agent',
+    title: 'Social Agent',
+    agent: 'openclaw',
+    area: 'social',
+    goal: 'Generate social post drafts, captions, and platform readiness checks without live publishing.'
+  },
+  {
+    id: 'commerce-agent',
+    title: 'Commerce Agent',
+    agent: 'moltis',
+    area: 'commerce',
+    goal: 'Improve product, order, stock, payment, and abandoned-cart automations with policy-safe steps.'
+  },
+  {
+    id: 'security-agent',
+    title: 'Security Agent',
+    agent: 'safeclaw',
+    area: 'security',
+    goal: 'Scan planned changes for secret leaks, unsafe live actions, auth/session exposure, and compliance risks.'
+  },
+  {
+    id: 'devops-watchdog',
+    title: 'DevOps Watchdog',
+    agent: 'autobot',
+    area: 'pc-live',
+    goal: 'Check local server uptime, watchdog logs, repo status, and safe deployment readiness.'
+  }
+];
+
+function findPcAgentRole(value = '') {
+  const key = String(value || '').trim().toLowerCase();
+  if (!key) return PC_AGENT_ROLES[0];
+  return PC_AGENT_ROLES.find(role =>
+    role.id === key ||
+    role.title.toLowerCase() === key ||
+    role.area === key ||
+    role.agent === key
+  ) || null;
+}
+
+function getPcAgentControlStatus() {
+  const claw = getClawRuntimeStatus();
+  const tasks = loadJSON('pcAgentControlTasks.json', []);
+  const queue = Array.isArray(tasks) ? tasks : [];
+  const watchdogLog = path.join(__dirname, 'logs', 'supersender-watchdog.log');
+  let watchdogTail = [];
+  try {
+    if (fs.existsSync(watchdogLog)) {
+      watchdogTail = fs.readFileSync(watchdogLog, 'utf8').trim().split(/\r?\n/).slice(-8);
+    }
+  } catch {}
+  const serverHealth = {
+    uptimeSeconds: Math.round(process.uptime()),
+    memoryMb: Math.round(process.memoryUsage().rss / 1024 / 1024),
+    port: PORT,
+    pid: process.pid
+  };
+  return {
+    success: true,
+    title: 'PC Agent Control Center',
+    updatedAt: new Date().toISOString(),
+    mode: settings.pc_agent_control_mode || 'supervised',
+    autopilotEnabled: settings.pc_agent_autopilot_enabled === true,
+    livePcActionsEnabled: CLAW_RUNTIME_POLICY.livePcActionsEnabled,
+    dryRunDefault: CLAW_RUNTIME_POLICY.dryRunDefault,
+    serverHealth,
+    watchdog: {
+      script: path.join(__dirname, 'scripts', 'live', 'watch-supersender-live.ps1'),
+      log: watchdogLog,
+      runningHint: watchdogTail.some(line => /Health OK|Watchdog started/i.test(line)),
+      tail: watchdogTail
+    },
+    roles: PC_AGENT_ROLES,
+    claw: {
+      agents: claw.totals.agents,
+      queued: claw.totals.queued,
+      pendingApproval: claw.totals.pendingApproval,
+      executableReady: claw.executable.exists,
+      sourceReady: claw.sources.zeroclaw.present
+    },
+    totals: {
+      tasks: queue.length,
+      queued: queue.filter(row => /queued|approval/i.test(row.status || '')).length,
+      completed: queue.filter(row => row.status === 'completed').length,
+      blocked: queue.filter(row => row.status === 'blocked').length
+    },
+    recentTasks: queue.slice(0, 50),
+    safety: {
+      default: 'supervised_dry_run',
+      approvalRequiredFor: CLAW_RUNTIME_POLICY.approvalRequired,
+      blockedActions: CLAW_RUNTIME_POLICY.blockedActions,
+      neverShare: ['.env', '.wa-auth', '.baileys-auth', 'api_keys.json', 'social_accounts.json', 'customer logs', 'payment records']
+    },
+    commands: [
+      '!agents',
+      '!agenttask code-writer Add a small feature safely',
+      '!autobuild Improve channel automation',
+      '!claw queue zeroclaw check project health'
+    ],
+    dashboard: 'http://localhost:3001/pc-agent-control'
+  };
+}
+
+function createPcAgentTask(input = {}) {
+  const role = findPcAgentRole(input.role || input.agent || input.area) || PC_AGENT_ROLES[0];
+  const goal = cleanOutgoingText(input.goal || input.prompt || role.goal);
+  const clawTask = queueClawRuntimeTask({
+    agent: input.agent || role.agent,
+    goal: `[${role.title}] ${goal}`,
+    mode: 'supervised',
+    dryRun: true,
+    source: input.source || 'pc_agent_control'
+  });
+  try { flushJSONSave('clawRuntimeTasks.json'); } catch {}
+  const rows = loadJSON('pcAgentControlTasks.json', []);
+  const queue = Array.isArray(rows) ? rows : [];
+  const task = {
+    id: uuid(),
+    roleId: role.id,
+    roleTitle: role.title,
+    area: role.area,
+    agent: input.agent || role.agent,
+    goal,
+    status: 'approval_required',
+    mode: 'supervised',
+    dryRun: true,
+    linkedClawTaskId: clawTask.task.id,
+    source: cleanOutgoingText(input.source || 'api'),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+  queue.unshift(task);
+  saveJSON('pcAgentControlTasks.json', queue.slice(0, 500));
+  try { flushJSONSave('pcAgentControlTasks.json'); } catch {}
+  return { success: true, task, clawTask: clawTask.task, role };
+}
+
+function queuePcAutopilotMission(input = {}) {
+  const missionGoal = cleanOutgoingText(input.goal || input.prompt || 'Make SuperSender Pro more autonomous, stable, and business-ready.');
+  const selected = String(input.roles || '').trim()
+    ? String(input.roles).split(/[,\n]/).map(findPcAgentRole).filter(Boolean)
+    : PC_AGENT_ROLES;
+  const tasks = selected.map(role => createPcAgentTask({
+    role: role.id,
+    goal: `${missionGoal} Area: ${role.area}. ${role.goal}`,
+    source: input.source || 'pc_autopilot'
+  }).task);
+  return {
+    success: true,
+    missionId: uuid(),
+    missionGoal,
+    tasks,
+    total: tasks.length,
+    status: 'queued_for_supervised_approval',
+    dashboard: 'http://localhost:3001/pc-agent-control',
+    note: 'Tasks are queued in dry-run/supervised mode. Approve exact patches/actions before live execution.'
+  };
+}
+
+function buildPcAgentControlPrompt(input = {}) {
+  const status = getPcAgentControlStatus();
+  const goal = cleanOutgoingText(input.goal || 'Build the next safe SuperSender Pro automation feature.');
+  const roles = status.roles.map(role => `- ${role.title} (${role.id}) uses ${role.agent}: ${role.goal}`).join('\n');
+  return `You are a supervised local AI agent team for SuperSender Pro.
+
+Goal:
+${goal}
+
+Available roles:
+${roles}
+
+Required workflow:
+1. Inspect only safe source files. Do not read .env, auth/session folders, payment/customer private logs, or token files.
+2. Produce a short plan with files to edit and tests to run.
+3. Create a small patch only after owner approval.
+4. Run syntax and endpoint smoke checks.
+5. Return a receipt: changed files, commands, tests, risks, and next safe task.
+
+Blocked actions:
+${status.safety.blockedActions.join(', ')}
+
+Approval required for:
+${status.safety.approvalRequiredFor.join(', ')}
+
+Dashboard:
+${status.dashboard}`;
+}
+
+function formatPcAgentControlReply() {
+  const status = getPcAgentControlStatus();
+  const roleLines = status.roles.map((role, index) => `${index + 1}. *${role.title}* (${role.id})\n   Agent: ${role.agent} | Area: ${role.area}`).join('\n');
+  return `🤖 *PC Agent Control Center*
+
+Mode: *${status.mode}*
+Autopilot: *${status.autopilotEnabled ? 'ON' : 'OFF'}*
+Live PC actions: *${status.livePcActionsEnabled ? 'ON' : 'OFF'}*
+Dry-run default: *${status.dryRunDefault ? 'ON' : 'OFF'}*
+Server: *${status.serverHealth.memoryMb} MB* | PID ${status.serverHealth.pid}
+Watchdog: *${status.watchdog.runningHint ? 'ACTIVE' : 'CHECK LOG'}*
+
+Agents discovered: *${status.claw.agents}*
+Control tasks: *${status.totals.tasks}*
+Pending approval: *${status.totals.queued}*
+
+*Control roles*
+${roleLines}
+
+Commands:
+*!agents*
+*!agenttask code-writer add dashboard filter*
+*!autobuild improve channel automation safely*
+
+Dashboard:
+${status.dashboard}`;
+}
+
 function getAgenticPublicRepoCatalog() {
   const queuedRows = loadJSON('agenticRepoImportQueue.json', []);
   const queueBySlug = {};
@@ -20400,6 +20653,82 @@ app.get('/api/claw-runtime/prompt', (req, res) => {
   }
 });
 
+app.get('/api/pc-agents/status', (_req, res) => {
+  try {
+    res.json(getPcAgentControlStatus());
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/pc-agents/task', (req, res) => {
+  try {
+    res.json(createPcAgentTask({ ...(req.body || {}), source: req.body?.source || 'api' }));
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/pc-agents/autopilot', (req, res) => {
+  try {
+    res.json(queuePcAutopilotMission({ ...(req.body || {}), source: req.body?.source || 'api' }));
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/pc-agents/prompt', (req, res) => {
+  try {
+    res.type('text/plain').send(buildPcAgentControlPrompt(req.query || {}));
+  } catch (error) {
+    res.status(500).type('text/plain').send(error.message);
+  }
+});
+
+app.get('/pc-agent-control', (_req, res) => {
+  try {
+    const status = getPcAgentControlStatus();
+    const rolesHtml = status.roles.map(role => `<div class="role"><div><b>${htmlEscape(role.title)}</b><div class="muted">${htmlEscape(role.goal)}</div></div><span class="pill">${htmlEscape(role.agent)}</span></div>`).join('');
+    const tasksHtml = status.recentTasks.slice(0, 25).map(row => `<tr><td>${htmlEscape(row.roleTitle || row.agent || '')}</td><td>${htmlEscape(row.goal || '')}</td><td>${htmlEscape(row.status || '')}</td></tr>`).join('') || '<tr><td colspan="3" class="muted">No PC agent control tasks yet.</td></tr>';
+    res.type('html').send(`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PC Agent Control Center</title>
+<style>
+body{margin:0;background:#07111f;color:#e5edf7;font-family:Inter,Segoe UI,Arial,sans-serif}.wrap{max-width:1180px;margin:0 auto;padding:28px}
+.top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap;margin-bottom:22px}h1{margin:0;font-size:34px}h2{margin:0 0 12px;font-size:20px}.muted{color:#9fb0c5}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}.card{background:#101c2c;border:1px solid #21334a;border-radius:14px;padding:18px;box-shadow:0 18px 50px rgba(0,0,0,.22)}
+.metric{font-size:30px;font-weight:800;color:#34d399}.btn,button{border:0;border-radius:10px;padding:11px 14px;background:#10b981;color:#04111d;font-weight:800;cursor:pointer;text-decoration:none;display:inline-block}.secondary{background:#1e2d41;color:#d9e7f7;border:1px solid #334a66}.warn{background:#f59e0b}
+input,select,textarea{width:100%;box-sizing:border-box;background:#07111f;color:#e5edf7;border:1px solid #2e4764;border-radius:10px;padding:11px;margin:7px 0 12px}textarea{min-height:100px}
+.role{display:flex;justify-content:space-between;gap:12px;border-top:1px solid #21334a;padding:12px 0}.pill{font-size:12px;padding:4px 8px;border-radius:999px;background:#123e34;color:#7df7ce}.log{white-space:pre-wrap;background:#07111f;border:1px solid #20344c;border-radius:10px;padding:12px;max-height:260px;overflow:auto}
+table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid #20344c;padding:9px;text-align:left}th{color:#93a9c4}a{color:#7dd3fc}
+</style></head><body><div class="wrap">
+<div class="top"><div><h1>PC Agent Control Center</h1><p class="muted">Control all local AI agents for SuperSender Pro in supervised dry-run mode.</p></div><div><a class="btn secondary" href="/">Dashboard</a> <a class="btn secondary" href="/claw-runtime">Claw Runtime</a> <a class="btn secondary" href="/api/pc-agents/status">JSON</a></div></div>
+<div class="grid">
+  <div class="card"><div class="muted">Mode</div><div class="metric">${htmlEscape(status.mode)}</div><p class="muted">Live actions: ${status.livePcActionsEnabled ? 'ON' : 'OFF'} | Dry-run: ${status.dryRunDefault ? 'ON' : 'OFF'}</p></div>
+  <div class="card"><div class="muted">Agents discovered</div><div class="metric">${status.claw.agents}</div><p class="muted">From ZeroClaw / awesome-claws hub</p></div>
+  <div class="card"><div class="muted">Control tasks</div><div class="metric">${status.totals.tasks}</div><p class="muted">Pending approval: ${status.totals.queued}</p></div>
+  <div class="card"><div class="muted">Server</div><div class="metric">${status.serverHealth.memoryMb} MB</div><p class="muted">PID ${status.serverHealth.pid} | Port ${status.serverHealth.port}</p></div>
+</div>
+<div class="grid" style="margin-top:14px">
+  <div class="card"><h2>Create one agent task</h2><label>Role</label><select id="role">${status.roles.map(role => `<option value="${htmlEscape(role.id)}">${htmlEscape(role.title)} - ${htmlEscape(role.area)}</option>`).join('')}</select><label>Goal</label><textarea id="goal">Improve SuperSender Pro safely and produce exact files/tests.</textarea><button onclick="queueTask()">Queue supervised task</button> <button class="secondary" onclick="copyPrompt()">Copy prompt</button></div>
+  <div class="card"><h2>Auto-build mission</h2><p class="muted">Queues every specialist role as dry-run tasks. No file writes or live actions without approval.</p><textarea id="mission">Make the project more autonomous, stable, and ready to sell to business owners.</textarea><button class="warn" onclick="queueAutopilot()">Queue full mission</button></div>
+</div>
+<div class="card" style="margin-top:14px"><h2>Agent roles</h2>${rolesHtml}</div>
+<div class="grid" style="margin-top:14px">
+  <div class="card"><h2>Recent tasks</h2><table><thead><tr><th>Role</th><th>Goal</th><th>Status</th></tr></thead><tbody>${tasksHtml}</tbody></table></div>
+  <div class="card"><h2>Watchdog log</h2><div class="log">${htmlEscape(status.watchdog.tail.join('\n') || 'No watchdog log yet.')}</div><p class="muted">${htmlEscape(status.watchdog.log)}</p></div>
+</div>
+<div class="card" style="margin-top:14px"><h2>Result</h2><div class="log" id="out">Ready.</div></div>
+</div><script>
+async function postJson(url,payload){const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});return r.json();}
+function show(v){document.getElementById('out').textContent=typeof v==='string'?v:JSON.stringify(v,null,2);}
+async function queueTask(){show(await postJson('/api/pc-agents/task',{role:document.getElementById('role').value,goal:document.getElementById('goal').value,source:'dashboard'}));}
+async function queueAutopilot(){show(await postJson('/api/pc-agents/autopilot',{goal:document.getElementById('mission').value,source:'dashboard'}));}
+async function copyPrompt(){const params=new URLSearchParams({goal:document.getElementById('goal').value});const t=await (await fetch('/api/pc-agents/prompt?'+params.toString())).text();await navigator.clipboard.writeText(t);show('Prompt copied to clipboard.');}
+</script></body></html>`);
+  } catch (error) {
+    res.status(500).send(`PC Agent Control failed: ${htmlEscape(error.message)}`);
+  }
+});
+
 app.get('/claw-runtime', (_req, res) => {
   try {
     const status = getClawRuntimeStatus();
@@ -20646,7 +20975,7 @@ button,.btn{background:#10b981;color:#06120d;border:0;border-radius:9px;padding:
 pre{white-space:pre-wrap;background:#081018;border-radius:10px;padding:14px;overflow:auto}
 </style></head><body>
 <main>
-  <div class="top"><div><h1>AI Automation Hub</h1><p class="muted">Adapters for n8n, LangGraph, Browser Use, CrewAI, ZeroClaw, OpenClaw, Hermes Agent, Agentic Inbox, MCP, and future AI agents.</p></div><div><a class="btn secondary" href="/">Dashboard</a> <a class="btn secondary" href="/ai-algorithms">AI Algorithms</a> <a class="btn secondary" href="/claw-runtime">Claw Runtime</a> <a class="btn secondary" href="/api/ai-automation/status">JSON Status</a></div></div>
+  <div class="top"><div><h1>AI Automation Hub</h1><p class="muted">Adapters for n8n, LangGraph, Browser Use, CrewAI, ZeroClaw, OpenClaw, Hermes Agent, Agentic Inbox, MCP, and future AI agents.</p></div><div><a class="btn secondary" href="/">Dashboard</a> <a class="btn secondary" href="/ai-algorithms">AI Algorithms</a> <a class="btn secondary" href="/claw-runtime">Claw Runtime</a> <a class="btn secondary" href="/pc-agent-control">PC Agent Control</a> <a class="btn secondary" href="/api/ai-automation/status">JSON Status</a></div></div>
   <section class="grid">
     <div class="card"><div class="muted">Repos</div><div class="value">${status.totals.repos}</div></div>
     <div class="card"><div class="muted">Configured</div><div class="value">${status.totals.configured}</div></div>
@@ -29617,7 +29946,7 @@ function splitSocialCommandArgs(text = '') {
 }
 
 function isWhatsAppSocialCommand(text = '') {
-  return /^!(social|connect|post|draft|approvepost|sharepost|poststatus|comment|telegram|control|admin|menuadmin|server|status|health|watchdog|next50|antigravity|aihub|automationhub|claw|claws|zeroclaw|pcagents|importskills|skillpacks|packs|waauto|automation|autosettings|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelfix|channelwatch|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
+  return /^!(social|connect|post|draft|approvepost|sharepost|poststatus|comment|telegram|control|admin|menuadmin|server|status|health|watchdog|next50|antigravity|aihub|automationhub|agents|agentcontrol|agenttask|autobuild|claw|claws|zeroclaw|pcagents|importskills|skillpacks|packs|waauto|automation|autosettings|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelfix|channelwatch|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
 }
 
 function adminNumberCandidates() {
@@ -30773,6 +31102,49 @@ async function handleWhatsAppSocialAdminCommand(ctx = {}) {
 
     if (command === '!aihub' || command === '!automationhub') {
       await reply(buildAiAutomationHubReply());
+      return true;
+    }
+
+    if (command === '!agents' || command === '!agentcontrol') {
+      await reply(formatPcAgentControlReply());
+      return true;
+    }
+
+    if (command === '!agenttask') {
+      const role = String(args[1] || 'project-architect').trim();
+      const goal = args.slice(2).join(' ').trim() || 'Improve SuperSender Pro safely and produce exact files/tests.';
+      const result = createPcAgentTask({ role, goal, source: 'whatsapp_admin' });
+      await reply(`✅ *PC Agent Task Queued*
+
+Role: *${result.task.roleTitle}*
+Agent: *${result.task.agent}*
+Status: *${result.task.status}*
+Dry-run: *YES*
+
+Goal:
+${result.task.goal}
+
+Dashboard:
+http://localhost:3001/pc-agent-control`);
+      return true;
+    }
+
+    if (command === '!autobuild') {
+      const goal = args.slice(1).join(' ').trim() || 'Make SuperSender Pro more autonomous, stable, and business-ready.';
+      const result = queuePcAutopilotMission({ goal, source: 'whatsapp_admin' });
+      await reply(`🤖 *Auto-build Mission Queued*
+
+Mode: *supervised dry-run*
+Tasks: *${result.total}*
+Status: *${result.status}*
+
+Goal:
+${result.missionGoal}
+
+No live file writes/social posts/payment actions will run without approval.
+
+Dashboard:
+${result.dashboard}`);
       return true;
     }
 

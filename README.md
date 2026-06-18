@@ -939,6 +939,35 @@ If you run PowerShell as Administrator, you can alternatively register a Schedul
 powershell -ExecutionPolicy Bypass -File .\scripts\live\register-supersender-startup.ps1
 ```
 
+## PC Agent Control Center
+
+Open:
+
+```text
+http://localhost:3001/pc-agent-control
+```
+
+This page controls the local AI agent team in supervised dry-run mode. It queues roles such as Project Architect, Code Writer, Test Runner, Channel Operator, Scraping Agent, Social Agent, Commerce Agent, Security Agent, and DevOps Watchdog. The system creates plans and task receipts first; filesystem writes, shell commands, WhatsApp sends, social publishing, payment delivery, and Git push stay approval-gated.
+
+API:
+
+```text
+GET  /api/pc-agents/status
+POST /api/pc-agents/task
+POST /api/pc-agents/autopilot
+GET  /api/pc-agents/prompt
+```
+
+WhatsApp admin commands:
+
+```text
+!agents
+!agenttask code-writer add dashboard filter
+!autobuild improve channel automation safely
+```
+
+Safe default: agents never receive `.env`, `.wa-auth`, `.baileys-auth`, `api_keys.json`, `social_accounts.json`, customer logs, payment records, or private keys.
+
 ## Admin Commands
 
 Send these from `ADMIN_NUMBER` in private chat or any group:
