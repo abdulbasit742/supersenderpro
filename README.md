@@ -859,6 +859,58 @@ D:\SuperSenderPro\imports\2026-06-18-uploaded-packs
 
 Override with `UPLOADED_IMPORT_PACKS_ROOT` if the extracted packs move to another laptop or server. Keep `.env`, `.git`, WhatsApp auth sessions, customer logs, payment records, and token-bearing files out of Git.
 
+## Claw Runtime Hub
+
+SuperSender can now use ZeroClaw and the awesome-claws directory as a supervised local agent layer for PC/project automation.
+
+Local sources:
+
+```text
+D:\SuperSenderPro\agent-runtime\sources\zeroclaw
+D:\SuperSenderPro\agent-runtime\sources\awesome-claws
+```
+
+Dashboard:
+
+```text
+http://localhost:3001/claw-runtime
+```
+
+APIs:
+
+```text
+GET  /api/claw-runtime/status
+GET  /api/claw-runtime/agents
+POST /api/claw-runtime/plan
+POST /api/claw-runtime/queue
+GET  /api/claw-runtime/prompt?agent=zeroclaw&goal=check%20project
+```
+
+WhatsApp admin commands:
+
+```text
+!claw
+!claw plan zeroclaw improve channel automation
+!claw queue zeroclaw check project health
+!claw prompt zeroclaw build safe PC assistant
+```
+
+Windows helper scripts:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\claw-runtime\setup-claw-runtime.ps1 -Refresh
+powershell -ExecutionPolicy Bypass -File .\scripts\claw-runtime\run-supervised-agent.ps1 -Agent zeroclaw -Goal "Check SuperSender project health"
+```
+
+Safety defaults:
+
+- `CLAW_RUNTIME_DEFAULT_MODE=supervised`
+- `CLAW_RUNTIME_DRY_RUN_DEFAULT=true`
+- `CLAW_RUNTIME_LIVE_PC_ACTIONS=false`
+- `CLAW_RUNTIME_ALLOW_YOLO=false`
+
+The runtime hub queues plans and dry-runs first. Filesystem writes, shell commands, browser actions, WhatsApp sends, social publishing, payment delivery, and Git pushes require admin approval. Do not pass `.env`, WhatsApp sessions, auth folders, customer logs, payment records, or private keys to external agents.
+
 ## Admin Commands
 
 Send these from `ADMIN_NUMBER` in private chat or any group:
@@ -891,6 +943,10 @@ Send these from `ADMIN_NUMBER` in private chat or any group:
 !importskills plan pes_payments_activation
 !importskills queue dealradar_growth_marketplace
 !importskills prompt bolt_supabase_chat
+!claw
+!claw plan zeroclaw improve channel automation
+!claw queue zeroclaw check project health
+!claw prompt zeroclaw build safe PC assistant
 !sync
 !help
 ```
