@@ -130,6 +130,8 @@ GET  /api/wa/automation-settings
 POST /api/wa/automation-settings
 POST /api/wa/automation-settings/preset
 POST /api/wa/automation-settings/test-reply
+GET  /api/wa/automation-settings/client-pack
+POST /api/wa/automation-settings/client-pack
 ```
 
 WhatsApp admin commands:
@@ -140,6 +142,7 @@ WhatsApp admin commands:
 !waauto off
 !waauto preset ecommerce_store
 !waauto test price kya hai
+!waauto pack founder_growth Client Name
 ```
 
 Business presets:
@@ -152,6 +155,8 @@ Business presets:
 - `support_center` - ticket triage, SLA alerts, issue routing, feedback recovery.
 
 Safe defaults are enabled: structured task-bot mode, explicit opt-in, promotional caps, unsubscribe footer, dry-run live actions, and human handoff keywords.
+
+The Client Pack Generator on the same page creates a sellable proposal for any preset. It includes the client pitch, setup checklist, demo WhatsApp replies, suggested setup/monthly pricing, API references, and safe operating rules. Generated packs are saved in runtime data as `waAutomationClientPacks.json` and should not be committed.
 
 ## Auto Stock Sourcing
 

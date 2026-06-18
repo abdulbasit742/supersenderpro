@@ -10186,6 +10186,118 @@ Dashboard:
 http://localhost:3001/wa-automation-settings`;
 }
 
+function buildWhatsAppAutomationClientPack(input = {}) {
+  const presetId = String(input.preset || input.profile || settings.whatsapp_automation_profile || 'ai_tools_reseller').trim().toLowerCase();
+  const preset = WHATSAPP_AUTOMATION_PRESETS.find(row => row.id === presetId) || WHATSAPP_AUTOMATION_PRESETS[0];
+  const businessName = cleanOutgoingText(input.businessName || input.clientName || `${preset.label} Client`).slice(0, 120);
+  const industry = cleanOutgoingText(input.industry || preset.businessType || 'business').slice(0, 80);
+  const dailyMessages = Math.max(0, Number(input.dailyMessages || input.volume || (preset.id === 'ecommerce_store' ? 120 : 50)));
+  const packageName = `${preset.label} WhatsApp Automation Pack`;
+  const firstReply = Number(preset.settings.firstReplyTargetSeconds || 3);
+  const followups = preset.settings.followupHours || [2, 24, 72];
+  const useCases = preset.settings.useCases || [];
+  const setupChecklist = [
+    'Confirm business name, offer list, prices, and support policy.',
+    'Add WhatsApp number/session and admin number.',
+    'Upload FAQ, product/service catalog, payment details, and handoff keywords.',
+    'Enable explicit opt-in and unsubscribe footer for promotional messages.',
+    `Apply preset: ${preset.id}.`,
+    'Run reply simulator with 10 real customer questions.',
+    'Start in dry-run mode, then enable live replies after admin approval.'
+  ];
+  const demoScript = [
+    { customer: 'price kya hai?', bot: 'Bilkul. Main available plans, price aur stock/service status share kar deta hoon.' },
+    { customer: 'order karna hai', bot: 'Great. Pehle option confirm karein, phir payment/booking details milengi. Verification ke baad delivery/confirmation ho jayegi.' },
+    { customer: 'issue aa raha hai', bot: 'Issue note kar liya. Main policy/status check kar ke solution ya human handoff arrange karta hoon.' }
+  ];
+  const pack = {
+    success: true,
+    id: `WAP-${Date.now().toString(36).toUpperCase()}`,
+    generatedAt: new Date().toISOString(),
+    businessName,
+    industry,
+    dailyMessages,
+    preset: preset.id,
+    packageName,
+    headline: `${businessName} can reply to leads in ${firstReply} seconds with structured WhatsApp automation.`,
+    pitch: [
+      `${packageName} is designed for ${industry} teams that want faster replies, safer broadcasts, follow-ups, and human handoff without losing control.`,
+      `It covers ${useCases.join(', ')} with ${followups.join(', ')} hour follow-ups and a ${preset.settings.promoWeeklyLimit}/week promotional cap.`,
+      dailyMessages >= 100
+        ? 'Recommended for high-volume teams because manual replies will leak hot leads.'
+        : 'Recommended as a lightweight starter automation that can grow into full CRM and ecommerce workflows.'
+    ],
+    modules: [
+      { name: '3 Second First Reply', value: `${firstReply}s target`, benefit: 'Hot leads get instant direction instead of waiting.' },
+      { name: 'Structured AI Replies', value: preset.settings.tone, benefit: 'Task-specific replies for price, order, support, booking, and handoff.' },
+      { name: 'Follow-up Engine', value: `${followups.join(', ')} hours`, benefit: 'Abandoned or undecided leads are recovered automatically.' },
+      { name: 'Safety Controls', value: 'Opt-in, promo cap, unsubscribe, dry-run', benefit: 'Automation stays sellable and safer for business use.' },
+      { name: 'Admin Control', value: '!waauto + dashboard', benefit: 'Owner can change presets directly from WhatsApp.' }
+    ],
+    setupChecklist,
+    demoScript,
+    whatsappCommands: [
+      `!waauto preset ${preset.id}`,
+      '!waauto test price kya hai',
+      '!waauto on',
+      '!waauto pack'
+    ],
+    api: {
+      settings: '/api/wa/automation-settings',
+      applyPreset: '/api/wa/automation-settings/preset',
+      testReply: '/api/wa/automation-settings/test-reply',
+      clientPack: '/api/wa/automation-settings/client-pack'
+    },
+    pricingSuggestion: {
+      setup: dailyMessages >= 100 ? 'Rs 45,000 - Rs 95,000 setup' : 'Rs 20,000 - Rs 45,000 setup',
+      monthly: dailyMessages >= 100 ? 'Rs 15,000 - Rs 45,000/month support' : 'Rs 5,000 - Rs 15,000/month support'
+    },
+    guardrails: [
+      'No open-ended general assistant mode by default.',
+      'Promotional messages require opt-in and weekly limits.',
+      'Payment, delivery, social posting, and bulk broadcast actions should stay dry-run until admin approval.',
+      'Human handoff triggers on urgent, complaint, refund, call, and admin keywords.'
+    ]
+  };
+  const rows = loadJSON('waAutomationClientPacks.json', []);
+  const nextRows = Array.isArray(rows) ? rows : [];
+  nextRows.unshift(pack);
+  saveJSON('waAutomationClientPacks.json', nextRows.slice(0, 200));
+  return pack;
+}
+
+function formatWhatsAppAutomationClientPackReply(pack = {}) {
+  const modules = (pack.modules || []).slice(0, 5).map(row => `• *${row.name}* — ${row.value}\n  ${row.benefit}`).join('\n');
+  const checklist = (pack.setupChecklist || []).slice(0, 7).map((item, index) => `${index + 1}. ${item}`).join('\n');
+  const commands = (pack.whatsappCommands || []).map(cmd => `• ${cmd}`).join('\n');
+  return `📦 *${pack.packageName || 'WhatsApp Automation Pack'}*
+
+Client: *${pack.businessName || '-'}*
+Industry: *${pack.industry || '-'}*
+Preset: *${pack.preset || '-'}*
+
+${pack.headline || ''}
+
+*Pitch*
+${(pack.pitch || []).map(line => `• ${line}`).join('\n')}
+
+*Modules*
+${modules}
+
+*Setup Checklist*
+${checklist}
+
+*Suggested Pricing*
+Setup: *${pack.pricingSuggestion?.setup || '-'}*
+Monthly: *${pack.pricingSuggestion?.monthly || '-'}*
+
+*Commands*
+${commands}
+
+Dashboard:
+http://localhost:3001/wa-automation-settings`;
+}
+
 function getAiAutomationStatus() {
   const repos = getAiAutomationRepoPlan();
   const repoCatalog = getAgenticPublicRepoCatalog();
@@ -18947,6 +19059,22 @@ app.post('/api/wa/automation-settings/test-reply', (req, res) => {
   }
 });
 
+app.get('/api/wa/automation-settings/client-pack', (req, res) => {
+  try {
+    res.json(buildWhatsAppAutomationClientPack(req.query || {}));
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/wa/automation-settings/client-pack', (req, res) => {
+  try {
+    res.json(buildWhatsAppAutomationClientPack(req.body || {}));
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
 app.get('/wa-automation-settings', (_req, res) => {
   try {
     const cfg = getWhatsAppAutomationSettings();
@@ -18987,6 +19115,27 @@ pre{white-space:pre-wrap;background:#081018;border:1px solid #263946;border-radi
   </section>
   <h2>Business Presets</h2>
   <section class="grid">${presetCards}</section>
+  <section class="card">
+    <h2>Client Pack Generator</h2>
+    <p class="muted">Founder ya client ko sell karne ke liye proposal, setup checklist, WhatsApp demo script, pricing suggestion, aur safety rules generate karein.</p>
+    <section class="grid">
+      <div>
+        <label>Client / Business Name</label><input id="clientName" value="New Client">
+      </div>
+      <div>
+        <label>Industry</label><input id="clientIndustry" value="${htmlEscape(cfg.businessType)}">
+      </div>
+      <div>
+        <label>Preset</label><select id="clientPreset">${cfg.presets.map(row => `<option value="${htmlEscape(row.id)}" ${row.active ? 'selected' : ''}>${htmlEscape(row.label)}</option>`).join('')}</select>
+      </div>
+      <div>
+        <label>Daily Messages</label><input id="dailyMessages" type="number" min="0" value="80">
+      </div>
+    </section>
+    <button onclick="generateClientPack()">Generate Client Pack</button>
+    <button class="secondary" onclick="copyClientPack()">Copy Pack</button>
+    <pre id="clientPackOut">Click Generate Client Pack to create a sellable business proposal.</pre>
+  </section>
   <section class="grid">
     <div class="card">
       <h2>Core Controls</h2>
@@ -19067,6 +19216,21 @@ async function saveSettings(){
 async function testReply(){
   const data = await postJson('/api/wa/automation-settings/test-reply',{message:document.getElementById('testMessage').value,source:'dashboard'});
   document.getElementById('testOutput').innerText = JSON.stringify(data, null, 2);
+}
+async function generateClientPack(){
+  const payload = {
+    businessName: document.getElementById('clientName').value,
+    industry: document.getElementById('clientIndustry').value,
+    preset: document.getElementById('clientPreset').value,
+    dailyMessages: Number(document.getElementById('dailyMessages').value || 0),
+    source: 'dashboard'
+  };
+  const data = await postJson('/api/wa/automation-settings/client-pack', payload);
+  document.getElementById('clientPackOut').innerText = JSON.stringify(data, null, 2);
+}
+async function copyClientPack(){
+  await navigator.clipboard.writeText(document.getElementById('clientPackOut').innerText);
+  alert('Client automation pack copied');
 }
 </script></body></html>`);
   } catch (error) {
@@ -29607,6 +29771,18 @@ async function handleWhatsAppSocialAdminCommand(ctx = {}) {
         const message = args.slice(2).join(' ').trim() || 'price kya hai?';
         const result = buildWhatsAppAutomationTestReply({ message, source: 'whatsapp_admin' });
         await reply(`🧪 *Automation Reply Preview*\nIntent: *${result.intent}*\nLead score: *${result.leadScore ?? '-'}*\n\n${result.reply}`);
+        return true;
+      }
+      if (['pack', 'clientpack', 'proposal', 'pitch'].includes(mode)) {
+        const preset = String(args[2] || settings.whatsapp_automation_profile || 'ai_tools_reseller').trim();
+        const businessName = args.slice(3).join(' ').trim() || `${preset} client`;
+        const pack = buildWhatsAppAutomationClientPack({
+          preset,
+          businessName,
+          industry: preset,
+          source: 'whatsapp_admin'
+        });
+        await reply(formatWhatsAppAutomationClientPackReply(pack));
         return true;
       }
       await reply(buildWhatsAppAutomationSettingsReply());
