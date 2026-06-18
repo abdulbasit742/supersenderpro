@@ -201,6 +201,11 @@ GET  /api/ai-automation/repo-catalog
 POST /api/ai-automation/repo-plan
 POST /api/ai-automation/repo-import
 GET  /api/ai-automation/repo-catalog-prompt
+GET  /api/ai-algorithms/catalog
+GET  /api/ai-algorithms/status
+POST /api/ai-algorithms/recommend
+POST /api/ai-algorithms/run
+GET  /api/ai-algorithms/prompt
 GET  /api/ai-automation/agent-registry
 POST /api/ai-automation/agent-registry
 POST /api/ai-automation/agent-task-plan
@@ -239,6 +244,8 @@ AGENTIC_MISSIONS_REQUIRE_APPROVAL=true
 AGENTIC_REPO_IMPORTS_ENABLED=true
 AGENTIC_REPO_IMPORT_DRY_RUN_DEFAULT=true
 AGENTIC_REPO_ALLOW_VENDOR_COPY=false
+AI_ALGORITHMS_ENABLED=true
+AI_ALGORITHMS_DRY_RUN_DEFAULT=true
 ```
 
 Built-in Agentic Skill Packs:
@@ -311,6 +318,39 @@ curl -X POST http://localhost:3001/api/ai-automation/repo-import \
   -d "{\"repo\":\"firecrawl\",\"dryRun\":true,\"source\":\"admin\"}"
 ```
 
+AI Algorithms Engine:
+
+The project now includes a June 2026-ready AI Algorithm Strategy Engine. It does not pretend that one model solves everything; it maps the right algorithm family to the right SuperSender module.
+
+Included algorithm families:
+
+- Intent routing, state repair, contextual memory RAG, hybrid retrieval, grounding checks.
+- Durable graph orchestration, agent handoff supervision, MCP tool routing, queue priority optimization.
+- Dealer ranking, dynamic pricing, price spread arbitrage, lead scoring, churn prediction, next-best-offer recommendations.
+- Fraud anomaly detection, PII/secret redaction, content safety moderation, semantic dedupe, viral prediction.
+- OCR, voice transcript intent parsing, product extraction, caption generation, website-change summarization.
+- Prompt optimization, A/B uplift testing, send-time optimization, business KPI advisor.
+
+Dashboard:
+
+```text
+http://localhost:3001/ai-algorithms
+```
+
+Useful API calls:
+
+```bash
+curl http://localhost:3001/api/ai-algorithms/catalog
+
+curl -X POST http://localhost:3001/api/ai-algorithms/recommend \
+  -H "Content-Type: application/json" \
+  -d "{\"goal\":\"make WhatsApp sales bot smarter\",\"module\":\"whatsapp-bot\"}"
+
+curl -X POST http://localhost:3001/api/ai-algorithms/run \
+  -H "Content-Type: application/json" \
+  -d "{\"algorithm\":\"intent-ensemble-router\",\"dryRun\":true,\"source\":\"admin\"}"
+```
+
 Safe operating rules:
 
 - Do not send `.env`, WhatsApp sessions, customer logs, or API tokens to external agents.
@@ -318,6 +358,7 @@ Safe operating rules:
 - Use `/api/ai-automation/agent-task-plan` before wiring a new agent so the system records safety steps and missing env keys.
 - Custom agents are stored in `data/agenticAgentRegistry.json`; this runtime file should not be committed.
 - Public repo import queue is stored in `data/agenticRepoImportQueue.json`; this runtime file should not be committed.
+- AI algorithm dry-runs are stored in `data/aiAlgorithmRuns.json`; this runtime file should not be committed.
 
 ## Facebook, Instagram, and LinkedIn Setup
 
