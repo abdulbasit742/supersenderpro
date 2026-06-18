@@ -201,6 +201,9 @@ GET  /api/ai-automation/agent-registry
 POST /api/ai-automation/agent-registry
 POST /api/ai-automation/agent-task-plan
 GET  /api/ai-automation/agent-prompt
+GET  /api/ai-automation/skills
+POST /api/ai-automation/skills/install
+POST /api/ai-automation/playbook
 POST /api/ai-automation/run-task
 ```
 
@@ -221,6 +224,35 @@ HERMES_EVOLUTION_WORKER_URL=
 OPENHANDS_WORKER_URL=
 OPENHANDS_API_KEY=
 AGENTIC_AGENT_WEBHOOK_URL=
+AGENTIC_SKILLS_ENABLED=true
+AGENTIC_SKILLS_DRY_RUN_DEFAULT=true
+```
+
+Built-in Agentic Skill Packs:
+
+- Ecommerce Autopilot: order sync, abandoned cart, COD confirmation, stock alerts.
+- Channel Publisher Copilot: source-channel watching, branding, filtering, fallback manual packets.
+- Scholarship Scout: website/source scraping, deadline detection, WhatsApp/social post drafts.
+- Dealer Intelligence Agent: dealer rate parsing, trust scoring, margin recommendation.
+- Payment Verifier: email/TXN/screenshot payment signal review and fraud guard.
+- Support Recovery Agent: customer memory, issue recovery, warranty-safe support replies.
+- Social Growth Engine: captions, social calendar, UTM/click tracking, content repurposing.
+- Developer Maintainer: health checks, diagnostics, safe patch planning, repo maintenance.
+
+To generate a workflow from a business goal:
+
+```bash
+curl -X POST http://localhost:3001/api/ai-automation/playbook \
+  -H "Content-Type: application/json" \
+  -d "{\"goal\":\"automate ecommerce and channel posting\",\"channels\":\"whatsapp,facebook,website\"}"
+```
+
+To install a pack in dry-run mode:
+
+```bash
+curl -X POST http://localhost:3001/api/ai-automation/skills/install \
+  -H "Content-Type: application/json" \
+  -d "{\"id\":\"ecommerce-autopilot\",\"source\":\"admin\"}"
 ```
 
 Safe operating rules:

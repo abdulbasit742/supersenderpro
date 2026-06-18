@@ -9015,10 +9015,200 @@ const AGENTIC_REPO_BLUEPRINTS = [
   }
 ];
 
+const AGENTIC_SKILL_PACKS = [
+  {
+    id: 'ecommerce-autopilot',
+    name: 'Ecommerce Autopilot',
+    category: 'commerce',
+    recommendedAgent: 'crewai',
+    priority: 1,
+    triggers: ['order_created', 'cart_abandoned', 'payment_pending', 'stock_low'],
+    tools: ['/api/ecommerce/status', '/api/ecommerce/automation-plan', '/api/ecommerce/webhook/:platform'],
+    bestFor: 'Auto-sync store orders, recover abandoned carts, send COD confirmations, and push stock alerts to WhatsApp.',
+    installPlan: ['Connect ecommerce platform/feed.', 'Enable order webhook.', 'Turn on payment-pending and abandoned-cart recipes.', 'Review dry-run drafts before live sends.']
+  },
+  {
+    id: 'channel-publisher-copilot',
+    name: 'Channel Publisher Copilot',
+    category: 'channels',
+    recommendedAgent: 'openclaw',
+    priority: 2,
+    triggers: ['source_channel_post', 'keyword_match', 'queue_empty', 'manual_packet_created'],
+    tools: ['/api/wa/channels/watchdog', '/api/wa/channels/addons', '/wa-channel-qr'],
+    bestFor: 'Watch source channels, apply branding, filter risky content, and create safe publish packets for target channels.',
+    installPlan: ['Add source and target channel IDs.', 'Enable source priority rules.', 'Set watermark/branding.', 'Keep fallback manual packets on.']
+  },
+  {
+    id: 'scholarship-scout',
+    name: 'Scholarship Scout',
+    category: 'research',
+    recommendedAgent: 'browser-use',
+    priority: 3,
+    triggers: ['daily_search', 'website_change', 'deadline_detected'],
+    tools: ['/api/scraping-agent/jobs', '/api/web-intel/*', '/api/ai-automation/agent-task-plan'],
+    bestFor: 'Fetch scholarship updates from sites/channels, extract deadlines, generate posts, and share to social/WhatsApp.',
+    installPlan: ['Add trusted scholarship source URLs.', 'Run first scraping job in dry-run.', 'Verify deadline/eligibility extraction.', 'Schedule daily collection.']
+  },
+  {
+    id: 'dealer-intelligence',
+    name: 'Dealer Intelligence Agent',
+    category: 'pricing',
+    recommendedAgent: 'langgraph',
+    priority: 4,
+    triggers: ['dealer_rate_post', 'price_drop', 'stock_request', 'trust_vote'],
+    tools: ['/api/scraping-agent/extract', '/api/ai-automation/run-task', '/api/ecommerce/features'],
+    bestFor: 'Parse dealer rates, rank trusted sellers, compare stock, and prepare buy/sell margin recommendations.',
+    installPlan: ['Confirm selling groups.', 'Parse last 24h rate messages.', 'Score dealer trust.', 'Draft admin purchase recommendation.']
+  },
+  {
+    id: 'payment-verifier',
+    name: 'Payment Verifier',
+    category: 'payments',
+    recommendedAgent: 'agentic-inbox',
+    priority: 5,
+    triggers: ['email_payment_received', 'txn_id_received', 'screenshot_uploaded'],
+    tools: ['/api/ai-automation/run-task', '/api/ecommerce/automation-plan'],
+    bestFor: 'Read payment signals, detect duplicate TXNs, and prepare approve/reject recommendations for admins.',
+    installPlan: ['Connect Gmail/IMAP parser.', 'Set amount tolerance.', 'Enable duplicate TXN guard.', 'Keep manual admin override.']
+  },
+  {
+    id: 'support-recovery',
+    name: 'Support Recovery Agent',
+    category: 'support',
+    recommendedAgent: 'hermes-agent',
+    priority: 6,
+    triggers: ['issue_reported', 'negative_review', 'warranty_limit', 'inactive_customer'],
+    tools: ['/api/agents/chat', '/api/agents/learning', '/api/project-agent/status'],
+    bestFor: 'Remember customer history, suggest recovery replies, follow warranty policy, and learn from outcomes.',
+    installPlan: ['Connect Hermes memory gateway when available.', 'Use local fallback until connected.', 'Record feedback after each support result.', 'Escalate risky issues to admin.']
+  },
+  {
+    id: 'social-growth-engine',
+    name: 'Social Growth Engine',
+    category: 'social',
+    recommendedAgent: 'postiz',
+    priority: 7,
+    triggers: ['new_product', 'daily_rates', 'viral_topic', 'content_calendar_due'],
+    tools: ['/api/social/*', '/api/ai-automation/agent-prompt', '/api/scraping-agent/status'],
+    bestFor: 'Generate captions, schedule posts, repurpose channel content, and keep social campaigns consistent.',
+    installPlan: ['Connect Meta/LinkedIn/TikTok tokens.', 'Use approval queue first.', 'Enable UTM/click tracking.', 'Review weekly campaign report.']
+  },
+  {
+    id: 'dev-maintainer',
+    name: 'Developer Maintainer',
+    category: 'devops',
+    recommendedAgent: 'openhands',
+    priority: 8,
+    triggers: ['health_failed', 'test_failed', 'dependency_update', 'bug_report'],
+    tools: ['/api/health', '/api/ai-automation/status', '/api/project-agent/run'],
+    bestFor: 'Prepare safe patches, run diagnostics, summarize failures, and keep repo maintenance moving.',
+    installPlan: ['Connect OpenHands worker only for internal use.', 'Limit file write scope.', 'Require syntax checks before patch summary.', 'Never expose secrets to worker.']
+  }
+];
+
 function agenticEnvConfigured(row = {}) {
   const keys = Array.isArray(row.workerEnv) ? row.workerEnv : [];
   if (!keys.length) return true;
   return keys.some(key => Boolean(process.env[key] || settings[String(key).toLowerCase()]));
+}
+
+function getAgenticSkillPacks() {
+  const installedRows = loadJSON('agenticSkillInstallations.json', []);
+  const customRows = loadJSON('agenticSkillPacks.json', []);
+  const installedById = Object.fromEntries((Array.isArray(installedRows) ? installedRows : []).map(row => [row.id, row]));
+  const custom = (Array.isArray(customRows) ? customRows : []).map((row, index) => ({
+    id: String(row.id || row.name || `custom-skill-${index + 1}`).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || `custom-skill-${index + 1}`,
+    name: cleanOutgoingText(row.name || 'Custom Skill Pack'),
+    category: cleanOutgoingText(row.category || 'custom'),
+    recommendedAgent: cleanOutgoingText(row.recommendedAgent || 'agentic-registry'),
+    priority: Number(row.priority || 50),
+    triggers: Array.isArray(row.triggers) ? row.triggers.map(cleanOutgoingText).filter(Boolean) : [],
+    tools: Array.isArray(row.tools) ? row.tools.map(cleanOutgoingText).filter(Boolean) : [],
+    bestFor: cleanOutgoingText(row.bestFor || row.description || 'Custom SuperSender automation pack.'),
+    installPlan: Array.isArray(row.installPlan) ? row.installPlan.map(cleanOutgoingText).filter(Boolean) : ['Review pack.', 'Run dry-run.', 'Enable after admin approval.'],
+    custom: true
+  }));
+  return [...AGENTIC_SKILL_PACKS, ...custom]
+    .sort((a, b) => Number(a.priority || 99) - Number(b.priority || 99))
+    .map(pack => ({
+      ...pack,
+      installed: Boolean(installedById[pack.id]),
+      installedAt: installedById[pack.id]?.installedAt || null,
+      installStatus: installedById[pack.id]?.status || (installedById[pack.id] ? 'installed' : 'available')
+    }));
+}
+
+function installAgenticSkillPack(input = {}) {
+  const id = String(input.id || input.skill || '').trim().toLowerCase();
+  if (!id) throw new Error('Skill pack id is required.');
+  const pack = getAgenticSkillPacks().find(row => row.id === id);
+  if (!pack) throw new Error('Unknown skill pack.');
+  const installedRows = loadJSON('agenticSkillInstallations.json', []);
+  const rows = Array.isArray(installedRows) ? installedRows.filter(row => row.id !== id) : [];
+  const install = {
+    id: pack.id,
+    name: pack.name,
+    recommendedAgent: pack.recommendedAgent,
+    status: 'installed',
+    dryRun: input.dryRun !== false,
+    installedBy: cleanOutgoingText(input.installedBy || input.source || 'dashboard'),
+    notes: cleanOutgoingText(input.notes || ''),
+    installedAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+  rows.push(install);
+  saveJSON('agenticSkillInstallations.json', rows.slice(-200));
+
+  const tasks = loadJSON('aiAutomationTasks.json', []);
+  tasks.push({
+    id: uuid(),
+    repo: pack.recommendedAgent,
+    repoName: pack.recommendedAgent,
+    type: 'skill_pack_install',
+    prompt: `Install and dry-run ${pack.name}: ${pack.bestFor}`,
+    status: 'blueprint_only',
+    source: install.installedBy,
+    result: 'Skill pack installed in registry. Enable connected workers/tokens before live automation.',
+    skillPack: pack.id,
+    createdAt: install.installedAt,
+    updatedAt: install.updatedAt
+  });
+  saveJSON('aiAutomationTasks.json', tasks.slice(-500));
+  return { success: true, skill: pack, install, packs: getAgenticSkillPacks() };
+}
+
+function buildAgenticPlaybook(input = {}) {
+  const goal = cleanOutgoingText(input.goal || input.prompt || 'Build the best SuperSender automation workflow.');
+  const channels = Array.isArray(input.channels) ? input.channels.map(item => String(item || '').toLowerCase()) : String(input.channels || '').split(',').map(item => item.trim().toLowerCase()).filter(Boolean);
+  const text = `${goal} ${channels.join(' ')}`.toLowerCase();
+  const packs = getAgenticSkillPacks().map(pack => {
+    let score = Number(pack.priority || 50) > 0 ? 100 - Number(pack.priority || 50) : 50;
+    const hay = `${pack.id} ${pack.name} ${pack.category} ${pack.bestFor} ${(pack.triggers || []).join(' ')} ${(pack.tools || []).join(' ')}`.toLowerCase();
+    for (const word of text.split(/[^a-z0-9]+/).filter(Boolean)) {
+      if (word.length >= 4 && hay.includes(word)) score += 8;
+    }
+    if (channels.some(channel => hay.includes(channel))) score += 20;
+    if (pack.installed) score += 10;
+    return { ...pack, score };
+  }).sort((a, b) => b.score - a.score).slice(0, 5);
+  const sequence = packs.map((pack, index) => ({
+    step: index + 1,
+    skill: pack.name,
+    agent: pack.recommendedAgent,
+    action: pack.installPlan?.[0] || 'Review and run dry-run.',
+    dryRunFirst: true
+  }));
+  return {
+    success: true,
+    goal,
+    channels,
+    recommendedPacks: packs,
+    sequence,
+    adminCommand: '!aihub',
+    nextApiCall: 'POST /api/ai-automation/skills/install',
+    safety: ['Run dry-run first.', 'Do not expose secrets to external agents.', 'Use admin approval before live posting or payment actions.'],
+    createdAt: new Date().toISOString()
+  };
 }
 
 function getAgenticAgentRegistry() {
@@ -9289,6 +9479,7 @@ function getAiAutomationRepoPlan() {
 function getAiAutomationStatus() {
   const repos = getAiAutomationRepoPlan();
   const agenticAgents = getAgenticAgentRegistry();
+  const skillPacks = getAgenticSkillPacks();
   const tasks = loadJSON('aiAutomationTasks.json', []);
   const configured = repos.filter(row => row.configured).length;
   const highPriority = repos.filter(row => Number(row.priority || 99) <= 5);
@@ -9303,12 +9494,15 @@ function getAiAutomationStatus() {
       highPriority: highPriority.length,
       agenticAgents: agenticAgents.length,
       agenticConfigured: agenticAgents.filter(row => row.configured).length,
+      skillPacks: skillPacks.length,
+      installedSkillPacks: skillPacks.filter(row => row.installed).length,
       queuedTasks: tasks.filter(task => task.status === 'queued').length,
       completedTasks: tasks.filter(task => task.status === 'done').length,
       failedTasks: tasks.filter(task => task.status === 'failed').length
     },
     repos,
     agenticAgents,
+    skillPacks,
     recentTasks: tasks.slice(-20).reverse(),
     nextRecommended: repos
       .filter(row => !row.configured || row.status !== 'done')
@@ -9359,6 +9553,7 @@ Configured: *${status.totals.configured}*
 Missing: *${status.totals.missing}*
 Queued tasks: *${status.totals.queuedTasks}*
 Agentic agents: *${status.totals.agenticAgents}*
+Skill packs: *${status.totals.skillPacks}* (${status.totals.installedSkillPacks} installed)
 
 Top priorities:
 ${lines}
@@ -17853,6 +18048,30 @@ app.post('/api/ai-automation/agent-task-plan', (req, res) => {
   }
 });
 
+app.get('/api/ai-automation/skills', (_req, res) => {
+  try {
+    res.json({ success: true, packs: getAgenticSkillPacks(), updatedAt: new Date().toISOString() });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/ai-automation/skills/install', (req, res) => {
+  try {
+    res.json(installAgenticSkillPack(req.body || {}));
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/ai-automation/playbook', (req, res) => {
+  try {
+    res.json(buildAgenticPlaybook(req.body || {}));
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
 app.get('/api/ai-automation/agent-prompt', (_req, res) => {
   try {
     const agents = getAgenticAgentRegistry().slice(0, 8).map(row => `- ${row.name} (${row.slug}): ${row.bestUse}`).join('\n');
@@ -17885,6 +18104,16 @@ app.post('/api/ai-automation/run-task', (req, res) => {
 app.get('/ai-automation-hub', (_req, res) => {
   try {
     const status = getAiAutomationStatus();
+    const skillRows = status.skillPacks
+      .map(pack => `<tr>
+        <td><b>${htmlEscape(pack.name)}</b><br><small>${htmlEscape(pack.id)}</small></td>
+        <td>${htmlEscape(pack.category)}<br><small>Agent: ${htmlEscape(pack.recommendedAgent)}</small></td>
+        <td><span class="pill ${pack.installed ? 'ok' : 'warn'}">${pack.installed ? 'Installed' : 'Available'}</span></td>
+        <td>${htmlEscape(pack.bestFor)}</td>
+        <td>${(pack.triggers || []).slice(0, 4).map(item => `<span class="pill warn">${htmlEscape(item)}</span>`).join(' ')}</td>
+        <td><button onclick="installSkill('${htmlEscape(pack.id)}')">${pack.installed ? 'Reinstall' : 'Install'}</button></td>
+      </tr>`)
+      .join('');
     const agentRows = status.agenticAgents
       .map(agent => `<tr>
         <td><b>${htmlEscape(agent.name)}</b><br><small>${htmlEscape(agent.slug)}</small></td>
@@ -17926,10 +18155,21 @@ pre{white-space:pre-wrap;background:#081018;border-radius:10px;padding:14px;over
   <section class="grid">
     <div class="card"><div class="muted">Repos</div><div class="value">${status.totals.repos}</div></div>
     <div class="card"><div class="muted">Configured</div><div class="value">${status.totals.configured}</div></div>
-    <div class="card"><div class="muted">Missing</div><div class="value">${status.totals.missing}</div></div>
+    <div class="card"><div class="muted">Skill Packs</div><div class="value">${status.totals.skillPacks}</div></div>
     <div class="card"><div class="muted">Agentic Agents</div><div class="value">${status.totals.agenticAgents}</div></div>
   </section>
   <div class="card"><b>WhatsApp command:</b> <code>!aihub</code><br><span class="muted">If a worker/API key is missing, this hub keeps the project running and marks the adapter as Not configured.</span></div>
+  <h2>Automation Playbook Builder</h2>
+  <div class="grid">
+    <div class="card">
+      <input id="playbookGoal" placeholder="Goal, e.g. automate ecommerce + channel posting" style="width:100%;padding:10px;margin:6px 0;border-radius:8px;border:1px solid #284150;background:#081018;color:#eaf7f3">
+      <input id="playbookChannels" placeholder="Channels, e.g. whatsapp, facebook, website" style="width:100%;padding:10px;margin:6px 0;border-radius:8px;border:1px solid #284150;background:#081018;color:#eaf7f3">
+      <button onclick="buildPlaybook()">Build Playbook</button>
+    </div>
+    <div class="card"><pre id="playbookOut">Write a goal to get a safe automation sequence.</pre></div>
+  </div>
+  <h2>Agentic Skill Packs</h2>
+  <table><thead><tr><th>Skill</th><th>Category</th><th>Status</th><th>Best for</th><th>Triggers</th><th>Action</th></tr></thead><tbody>${skillRows}</tbody></table>
   <h2>Agentic Agent Registry</h2>
   <div class="grid">
     <div class="card">
@@ -17976,6 +18216,17 @@ async function copyAgentPrompt(){
   const t = await (await fetch('/api/ai-automation/agent-prompt')).text();
   await navigator.clipboard.writeText(t);
   alert('Agent prompt copied');
+}
+async function installSkill(id){
+  const r = await fetch('/api/ai-automation/skills/install',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,source:'dashboard'})});
+  const data = await r.json();
+  alert(data.success ? 'Skill installed: '+data.skill.name : data.error);
+  if(data.success) location.reload();
+}
+async function buildPlaybook(){
+  const payload = {goal:document.getElementById('playbookGoal').value,channels:document.getElementById('playbookChannels').value};
+  const r = await fetch('/api/ai-automation/playbook',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  document.getElementById('playbookOut').innerText = JSON.stringify(await r.json(), null, 2);
 }
 </script>
 </body></html>`);
