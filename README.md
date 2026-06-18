@@ -911,6 +911,34 @@ Safety defaults:
 
 The runtime hub queues plans and dry-runs first. Filesystem writes, shell commands, browser actions, WhatsApp sends, social publishing, payment delivery, and Git pushes require admin approval. Do not pass `.env`, WhatsApp sessions, auth folders, customer logs, payment records, or private keys to external agents.
 
+## Keep SuperSender Live on This PC
+
+Use the no-admin Windows Startup launcher if Task Scheduler registration is blocked:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\live\register-supersender-startup-user.ps1
+```
+
+This creates:
+
+```text
+C:\Users\<you>\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\SuperSenderPro-Server.bat
+```
+
+On the next Windows login it runs:
+
+```powershell
+.\scripts\live\start-supersender-server.ps1
+```
+
+The launcher starts `node-local.exe server.js`, writes logs to `logs/supersender-live.*.log`, and checks `http://localhost:3001/api/health`.
+
+If you run PowerShell as Administrator, you can alternatively register a Scheduled Task:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\live\register-supersender-startup.ps1
+```
+
 ## Admin Commands
 
 Send these from `ADMIN_NUMBER` in private chat or any group:
