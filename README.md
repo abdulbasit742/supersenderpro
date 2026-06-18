@@ -179,6 +179,57 @@ The AI Automation Hub also includes `data-scraping-agent` as a configured import
 http://localhost:3001/ai-automation-hub
 ```
 
+## Agentic Agent Registry
+
+SuperSender Pro now has a future-proof Agentic Agent Registry. This lets you add current and upcoming AI agent frameworks without rewriting the main WhatsApp, ecommerce, social, or channel automation code.
+
+Built-in blueprints:
+
+- OpenClaw (`openclaw/openclaw`) for self-hosted personal/operator automation.
+- Hermes Agent (`NousResearch/hermes-agent`) for long-running memory and self-improving agent loops.
+- Hermes Agent Self-Evolution for prompt/skill improvement research.
+- OpenHands for internal developer-agent/build-agent automation.
+- Awesome OpenClaw Agents for future agent persona templates.
+- CrewAI, LangGraph, Browser Use, n8n, MCP, and Agentic Inbox remain in the main AI Automation Hub.
+
+Main APIs:
+
+```text
+GET  /api/ai-automation/status
+GET  /api/ai-automation/repos
+GET  /api/ai-automation/agent-registry
+POST /api/ai-automation/agent-registry
+POST /api/ai-automation/agent-task-plan
+GET  /api/ai-automation/agent-prompt
+POST /api/ai-automation/run-task
+```
+
+Dashboard:
+
+```text
+http://localhost:3001/ai-automation-hub
+```
+
+Useful env keys:
+
+```text
+OPENCLAW_GATEWAY_URL=
+OPENCLAW_API_KEY=
+HERMES_AGENT_URL=
+HERMES_AGENT_API_KEY=
+HERMES_EVOLUTION_WORKER_URL=
+OPENHANDS_WORKER_URL=
+OPENHANDS_API_KEY=
+AGENTIC_AGENT_WEBHOOK_URL=
+```
+
+Safe operating rules:
+
+- Do not send `.env`, WhatsApp sessions, customer logs, or API tokens to external agents.
+- Keep every live-posting/payment/WhatsApp action in dry-run until admin approves it.
+- Use `/api/ai-automation/agent-task-plan` before wiring a new agent so the system records safety steps and missing env keys.
+- Custom agents are stored in `data/agenticAgentRegistry.json`; this runtime file should not be committed.
+
 ## Facebook, Instagram, and LinkedIn Setup
 
 The system has a Social dashboard at:

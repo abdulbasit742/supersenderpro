@@ -8947,8 +8947,190 @@ Git:
 https://github.com/abdulbasit742/supersenderpro.git`;
 }
 
+const AGENTIC_REPO_BLUEPRINTS = [
+  {
+    slug: 'openclaw',
+    name: 'OpenClaw',
+    repo: 'openclaw/openclaw',
+    url: 'https://github.com/openclaw/openclaw',
+    category: 'personal-agent',
+    integrationType: 'external-gateway',
+    priority: 1,
+    licenseRisk: 'medium',
+    workerEnv: ['OPENCLAW_GATEWAY_URL', 'OPENCLAW_API_KEY'],
+    bestUse: 'Self-hosted personal operator for WhatsApp/Telegram style instructions, local tools, memory, and business automation.',
+    nextTask: 'Connect an OpenClaw gateway URL, then route admin WhatsApp commands into approved OpenClaw tasks.'
+  },
+  {
+    slug: 'hermes-agent',
+    name: 'Hermes Agent',
+    repo: 'NousResearch/hermes-agent',
+    url: 'https://github.com/NousResearch/hermes-agent',
+    category: 'self-improving-agent',
+    integrationType: 'external-gateway',
+    priority: 2,
+    licenseRisk: 'medium',
+    workerEnv: ['HERMES_AGENT_URL', 'HERMES_AGENT_API_KEY'],
+    bestUse: 'Long-running agent with memory/learning loop for customer patterns, prompt improvement, task recall, and operator mode.',
+    nextTask: 'Connect Hermes gateway and mirror selected SuperSender tasks into Hermes memory for learning.'
+  },
+  {
+    slug: 'hermes-self-evolution',
+    name: 'Hermes Agent Self-Evolution',
+    repo: 'NousResearch/hermes-agent-self-evolution',
+    url: 'https://github.com/NousResearch/hermes-agent-self-evolution',
+    category: 'prompt-evolution',
+    integrationType: 'research-blueprint',
+    priority: 3,
+    licenseRisk: 'medium',
+    workerEnv: ['HERMES_EVOLUTION_WORKER_URL'],
+    bestUse: 'Improve prompts, skills, tool descriptions, and agent behavior through evaluation loops.',
+    nextTask: 'Use as blueprint for SuperSender prompt testing and auto-improvement, not as customer-facing runtime yet.'
+  },
+  {
+    slug: 'openhands',
+    name: 'OpenHands',
+    repo: 'OpenHands/OpenHands',
+    url: 'https://github.com/OpenHands/OpenHands',
+    category: 'developer-agent',
+    integrationType: 'external-worker',
+    priority: 4,
+    licenseRisk: 'medium',
+    workerEnv: ['OPENHANDS_WORKER_URL', 'OPENHANDS_API_KEY'],
+    bestUse: 'Developer automation, coding tasks, repo maintenance, bug fixing, and build-agent dashboard ideas.',
+    nextTask: 'Connect as optional internal build worker with strict allowlisted tasks only.'
+  },
+  {
+    slug: 'awesome-openclaw-agents',
+    name: 'Awesome OpenClaw Agents',
+    repo: 'mergisi/awesome-openclaw-agents',
+    url: 'https://github.com/mergisi/awesome-openclaw-agents',
+    category: 'agent-template-library',
+    integrationType: 'template-directory',
+    priority: 5,
+    licenseRisk: 'low',
+    workerEnv: [],
+    bestUse: 'Template catalog for sales, scraper, support, ecommerce, posting, and monitoring agent personas.',
+    nextTask: 'Import selected SOUL/template ideas into SuperSender agent presets after review.'
+  }
+];
+
+function agenticEnvConfigured(row = {}) {
+  const keys = Array.isArray(row.workerEnv) ? row.workerEnv : [];
+  if (!keys.length) return true;
+  return keys.some(key => Boolean(process.env[key] || settings[String(key).toLowerCase()]));
+}
+
+function getAgenticAgentRegistry() {
+  const customRows = loadJSON('agenticAgentRegistry.json', []);
+  const normalizedCustom = (Array.isArray(customRows) ? customRows : []).map((row, index) => {
+    const slug = String(row.slug || row.name || `custom-agent-${index + 1}`)
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '') || `custom-agent-${index + 1}`;
+    return {
+      slug,
+      name: cleanOutgoingText(row.name || slug),
+      repo: cleanOutgoingText(row.repo || ''),
+      url: cleanOutgoingText(row.url || ''),
+      category: cleanOutgoingText(row.category || 'custom-agent'),
+      integrationType: cleanOutgoingText(row.integrationType || row.mode || 'custom-webhook'),
+      priority: Number(row.priority || 50),
+      licenseRisk: cleanOutgoingText(row.licenseRisk || 'unknown'),
+      workerEnv: Array.isArray(row.workerEnv) ? row.workerEnv.map(key => String(key || '').trim()).filter(Boolean) : [],
+      bestUse: cleanOutgoingText(row.bestUse || row.description || 'Custom agentic automation adapter.'),
+      nextTask: cleanOutgoingText(row.nextTask || 'Add credentials or webhook URL, then queue a safe test task.'),
+      custom: true,
+      createdAt: row.createdAt || new Date().toISOString(),
+      updatedAt: row.updatedAt || row.createdAt || new Date().toISOString()
+    };
+  });
+
+  const merged = [...AGENTIC_REPO_BLUEPRINTS, ...normalizedCustom];
+  return merged.map(row => {
+    const configured = agenticEnvConfigured(row);
+    return {
+      ...row,
+      configured,
+      status: configured ? 'configured_or_blueprint_ready' : 'needs_connection',
+      missingEnv: (Array.isArray(row.workerEnv) ? row.workerEnv : []).filter(key => !process.env[key] && !settings[String(key).toLowerCase()])
+    };
+  }).sort((a, b) => Number(a.priority || 99) - Number(b.priority || 99));
+}
+
+function saveAgenticCustomRegistry(rows = []) {
+  const customRows = (Array.isArray(rows) ? rows : []).filter(row => row.custom === true || !AGENTIC_REPO_BLUEPRINTS.some(base => base.slug === row.slug));
+  saveJSON('agenticAgentRegistry.json', customRows.slice(-200));
+}
+
+function registerAgenticAgent(input = {}) {
+  const name = cleanOutgoingText(input.name || input.slug || '');
+  if (!name) throw new Error('Agent name is required.');
+  const slug = String(input.slug || name)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  if (!slug) throw new Error('Valid agent slug is required.');
+  const existing = getAgenticAgentRegistry();
+  if (existing.some(row => row.slug === slug && row.custom !== true)) {
+    throw new Error('Built-in agent slug already exists; choose a different slug.');
+  }
+  const custom = existing.filter(row => row.custom === true && row.slug !== slug);
+  const record = {
+    slug,
+    name,
+    repo: cleanOutgoingText(input.repo || ''),
+    url: cleanOutgoingText(input.url || ''),
+    category: cleanOutgoingText(input.category || 'custom-agent'),
+    integrationType: cleanOutgoingText(input.integrationType || input.mode || 'custom-webhook'),
+    priority: Number(input.priority || 50),
+    licenseRisk: cleanOutgoingText(input.licenseRisk || 'unknown'),
+    workerEnv: Array.isArray(input.workerEnv) ? input.workerEnv.map(key => String(key || '').trim()).filter(Boolean) : [],
+    bestUse: cleanOutgoingText(input.bestUse || input.description || 'Custom agentic automation adapter.'),
+    nextTask: cleanOutgoingText(input.nextTask || 'Add credentials or webhook URL, then queue a safe test task.'),
+    custom: true,
+    createdAt: input.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+  custom.push(record);
+  saveAgenticCustomRegistry(custom);
+  return { success: true, agent: record, registry: getAgenticAgentRegistry() };
+}
+
+function buildAgenticTaskPlan(input = {}) {
+  const registry = getAgenticAgentRegistry();
+  const requested = String(input.agent || input.repo || input.slug || '').trim().toLowerCase();
+  const agent = registry.find(row => row.slug === requested || row.name.toLowerCase() === requested) || registry[0];
+  const goal = cleanOutgoingText(input.goal || input.prompt || 'Improve SuperSender Pro automation safely.');
+  const task = {
+    id: uuid(),
+    agent: agent.slug,
+    agentName: agent.name,
+    goal,
+    status: agent.configured ? 'ready_for_worker' : 'blueprint_only',
+    safety: [
+      'No destructive filesystem commands without explicit admin approval.',
+      'No customer/session/token files in prompts or logs.',
+      'Use dry-run mode before live social, WhatsApp, or payment actions.',
+      'Record task summary to aiAutomationTasks.json for audit.'
+    ],
+    steps: [
+      `Use ${agent.name} for: ${agent.bestUse}`,
+      'Load only the minimum required context from SuperSender.',
+      'Generate a small, testable patch or automation draft.',
+      'Run syntax/API smoke checks.',
+      'Return admin-ready summary and next action.'
+    ],
+    missingEnv: agent.missingEnv || [],
+    createdAt: new Date().toISOString()
+  };
+  return { success: true, agent, task };
+}
+
 function getAiAutomationRepoPlan() {
   const statusRows = loadJSON('aiAutomationStatus.json', {});
+  const agenticRows = getAgenticAgentRegistry();
+  const agenticBySlug = Object.fromEntries(agenticRows.map(row => [row.slug, row]));
   const rows = [
     {
       slug: 'n8n',
@@ -9011,11 +9193,47 @@ function getAiAutomationRepoPlan() {
       nextTask: 'Define agent roles and connect through a single worker endpoint.'
     },
     {
+      slug: 'openclaw',
+      name: 'OpenClaw',
+      category: 'personal-agent',
+      integrationType: 'external-gateway',
+      priority: 6,
+      licenseRisk: 'medium',
+      configured: Boolean(agenticBySlug.openclaw?.configured),
+      missingEnv: agenticBySlug.openclaw?.missingEnv || ['OPENCLAW_GATEWAY_URL', 'OPENCLAW_API_KEY'].filter(key => !process.env[key] && !settings[String(key).toLowerCase()]),
+      bestUse: agenticBySlug.openclaw?.bestUse || 'Self-hosted personal operator for long-running business automation.',
+      nextTask: agenticBySlug.openclaw?.nextTask || 'Connect OpenClaw gateway and route approved admin tasks.'
+    },
+    {
+      slug: 'hermes-agent',
+      name: 'Hermes Agent',
+      category: 'self-improving-agent',
+      integrationType: 'external-gateway',
+      priority: 7,
+      licenseRisk: 'medium',
+      configured: Boolean(agenticBySlug['hermes-agent']?.configured),
+      missingEnv: agenticBySlug['hermes-agent']?.missingEnv || ['HERMES_AGENT_URL', 'HERMES_AGENT_API_KEY'].filter(key => !process.env[key] && !settings[String(key).toLowerCase()]),
+      bestUse: agenticBySlug['hermes-agent']?.bestUse || 'Agent memory and self-improvement loop for SuperSender operator mode.',
+      nextTask: agenticBySlug['hermes-agent']?.nextTask || 'Connect Hermes gateway and mirror safe tasks into memory.'
+    },
+    {
+      slug: 'agentic-registry',
+      name: 'Future Agent Registry',
+      category: 'agent-platform',
+      integrationType: 'internal-registry',
+      priority: 8,
+      licenseRisk: 'low',
+      configured: true,
+      missingEnv: [],
+      bestUse: 'Add upcoming agentic repos/frameworks without code rewrites: name, repo, env keys, safety notes, and run plan.',
+      nextTask: 'Use POST /api/ai-automation/agent-registry to add the next AI agent framework.'
+    },
+    {
       slug: 'agentic-inbox',
       name: 'Cloudflare Agentic Inbox',
       category: 'inbox',
       integrationType: 'architecture-pattern',
-      priority: 6,
+      priority: 9,
       licenseRisk: 'low',
       configured: Boolean(settings.gmail_payment_parser_enabled || process.env.GMAIL_CLIENT_ID || process.env.EMAIL_USER),
       missingEnv: ['GMAIL_CLIENT_ID', 'GMAIL_CLIENT_SECRET'].filter(key => !process.env[key] && !settings[String(key).toLowerCase()]),
@@ -9027,7 +9245,7 @@ function getAiAutomationRepoPlan() {
       name: 'claude-task-master',
       category: 'project-management',
       integrationType: 'internal-dev-tool',
-      priority: 7,
+      priority: 10,
       licenseRisk: 'high',
       configured: process.env.TASK_MASTER_ENABLED === 'true' || settings.task_master_enabled === true,
       missingEnv: ['TASK_MASTER_ENABLED'].filter(key => !process.env[key] && !settings[String(key).toLowerCase()]),
@@ -9039,7 +9257,7 @@ function getAiAutomationRepoPlan() {
       name: 'awesome-mcp-servers',
       category: 'mcp',
       integrationType: 'directory',
-      priority: 8,
+      priority: 11,
       licenseRisk: 'low',
       configured: settings.mcp_hub_enabled !== false,
       missingEnv: [],
@@ -9047,40 +9265,16 @@ function getAiAutomationRepoPlan() {
       nextTask: 'Add MCP Hub page with recommended connectors and setup checklist.'
     },
     {
-      slug: 'openhands',
-      name: 'OpenHands',
-      category: 'developer-agent',
-      integrationType: 'inspiration-only',
-      priority: 9,
-      licenseRisk: 'medium',
-      configured: false,
-      missingEnv: [],
-      bestUse: 'Self-hosted coding automation and long-running development control center patterns.',
-      nextTask: 'Use as architecture inspiration for future build-agent dashboard.'
-    },
-    {
       slug: 'aider',
       name: 'Aider',
       category: 'developer-agent',
       integrationType: 'internal-cli',
-      priority: 10,
+      priority: 12,
       licenseRisk: 'low',
       configured: false,
       missingEnv: [],
       bestUse: 'Internal code editing workflow, repo-map ideas, tests, and commit discipline.',
       nextTask: 'Document optional local usage; do not embed in runtime product.'
-    },
-    {
-      slug: 'hermes-agent',
-      name: 'Hermes Agent',
-      category: 'personal-agent',
-      integrationType: 'research',
-      priority: 11,
-      licenseRisk: 'medium',
-      configured: false,
-      missingEnv: [],
-      bestUse: 'Personal autonomous agent/memory ideas for long-running operator mode.',
-      nextTask: 'Review after LangGraph and CrewAI worker are stable.'
     }
   ];
 
@@ -9094,6 +9288,7 @@ function getAiAutomationRepoPlan() {
 
 function getAiAutomationStatus() {
   const repos = getAiAutomationRepoPlan();
+  const agenticAgents = getAgenticAgentRegistry();
   const tasks = loadJSON('aiAutomationTasks.json', []);
   const configured = repos.filter(row => row.configured).length;
   const highPriority = repos.filter(row => Number(row.priority || 99) <= 5);
@@ -9106,11 +9301,14 @@ function getAiAutomationStatus() {
       configured,
       missing: repos.length - configured,
       highPriority: highPriority.length,
+      agenticAgents: agenticAgents.length,
+      agenticConfigured: agenticAgents.filter(row => row.configured).length,
       queuedTasks: tasks.filter(task => task.status === 'queued').length,
       completedTasks: tasks.filter(task => task.status === 'done').length,
       failedTasks: tasks.filter(task => task.status === 'failed').length
     },
     repos,
+    agenticAgents,
     recentTasks: tasks.slice(-20).reverse(),
     nextRecommended: repos
       .filter(row => !row.configured || row.status !== 'done')
@@ -9125,6 +9323,7 @@ function runAiAutomationTask(input = {}) {
   const repoSlug = String(input.repo || input.slug || '').trim().toLowerCase();
   const repo = repos.find(row => row.slug === repoSlug || row.name.toLowerCase() === repoSlug);
   if (!repo) throw new Error('Known repo slug is required.');
+  const agentPlan = buildAgenticTaskPlan({ agent: repo.slug, goal: input.prompt || repo.nextTask || '' });
   const tasks = loadJSON('aiAutomationTasks.json', []);
   const task = {
     id: uuid(),
@@ -9132,9 +9331,12 @@ function runAiAutomationTask(input = {}) {
     repoName: repo.name,
     type: cleanOutgoingText(input.type || 'integration_task'),
     prompt: cleanOutgoingText(input.prompt || repo.nextTask || ''),
-    status: 'queued',
+    status: agentPlan.task.status === 'ready_for_worker' ? 'queued' : 'blueprint_only',
     source: cleanOutgoingText(input.source || 'api'),
-    result: 'Queued in SuperSender AI Automation Hub. External worker can pick this task when configured.',
+    result: agentPlan.task.status === 'ready_for_worker'
+      ? 'Queued in SuperSender AI Automation Hub. External worker can pick this task when configured.'
+      : 'Saved as blueprint-only task until worker credentials are configured.',
+    agentPlan: agentPlan.task,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
@@ -9156,6 +9358,7 @@ Repos: *${status.totals.repos}*
 Configured: *${status.totals.configured}*
 Missing: *${status.totals.missing}*
 Queued tasks: *${status.totals.queuedTasks}*
+Agentic agents: *${status.totals.agenticAgents}*
 
 Top priorities:
 ${lines}
@@ -17626,6 +17829,51 @@ app.get('/api/ai-automation/status', (_req, res) => {
   }
 });
 
+app.get('/api/ai-automation/agent-registry', (_req, res) => {
+  try {
+    res.json({ success: true, agents: getAgenticAgentRegistry(), updatedAt: new Date().toISOString() });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/ai-automation/agent-registry', (req, res) => {
+  try {
+    res.json(registerAgenticAgent(req.body || {}));
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/ai-automation/agent-task-plan', (req, res) => {
+  try {
+    res.json(buildAgenticTaskPlan(req.body || {}));
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/ai-automation/agent-prompt', (_req, res) => {
+  try {
+    const agents = getAgenticAgentRegistry().slice(0, 8).map(row => `- ${row.name} (${row.slug}): ${row.bestUse}`).join('\n');
+    res.type('text/plain').send(`SuperSender Pro Agentic Adapter Prompt
+
+Goal: add or improve one AI agent framework adapter without breaking WhatsApp, ecommerce, channel automation, or social posting.
+
+Available built-in agents:
+${agents}
+
+Rules:
+- Never include secrets, sessions, .env values, or customer logs in prompts.
+- Use dry-run for live posting/payment/WhatsApp actions.
+- Add a small API endpoint first, then a dashboard card, then WhatsApp admin command support.
+- Verify with node --check server.js and GET /api/ai-automation/status.
+- Commit only safe source/docs files.`);
+  } catch (error) {
+    res.status(500).type('text/plain').send(error.message);
+  }
+});
+
 app.post('/api/ai-automation/run-task', (req, res) => {
   try {
     res.json(runAiAutomationTask({ ...(req.body || {}), source: req.body?.source || 'api' }));
@@ -17637,6 +17885,15 @@ app.post('/api/ai-automation/run-task', (req, res) => {
 app.get('/ai-automation-hub', (_req, res) => {
   try {
     const status = getAiAutomationStatus();
+    const agentRows = status.agenticAgents
+      .map(agent => `<tr>
+        <td><b>${htmlEscape(agent.name)}</b><br><small>${htmlEscape(agent.slug)}</small></td>
+        <td>${htmlEscape(agent.category)}<br><small>${htmlEscape(agent.integrationType)}</small></td>
+        <td><span class="pill ${agent.configured ? 'ok' : 'warn'}">${agent.configured ? 'Ready' : 'Needs keys'}</span>${agent.missingEnv?.length ? `<br><small class="warn-text">${htmlEscape(agent.missingEnv.join(', '))}</small>` : ''}</td>
+        <td>${htmlEscape(agent.bestUse)}</td>
+        <td><button onclick="buildAgentPlan('${htmlEscape(agent.slug)}')">Plan</button></td>
+      </tr>`)
+      .join('');
     const rows = status.repos
       .sort((a, b) => Number(a.priority || 99) - Number(b.priority || 99))
       .map(repo => `<tr>
@@ -17665,14 +17922,32 @@ button,.btn{background:#10b981;color:#06120d;border:0;border-radius:9px;padding:
 pre{white-space:pre-wrap;background:#081018;border-radius:10px;padding:14px;overflow:auto}
 </style></head><body>
 <main>
-  <div class="top"><div><h1>AI Automation Hub</h1><p class="muted">Adapters for n8n, LangGraph, Browser Use, CrewAI, Agentic Inbox, MCP, and developer-agent repos.</p></div><div><a class="btn secondary" href="/">Dashboard</a> <a class="btn secondary" href="/api/ai-automation/status">JSON Status</a></div></div>
+  <div class="top"><div><h1>AI Automation Hub</h1><p class="muted">Adapters for n8n, LangGraph, Browser Use, CrewAI, OpenClaw, Hermes Agent, Agentic Inbox, MCP, and future AI agents.</p></div><div><a class="btn secondary" href="/">Dashboard</a> <a class="btn secondary" href="/api/ai-automation/status">JSON Status</a></div></div>
   <section class="grid">
     <div class="card"><div class="muted">Repos</div><div class="value">${status.totals.repos}</div></div>
     <div class="card"><div class="muted">Configured</div><div class="value">${status.totals.configured}</div></div>
     <div class="card"><div class="muted">Missing</div><div class="value">${status.totals.missing}</div></div>
-    <div class="card"><div class="muted">Queued Tasks</div><div class="value">${status.totals.queuedTasks}</div></div>
+    <div class="card"><div class="muted">Agentic Agents</div><div class="value">${status.totals.agenticAgents}</div></div>
   </section>
   <div class="card"><b>WhatsApp command:</b> <code>!aihub</code><br><span class="muted">If a worker/API key is missing, this hub keeps the project running and marks the adapter as Not configured.</span></div>
+  <h2>Agentic Agent Registry</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Add future agent</h3>
+      <input id="agentName" placeholder="Agent name, e.g. New Agent" style="width:100%;padding:10px;margin:6px 0;border-radius:8px;border:1px solid #284150;background:#081018;color:#eaf7f3">
+      <input id="agentRepo" placeholder="GitHub repo, e.g. owner/repo" style="width:100%;padding:10px;margin:6px 0;border-radius:8px;border:1px solid #284150;background:#081018;color:#eaf7f3">
+      <input id="agentEnv" placeholder="Env keys, comma separated" style="width:100%;padding:10px;margin:6px 0;border-radius:8px;border:1px solid #284150;background:#081018;color:#eaf7f3">
+      <textarea id="agentUse" placeholder="Best use in SuperSender" style="width:100%;min-height:80px;padding:10px;margin:6px 0;border-radius:8px;border:1px solid #284150;background:#081018;color:#eaf7f3"></textarea>
+      <button onclick="registerAgent()">Register Agent</button>
+    </div>
+    <div class="card">
+      <h3>Agent plan output</h3>
+      <pre id="agentPlan">Select Plan on any agent to generate safe steps.</pre>
+      <button onclick="copyAgentPrompt()">Copy Agent Prompt</button>
+    </div>
+  </div>
+  <table><thead><tr><th>Agent</th><th>Type</th><th>Status</th><th>Best use</th><th>Action</th></tr></thead><tbody>${agentRows}</tbody></table>
+  <h2>Repo integration priorities</h2>
   <table><thead><tr><th>Repo</th><th>Category</th><th>Status</th><th>Priority</th><th>Best use</th><th>Next task</th><th>Action</th></tr></thead><tbody>${rows}</tbody></table>
   <h2>Recent queued tasks</h2><table><thead><tr><th>Repo</th><th>Status</th><th>Prompt</th><th>Created</th></tr></thead><tbody id="recent">${recent}</tbody></table>
   <h2>Copy prompt</h2><pre id="prompt">Build the next SuperSender Pro AI Automation adapter from /api/ai-automation/status. Use safe defaults, no secrets in code, preserve the current WhatsApp bot and dashboard, and verify endpoints after each change.</pre>
@@ -17684,6 +17959,23 @@ async function queueTask(repo){
   const data = await r.json();
   alert(data.success ? 'Queued task for '+data.repo.name : data.error);
   if(data.success) location.reload();
+}
+async function buildAgentPlan(agent){
+  const r = await fetch('/api/ai-automation/agent-task-plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({agent,goal:'Make SuperSender Pro smarter, safer, and more automated.'})});
+  document.getElementById('agentPlan').innerText = JSON.stringify(await r.json(), null, 2);
+}
+async function registerAgent(){
+  const workerEnv = document.getElementById('agentEnv').value.split(',').map(x=>x.trim()).filter(Boolean);
+  const payload = {name:document.getElementById('agentName').value,repo:document.getElementById('agentRepo').value,workerEnv,bestUse:document.getElementById('agentUse').value};
+  const r = await fetch('/api/ai-automation/agent-registry',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  const data = await r.json();
+  alert(data.success ? 'Agent registered' : data.error);
+  if(data.success) location.reload();
+}
+async function copyAgentPrompt(){
+  const t = await (await fetch('/api/ai-automation/agent-prompt')).text();
+  await navigator.clipboard.writeText(t);
+  alert('Agent prompt copied');
 }
 </script>
 </body></html>`);
