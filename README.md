@@ -209,6 +209,90 @@ Comments/replies are available from Social Hub:
 
 Until valid tokens and IDs are added, the system safely reports `Token needed` and stores blocked publish attempts instead of crashing.
 
+## Ecommerce Integration Hub
+
+Open:
+
+```text
+http://localhost:3001/ecommerce-hub
+```
+
+This hub connects external stores to the same WhatsApp product catalog, order list, admin alerts, and abandoned-cart automation used by SuperSender Pro.
+
+Supported connector profiles:
+
+- Shopify
+- WooCommerce
+- Magento / Adobe Commerce
+- BigCommerce
+- Ecwid
+- OpenCart
+- Wix Stores
+- Squarespace Commerce
+- Daraz Seller Center via feed/API bridge
+- Dukaan via feed/API bridge
+- Custom website/API JSON feed
+
+Main APIs:
+
+```text
+GET    /api/ecommerce/status
+GET    /api/ecommerce/platforms
+GET    /api/ecommerce/connections
+POST   /api/ecommerce/connections
+PUT    /api/ecommerce/connections/:id
+DELETE /api/ecommerce/connections/:id
+POST   /api/ecommerce/connections/:id/test
+POST   /api/ecommerce/connections/:id/sync-products
+POST   /api/ecommerce/connections/:id/sync-orders
+POST   /api/ecommerce/sync-all
+POST   /api/ecommerce/webhook/:platform/:connectionId?
+```
+
+How it works:
+
+1. Add a store connection from `/ecommerce-hub`.
+2. Paste the store URL plus token/consumer keys, or provide a product/order JSON feed.
+3. Click `Sync Products` to import products into the WhatsApp catalog data.
+4. Click `Sync Orders` or connect webhooks to create/update orders automatically.
+5. Existing WhatsApp order notifications, admin alerts, abandoned cart reminders, and commerce events continue to work.
+
+For platforms with complex signing such as Daraz, use a lightweight n8n/custom bridge that outputs JSON to:
+
+```text
+POST /api/ecommerce/webhook/daraz
+```
+
+Product feed format can be either an array or:
+
+```json
+{
+  "products": [
+    {
+      "id": "SKU-1",
+      "name": "Product name",
+      "price": 2500,
+      "image": "https://example.com/product.jpg",
+      "url": "https://example.com/product"
+    }
+  ]
+}
+```
+
+Order webhook format can be either the native platform payload or:
+
+```json
+{
+  "order": {
+    "id": "1001",
+    "customer_name": "Ali",
+    "phone": "03001234567",
+    "total": 2500,
+    "items": [{ "name": "Product", "quantity": 1, "price": 2500 }]
+  }
+}
+```
+
 ## Social Auto Poster
 
 Place social post files in:
