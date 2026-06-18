@@ -5,14 +5,14 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$startScript = Join-Path $ProjectRoot "scripts\live\start-supersender-server.ps1"
-if (!(Test-Path $startScript)) {
-  throw "Startup script not found: $startScript"
+$watchScript = Join-Path $ProjectRoot "scripts\live\watch-supersender-live.ps1"
+if (!(Test-Path $watchScript)) {
+  throw "Watchdog script not found: $watchScript"
 }
 
 $action = New-ScheduledTaskAction `
   -Execute "powershell.exe" `
-  -Argument "-NoProfile -ExecutionPolicy Bypass -File `"$startScript`""
+  -Argument "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$watchScript`""
 
 $trigger = New-ScheduledTaskTrigger -AtLogOn
 
@@ -28,10 +28,9 @@ Register-ScheduledTask `
   -Action $action `
   -Trigger $trigger `
   -Settings $settings `
-  -Description "Starts SuperSender Pro local server and Claw Runtime Hub on Windows login." `
+  -Description "Keeps SuperSender Pro local server and Claw Runtime Hub alive on Windows login." `
   -Force | Out-Null
 
 Write-Host "Registered Windows startup task: $TaskName"
 Write-Host "Run now:"
 Write-Host "  Start-ScheduledTask -TaskName `"$TaskName`""
-
