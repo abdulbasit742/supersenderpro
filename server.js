@@ -8997,6 +8997,19 @@ https://github.com/abdulbasit742/supersenderpro.git`;
 
 const AGENTIC_REPO_BLUEPRINTS = [
   {
+    slug: 'zeroclaw',
+    name: 'ZeroClaw',
+    repo: 'zeroclaw-labs/zeroclaw',
+    url: 'https://github.com/zeroclaw-labs/zeroclaw',
+    category: 'local-agent-runtime',
+    integrationType: 'local-supervised-runtime',
+    priority: 0,
+    licenseRisk: 'medium',
+    workerEnv: ['ZEROCLAW_BINARY_PATH', 'ZEROCLAW_GATEWAY_URL'],
+    bestUse: 'Rust personal AI assistant runtime for supervised PC/project automation, channels, tools, SOPs, memory, and local-first workflows.',
+    nextTask: 'Use /claw-runtime to create a supervised local task; keep live PC actions disabled until the runtime is configured and approved.'
+  },
+  {
     slug: 'openclaw',
     name: 'OpenClaw',
     repo: 'openclaw/openclaw',
@@ -9155,6 +9168,8 @@ const AGENTIC_SKILL_PACKS = [
 ];
 
 const AGENTIC_PUBLIC_REPO_CATALOG = [
+  { slug: 'zeroclaw', name: 'ZeroClaw', repo: 'zeroclaw-labs/zeroclaw', url: 'https://github.com/zeroclaw-labs/zeroclaw', category: 'local-agent-runtime', mode: 'local-supervised-runtime', priority: 0, risk: 'medium', bestUse: 'Local Rust agent runtime for PC/project automation, supervised actions, channels, SOPs, memory, and tool receipts.', env: ['ZEROCLAW_BINARY_PATH', 'ZEROCLAW_GATEWAY_URL'], skillPack: 'dev-maintainer' },
+  { slug: 'awesome-claws', name: 'Awesome Claws', repo: 'machinae/awesome-claws', url: 'https://github.com/machinae/awesome-claws', category: 'claw-agent-directory', mode: 'directory-parser', priority: 0.5, risk: 'low', bestUse: 'Directory of 34 Claw-style agents to classify and attach as safe SuperSender blueprints.', env: [], skillPack: 'dev-maintainer' },
   { slug: 'openhands', name: 'OpenHands', repo: 'OpenHands/OpenHands', url: 'https://github.com/OpenHands/OpenHands', category: 'developer-agent', mode: 'external-worker', priority: 1, risk: 'medium', bestUse: 'Internal build agent, bug fixing, repo maintenance, testing, and developer automation.', env: ['OPENHANDS_WORKER_URL', 'OPENHANDS_API_KEY'], skillPack: 'dev-maintainer' },
   { slug: 'hermes-agent', name: 'Hermes Agent', repo: 'NousResearch/hermes-agent', url: 'https://github.com/NousResearch/hermes-agent', category: 'self-improving-agent', mode: 'external-gateway', priority: 2, risk: 'medium', bestUse: 'Long-running memory, self-improvement, customer-history learning, and prompt evolution.', env: ['HERMES_AGENT_URL', 'HERMES_AGENT_API_KEY'], skillPack: 'support-recovery' },
   { slug: 'openclaw', name: 'OpenClaw', repo: 'openclaw/openclaw', url: 'https://github.com/openclaw/openclaw', category: 'personal-operator', mode: 'external-gateway', priority: 3, risk: 'medium', bestUse: 'Personal business operator for WhatsApp-style admin commands, local tools, memory, and workflows.', env: ['OPENCLAW_GATEWAY_URL', 'OPENCLAW_API_KEY'], skillPack: 'channel-publisher-copilot' },
@@ -10795,6 +10810,256 @@ function runAiAutomationTask(input = {}) {
   tasks.push(task);
   saveJSON('aiAutomationTasks.json', tasks.slice(-500));
   return { success: true, task, repo };
+}
+
+const CLAW_RUNTIME_ROOT = process.env.CLAW_RUNTIME_ROOT || 'D:\\SuperSenderPro\\agent-runtime';
+const CLAW_RUNTIME_SOURCES = process.env.CLAW_RUNTIME_SOURCES || path.join(CLAW_RUNTIME_ROOT, 'sources');
+
+const CLAW_RUNTIME_POLICY = {
+  defaultMode: process.env.CLAW_RUNTIME_DEFAULT_MODE || 'supervised',
+  dryRunDefault: process.env.CLAW_RUNTIME_DRY_RUN_DEFAULT !== 'false',
+  livePcActionsEnabled: process.env.CLAW_RUNTIME_LIVE_PC_ACTIONS === 'true',
+  allowYolo: process.env.CLAW_RUNTIME_ALLOW_YOLO === 'true',
+  allowedWorkspaces: [
+    process.env.CLAW_RUNTIME_ALLOWED_WORKSPACE,
+    'D:\\SuperSenderPro\\supersender-pro-final',
+    'D:\\SuperSenderPro\\repo-ready-to-push',
+    'D:\\SuperSenderPro\\agent-runtime'
+  ].filter(Boolean),
+  blockedActions: ['delete_files', 'format_disk', 'credential_dump', 'cold_broadcast', 'payment_approve_live', 'social_post_live_without_approval'],
+  approvalRequired: ['filesystem_write', 'shell_command', 'browser_action', 'whatsapp_send', 'social_publish', 'payment_delivery', 'git_push']
+};
+
+function getGitHeadSafe(repoPath = '') {
+  try {
+    if (!repoPath || !fs.existsSync(path.join(repoPath, '.git'))) return '';
+    return execFileSync('git', ['-C', repoPath, 'log', '-1', '--oneline'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+  } catch {
+    return '';
+  }
+}
+
+function parseAwesomeClawsAgents() {
+  const readmePath = path.join(CLAW_RUNTIME_SOURCES, 'awesome-claws', 'README.md');
+  if (!fs.existsSync(readmePath)) return [];
+  const raw = fs.readFileSync(readmePath, 'utf8');
+  const rows = [];
+  const pattern = /^- \*\*\[([^\]]+)\]\(([^)]+)\)\*\* - ([^-]+?) - (.+)$/gm;
+  let match;
+  while ((match = pattern.exec(raw)) !== null) {
+    const name = cleanOutgoingText(match[1]);
+    const url = cleanOutgoingText(match[2]);
+    const language = cleanOutgoingText(match[3]).trim();
+    const description = cleanOutgoingText(match[4]).trim();
+    const repo = url.replace(/^https?:\/\/github\.com\//i, '').replace(/\/+$/, '');
+    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || `claw-${rows.length + 1}`;
+    rows.push({
+      slug,
+      name,
+      repo,
+      url,
+      language,
+      description,
+      source: 'awesome-claws',
+      category: /android|esp32|hardware|raspberry|phone/i.test(description) ? 'edge-mobile-agent'
+        : /memory|assistant|personal/i.test(description) ? 'personal-agent'
+        : /multi|team|workflow|agent/i.test(description) ? 'multi-agent'
+        : 'claw-agent',
+      safeUse: /sandbox|security|local|privacy/i.test(description)
+        ? 'Good candidate for supervised local runtime experiments.'
+        : 'Use as architecture/reference first; do not run live without review.'
+    });
+  }
+  return rows;
+}
+
+function getClawRuntimeStatus() {
+  const zeroclawSource = path.join(CLAW_RUNTIME_SOURCES, 'zeroclaw');
+  const awesomeSource = path.join(CLAW_RUNTIME_SOURCES, 'awesome-claws');
+  const agents = parseAwesomeClawsAgents();
+  const queued = loadJSON('clawRuntimeTasks.json', []);
+  const executable = process.env.ZEROCLAW_BINARY_PATH || settings.zeroclaw_binary_path || '';
+  return {
+    success: true,
+    title: 'Claw Runtime Hub',
+    updatedAt: new Date().toISOString(),
+    root: CLAW_RUNTIME_ROOT,
+    sources: {
+      root: CLAW_RUNTIME_SOURCES,
+      zeroclaw: {
+        path: zeroclawSource,
+        present: fs.existsSync(zeroclawSource),
+        gitHead: getGitHeadSafe(zeroclawSource),
+        setupBat: fs.existsSync(path.join(zeroclawSource, 'setup.bat')),
+        cargoToml: fs.existsSync(path.join(zeroclawSource, 'Cargo.toml'))
+      },
+      awesomeClaws: {
+        path: awesomeSource,
+        present: fs.existsSync(awesomeSource),
+        gitHead: getGitHeadSafe(awesomeSource),
+        discoveredAgents: agents.length
+      }
+    },
+    executable: {
+      configured: Boolean(executable),
+      path: executable || '',
+      exists: executable ? fs.existsSync(executable) : false,
+      gatewayUrl: process.env.ZEROCLAW_GATEWAY_URL || settings.zeroclaw_gateway_url || ''
+    },
+    policy: CLAW_RUNTIME_POLICY,
+    totals: {
+      agents: agents.length,
+      queued: Array.isArray(queued) ? queued.length : 0,
+      pendingApproval: (Array.isArray(queued) ? queued : []).filter(row => row.status === 'approval_required').length,
+      dryRuns: (Array.isArray(queued) ? queued : []).filter(row => row.dryRun).length
+    },
+    agents,
+    recentTasks: (Array.isArray(queued) ? queued : []).slice(0, 50),
+    setupCommands: [
+      `cd /d ${path.join(CLAW_RUNTIME_SOURCES, 'zeroclaw')}`,
+      'setup.bat',
+      'zeroclaw quickstart',
+      'zeroclaw agent -a supersender'
+    ],
+    integrationRules: [
+      'Use supervised mode by default.',
+      'Never pass .env, WhatsApp sessions, customer logs, payment data, or auth folders to external agents.',
+      'Keep PC actions dry-run unless CLAW_RUNTIME_LIVE_PC_ACTIONS=true and admin approval exists.',
+      'Route SuperSender tasks through queue first, then approve exact command/action.'
+    ]
+  };
+}
+
+function findClawAgent(input = {}) {
+  const requested = String(input.agent || input.slug || input.name || '').trim().toLowerCase();
+  const agents = getClawRuntimeStatus().agents;
+  if (!requested) return agents.find(row => row.slug === 'zeroclaw') || agents[0] || null;
+  return agents.find(row =>
+    row.slug === requested ||
+    row.name.toLowerCase() === requested ||
+    row.repo.toLowerCase() === requested ||
+    row.repo.toLowerCase().endsWith(`/${requested}`)
+  ) || null;
+}
+
+function buildClawRuntimePlan(input = {}) {
+  const status = getClawRuntimeStatus();
+  const agent = findClawAgent(input) || {
+    slug: 'zeroclaw',
+    name: 'ZeroClaw',
+    repo: 'zeroclaw-labs/zeroclaw',
+    url: 'https://github.com/zeroclaw-labs/zeroclaw',
+    language: 'Rust',
+    description: 'Local supervised agent runtime.',
+    safeUse: 'Primary runtime for SuperSender PC/project automation.'
+  };
+  const goal = cleanOutgoingText(input.goal || input.prompt || 'Make SuperSender Pro more autonomous safely.');
+  const mode = String(input.mode || CLAW_RUNTIME_POLICY.defaultMode || 'supervised').toLowerCase();
+  const dryRun = input.dryRun !== false || CLAW_RUNTIME_POLICY.dryRunDefault || !CLAW_RUNTIME_POLICY.livePcActionsEnabled;
+  const risk = /delete|format|password|token|session|payment approve|broadcast all|post live|git push/i.test(goal) ? 'high'
+    : /write|shell|browser|whatsapp|social|payment|file/i.test(goal) ? 'medium'
+    : 'low';
+  const approvalRequired = dryRun || risk !== 'low' || mode !== 'supervised';
+  return {
+    success: true,
+    agent,
+    goal,
+    mode,
+    dryRun,
+    risk,
+    approvalRequired,
+    readiness: {
+      sourceReady: status.sources.zeroclaw.present,
+      executableReady: status.executable.exists,
+      gatewayReady: Boolean(status.executable.gatewayUrl),
+      livePcActionsEnabled: status.policy.livePcActionsEnabled
+    },
+    steps: [
+      'Sanitize context: remove tokens, .env, auth/session folders, payment IDs, and customer-private data.',
+      `Use agent ${agent.name} for a supervised dry-run plan first.`,
+      'Restrict workspace to allowed SuperSender folders.',
+      'Generate exact action list with risk tags and expected file/API changes.',
+      approvalRequired ? 'Ask admin approval before shell/browser/filesystem/WhatsApp/social/payment action.' : 'Execute only low-risk read-only action.',
+      'Write receipt to clawRuntimeTasks.json and show result in dashboard.'
+    ],
+    blockedActions: CLAW_RUNTIME_POLICY.blockedActions,
+    approvalRequiredFor: CLAW_RUNTIME_POLICY.approvalRequired,
+    nextCommand: `!claw queue ${agent.slug} ${goal}`.slice(0, 280),
+    dashboard: 'http://localhost:3001/claw-runtime',
+    createdAt: new Date().toISOString()
+  };
+}
+
+function queueClawRuntimeTask(input = {}) {
+  const plan = buildClawRuntimePlan(input);
+  const rows = loadJSON('clawRuntimeTasks.json', []);
+  const queue = Array.isArray(rows) ? rows : [];
+  const task = {
+    id: uuid(),
+    agent: plan.agent.slug,
+    agentName: plan.agent.name,
+    goal: plan.goal,
+    mode: plan.mode,
+    dryRun: plan.dryRun,
+    risk: plan.risk,
+    status: plan.approvalRequired ? 'approval_required' : 'queued_read_only',
+    source: cleanOutgoingText(input.source || 'api'),
+    plan,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+  queue.unshift(task);
+  saveJSON('clawRuntimeTasks.json', queue.slice(0, 500));
+  return { success: true, task };
+}
+
+function buildClawRuntimePrompt(input = {}) {
+  const plan = buildClawRuntimePlan(input);
+  const prompt = `You are a supervised local agent working for SuperSender Pro.
+
+Agent: ${plan.agent.name}
+Repo: ${plan.agent.repo}
+Goal: ${plan.goal}
+Mode: ${plan.mode}
+Risk: ${plan.risk}
+Dry-run: ${plan.dryRun ? 'yes' : 'no'}
+
+Rules:
+- Do not read, print, copy, or commit .env files, WhatsApp sessions, auth folders, customer logs, payment records, or private keys.
+- Work only inside allowed SuperSender folders unless admin explicitly approves another path.
+- First return a plan and exact commands. Do not execute destructive or live-send actions.
+- WhatsApp, social posting, payment delivery, browser actions, filesystem writes, and git push require admin approval.
+- Produce a receipt: files touched, commands run, tests passed, remaining risks.
+
+Steps:
+${plan.steps.map((step, index) => `${index + 1}. ${step}`).join('\n')}
+`;
+  return { success: true, plan, prompt };
+}
+
+function formatClawRuntimeReply() {
+  const status = getClawRuntimeStatus();
+  const topAgents = status.agents.slice(0, 12).map((agent, index) => `${index + 1}. *${agent.name}* — ${agent.language}\n   ${agent.repo}`).join('\n');
+  return `🦀 *Claw Runtime Hub*
+
+ZeroClaw source: *${status.sources.zeroclaw.present ? 'READY' : 'MISSING'}*
+awesome-claws source: *${status.sources.awesomeClaws.present ? 'READY' : 'MISSING'}*
+Agents discovered: *${status.totals.agents}*
+Queued tasks: *${status.totals.queued}*
+Live PC actions: *${status.policy.livePcActionsEnabled ? 'ON' : 'OFF'}*
+Mode: *${status.policy.defaultMode}*
+
+*Top agents*
+${topAgents || 'No agents discovered yet.'}
+
+Commands:
+*!claw*
+*!claw plan zeroclaw improve channel automation*
+*!claw queue zeroclaw check project health*
+*!claw prompt zeroclaw build safe PC assistant*
+
+Dashboard:
+http://localhost:3001/claw-runtime`;
 }
 
 function getAgenticPublicRepoCatalog() {
@@ -20094,6 +20359,147 @@ app.post('/api/ai-automation/run-task', (req, res) => {
   }
 });
 
+app.get('/api/claw-runtime/status', (_req, res) => {
+  try {
+    res.json(getClawRuntimeStatus());
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/claw-runtime/agents', (_req, res) => {
+  try {
+    const status = getClawRuntimeStatus();
+    res.json({ success: true, total: status.agents.length, agents: status.agents });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/claw-runtime/plan', (req, res) => {
+  try {
+    res.json(buildClawRuntimePlan(req.body || {}));
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/claw-runtime/queue', (req, res) => {
+  try {
+    res.json(queueClawRuntimeTask({ ...(req.body || {}), source: req.body?.source || 'api' }));
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/claw-runtime/prompt', (req, res) => {
+  try {
+    res.type('text/plain').send(buildClawRuntimePrompt(req.query || {}).prompt);
+  } catch (error) {
+    res.status(400).type('text/plain').send(error.message);
+  }
+});
+
+app.get('/claw-runtime', (_req, res) => {
+  try {
+    const status = getClawRuntimeStatus();
+    const agentRows = status.agents.map(agent => `<tr>
+      <td><b>${htmlEscape(agent.name)}</b><br><small>${htmlEscape(agent.slug)}</small></td>
+      <td>${htmlEscape(agent.language || '-')}<br><small>${htmlEscape(agent.category || '')}</small></td>
+      <td>${htmlEscape(agent.repo)}<br><a href="${htmlEscape(agent.url)}" target="_blank">GitHub</a></td>
+      <td>${htmlEscape(agent.description || '')}<br><small>${htmlEscape(agent.safeUse || '')}</small></td>
+      <td><button onclick="planAgent('${htmlEscape(agent.slug)}')">Plan</button> <button class="secondary" onclick="queueAgent('${htmlEscape(agent.slug)}')">Queue</button></td>
+    </tr>`).join('');
+    const tasks = status.recentTasks.length
+      ? status.recentTasks.map(task => `<tr><td>${htmlEscape(task.agentName || task.agent)}</td><td><span class="pill ${task.dryRun ? 'warn' : 'ok'}">${htmlEscape(task.status || '')}</span></td><td>${htmlEscape(task.risk || '')}</td><td>${htmlEscape(task.goal || '')}</td><td>${htmlEscape(task.createdAt || '')}</td></tr>`).join('')
+      : '<tr><td colspan="5" class="muted">No Claw runtime tasks queued yet.</td></tr>';
+    res.type('html').send(`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Claw Runtime Hub</title>
+<style>
+body{font-family:Inter,Arial,sans-serif;background:#071014;color:#eaf7f3;margin:0;padding:24px;line-height:1.45}
+.top{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap;margin-bottom:18px}
+h1,h2,h3{margin-top:0}.muted,small{color:#9fb3c8}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin:16px 0}
+.card{background:#13212b;border:1px solid #284150;border-radius:14px;padding:16px}.value{font-size:30px;font-weight:900;color:#19c79a}
+table{width:100%;border-collapse:collapse;background:#101d26;border:1px solid #263946;border-radius:14px;overflow:hidden;margin-top:14px}
+th,td{text-align:left;padding:12px;border-bottom:1px solid #263946;vertical-align:top}th{background:#162734;color:#b8d8ee}
+.pill{display:inline-flex;border-radius:999px;padding:4px 9px;font-size:12px;font-weight:800}.ok{background:#063d31;color:#6ee7b7}.warn{background:#3d3210;color:#fde68a}
+button,.btn{background:#10b981;color:#06120d;border:0;border-radius:9px;padding:9px 12px;font-weight:800;text-decoration:none;cursor:pointer}.secondary{background:#223442;color:#d8f3ff}
+input,textarea{width:100%;box-sizing:border-box;padding:10px;margin:6px 0;border-radius:8px;border:1px solid #284150;background:#081018;color:#eaf7f3}
+pre{white-space:pre-wrap;background:#081018;border-radius:10px;padding:14px;overflow:auto;min-height:220px}
+a{color:#5eead4}
+</style></head><body><main>
+  <div class="top">
+    <div><h1>Claw Runtime Hub</h1><p class="muted">ZeroClaw + awesome-claws based local PC/project agent control. Supervised by default. Live PC actions are OFF unless explicitly enabled.</p></div>
+    <div><a class="btn secondary" href="/">Dashboard</a> <a class="btn secondary" href="/ai-automation-hub">AI Hub</a> <a class="btn secondary" href="/api/claw-runtime/status">JSON</a></div>
+  </div>
+  <section class="grid">
+    <div class="card"><div class="muted">Agents discovered</div><div class="value">${status.totals.agents}</div></div>
+    <div class="card"><div class="muted">ZeroClaw source</div><div class="value">${status.sources.zeroclaw.present ? 'READY' : 'NO'}</div><small>${htmlEscape(status.sources.zeroclaw.gitHead || '')}</small></div>
+    <div class="card"><div class="muted">awesome-claws</div><div class="value">${status.sources.awesomeClaws.present ? 'READY' : 'NO'}</div><small>${htmlEscape(status.sources.awesomeClaws.gitHead || '')}</small></div>
+    <div class="card"><div class="muted">Live PC actions</div><div class="value">${status.policy.livePcActionsEnabled ? 'ON' : 'OFF'}</div><small>Default: ${htmlEscape(status.policy.defaultMode)}</small></div>
+    <div class="card"><div class="muted">Queued tasks</div><div class="value">${status.totals.queued}</div><small>${status.totals.pendingApproval} need approval</small></div>
+  </section>
+  <section class="grid">
+    <div class="card">
+      <h2>Queue supervised task</h2>
+      <input id="agent" value="zeroclaw" placeholder="Agent slug, e.g. zeroclaw, hermes-agent">
+      <textarea id="goal">Check SuperSender project health and suggest the next safe automation step.</textarea>
+      <button onclick="planCustom()">Build Plan</button>
+      <button class="secondary" onclick="queueCustom()">Queue Dry-run</button>
+      <button class="secondary" onclick="copyPrompt()">Copy Prompt</button>
+    </div>
+    <div class="card">
+      <h2>Output</h2>
+      <pre id="out">Choose an agent action.</pre>
+    </div>
+  </section>
+  <section class="card">
+    <h2>Local Setup Commands</h2>
+    <pre>${htmlEscape(status.setupCommands.join('\n'))}</pre>
+    <p class="muted">These are setup commands for you/admin to run manually. SuperSender does not run untrusted install scripts automatically.</p>
+  </section>
+  <h2>Discovered Claw Agents</h2>
+  <table><thead><tr><th>Agent</th><th>Language</th><th>Repo</th><th>Use</th><th>Action</th></tr></thead><tbody>${agentRows}</tbody></table>
+  <h2>Recent Runtime Tasks</h2>
+  <table><thead><tr><th>Agent</th><th>Status</th><th>Risk</th><th>Goal</th><th>Created</th></tr></thead><tbody>${tasks}</tbody></table>
+</main>
+<script>
+async function postJson(url, payload){
+  const r = await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  const data = await r.json();
+  if(!data.success) throw new Error(data.error || 'Request failed');
+  return data;
+}
+async function planAgent(agent){
+  const data = await postJson('/api/claw-runtime/plan',{agent,goal:'Use this agent as a safe SuperSender blueprint.'});
+  document.getElementById('out').innerText = JSON.stringify(data,null,2);
+}
+async function queueAgent(agent){
+  const data = await postJson('/api/claw-runtime/queue',{agent,goal:'Use this agent as a safe SuperSender blueprint.',source:'dashboard'});
+  document.getElementById('out').innerText = JSON.stringify(data,null,2);
+  setTimeout(()=>location.reload(), 900);
+}
+async function planCustom(){
+  const data = await postJson('/api/claw-runtime/plan',{agent:document.getElementById('agent').value,goal:document.getElementById('goal').value});
+  document.getElementById('out').innerText = JSON.stringify(data,null,2);
+}
+async function queueCustom(){
+  const data = await postJson('/api/claw-runtime/queue',{agent:document.getElementById('agent').value,goal:document.getElementById('goal').value,source:'dashboard'});
+  document.getElementById('out').innerText = JSON.stringify(data,null,2);
+  setTimeout(()=>location.reload(), 900);
+}
+async function copyPrompt(){
+  const params = new URLSearchParams({agent:document.getElementById('agent').value,goal:document.getElementById('goal').value});
+  const text = await (await fetch('/api/claw-runtime/prompt?' + params.toString())).text();
+  document.getElementById('out').innerText = text;
+  await navigator.clipboard.writeText(text);
+  alert('Prompt copied');
+}
+</script></body></html>`);
+  } catch (error) {
+    res.status(500).send(`Claw Runtime Hub failed: ${htmlEscape(error.message)}`);
+  }
+});
+
 app.get('/ai-algorithms', (_req, res) => {
   try {
     const algorithms = getAiAlgorithmCatalog();
@@ -20240,7 +20646,7 @@ button,.btn{background:#10b981;color:#06120d;border:0;border-radius:9px;padding:
 pre{white-space:pre-wrap;background:#081018;border-radius:10px;padding:14px;overflow:auto}
 </style></head><body>
 <main>
-  <div class="top"><div><h1>AI Automation Hub</h1><p class="muted">Adapters for n8n, LangGraph, Browser Use, CrewAI, OpenClaw, Hermes Agent, Agentic Inbox, MCP, and future AI agents.</p></div><div><a class="btn secondary" href="/">Dashboard</a> <a class="btn secondary" href="/ai-algorithms">AI Algorithms</a> <a class="btn secondary" href="/api/ai-automation/status">JSON Status</a></div></div>
+  <div class="top"><div><h1>AI Automation Hub</h1><p class="muted">Adapters for n8n, LangGraph, Browser Use, CrewAI, ZeroClaw, OpenClaw, Hermes Agent, Agentic Inbox, MCP, and future AI agents.</p></div><div><a class="btn secondary" href="/">Dashboard</a> <a class="btn secondary" href="/ai-algorithms">AI Algorithms</a> <a class="btn secondary" href="/claw-runtime">Claw Runtime</a> <a class="btn secondary" href="/api/ai-automation/status">JSON Status</a></div></div>
   <section class="grid">
     <div class="card"><div class="muted">Repos</div><div class="value">${status.totals.repos}</div></div>
     <div class="card"><div class="muted">Configured</div><div class="value">${status.totals.configured}</div></div>
@@ -29211,7 +29617,7 @@ function splitSocialCommandArgs(text = '') {
 }
 
 function isWhatsAppSocialCommand(text = '') {
-  return /^!(social|connect|post|draft|approvepost|sharepost|poststatus|comment|telegram|control|admin|menuadmin|server|status|health|watchdog|next50|antigravity|aihub|automationhub|importskills|skillpacks|packs|waauto|automation|autosettings|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelfix|channelwatch|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
+  return /^!(social|connect|post|draft|approvepost|sharepost|poststatus|comment|telegram|control|admin|menuadmin|server|status|health|watchdog|next50|antigravity|aihub|automationhub|claw|claws|zeroclaw|pcagents|importskills|skillpacks|packs|waauto|automation|autosettings|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelfix|channelwatch|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
 }
 
 function adminNumberCandidates() {
@@ -30367,6 +30773,29 @@ async function handleWhatsAppSocialAdminCommand(ctx = {}) {
 
     if (command === '!aihub' || command === '!automationhub') {
       await reply(buildAiAutomationHubReply());
+      return true;
+    }
+
+    if (command === '!claw' || command === '!claws' || command === '!zeroclaw' || command === '!pcagents') {
+      const mode = String(args[1] || 'status').toLowerCase();
+      const agent = String(args[2] || 'zeroclaw').trim();
+      const goal = args.slice(3).join(' ').trim() || 'Check SuperSender project health and suggest the next safe automation step.';
+      if (['plan', 'map'].includes(mode)) {
+        const plan = buildClawRuntimePlan({ agent, goal, source: 'whatsapp_admin' });
+        await reply(`🦀 *Claw Runtime Plan*\n\nAgent: *${plan.agent.name}*\nRisk: *${plan.risk}*\nDry-run: *${plan.dryRun ? 'YES' : 'NO'}*\nApproval: *${plan.approvalRequired ? 'Required' : 'Not required'}*\n\n${plan.steps.map((step, index) => `${index + 1}. ${step}`).join('\n')}\n\nDashboard:\n${plan.dashboard}`);
+        return true;
+      }
+      if (['queue', 'run', 'use'].includes(mode)) {
+        const result = queueClawRuntimeTask({ agent, goal, source: 'whatsapp_admin' });
+        await reply(`✅ *Claw Runtime Task Queued*\n\nAgent: *${result.task.agentName}*\nStatus: *${result.task.status}*\nRisk: *${result.task.risk}*\nDry-run: *${result.task.dryRun ? 'YES' : 'NO'}*\n\nGoal:\n${result.task.goal}\n\nDashboard:\nhttp://localhost:3001/claw-runtime`);
+        return true;
+      }
+      if (['prompt', 'copy'].includes(mode)) {
+        const built = buildClawRuntimePrompt({ agent, goal, source: 'whatsapp_admin' });
+        await reply(`🧠 *Claw Runtime Prompt*\n\n${built.prompt.slice(0, 3000)}${built.prompt.length > 3000 ? '\n\n...continued in /api/claw-runtime/prompt' : ''}`);
+        return true;
+      }
+      await reply(formatClawRuntimeReply());
       return true;
     }
 
