@@ -39612,6 +39612,194 @@ const ECOMMERCE_PLATFORM_DIRECTORY = [
   }
 ];
 
+const ECOMMERCE_REPO_BLUEPRINTS = [
+  {
+    slug: 'medusa',
+    name: 'Medusa',
+    repo: 'medusajs/medusa',
+    url: 'https://github.com/medusajs/medusa',
+    category: 'headless-commerce',
+    bestFor: 'Custom Shopify-like backend, multi-vendor stores, AI tools marketplace, custom checkout flows',
+    useInSuperSender: 'Use as future backend pattern for product, cart, order, customer, and fulfillment modules.',
+    integrationMode: 'connector-blueprint',
+    priority: 1
+  },
+  {
+    slug: 'saleor',
+    name: 'Saleor',
+    repo: 'saleor/saleor',
+    url: 'https://github.com/saleor/saleor',
+    category: 'graphql-commerce',
+    bestFor: 'GraphQL-first enterprise commerce and multi-channel catalog/order APIs',
+    useInSuperSender: 'Use GraphQL connector pattern for products, orders, channels, webhooks, and permissions.',
+    integrationMode: 'api-adapter',
+    priority: 2
+  },
+  {
+    slug: 'vendure',
+    name: 'Vendure',
+    repo: 'vendure-ecommerce/vendure',
+    url: 'https://github.com/vendure-ecommerce/vendure',
+    category: 'typescript-commerce',
+    bestFor: 'TypeScript plugin-based ecommerce engine with channels and custom workflows',
+    useInSuperSender: 'Use plugin architecture pattern for Daraz/Shopify/Woo/custom store adapters.',
+    integrationMode: 'architecture-pattern',
+    priority: 3
+  },
+  {
+    slug: 'spree',
+    name: 'Spree Commerce',
+    repo: 'spree/spree',
+    url: 'https://github.com/spree/spree',
+    category: 'rails-commerce',
+    bestFor: 'Mature open-source storefront, promotions, carts, orders, inventory',
+    useInSuperSender: 'Use promotion/order lifecycle patterns for WhatsApp discount and lifecycle automation.',
+    integrationMode: 'lifecycle-pattern',
+    priority: 4
+  },
+  {
+    slug: 'solidus',
+    name: 'Solidus',
+    repo: 'solidusio/solidus',
+    url: 'https://github.com/solidusio/solidus',
+    category: 'rails-commerce',
+    bestFor: 'Customizable commerce with strong order/payment/stock primitives',
+    useInSuperSender: 'Use stock/payment abstraction ideas for dealer-stock and reseller workflows.',
+    integrationMode: 'domain-model-pattern',
+    priority: 5
+  },
+  {
+    slug: 'bagisto',
+    name: 'Bagisto',
+    repo: 'bagisto/bagisto',
+    url: 'https://github.com/bagisto/bagisto',
+    category: 'laravel-commerce',
+    bestFor: 'Marketplace and multi-vendor commerce in PHP/Laravel ecosystems',
+    useInSuperSender: 'Use marketplace/vendor concepts for dealer intelligence and supplier ranking.',
+    integrationMode: 'marketplace-pattern',
+    priority: 6
+  },
+  {
+    slug: 'sylius',
+    name: 'Sylius',
+    repo: 'Sylius/Sylius',
+    url: 'https://github.com/Sylius/Sylius',
+    category: 'symfony-commerce',
+    bestFor: 'Enterprise-grade customizable commerce workflows',
+    useInSuperSender: 'Use workflow/state-machine ideas for orders, warranty, returns, and approvals.',
+    integrationMode: 'workflow-pattern',
+    priority: 7
+  },
+  {
+    slug: 'prestashop',
+    name: 'PrestaShop',
+    repo: 'PrestaShop/PrestaShop',
+    url: 'https://github.com/PrestaShop/PrestaShop',
+    category: 'classic-commerce',
+    bestFor: 'Catalog, inventory, promotions, and traditional store integrations',
+    useInSuperSender: 'Use connector target for legacy stores through APIs/feed/webhooks.',
+    integrationMode: 'connector-blueprint',
+    priority: 8
+  },
+  {
+    slug: 'woocommerce',
+    name: 'WooCommerce',
+    repo: 'woocommerce/woocommerce',
+    url: 'https://github.com/woocommerce/woocommerce',
+    category: 'wordpress-commerce',
+    bestFor: 'Pakistan SME stores on WordPress',
+    useInSuperSender: 'Already supported with product/order sync and webhook ingestion.',
+    integrationMode: 'native-connector',
+    priority: 9
+  },
+  {
+    slug: 'reaction-commerce',
+    name: 'Reaction Commerce',
+    repo: 'reactioncommerce/reaction',
+    url: 'https://github.com/reactioncommerce/reaction',
+    category: 'marketplace-commerce',
+    bestFor: 'Marketplace/event-driven commerce concepts',
+    useInSuperSender: 'Use event-driven order/catalog patterns for automation queue expansion.',
+    integrationMode: 'event-pattern',
+    priority: 10
+  }
+];
+
+const ECOMMERCE_AUTOMATION_RECIPES = [
+  {
+    id: 'cod-confirmation',
+    name: 'COD Confirmation',
+    trigger: 'order_created',
+    platforms: ['shopify', 'woocommerce', 'daraz', 'custom'],
+    whatsappTemplate: 'Hi {name}, aap ka COD order #{orderNumber} Rs.{total} receive ho gaya. Confirm karne ke liye YES reply karein.',
+    action: 'send_whatsapp_confirmation',
+    priority: 'P0'
+  },
+  {
+    id: 'abandoned-cart',
+    name: 'Abandoned Cart Recovery',
+    trigger: 'cart_abandoned',
+    platforms: ['shopify', 'woocommerce', 'bigcommerce', 'custom'],
+    whatsappTemplate: 'Hi {name}, aap ki cart mein {items} abhi bhi waiting hai. Complete checkout: {cartUrl}',
+    action: 'send_recovery_message',
+    priority: 'P0'
+  },
+  {
+    id: 'back-in-stock',
+    name: 'Back In Stock Alert',
+    trigger: 'stock_restocked',
+    platforms: ['shopify', 'woocommerce', 'magento', 'custom'],
+    whatsappTemplate: '{product} wapas stock mein aa gaya hai. Limited quantity available. Order ke liye reply karein.',
+    action: 'notify_waitlist',
+    priority: 'P0'
+  },
+  {
+    id: 'low-stock-urgency',
+    name: 'Low Stock Urgency',
+    trigger: 'stock_low',
+    platforms: ['all'],
+    whatsappTemplate: 'Limited stock alert: {product} sirf {qty} left. Interested hain to abhi reply karein.',
+    action: 'draft_segment_broadcast',
+    priority: 'P1'
+  },
+  {
+    id: 'review-request',
+    name: 'Review Request',
+    trigger: 'order_delivered_24h',
+    platforms: ['all'],
+    whatsappTemplate: 'Aap ka order kaisa raha? Reply 1-5 rating. Agar issue hai to hum abhi help karte hain.',
+    action: 'request_review',
+    priority: 'P1'
+  },
+  {
+    id: 'cross-sell',
+    name: 'Smart Cross Sell',
+    trigger: 'order_delivered_3d',
+    platforms: ['all'],
+    whatsappTemplate: 'Aap ne {product} liya tha. Is ke sath best add-on: {recommendation}. Bundle price Rs.{price}.',
+    action: 'recommend_product',
+    priority: 'P1'
+  },
+  {
+    id: 'delay-notify',
+    name: 'Proactive Delay Notify',
+    trigger: 'fulfillment_delayed',
+    platforms: ['all'],
+    whatsappTemplate: 'Order #{orderNumber} mein thori delay hai. Reason: {reason}. New ETA: {eta}.',
+    action: 'send_delay_update',
+    priority: 'P0'
+  },
+  {
+    id: 'price-drop',
+    name: 'Price Drop Campaign',
+    trigger: 'price_changed_down',
+    platforms: ['all'],
+    whatsappTemplate: '{product} ki price drop ho gayi: Rs.{oldPrice} se Rs.{newPrice}. Reply ORDER to buy.',
+    action: 'draft_hot_leads_campaign',
+    priority: 'P2'
+  }
+];
+
 function normalizeEcommercePlatform(value = '') {
   const raw = String(value || '').trim().toLowerCase().replace(/\s+/g, '-');
   const aliases = {
@@ -39895,12 +40083,88 @@ function ecommerceHubSummary() {
   return {
     enabled: commerceSettings.enabled !== false,
     platforms: ECOMMERCE_PLATFORM_DIRECTORY,
+    repoBlueprints: ECOMMERCE_REPO_BLUEPRINTS,
+    automationRecipes: ECOMMERCE_AUTOMATION_RECIPES,
     connections,
     platformCounts,
     importedProducts,
     commerceOrders: commerceOrders.length,
     recentEvents: (commerceEvents || []).slice(-20).reverse()
   };
+}
+
+function renderEcommerceRecipeTemplate(template = '', variables = {}) {
+  return String(template || '').replace(/\{([a-zA-Z0-9_]+)\}/g, (_match, key) => {
+    const value = variables[key] ?? variables[key.toLowerCase()] ?? '';
+    return value === undefined || value === null || value === '' ? `{${key}}` : String(value);
+  });
+}
+
+function ecommerceRecipeById(id = '') {
+  const raw = String(id || '').trim().toLowerCase();
+  return ECOMMERCE_AUTOMATION_RECIPES.find(item => item.id === raw) || null;
+}
+
+function buildEcommerceRecipeDraft(recipeId = '', input = {}) {
+  const recipe = ecommerceRecipeById(recipeId);
+  if (!recipe) throw new Error('Ecommerce automation recipe not found');
+  const product = input.productId ? findProductById(input.productId) : null;
+  const order = input.orderId || input.orderNumber ? findOrderByAnyIdentifier(input.orderId || input.orderNumber) : null;
+  const variables = {
+    name: input.name || order?.customerName || input.customerName || 'Customer',
+    orderNumber: input.orderNumber || order?.orderNumber || order?.externalId || '',
+    total: Number(input.total || order?.total || product?.price || 0).toLocaleString(),
+    items: input.items || (Array.isArray(order?.items) ? order.items.map(item => item.name).join(', ') : product?.name || 'selected items'),
+    product: input.product || product?.name || input.productName || 'Product',
+    qty: input.qty || input.quantity || product?.quantity || product?.stockQty || 'few',
+    cartUrl: input.cartUrl || input.checkoutUrl || '',
+    recommendation: input.recommendation || input.addon || 'recommended add-on',
+    price: Number(input.price || product?.price || 0).toLocaleString(),
+    oldPrice: Number(input.oldPrice || product?.regularPrice || 0).toLocaleString(),
+    newPrice: Number(input.newPrice || product?.price || 0).toLocaleString(),
+    reason: input.reason || 'operational delay',
+    eta: input.eta || input.etaText || 'soon'
+  };
+  const message = renderEcommerceRecipeTemplate(recipe.whatsappTemplate, variables);
+  const draft = {
+    id: `ec-draft-${uuid()}`,
+    recipeId: recipe.id,
+    recipeName: recipe.name,
+    action: recipe.action,
+    message,
+    variables,
+    targetNumber: normalizeNumber(input.number || input.phone || order?.customerNumber || ''),
+    productId: product?.id || input.productId || '',
+    orderId: order?.id || input.orderId || '',
+    createdAt: new Date().toISOString(),
+    status: 'draft'
+  };
+  logCommerceEvent('automation_recipe_draft', draft, 'ecommerce');
+  return draft;
+}
+
+function buildEcommerceRepoPrompt(slug = '') {
+  const blueprints = slug
+    ? ECOMMERCE_REPO_BLUEPRINTS.filter(item => item.slug === String(slug).trim().toLowerCase())
+    : ECOMMERCE_REPO_BLUEPRINTS.slice(0, 10);
+  const lines = [
+    'Integrate these ecommerce open-source ideas into SuperSender Pro without copying code blindly.',
+    '',
+    'Rules:',
+    '- Keep existing Node/Express server.js working.',
+    '- Add adapters behind /api/ecommerce/*.',
+    '- Never commit real tokens.',
+    '- Normalize products into laptop_products.json and orders into orders.json.',
+    '- Add tests/syntax check after every patch.',
+    ''
+  ];
+  for (const item of blueprints) {
+    lines.push(`Repo: ${item.name} (${item.repo})`);
+    lines.push(`Use: ${item.useInSuperSender}`);
+    lines.push(`Mode: ${item.integrationMode}`);
+    lines.push('');
+  }
+  return lines.join('\n').trim();
 }
 
 function buildEcommerceHubPage(req) {
@@ -39926,6 +40190,21 @@ function buildEcommerceHubPage(req) {
       <b>${htmlEscape(item.label)}</b>
       <small>${htmlEscape(item.auth)}</small>
       <p>${htmlEscape(item.notes)}</p>
+    </div>`).join('');
+  const recipeCards = ECOMMERCE_AUTOMATION_RECIPES.map(item => `
+    <div class="platform">
+      <b>${htmlEscape(item.name)}</b>
+      <small>${htmlEscape(item.trigger)} | ${htmlEscape(item.priority)}</small>
+      <p>${htmlEscape(item.whatsappTemplate)}</p>
+      <button onclick="recipeDraft('${htmlEscape(item.id)}')">Generate Draft</button>
+    </div>`).join('');
+  const repoCards = ECOMMERCE_REPO_BLUEPRINTS.map(item => `
+    <div class="platform">
+      <b>${htmlEscape(item.name)}</b>
+      <small>${htmlEscape(item.category)} | ${htmlEscape(item.integrationMode)}</small>
+      <p>${htmlEscape(item.useInSuperSender)}</p>
+      <a class="btn secondary" href="${htmlEscape(item.url)}" target="_blank">Repo</a>
+      <button onclick="copyRepoPrompt('${htmlEscape(item.slug)}')">Copy Prompt</button>
     </div>`).join('');
   const eventRows = summary.recentEvents.map(event => `
     <tr>
@@ -39972,6 +40251,8 @@ function buildEcommerceHubPage(req) {
       </section>
     </div>
     <section class="card" style="margin-top:16px"><h2>Connections</h2><table><thead><tr><th>Name</th><th>Platform</th><th>Store/Feed</th><th>Status</th><th>Actions</th></tr></thead><tbody>${connectionRows}</tbody></table></section>
+    <section class="card" style="margin-top:16px"><h2>Automation Recipes</h2><p class="muted">Ready WhatsApp ecommerce automations. Generate draft, then send/broadcast safely after review.</p><div class="grid">${recipeCards}</div></section>
+    <section class="card" style="margin-top:16px"><h2>GitHub Repo Blueprints</h2><p class="muted">Best public ecommerce repo ideas converted into safe SuperSender integration patterns.</p><div class="grid">${repoCards}</div></section>
     <section class="card" style="margin-top:16px"><h2>Recent Commerce Events</h2><table><thead><tr><th>Time</th><th>Type</th><th>Source</th><th>Payload</th></tr></thead><tbody>${eventRows || '<tr><td colspan="4" class="muted">No events yet.</td></tr>'}</tbody></table></section>
   </main><script>
     async function api(url, options={}){ const r=await fetch(url,{headers:{'Content-Type':'application/json'},...options}); const d=await r.json().catch(()=>({})); if(!r.ok||d.success===false) throw new Error(d.error||'Request failed'); return d; }
@@ -39984,6 +40265,8 @@ function buildEcommerceHubPage(req) {
     async function syncProducts(id){ try{ const d=await api('/api/ecommerce/connections/'+id+'/sync-products',{method:'POST'}); alert('Products synced: '+d.imported+' imported, '+d.added+' added, '+d.updated+' updated'); location.reload(); }catch(e){ alert(e.message); } }
     async function syncOrders(id){ try{ const d=await api('/api/ecommerce/connections/'+id+'/sync-orders',{method:'POST'}); alert('Orders synced: '+d.processed); location.reload(); }catch(e){ alert(e.message); } }
     async function copyText(text){ await navigator.clipboard.writeText(text); alert('Copied: '+text); }
+    async function recipeDraft(id){ try{ const d=await api('/api/ecommerce/automation-recipes/'+id+'/draft',{method:'POST',body:JSON.stringify({})}); await navigator.clipboard.writeText(d.draft.message); alert('Draft copied:\\n\\n'+d.draft.message); }catch(e){ alert(e.message); } }
+    async function copyRepoPrompt(slug){ try{ const d=await api('/api/ecommerce/repo-blueprints/'+slug+'/prompt'); await navigator.clipboard.writeText(d.prompt); alert('Prompt copied for '+slug); }catch(e){ alert(e.message); } }
   </script></body></html>`;
 }
 
@@ -40189,6 +40472,52 @@ app.get('/api/ecommerce/status', (req, res) => {
 
 app.get('/api/ecommerce/platforms', (req, res) => {
   res.json({ success: true, platforms: ECOMMERCE_PLATFORM_DIRECTORY });
+});
+
+app.get('/api/ecommerce/repo-blueprints', (req, res) => {
+  res.json({ success: true, blueprints: ECOMMERCE_REPO_BLUEPRINTS });
+});
+
+app.get('/api/ecommerce/repo-blueprints/:slug/prompt', (req, res) => {
+  try {
+    const slug = String(req.params.slug || '').trim().toLowerCase();
+    const exists = ECOMMERCE_REPO_BLUEPRINTS.some(item => item.slug === slug);
+    if (!exists) return res.status(404).json({ success: false, error: 'Ecommerce repo blueprint not found' });
+    res.json({ success: true, slug, prompt: buildEcommerceRepoPrompt(slug) });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/ecommerce/repo-blueprints-prompt', (req, res) => {
+  res.type('text/plain').send(buildEcommerceRepoPrompt(String(req.query.slug || '')));
+});
+
+app.get('/api/ecommerce/automation-recipes', (req, res) => {
+  res.json({ success: true, recipes: ECOMMERCE_AUTOMATION_RECIPES });
+});
+
+app.post('/api/ecommerce/automation-recipes/:id/draft', (req, res) => {
+  try {
+    const draft = buildEcommerceRecipeDraft(req.params.id, req.body || {});
+    res.json({ success: true, draft });
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/ecommerce/automation-recipes/:id/send', async (req, res) => {
+  try {
+    const draft = buildEcommerceRecipeDraft(req.params.id, req.body || {});
+    if (!draft.targetNumber) return res.status(400).json({ success: false, error: 'target number is required', draft });
+    const sent = await sendCommerceMessage(draft.targetNumber, draft.message);
+    draft.status = sent ? 'sent' : 'queued_or_failed';
+    draft.sentAt = sent ? new Date().toISOString() : null;
+    logCommerceEvent('automation_recipe_sent', draft, 'ecommerce');
+    res.json({ success: true, sent, draft });
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
 });
 
 app.get('/api/ecommerce/connections', (req, res) => {
