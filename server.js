@@ -9149,6 +9149,41 @@ const AGENTIC_PUBLIC_REPO_CATALOG = [
   { slug: 'ai-agents-for-beginners', name: 'AI Agents for Beginners', repo: 'microsoft/ai-agents-for-beginners', url: 'https://github.com/microsoft/ai-agents-for-beginners', category: 'learning-blueprint', mode: 'reference', priority: 40, risk: 'low', bestUse: 'Learning examples and architecture references for future agent features.', env: [], skillPack: 'dev-maintainer' }
 ];
 
+const AI_ALGORITHM_CATALOG = [
+  { id: 'intent-ensemble-router', name: 'Intent Ensemble Router', family: 'nlp', module: 'whatsapp-bot', priority: 1, level: 'production', bestFor: 'Classify customer messages into price, availability, order, issue, renewal, bot-service, scholarship, ecommerce, and fallback intents.', keywords: ['intent', 'message', 'reply', 'whatsapp', 'customer', 'classification'], technique: 'keyword + semantic + state-aware ensemble', guardrail: 'Low confidence asks one clarifying question or escalates.' },
+  { id: 'contextual-memory-rag', name: 'Contextual Memory RAG', family: 'rag', module: 'customer-memory', priority: 2, level: 'production', bestFor: 'Remember purchases, issues, preferred tools, payment method, and previous promises before replying.', keywords: ['rag', 'memory', 'customer', 'history', 'context', 'profile'], technique: 'hybrid retrieval + recency + customer profile facts', guardrail: 'Never expose internal notes or other customer data.' },
+  { id: 'durable-graph-orchestrator', name: 'Durable Graph Orchestrator', family: 'agentic-graph', module: 'orders', priority: 3, level: 'production', bestFor: 'Run order, payment, delivery, warranty, renewal, and human approval flows with resumable state.', keywords: ['graph', 'state', 'order', 'payment', 'approval', 'human'], technique: 'durable state graph with interrupt/human-in-loop checkpoints', guardrail: 'Payment, delivery, and live posting nodes require explicit policy checks.' },
+  { id: 'agent-handoff-supervisor', name: 'Agent Handoff Supervisor', family: 'multi-agent', module: 'ai-automation', priority: 4, level: 'production', bestFor: 'Route tasks to sales, support, scraping, caption, pricing, compliance, or developer-maintainer agents.', keywords: ['agent', 'handoff', 'tools', 'supervisor', 'automation'], technique: 'tool-aware supervisor with handoffs and tracing', guardrail: 'External agents receive goals and sanitized context only.' },
+  { id: 'hybrid-search-retriever', name: 'Hybrid Search Retriever', family: 'retrieval', module: 'knowledge-base', priority: 5, level: 'production', bestFor: 'Find best answer from plans, policies, scholarship data, product docs, channel posts, and website extracts.', keywords: ['search', 'retrieval', 'faq', 'docs', 'scholarship', 'website'], technique: 'BM25 + vector search + recency boost', guardrail: 'Use citations for externally sourced answers.' },
+  { id: 'semantic-dedupe-clusterer', name: 'Semantic Dedupe Clusterer', family: 'embeddings', module: 'channels', priority: 6, level: 'production', bestFor: 'Prevent duplicate channel posts, repeated product forwards, and repeated scholarship updates.', keywords: ['dedupe', 'duplicate', 'channel', 'post', 'similar'], technique: 'embedding similarity + normalized text + media hash', guardrail: 'High duplicate score sends to queue instead of live forward.' },
+  { id: 'content-safety-moderator', name: 'Multimodal Content Safety Moderator', family: 'safety', module: 'channels-social', priority: 7, level: 'production', bestFor: 'Block NSFW, unsafe, scammy, competitor, banned words, phone/link leakage, and policy-risk posts.', keywords: ['safety', 'moderation', 'nsfw', 'spam', 'scam', 'policy'], technique: 'rules + classifier + image safety adapter', guardrail: 'Unknown or risky media defaults to manual review.' },
+  { id: 'dynamic-pricing-bandit', name: 'Dynamic Pricing Bandit', family: 'optimization', module: 'pricing', priority: 8, level: 'advanced', bestFor: 'Choose prices by stock, demand, VIP discount, margin, conversion, and urgency without fake scarcity.', keywords: ['pricing', 'profit', 'bandit', 'stock', 'margin', 'conversion'], technique: 'contextual bandit + guardrail rules', guardrail: 'No deceptive scarcity; only real stock urgency.' },
+  { id: 'dealer-multicriteria-ranker', name: 'Dealer Multi-Criteria Ranker', family: 'ranking', module: 'dealer-intelligence', priority: 9, level: 'production', bestFor: 'Rank dealers by trust score, price, stock, response time, warranty reliability, and scam risk.', keywords: ['dealer', 'rank', 'trust', 'rate', 'stock', 'supplier'], technique: 'weighted ranking + Bayesian trust update', guardrail: 'Scammer or disputed dealers are excluded by default.' },
+  { id: 'fraud-anomaly-detector', name: 'Fraud Anomaly Detector', family: 'anomaly-detection', module: 'payments', priority: 10, level: 'production', bestFor: 'Flag duplicate TXNs, fake screenshots, repeated failed payments, suspicious warranty claims, and same-number abuse.', keywords: ['fraud', 'payment', 'scam', 'txn', 'duplicate', 'screenshot'], technique: 'rules + anomaly score + velocity checks', guardrail: 'High-risk payments require manual admin approval.' },
+  { id: 'lead-scoring-model', name: 'Lead Scoring Model', family: 'propensity', module: 'sales', priority: 11, level: 'production', bestFor: 'Score hot leads by message intent, click/source, budget, urgency, tool interest, and reply speed.', keywords: ['lead', 'sales', 'hot', 'conversion', 'score'], technique: 'rules + logistic scoring + recency decay', guardrail: 'Use score for prioritization, not unfair exclusion.' },
+  { id: 'renewal-churn-predictor', name: 'Renewal Churn Predictor', family: 'forecasting', module: 'zero-touch', priority: 12, level: 'production', bestFor: 'Predict who should get 7-day, 3-day, 1-day, and missed-renewal follow-ups.', keywords: ['renewal', 'churn', 'expiry', 'follow-up', 'zero-touch'], technique: 'survival-style rules + engagement score', guardrail: 'Respect max promo frequency and opt-out.' },
+  { id: 'next-best-offer-recommender', name: 'Next Best Offer Recommender', family: 'recommender', module: 'commerce', priority: 13, level: 'production', bestFor: 'Suggest Claude after ChatGPT, bundles for Gold/VIP, laptops/accessories add-ons, or scholarships by interest.', keywords: ['recommend', 'upsell', 'bundle', 'cross-sell', 'offer'], technique: 'association rules + customer segment + stock-aware ranking', guardrail: 'Do not recommend out-of-stock or irrelevant products.' },
+  { id: 'send-time-optimizer', name: 'Send-Time Optimizer', family: 'optimization', module: 'broadcasts', priority: 14, level: 'advanced', bestFor: 'Pick best posting/broadcast time per segment, channel, and niche.', keywords: ['broadcast', 'time', 'schedule', 'channel', 'engagement'], technique: 'time-window scoring + exploration budget', guardrail: 'Never exceed weekly promotional limits.' },
+  { id: 'caption-generation-router', name: 'AI Caption Generation Router', family: 'generation', module: 'social-channels', priority: 15, level: 'production', bestFor: 'Generate Urdu/English captions, CTAs, hashtags, WhatsApp channel copy, and social snippets.', keywords: ['caption', 'social', 'post', 'urdu', 'english', 'hashtag'], technique: 'template + LLM rewrite + platform policy filter', guardrail: 'Brand-safe and platform-compliant output only.' },
+  { id: 'ocr-caption-extractor', name: 'OCR Caption Extractor', family: 'vision', module: 'scraping-channels', priority: 16, level: 'production', bestFor: 'Extract text from screenshots, scholarship posters, product images, invoices, and dealer rate images.', keywords: ['ocr', 'image', 'poster', 'screenshot', 'invoice'], technique: 'OCR + entity parser + confidence scoring', guardrail: 'Low confidence text requires manual check.' },
+  { id: 'voice-transcript-intent', name: 'Voice Transcript Intent Parser', family: 'audio', module: 'whatsapp-bot', priority: 17, level: 'advanced', bestFor: 'Understand WhatsApp voice notes and route to price/order/support flows.', keywords: ['voice', 'audio', 'transcript', 'intent'], technique: 'ASR + intent ensemble', guardrail: 'Sensitive/payment audio summary only; do not store raw audio longer than needed.' },
+  { id: 'stock-demand-forecaster', name: 'Stock Demand Forecaster', family: 'time-series', module: 'stock', priority: 18, level: 'production', bestFor: 'Predict low stock and restock needs for AI tools, laptops, accessories, dry fruits, shirts, and pizza bot menus.', keywords: ['stock', 'inventory', 'forecast', 'restock', 'demand'], technique: 'moving average + seasonality + trend features', guardrail: 'Dealer purchase still needs admin approval unless trusted automation is enabled.' },
+  { id: 'price-spread-arbitrage', name: 'Price Spread Arbitrage Finder', family: 'analytics', module: 'dealer-rates', priority: 19, level: 'production', bestFor: 'Find cheapest buy source, best sell price, and margin opportunity from dealer groups.', keywords: ['rate', 'dealer', 'profit', 'spread', 'arbitrage'], technique: 'spread analytics + reliability filter', guardrail: 'Unverified/scammer rates are excluded from auto-buy suggestions.' },
+  { id: 'channel-viral-predictor', name: 'Channel Viral Predictor', family: 'ranking', module: 'channels', priority: 20, level: 'advanced', bestFor: 'Predict which source-channel posts are worth forwarding fast.', keywords: ['viral', 'channel', 'forward', 'engagement', 'priority'], technique: 'source reputation + keyword momentum + novelty score', guardrail: 'Safety moderator runs before priority forwarding.' },
+  { id: 'topic-trend-detector', name: 'Topic Trend Detector', family: 'trend-detection', module: 'content-intel', priority: 21, level: 'advanced', bestFor: 'Detect trending AI tools, scholarships, offers, and social topics from web/channel data.', keywords: ['trend', 'topic', 'content', 'scholarship', 'ai tools'], technique: 'keyword burst + embedding clusters + recency weighting', guardrail: 'External trend claims should include source link.' },
+  { id: 'ab-test-uplift-engine', name: 'A/B Uplift Engine', family: 'experimentation', module: 'marketing', priority: 22, level: 'advanced', bestFor: 'Compare copy, price, CTA, timing, and offer variants without over-messaging users.', keywords: ['ab test', 'uplift', 'conversion', 'campaign', 'experiment'], technique: 'sequential testing + uplift estimate', guardrail: 'Small-test first and cap promo frequency.' },
+  { id: 'ai-copy-quality-grader', name: 'AI Copy Quality Grader', family: 'evaluation', module: 'content', priority: 23, level: 'production', bestFor: 'Grade captions, bot replies, sales scripts, and channel posts for clarity, tone, CTA, and compliance.', keywords: ['quality', 'copy', 'grade', 'reply', 'caption'], technique: 'LLM rubric + deterministic policy checks', guardrail: 'Never approve misleading claims or fake urgency.' },
+  { id: 'prompt-optimizer-dspy-style', name: 'Prompt Optimizer', family: 'optimization', module: 'ai-agent', priority: 24, level: 'advanced', bestFor: 'Improve bot prompts and agent instructions from examples and scored outcomes.', keywords: ['prompt', 'optimize', 'dspy', 'eval', 'instructions'], technique: 'DSPy-style prompt/program optimization', guardrail: 'Only promote prompts that pass safety and regression checks.' },
+  { id: 'mcp-tool-router', name: 'MCP Tool Router', family: 'tool-use', module: 'integrations', priority: 25, level: 'advanced', bestFor: 'Route AI agents to tools like GitHub, Sheets, browser, Notion, CRM, files, and custom APIs.', keywords: ['mcp', 'tools', 'connector', 'api', 'agent'], technique: 'tool schema matching + permission policy', guardrail: 'Write/destructive tools require scoped approval.' },
+  { id: 'rag-grounded-answer-checker', name: 'RAG Grounded Answer Checker', family: 'evaluation', module: 'knowledge-base', priority: 26, level: 'production', bestFor: 'Check whether an answer is supported by retrieved sources or should be escalated.', keywords: ['rag', 'grounding', 'source', 'answer', 'hallucination'], technique: 'claim extraction + evidence overlap + LLM judge', guardrail: 'Unsupported factual claims are blocked or marked as uncertain.' },
+  { id: 'pii-secret-redactor', name: 'PII and Secret Redactor', family: 'privacy', module: 'security', priority: 27, level: 'production', bestFor: 'Remove phone numbers, tokens, private keys, sessions, customer logs, and payment IDs before external agent calls.', keywords: ['privacy', 'secret', 'redact', 'token', 'pii'], technique: 'regex + entropy + allow/deny path policy', guardrail: 'Blocks external call if high-severity secret remains.' },
+  { id: 'queue-priority-optimizer', name: 'Queue Priority Optimizer', family: 'operations', module: 'automation-queue', priority: 28, level: 'production', bestFor: 'Prioritize urgent orders, payment verification, channel forwards, stock alerts, and support issues.', keywords: ['queue', 'priority', 'jobs', 'automation', 'sla'], technique: 'weighted priority + SLA aging + risk boost', guardrail: 'Human approval jobs cannot be skipped.' },
+  { id: 'conversation-state-repair', name: 'Conversation State Repair', family: 'state-machine', module: 'whatsapp-bot', priority: 29, level: 'production', bestFor: 'Detect stuck WhatsApp states and recover users to correct menu/flow.', keywords: ['state', 'conversation', 'stuck', 'menu', 'flow'], technique: 'transition validation + timeout + intent override', guardrail: 'Never jump to payment/delivery without required prior steps.' },
+  { id: 'multimodal-product-extractor', name: 'Multimodal Product Extractor', family: 'vision-language', module: 'catalog', priority: 30, level: 'advanced', bestFor: 'Turn product images/videos/PDFs into catalog entries with title, price, features, and availability.', keywords: ['product', 'image', 'video', 'pdf', 'catalog'], technique: 'vision-language extraction + OCR + schema validation', guardrail: 'Low confidence product drafts require admin review.' },
+  { id: 'website-change-summarizer', name: 'Website Change Summarizer', family: 'web-intelligence', module: 'scraping', priority: 31, level: 'production', bestFor: 'Detect meaningful changes on websites and turn them into WhatsApp/social/website posts.', keywords: ['website', 'change', 'scrape', 'monitor', 'post'], technique: 'diff + semantic summarization + entity extraction', guardrail: 'Do not repost unchanged or low-confidence changes.' },
+  { id: 'business-kpi-advisor', name: 'Business KPI Advisor', family: 'analytics', module: 'dashboard', priority: 32, level: 'production', bestFor: 'Generate daily/weekly suggestions from revenue, conversion, stock, dealer rates, and campaign data.', keywords: ['kpi', 'analytics', 'dashboard', 'profit', 'suggestion'], technique: 'rules + anomaly detection + LLM executive summary', guardrail: 'Separate facts from recommendations.' }
+];
+
 function agenticEnvConfigured(row = {}) {
   const keys = Array.isArray(row.workerEnv) ? row.workerEnv : [];
   if (!keys.length) return true;
@@ -9668,10 +9703,116 @@ function getAiAutomationRepoPlan() {
   }));
 }
 
+function getAiAlgorithmCatalog() {
+  const runtime = loadJSON('aiAlgorithmSettings.json', {});
+  const enabledMap = runtime.enabled || {};
+  return AI_ALGORITHM_CATALOG.map(row => ({
+    ...row,
+    enabled: enabledMap[row.id] !== false && process.env.AI_ALGORITHMS_ENABLED !== 'false',
+    status: enabledMap[row.id] === false ? 'disabled' : (process.env.AI_ALGORITHMS_ENABLED === 'false' ? 'globally_disabled' : 'ready'),
+    dryRunDefault: process.env.AI_ALGORITHMS_DRY_RUN_DEFAULT !== 'false',
+    inputs: row.inputs || [],
+    outputs: row.outputs || []
+  })).sort((a, b) => Number(a.priority || 999) - Number(b.priority || 999));
+}
+
+function recommendAiAlgorithms(input = {}) {
+  const goal = cleanOutgoingText(input.goal || input.prompt || input.message || '');
+  const moduleName = String(input.module || input.area || '').toLowerCase();
+  const text = `${goal} ${moduleName} ${input.channel || ''} ${input.intent || ''}`.toLowerCase();
+  const requestedLimit = Math.max(1, Math.min(12, Number(input.limit || 6)));
+  const catalog = getAiAlgorithmCatalog();
+  const ranked = catalog.map(row => {
+    let score = Math.max(1, 120 - Number(row.priority || 99));
+    const hay = `${row.id} ${row.name} ${row.family} ${row.module} ${row.bestFor} ${(row.keywords || []).join(' ')}`.toLowerCase();
+    if (moduleName && String(row.module || '').toLowerCase().includes(moduleName)) score += 35;
+    for (const word of text.split(/[^a-z0-9]+/).filter(Boolean)) {
+      if (word.length >= 3 && hay.includes(word)) score += word.length >= 6 ? 12 : 6;
+    }
+    if (!row.enabled) score -= 100;
+    return {
+      ...row,
+      score,
+      reason: `${row.technique}. Guardrail: ${row.guardrail}`
+    };
+  }).sort((a, b) => b.score - a.score);
+  const selected = ranked.slice(0, requestedLimit);
+  return {
+    success: true,
+    goal: goal || 'Recommend best SuperSender AI algorithms.',
+    module: moduleName || 'auto',
+    selected,
+    sequence: selected.map((row, index) => ({
+      step: index + 1,
+      algorithm: row.id,
+      action: `Apply ${row.name} to ${row.module} in dry-run mode first.`,
+      guardrail: row.guardrail
+    })),
+    safety: [
+      'Run in dry-run before sending live WhatsApp/social/payment actions.',
+      'Use PII and Secret Redactor before external AI calls.',
+      'Record algorithm runs to data/aiAlgorithmRuns.json; do not commit runtime data.'
+    ],
+    createdAt: new Date().toISOString()
+  };
+}
+
+function runAiAlgorithm(input = {}) {
+  if (process.env.AI_ALGORITHMS_ENABLED === 'false') throw new Error('AI algorithms are disabled by AI_ALGORITHMS_ENABLED=false.');
+  const algorithmId = String(input.algorithm || input.id || '').trim().toLowerCase();
+  if (!algorithmId) throw new Error('algorithm id is required.');
+  const algorithm = getAiAlgorithmCatalog().find(row => row.id === algorithmId || row.name.toLowerCase() === algorithmId);
+  if (!algorithm) throw new Error('Unknown AI algorithm.');
+  if (!algorithm.enabled) throw new Error('Algorithm is disabled.');
+  const dryRun = input.dryRun !== false || process.env.AI_ALGORITHMS_DRY_RUN_DEFAULT !== 'false';
+  const run = {
+    id: uuid(),
+    algorithm: algorithm.id,
+    algorithmName: algorithm.name,
+    module: algorithm.module,
+    family: algorithm.family,
+    dryRun,
+    inputSummary: cleanOutgoingText(input.goal || input.prompt || input.message || algorithm.bestFor).slice(0, 500),
+    status: dryRun ? 'dry_run_complete' : 'approval_required',
+    recommendation: {
+      technique: algorithm.technique,
+      guardrail: algorithm.guardrail,
+      nextAction: dryRun
+        ? `Review dry-run result, then connect ${algorithm.name} to ${algorithm.module}.`
+        : `Admin approval required before live ${algorithm.module} action.`
+    },
+    createdAt: new Date().toISOString()
+  };
+  const runs = loadJSON('aiAlgorithmRuns.json', []);
+  const rows = Array.isArray(runs) ? runs : [];
+  rows.unshift(run);
+  saveJSON('aiAlgorithmRuns.json', rows.slice(0, 500));
+  return { success: true, run, algorithm };
+}
+
+function buildAiAlgorithmsPrompt() {
+  const top = getAiAlgorithmCatalog().slice(0, 20).map(row => `- ${row.name} (${row.id}) for ${row.module}: ${row.bestFor}`).join('\n');
+  return `SuperSender Pro AI Algorithms Prompt
+
+Goal: apply the best practical AI algorithms available through June 2026 to SuperSender Pro modules.
+
+Top algorithms:
+${top}
+
+Implementation rules:
+- Add algorithms as safe routers, scorers, and dry-run adapters first.
+- Payment, delivery, WhatsApp broadcast, social publishing, and channel forwarding need admin approval unless a trusted policy already allows it.
+- Use PII/Secret Redactor before any external agent/model/tool call.
+- Keep runtime data in data/*.json and do not commit it.
+- Verify with GET /api/ai-algorithms/catalog, POST /api/ai-algorithms/recommend, POST /api/ai-algorithms/run, and node --check server.js.`;
+}
+
 function getAiAutomationStatus() {
   const repos = getAiAutomationRepoPlan();
   const repoCatalog = getAgenticPublicRepoCatalog();
   const repoImportQueue = loadJSON('agenticRepoImportQueue.json', []);
+  const algorithms = getAiAlgorithmCatalog();
+  const algorithmRuns = loadJSON('aiAlgorithmRuns.json', []);
   const agenticAgents = getAgenticAgentRegistry();
   const skillPacks = getAgenticSkillPacks();
   const missions = getAgenticMissions();
@@ -9698,11 +9839,16 @@ function getAiAutomationStatus() {
       failedTasks: tasks.filter(task => task.status === 'failed').length,
       repoCatalog: repoCatalog.length,
       repoImportsQueued: Array.isArray(repoImportQueue) ? repoImportQueue.length : 0,
-      highRiskRepos: repoCatalog.filter(row => String(row.licenseRisk || '').toLowerCase() === 'high').length
+      highRiskRepos: repoCatalog.filter(row => String(row.licenseRisk || '').toLowerCase() === 'high').length,
+      algorithms: algorithms.length,
+      algorithmsReady: algorithms.filter(row => row.enabled).length,
+      algorithmRuns: Array.isArray(algorithmRuns) ? algorithmRuns.length : 0
     },
     repos,
     repoCatalog,
     repoImportQueue: (Array.isArray(repoImportQueue) ? repoImportQueue : []).slice(0, 50),
+    algorithms,
+    recentAlgorithmRuns: (Array.isArray(algorithmRuns) ? algorithmRuns : []).slice(0, 25),
     agenticAgents,
     skillPacks,
     missions,
@@ -18422,6 +18568,70 @@ app.get('/api/ai-automation/repo-catalog-prompt', (_req, res) => {
   }
 });
 
+app.get('/api/ai-algorithms/catalog', (_req, res) => {
+  try {
+    const algorithms = getAiAlgorithmCatalog();
+    res.json({
+      success: true,
+      count: algorithms.length,
+      ready: algorithms.filter(row => row.enabled).length,
+      algorithms,
+      updatedAt: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/ai-algorithms/status', (_req, res) => {
+  try {
+    const algorithms = getAiAlgorithmCatalog();
+    const runs = loadJSON('aiAlgorithmRuns.json', []);
+    res.json({
+      success: true,
+      totals: {
+        algorithms: algorithms.length,
+        ready: algorithms.filter(row => row.enabled).length,
+        production: algorithms.filter(row => row.level === 'production').length,
+        advanced: algorithms.filter(row => row.level === 'advanced').length,
+        runs: Array.isArray(runs) ? runs.length : 0
+      },
+      byModule: algorithms.reduce((acc, row) => {
+        acc[row.module] = (acc[row.module] || 0) + 1;
+        return acc;
+      }, {}),
+      recentRuns: (Array.isArray(runs) ? runs : []).slice(0, 25),
+      updatedAt: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/ai-algorithms/recommend', (req, res) => {
+  try {
+    res.json(recommendAiAlgorithms(req.body || {}));
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/ai-algorithms/run', (req, res) => {
+  try {
+    res.json(runAiAlgorithm({ ...(req.body || {}), source: req.body?.source || 'api' }));
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/ai-algorithms/prompt', (_req, res) => {
+  try {
+    res.type('text/plain').send(buildAiAlgorithmsPrompt());
+  } catch (error) {
+    res.status(500).type('text/plain').send(error.message);
+  }
+});
+
 app.get('/api/ai-automation/status', (_req, res) => {
   try {
     res.json(getAiAutomationStatus());
@@ -18540,6 +18750,81 @@ app.post('/api/ai-automation/run-task', (req, res) => {
   }
 });
 
+app.get('/ai-algorithms', (_req, res) => {
+  try {
+    const algorithms = getAiAlgorithmCatalog();
+    const runs = loadJSON('aiAlgorithmRuns.json', []);
+    const rows = algorithms.map(row => `<tr>
+      <td><b>${htmlEscape(row.name)}</b><br><small>${htmlEscape(row.id)}</small></td>
+      <td>${htmlEscape(row.family)}<br><small>${htmlEscape(row.module)}</small></td>
+      <td><span class="pill ${row.enabled ? 'ok' : 'warn'}">${htmlEscape(row.status)}</span><br><small>${htmlEscape(row.level)}</small></td>
+      <td>${Number(row.priority || 0)}</td>
+      <td>${htmlEscape(row.bestFor)}<br><small>${htmlEscape(row.technique)}</small></td>
+      <td>${htmlEscape(row.guardrail)}</td>
+      <td><button onclick="recommendAlgo('${htmlEscape(row.id)}')">Recommend</button> <button onclick="runAlgo('${htmlEscape(row.id)}')">Dry Run</button></td>
+    </tr>`).join('');
+    const recent = (Array.isArray(runs) ? runs : []).slice(0, 20).map(run => `<tr><td>${htmlEscape(run.algorithmName || run.algorithm)}</td><td>${htmlEscape(run.module || '')}</td><td>${htmlEscape(run.status || '')}</td><td>${htmlEscape(run.createdAt || '')}</td></tr>`).join('') || '<tr><td colspan="4" class="muted">No algorithm dry-runs yet.</td></tr>';
+    res.type('html').send(`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI Algorithms Engine</title>
+<style>
+body{font-family:Inter,Arial,sans-serif;background:#071014;color:#eaf7f3;margin:0;padding:24px;line-height:1.45}
+.top{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap;margin-bottom:18px}
+h1{margin:0}.muted,small{color:#9fb3c8}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:16px 0}
+.card{background:#13212b;border:1px solid #284150;border-radius:14px;padding:16px}.value{font-size:30px;font-weight:900;color:#19c79a}
+table{width:100%;border-collapse:collapse;background:#101d26;border:1px solid #263946;border-radius:14px;overflow:hidden;margin-top:14px}
+th,td{text-align:left;padding:12px;border-bottom:1px solid #263946;vertical-align:top}th{background:#162734;color:#b8d8ee}
+.pill{display:inline-flex;border-radius:999px;padding:4px 9px;font-size:12px;font-weight:800}.ok{background:#063d31;color:#6ee7b7}.warn{background:#3d3210;color:#fde68a}
+button,.btn{background:#10b981;color:#06120d;border:0;border-radius:9px;padding:9px 12px;font-weight:800;text-decoration:none;cursor:pointer}.secondary{background:#223442;color:#d8f3ff}
+input,textarea{width:100%;box-sizing:border-box;padding:10px;margin:6px 0;border-radius:8px;border:1px solid #284150;background:#081018;color:#eaf7f3}
+pre{white-space:pre-wrap;background:#081018;border-radius:10px;padding:14px;overflow:auto}
+</style></head><body><main>
+  <div class="top"><div><h1>AI Algorithms Engine</h1><p class="muted">June 2026-ready algorithm catalog for sales, support, payments, channels, scraping, ecommerce, pricing, and agent automation.</p></div><div><a class="btn secondary" href="/ai-automation-hub">AI Hub</a> <a class="btn secondary" href="/api/ai-algorithms/catalog">Catalog JSON</a></div></div>
+  <section class="grid">
+    <div class="card"><div class="muted">Algorithms</div><div class="value">${algorithms.length}</div></div>
+    <div class="card"><div class="muted">Ready</div><div class="value">${algorithms.filter(row => row.enabled).length}</div></div>
+    <div class="card"><div class="muted">Advanced</div><div class="value">${algorithms.filter(row => row.level === 'advanced').length}</div></div>
+    <div class="card"><div class="muted">Dry-runs</div><div class="value">${Array.isArray(runs) ? runs.length : 0}</div></div>
+  </section>
+  <div class="grid">
+    <div class="card">
+      <h3>Recommend algorithms</h3>
+      <input id="algoGoal" placeholder="Goal, e.g. make WhatsApp sales bot smarter">
+      <input id="algoModule" placeholder="Module, e.g. whatsapp-bot, pricing, channels">
+      <button onclick="recommendCustom()">Recommend Best Stack</button>
+      <button onclick="copyAlgoPrompt()">Copy Algorithm Prompt</button>
+    </div>
+    <div class="card"><pre id="algoOut">Click Recommend or Dry Run.</pre></div>
+  </div>
+  <h2>Algorithm Catalog</h2>
+  <table><thead><tr><th>Algorithm</th><th>Family</th><th>Status</th><th>Priority</th><th>Best Use</th><th>Guardrail</th><th>Action</th></tr></thead><tbody>${rows}</tbody></table>
+  <h2>Recent Runs</h2>
+  <table><thead><tr><th>Algorithm</th><th>Module</th><th>Status</th><th>Created</th></tr></thead><tbody>${recent}</tbody></table>
+</main>
+<script>
+async function recommendCustom(){
+  const payload = { goal: document.getElementById('algoGoal').value, module: document.getElementById('algoModule').value, limit: 8 };
+  const r = await fetch('/api/ai-algorithms/recommend',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  document.getElementById('algoOut').innerText = JSON.stringify(await r.json(), null, 2);
+}
+async function recommendAlgo(id){
+  const r = await fetch('/api/ai-algorithms/recommend',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({goal:id,limit:5})});
+  document.getElementById('algoOut').innerText = JSON.stringify(await r.json(), null, 2);
+}
+async function runAlgo(id){
+  const r = await fetch('/api/ai-algorithms/run',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({algorithm:id,dryRun:true,source:'dashboard'})});
+  document.getElementById('algoOut').innerText = JSON.stringify(await r.json(), null, 2);
+  setTimeout(()=>location.reload(), 900);
+}
+async function copyAlgoPrompt(){
+  const t = await (await fetch('/api/ai-algorithms/prompt')).text();
+  await navigator.clipboard.writeText(t);
+  alert('AI algorithms prompt copied');
+}
+</script></body></html>`);
+  } catch (error) {
+    res.status(500).send(`AI Algorithms page failed: ${htmlEscape(error.message)}`);
+  }
+});
+
 app.get('/ai-automation-hub', (_req, res) => {
   try {
     const status = getAiAutomationStatus();
@@ -18611,7 +18896,7 @@ button,.btn{background:#10b981;color:#06120d;border:0;border-radius:9px;padding:
 pre{white-space:pre-wrap;background:#081018;border-radius:10px;padding:14px;overflow:auto}
 </style></head><body>
 <main>
-  <div class="top"><div><h1>AI Automation Hub</h1><p class="muted">Adapters for n8n, LangGraph, Browser Use, CrewAI, OpenClaw, Hermes Agent, Agentic Inbox, MCP, and future AI agents.</p></div><div><a class="btn secondary" href="/">Dashboard</a> <a class="btn secondary" href="/api/ai-automation/status">JSON Status</a></div></div>
+  <div class="top"><div><h1>AI Automation Hub</h1><p class="muted">Adapters for n8n, LangGraph, Browser Use, CrewAI, OpenClaw, Hermes Agent, Agentic Inbox, MCP, and future AI agents.</p></div><div><a class="btn secondary" href="/">Dashboard</a> <a class="btn secondary" href="/ai-algorithms">AI Algorithms</a> <a class="btn secondary" href="/api/ai-automation/status">JSON Status</a></div></div>
   <section class="grid">
     <div class="card"><div class="muted">Repos</div><div class="value">${status.totals.repos}</div></div>
     <div class="card"><div class="muted">Configured</div><div class="value">${status.totals.configured}</div></div>
