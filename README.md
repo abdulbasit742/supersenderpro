@@ -142,6 +142,43 @@ POST /api/stock-sourcing/:code/approve
 POST /api/stock-sourcing/:code/reject
 ```
 
+## Scraping Agent Hub
+
+The uploaded `data-scraping-agent.zip` has been imported as a blueprint pack instead of a separate app. SuperSender now exposes a built-in Scraping Agent Hub:
+
+```text
+http://localhost:3001/scraping-agent-hub
+GET  /api/scraping-agent/status
+GET  /api/scraping-agent/blueprints
+GET  /api/scraping-agent/prompt
+GET  /api/scraping-agent/jobs
+POST /api/scraping-agent/extract
+POST /api/scraping-agent/jobs
+POST /api/scraping-agent/jobs/:id/run
+```
+
+Supported uses:
+
+- Fetch any public website URL and extract title, description, headings, links, emails, phone numbers, prices, dates, WhatsApp links, and keywords.
+- Search current web data through Tavily when `TAVILY_API_KEY` is configured.
+- Create WhatsApp-ready drafts for scholarship updates, ecommerce products, AI tool deals, competitor prices, and social/channel content.
+- Store the last 1000 extraction jobs in `data/scrapingAgentJobs.json`.
+- Use public repo blueprints safely from Firecrawl, Crawlee, Browser Use, n8n, Postiz, Chatwoot, BullMQ, Uptime Kuma, LangGraph, and CrewAI without copying their code blindly.
+
+Example:
+
+```bash
+curl -X POST http://localhost:3001/api/scraping-agent/jobs \
+  -H "Content-Type: application/json" \
+  -d "{\"url\":\"https://example.com\",\"target\":\"product_import\"}"
+```
+
+The AI Automation Hub also includes `data-scraping-agent` as a configured imported blueprint:
+
+```text
+http://localhost:3001/ai-automation-hub
+```
+
 ## Facebook, Instagram, and LinkedIn Setup
 
 The system has a Social dashboard at:
@@ -231,6 +268,19 @@ Supported connector profiles:
 - Squarespace Commerce
 - Daraz Seller Center via feed/API bridge
 - Dukaan via feed/API bridge
+- Amazon Seller / SP-API via bridge
+- eBay via OAuth/feed bridge
+- Etsy via OAuth/feed bridge
+- Lazada via seller bridge
+- AliExpress/dropshipping feeds
+- SHOPLINE
+- Shopware
+- commercetools
+- Square Online
+- Lightspeed
+- Odoo Ecommerce
+- Zoho Commerce
+- WhatsApp Catalog / Manual Store
 - Custom website/API JSON feed
 
 Main APIs:
@@ -238,6 +288,8 @@ Main APIs:
 ```text
 GET    /api/ecommerce/status
 GET    /api/ecommerce/platforms
+GET    /api/ecommerce/features
+POST   /api/ecommerce/automation-plan
 GET    /api/ecommerce/repo-blueprints
 GET    /api/ecommerce/repo-blueprints/:slug/prompt
 GET    /api/ecommerce/repo-blueprints-prompt
@@ -265,6 +317,7 @@ Built-in open-source repo blueprints:
 - Sylius: state-machine/workflow pattern
 - PrestaShop/WooCommerce: legacy store connector targets
 - Reaction Commerce: event-driven marketplace concepts
+- Magento Open Source, Shopware, nopCommerce, Odoo, ERPNext, Aimeos, Broadleaf: enterprise/ERP/plugin patterns
 
 These are used as implementation blueprints and connector patterns, not copied blindly into the codebase.
 
@@ -278,6 +331,12 @@ Automation recipes included:
 - Smart cross-sell
 - Proactive delay notification
 - Price-drop campaign
+- Payment pending recovery
+- Failed payment support
+- Refund/return update
+- VIP loyalty offer
+- Reorder reminder
+- Bundle builder
 
 How it works:
 

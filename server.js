@@ -8987,11 +8987,23 @@ function getAiAutomationRepoPlan() {
       nextTask: 'Add browser worker status card and scrape URL task type.'
     },
     {
+      slug: 'data-scraping-agent',
+      name: 'Data Scraping Agent Pack',
+      category: 'web-data',
+      integrationType: 'imported-blueprint',
+      priority: 4,
+      licenseRisk: 'local-archive',
+      configured: true,
+      missingEnv: [],
+      bestUse: 'Imported zip ideas for lead capture, plan checkout, tool catalog, earnings dashboard, and scraper-driven WhatsApp follow-up.',
+      nextTask: 'Use /scraping-agent-hub to create extractor jobs for websites, scholarships, products, competitors, and channel content.'
+    },
+    {
       slug: 'crewai',
       name: 'CrewAI',
       category: 'multi-agent',
       integrationType: 'external-worker',
-      priority: 4,
+      priority: 5,
       licenseRisk: 'medium',
       configured: Boolean(process.env.CREWAI_WORKER_URL || settings.crewai_worker_url),
       missingEnv: ['CREWAI_WORKER_URL'].filter(key => !process.env[key] && !settings[String(key).toLowerCase()]),
@@ -9003,7 +9015,7 @@ function getAiAutomationRepoPlan() {
       name: 'Cloudflare Agentic Inbox',
       category: 'inbox',
       integrationType: 'architecture-pattern',
-      priority: 5,
+      priority: 6,
       licenseRisk: 'low',
       configured: Boolean(settings.gmail_payment_parser_enabled || process.env.GMAIL_CLIENT_ID || process.env.EMAIL_USER),
       missingEnv: ['GMAIL_CLIENT_ID', 'GMAIL_CLIENT_SECRET'].filter(key => !process.env[key] && !settings[String(key).toLowerCase()]),
@@ -9015,7 +9027,7 @@ function getAiAutomationRepoPlan() {
       name: 'claude-task-master',
       category: 'project-management',
       integrationType: 'internal-dev-tool',
-      priority: 6,
+      priority: 7,
       licenseRisk: 'high',
       configured: process.env.TASK_MASTER_ENABLED === 'true' || settings.task_master_enabled === true,
       missingEnv: ['TASK_MASTER_ENABLED'].filter(key => !process.env[key] && !settings[String(key).toLowerCase()]),
@@ -9027,7 +9039,7 @@ function getAiAutomationRepoPlan() {
       name: 'awesome-mcp-servers',
       category: 'mcp',
       integrationType: 'directory',
-      priority: 7,
+      priority: 8,
       licenseRisk: 'low',
       configured: settings.mcp_hub_enabled !== false,
       missingEnv: [],
@@ -9039,7 +9051,7 @@ function getAiAutomationRepoPlan() {
       name: 'OpenHands',
       category: 'developer-agent',
       integrationType: 'inspiration-only',
-      priority: 8,
+      priority: 9,
       licenseRisk: 'medium',
       configured: false,
       missingEnv: [],
@@ -9051,7 +9063,7 @@ function getAiAutomationRepoPlan() {
       name: 'Aider',
       category: 'developer-agent',
       integrationType: 'internal-cli',
-      priority: 9,
+      priority: 10,
       licenseRisk: 'low',
       configured: false,
       missingEnv: [],
@@ -9063,7 +9075,7 @@ function getAiAutomationRepoPlan() {
       name: 'Hermes Agent',
       category: 'personal-agent',
       integrationType: 'research',
-      priority: 10,
+      priority: 11,
       licenseRisk: 'medium',
       configured: false,
       missingEnv: [],
@@ -17677,6 +17689,522 @@ async function queueTask(repo){
 </body></html>`);
   } catch (error) {
     res.status(500).send(`AI Automation Hub failed: ${htmlEscape(error.message)}`);
+  }
+});
+
+const SCRAPING_AGENT_IMPORTED_BLUEPRINTS = [
+  {
+    slug: 'zip-ai-sales-chat',
+    name: 'Imported AI Sales Chat',
+    source: 'data-scraping-agent.zip',
+    files: ['app/api/chat/route.ts', 'components/chatbot.tsx'],
+    useInSuperSender: 'Lead qualification prompt pattern, saveLead/confirmOrder flow, WhatsApp-ready follow-up.'
+  },
+  {
+    slug: 'zip-lead-scoring',
+    name: 'Imported Lead Scoring',
+    source: 'data-scraping-agent.zip',
+    files: ['app/api/leads/route.ts', 'components/admin/leads-board.tsx'],
+    useInSuperSender: 'Score scraped leads, summarize use case, and prepare WhatsApp opener for admin.'
+  },
+  {
+    slug: 'zip-subscription-checkout',
+    name: 'Imported Subscription Checkout',
+    source: 'data-scraping-agent.zip',
+    files: ['app/api/subscriptions/route.ts', 'components/plan-checkout.tsx'],
+    useInSuperSender: 'Convert scraped tool/product demand into subscription/order workflow.'
+  },
+  {
+    slug: 'zip-tool-catalog',
+    name: 'Imported Tool Catalog',
+    source: 'data-scraping-agent.zip',
+    files: ['app/api/tools/route.ts', 'components/tools-grid.tsx'],
+    useInSuperSender: 'Map scraped products, AI tools, laptops, courses, and services into catalog cards.'
+  },
+  {
+    slug: 'zip-earnings-dashboard',
+    name: 'Imported Earnings Dashboard',
+    source: 'data-scraping-agent.zip',
+    files: ['app/admin/earnings/page.tsx', 'components/admin/earnings-dashboard.tsx'],
+    useInSuperSender: 'Revenue and conversion dashboard pattern for ecommerce and reseller analytics.'
+  }
+];
+
+const SCRAPING_AGENT_REPO_BLUEPRINTS = [
+  {
+    slug: 'firecrawl',
+    repo: 'mendableai/firecrawl',
+    bestUse: 'Clean website-to-markdown extraction, structured page crawl, scholarship/product scraping.',
+    mode: 'api-adapter'
+  },
+  {
+    slug: 'crawlee',
+    repo: 'apify/crawlee',
+    bestUse: 'Queue-based crawler workers, retries, proxy-aware scraping, scheduled source checks.',
+    mode: 'worker-blueprint'
+  },
+  {
+    slug: 'browser-use',
+    repo: 'browser-use/browser-use',
+    bestUse: 'Login-required sites, visual browsing, social/source verification, screenshots.',
+    mode: 'external-worker'
+  },
+  {
+    slug: 'tavily',
+    repo: 'tavily-ai/tavily-python',
+    bestUse: 'Search intelligence for current scholarships, AI tool deals, competitors, and leads.',
+    mode: 'configured-api'
+  },
+  {
+    slug: 'n8n',
+    repo: 'n8n-io/n8n',
+    bestUse: 'No-code scheduling, Google Sheets sync, Slack/WhatsApp alerts, approval flows.',
+    mode: 'workflow-webhook'
+  },
+  {
+    slug: 'postiz',
+    repo: 'gitroomhq/postiz-app',
+    bestUse: 'Social calendar, post queue, approvals, and multi-platform publishing UX.',
+    mode: 'ui-pattern'
+  },
+  {
+    slug: 'chatwoot',
+    repo: 'chatwoot/chatwoot',
+    bestUse: 'Inbox, lead timeline, assignment, notes, tags, and customer support workflows.',
+    mode: 'inbox-pattern'
+  },
+  {
+    slug: 'bullmq',
+    repo: 'taskforcesh/bullmq',
+    bestUse: 'Reliable background scraping, retry queues, follow-ups, broadcast scheduling.',
+    mode: 'queue-pattern'
+  },
+  {
+    slug: 'uptime-kuma',
+    repo: 'louislam/uptime-kuma',
+    bestUse: 'Source health checker, endpoint monitor, bot health, alerting dashboard.',
+    mode: 'monitoring-pattern'
+  },
+  {
+    slug: 'langgraph',
+    repo: 'langchain-ai/langgraph',
+    bestUse: 'Stateful scraping and content decision graph: fetch, classify, rewrite, approve, post.',
+    mode: 'agent-workflow'
+  },
+  {
+    slug: 'crewai',
+    repo: 'crewAIInc/crewAI',
+    bestUse: 'Multi-agent research team for source discovery, quality checks, captioning, and compliance.',
+    mode: 'multi-agent'
+  }
+];
+
+function getScrapingAgentJobs() {
+  const rows = loadJSON('scrapingAgentJobs.json', []);
+  return Array.isArray(rows) ? rows : [];
+}
+
+function saveScrapingAgentJobs(rows = []) {
+  saveJSON('scrapingAgentJobs.json', (Array.isArray(rows) ? rows : []).slice(-1000));
+}
+
+function getScrapingAgentStatus() {
+  const jobs = getScrapingAgentJobs();
+  const recent = jobs.slice(-20).reverse();
+  const byStatus = jobs.reduce((acc, job) => {
+    const key = String(job.status || 'unknown');
+    acc[key] = (acc[key] || 0) + 1;
+    return acc;
+  }, {});
+  return {
+    success: true,
+    title: 'Scraping Agent Hub',
+    configured: true,
+    tavilyConfigured: buildTavilyClientFromSettings().isConfigured(),
+    sourceZip: 'C:\\Users\\bsphy2304\\Downloads\\data-scraping-agent.zip',
+    importedBlueprints: SCRAPING_AGENT_IMPORTED_BLUEPRINTS,
+    repoBlueprints: SCRAPING_AGENT_REPO_BLUEPRINTS,
+    totals: {
+      jobs: jobs.length,
+      queued: byStatus.queued || 0,
+      running: byStatus.running || 0,
+      done: byStatus.done || 0,
+      failed: byStatus.failed || 0
+    },
+    useCases: [
+      'website_product_scrape',
+      'scholarship_update_scrape',
+      'competitor_price_monitor',
+      'lead_capture_from_forms',
+      'whatsapp_channel_content_research',
+      'ecommerce_catalog_import',
+      'social_post_source_collection'
+    ],
+    recent,
+    updatedAt: new Date().toISOString()
+  };
+}
+
+function normalizeScrapingUrl(url = '') {
+  const raw = String(url || '').trim();
+  if (!raw) throw new Error('url is required');
+  const withScheme = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+  const parsed = new URL(withScheme);
+  if (!['http:', 'https:'].includes(parsed.protocol)) throw new Error('Only http/https URLs are allowed');
+  return parsed.toString();
+}
+
+function stripHtmlForScraping(html = '') {
+  return String(html || '')
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/(p|div|li|tr|h[1-6])>/gi, '\n')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&#39;/gi, "'")
+    .replace(/&quot;/gi, '"')
+    .replace(/[ \t]+/g, ' ')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+function pickHtmlMeta(html = '') {
+  const source = String(html || '');
+  const pick = (regex) => {
+    const match = source.match(regex);
+    return match ? cleanOutgoingText(match[1]).slice(0, 300) : '';
+  };
+  const headings = [];
+  for (const match of source.matchAll(/<h[1-3][^>]*>([\s\S]*?)<\/h[1-3]>/gi)) {
+    const text = stripHtmlForScraping(match[1]).slice(0, 180);
+    if (text && !headings.includes(text)) headings.push(text);
+    if (headings.length >= 10) break;
+  }
+  const links = [];
+  for (const match of source.matchAll(/<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi)) {
+    const href = String(match[1] || '').trim();
+    const label = stripHtmlForScraping(match[2]).slice(0, 120);
+    if (href && !href.startsWith('#') && links.length < 20) links.push({ href, label });
+  }
+  return {
+    title: pick(/<title[^>]*>([\s\S]*?)<\/title>/i),
+    description: pick(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i) || pick(/<meta[^>]+content=["']([^"']+)["'][^>]+name=["']description["']/i),
+    headings,
+    links
+  };
+}
+
+function classifyScrapedContent(text = '') {
+  const lower = String(text || '').toLowerCase();
+  const aiToolHits = ['chatgpt', 'claude', 'gemini', 'cursor', 'midjourney', 'perplexity', 'canva', 'capcut', 'turnitin'].filter(k => lower.includes(k)).length;
+  const hasPriceSignal = /\b(?:rs\.?|pkr)\b/i.test(lower) || /[0-9][0-9,]{2,8}/.test(lower);
+  if (aiToolHits && hasPriceSignal) return 'ai_tool';
+  const scores = [
+    { type: 'scholarship', score: ['scholarship', 'admission', 'deadline', 'eligibility', 'fully funded', 'students'].filter(k => lower.includes(k)).length },
+    { type: 'product', score: ['price', 'rs', 'pkr', 'stock', 'available', 'buy', 'cart', 'sku', 'product'].filter(k => lower.includes(k)).length },
+    { type: 'lead', score: ['contact', 'whatsapp', 'email', 'quote', 'consultation', 'call now'].filter(k => lower.includes(k)).length },
+    { type: 'ai_tool', score: aiToolHits },
+    { type: 'social_post', score: ['follow', 'subscribe', 'channel', 'telegram', 'instagram', 'facebook'].filter(k => lower.includes(k)).length }
+  ].sort((a, b) => b.score - a.score);
+  return scores[0]?.score > 0 ? scores[0].type : 'general';
+}
+
+function extractScrapedEntities(text = '') {
+  const value = String(text || '');
+  const unique = (items, limit = 25) => [...new Set(items.filter(Boolean).map(item => String(item).trim()).filter(Boolean))].slice(0, limit);
+  const emails = unique(Array.from(value.matchAll(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi)).map(match => match[0]), 20);
+  const phones = unique(Array.from(value.matchAll(/(?:\+?92|0)?3[0-9]{2}[-\s]?[0-9]{7}|(?:\+?[0-9][0-9\s().-]{7,18})/g))
+    .map(match => match[0].replace(/\s+/g, ' ').trim())
+    .filter(item => !/^\d{1,2}[\/.-]\d{1,2}[\/.-]\d{2,4}$/.test(item) && !/^\d{4}[\/.-]\d{1,2}[\/.-]\d{1,2}$/.test(item)), 20);
+  const prices = unique(Array.from(value.matchAll(/(?:rs\.?|pkr)\s*[0-9][0-9,]{1,8}|[0-9][0-9,]{2,8}\s*(?:rs\.?|pkr)/gi)).map(match => match[0]), 30);
+  const dates = unique(Array.from(value.matchAll(/\b(?:\d{1,2}[\/.-]\d{1,2}[\/.-]\d{2,4}|\d{4}[\/.-]\d{1,2}[\/.-]\d{1,2}|(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s+\d{1,2},?\s+\d{4})\b/gi)).map(match => match[0]), 20);
+  const whatsappLinks = unique(Array.from(value.matchAll(/https?:\/\/(?:chat\.whatsapp\.com|whatsapp\.com\/channel|wa\.me)\/\S+/gi)).map(match => match[0].replace(/[),.]+$/g, '')), 20);
+  const keywords = unique([
+    ...Array.from(value.matchAll(/\b(ChatGPT|Claude|Gemini|Cursor|Midjourney|Perplexity|Canva|CapCut|Turnitin|Scholarship|Admission|Laptop|SSD|RAM|Ecommerce|Shopify|WooCommerce)\b/gi)).map(match => match[0])
+  ], 30);
+  return { emails, phones, prices, dates, whatsappLinks, keywords };
+}
+
+function buildScrapingAgentExtract({ url = '', html = '', text = '', source = 'api' } = {}) {
+  const rawHtml = String(html || '');
+  const bodyText = cleanOutgoingText(text || (rawHtml ? stripHtmlForScraping(rawHtml) : '')).slice(0, 20000);
+  const meta = rawHtml ? pickHtmlMeta(rawHtml) : { title: '', description: '', headings: [], links: [] };
+  const entities = extractScrapedEntities([meta.title, meta.description, bodyText].filter(Boolean).join('\n'));
+  const category = classifyScrapedContent([meta.title, meta.description, bodyText].join('\n'));
+  const summarySource = [meta.title, meta.description, meta.headings?.slice(0, 5).join(' | '), bodyText.slice(0, 500)].filter(Boolean).join('\n');
+  const summary = cleanOutgoingText(summarySource).slice(0, 700);
+  const whatsappDraft = [
+    meta.title || 'New scraped update',
+    summary,
+    entities.prices.length ? `Prices: ${entities.prices.slice(0, 5).join(', ')}` : '',
+    entities.dates.length ? `Dates: ${entities.dates.slice(0, 5).join(', ')}` : '',
+    url ? `Source: ${url}` : '',
+    'Reply if you want details.'
+  ].filter(Boolean).join('\n\n');
+  return {
+    success: true,
+    id: uuid(),
+    source,
+    url,
+    category,
+    meta,
+    entities,
+    summary,
+    textLength: bodyText.length,
+    whatsappDraft,
+    extractedAt: new Date().toISOString()
+  };
+}
+
+async function fetchUrlForScraping(url = '', timeoutMs = 15000) {
+  const target = normalizeScrapingUrl(url);
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), Math.max(3000, Number(timeoutMs || 15000)));
+  try {
+    const response = await fetch(target, {
+      method: 'GET',
+      redirect: 'follow',
+      signal: controller.signal,
+      headers: {
+        'user-agent': process.env.SCRAPING_AGENT_USER_AGENT || 'SuperSenderProScrapingAgent/1.0',
+        accept: 'text/html,application/xhtml+xml,application/json,text/plain;q=0.9,*/*;q=0.8'
+      }
+    });
+    const contentType = response.headers.get('content-type') || '';
+    const body = await response.text();
+    return { url: response.url || target, status: response.status, ok: response.ok, contentType, body };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function runScrapingAgentJob(job = {}) {
+  const jobs = getScrapingAgentJobs();
+  const index = jobs.findIndex(row => row.id === job.id);
+  const current = index >= 0 ? jobs[index] : job;
+  current.status = 'running';
+  current.startedAt = new Date().toISOString();
+  current.updatedAt = current.startedAt;
+  if (index >= 0) {
+    jobs[index] = current;
+    saveScrapingAgentJobs(jobs);
+  }
+  try {
+    let result;
+    if (current.url) {
+      const fetched = await fetchUrlForScraping(current.url, current.timeoutMs || 15000);
+      result = buildScrapingAgentExtract({
+        url: fetched.url,
+        html: /html/i.test(fetched.contentType) ? fetched.body : '',
+        text: /html/i.test(fetched.contentType) ? '' : fetched.body,
+        source: current.source || 'job'
+      });
+      result.http = { status: fetched.status, ok: fetched.ok, contentType: fetched.contentType };
+    } else if (current.query) {
+      const client = buildTavilyClientFromSettings();
+      if (!client.isConfigured()) throw new Error('Tavily API key is required for search jobs.');
+      const response = await client.search(current.query, {
+        maxResults: current.maxResults || 8,
+        searchDepth: current.searchDepth || 'advanced',
+        includeAnswer: true,
+        includeRawContent: current.includeRawContent === true
+      });
+      const combined = [
+        response.answer || '',
+        ...(response.results || []).map(row => `${row.title || ''}\n${row.content || row.raw_content || ''}\n${row.url || ''}`)
+      ].join('\n\n');
+      result = buildScrapingAgentExtract({ text: combined, source: current.source || 'search' });
+      result.search = response;
+    } else if (current.html || current.text) {
+      result = buildScrapingAgentExtract({ html: current.html || '', text: current.text || '', source: current.source || 'manual' });
+    } else {
+      throw new Error('Job needs url, query, html, or text.');
+    }
+    current.status = 'done';
+    current.result = result;
+    current.error = '';
+    current.completedAt = new Date().toISOString();
+    current.updatedAt = current.completedAt;
+    if (index >= 0) {
+      jobs[index] = current;
+      saveScrapingAgentJobs(jobs);
+    }
+    logs.push({ id: uuid(), type: 'scraping_agent_job', status: 'done', jobId: current.id, category: result.category, time: current.completedAt });
+    saveJSON('logs.json', logs);
+    return { success: true, job: current, result };
+  } catch (error) {
+    current.status = 'failed';
+    current.error = error.message;
+    current.updatedAt = new Date().toISOString();
+    if (index >= 0) {
+      jobs[index] = current;
+      saveScrapingAgentJobs(jobs);
+    }
+    logs.push({ id: uuid(), type: 'scraping_agent_job', status: 'failed', jobId: current.id, error: error.message, time: current.updatedAt });
+    saveJSON('logs.json', logs);
+    throw error;
+  }
+}
+
+function createScrapingAgentJob(input = {}) {
+  const jobs = getScrapingAgentJobs();
+  const job = {
+    id: uuid(),
+    type: cleanOutgoingText(input.type || (input.url ? 'url_extract' : input.query ? 'search_extract' : 'manual_extract')),
+    url: input.url ? normalizeScrapingUrl(input.url) : '',
+    query: cleanOutgoingText(input.query || ''),
+    html: input.html ? String(input.html).slice(0, 200000) : '',
+    text: input.text ? String(input.text).slice(0, 200000) : '',
+    source: cleanOutgoingText(input.source || 'api'),
+    target: cleanOutgoingText(input.target || ''),
+    maxResults: Math.max(1, Math.min(20, Number(input.maxResults || 8))),
+    searchDepth: cleanOutgoingText(input.searchDepth || 'advanced'),
+    timeoutMs: Math.max(3000, Math.min(60000, Number(input.timeoutMs || 15000))),
+    autoRun: input.autoRun !== false,
+    status: input.autoRun === false ? 'queued' : 'queued',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+  if (!job.url && !job.query && !job.html && !job.text) throw new Error('Provide url, query, html, or text.');
+  jobs.push(job);
+  saveScrapingAgentJobs(jobs);
+  return job;
+}
+
+function buildScrapingAgentPrompt() {
+  return [
+    'Build the next SuperSender Pro Scraping Agent adapter.',
+    '',
+    'Rules:',
+    '- Use existing /api/scraping-agent/* and /api/web-intel/* routes.',
+    '- Do not copy public repo code blindly; convert ideas into safe adapters.',
+    '- Keep secrets in .env/settings only.',
+    '- Preserve WhatsApp bot, ecommerce hub, channel automation, and social hub.',
+    '- Verify with node --check server.js and GET /api/scraping-agent/status.',
+    '',
+    'High-value repos:',
+    ...SCRAPING_AGENT_REPO_BLUEPRINTS.map((row, index) => `${index + 1}. ${row.repo} - ${row.bestUse}`),
+    '',
+    'Imported zip blueprints:',
+    ...SCRAPING_AGENT_IMPORTED_BLUEPRINTS.map(row => `- ${row.name}: ${row.useInSuperSender}`)
+  ].join('\n');
+}
+
+app.get('/api/scraping-agent/status', (_req, res) => {
+  try {
+    res.json(getScrapingAgentStatus());
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/scraping-agent/blueprints', (_req, res) => {
+  try {
+    res.json({
+      success: true,
+      imported: SCRAPING_AGENT_IMPORTED_BLUEPRINTS,
+      repos: SCRAPING_AGENT_REPO_BLUEPRINTS,
+      prompt: buildScrapingAgentPrompt()
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/scraping-agent/prompt', (_req, res) => {
+  res.type('text/plain').send(buildScrapingAgentPrompt());
+});
+
+app.get('/api/scraping-agent/jobs', (req, res) => {
+  try {
+    res.json({ success: true, jobs: sliceForApi(req, getScrapingAgentJobs(), { defaultLimit: 100, maxLimit: 1000 }) });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/scraping-agent/extract', async (req, res) => {
+  try {
+    let result;
+    if (req.body?.url) {
+      const fetched = await fetchUrlForScraping(req.body.url, req.body.timeoutMs || 15000);
+      result = buildScrapingAgentExtract({
+        url: fetched.url,
+        html: /html/i.test(fetched.contentType) ? fetched.body : '',
+        text: /html/i.test(fetched.contentType) ? '' : fetched.body,
+        source: req.body?.source || 'api_extract'
+      });
+      result.http = { status: fetched.status, ok: fetched.ok, contentType: fetched.contentType };
+    } else {
+      result = buildScrapingAgentExtract({
+        html: req.body?.html || '',
+        text: req.body?.text || '',
+        source: req.body?.source || 'api_extract'
+      });
+    }
+    res.json(result);
+  } catch (error) {
+    console.error('[ScrapingAgent] extract failed:', error.message);
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/scraping-agent/jobs', async (req, res) => {
+  try {
+    const job = createScrapingAgentJob(req.body || {});
+    if (req.body?.autoRun !== false) {
+      const result = await runScrapingAgentJob(job);
+      return res.json(result);
+    }
+    res.json({ success: true, job });
+  } catch (error) {
+    console.error('[ScrapingAgent] job create failed:', error.message);
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/scraping-agent/jobs/:id/run', async (req, res) => {
+  try {
+    const job = getScrapingAgentJobs().find(row => row.id === req.params.id);
+    if (!job) return res.status(404).json({ success: false, error: 'Job not found' });
+    const result = await runScrapingAgentJob({ ...job, ...(req.body || {}) });
+    res.json(result);
+  } catch (error) {
+    console.error('[ScrapingAgent] job run failed:', error.message);
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/scraping-agent-hub', (_req, res) => {
+  try {
+    const status = getScrapingAgentStatus();
+    const imported = SCRAPING_AGENT_IMPORTED_BLUEPRINTS.map(row => `<div class="card"><h3>${htmlEscape(row.name)}</h3><p>${htmlEscape(row.useInSuperSender)}</p><small>${htmlEscape(row.files.join(', '))}</small></div>`).join('');
+    const repos = SCRAPING_AGENT_REPO_BLUEPRINTS.map(row => `<tr><td><b>${htmlEscape(row.repo)}</b><br><small>${htmlEscape(row.slug)}</small></td><td>${htmlEscape(row.mode)}</td><td>${htmlEscape(row.bestUse)}</td></tr>`).join('');
+    const jobs = status.recent.length ? status.recent.map(job => `<tr><td>${htmlEscape(job.type)}</td><td>${htmlEscape(job.status)}</td><td>${htmlEscape(job.url || job.query || job.source)}</td><td>${htmlEscape(job.updatedAt || job.createdAt)}</td></tr>`).join('') : '<tr><td colspan="4" class="muted">No jobs yet.</td></tr>';
+    res.type('html').send(`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Scraping Agent Hub</title>
+<style>
+body{font-family:Inter,Arial,sans-serif;background:#071014;color:#eaf7f3;margin:0;padding:24px;line-height:1.45}.top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}.muted,small{color:#9fb3c8}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}.card{background:#13212b;border:1px solid #284150;border-radius:14px;padding:16px;margin:12px 0}.value{font-size:30px;font-weight:900;color:#19c79a}input,textarea,select{width:100%;box-sizing:border-box;background:#081018;color:#eaf7f3;border:1px solid #284150;border-radius:9px;padding:10px;margin:6px 0 12px}button,.btn{background:#10b981;color:#06120d;border:0;border-radius:9px;padding:10px 13px;font-weight:800;text-decoration:none;cursor:pointer}.secondary{background:#223442;color:#d8f3ff}table{width:100%;border-collapse:collapse;background:#101d26;border:1px solid #263946;border-radius:14px;overflow:hidden;margin-top:14px}th,td{text-align:left;padding:12px;border-bottom:1px solid #263946;vertical-align:top}th{background:#162734;color:#b8d8ee}pre{white-space:pre-wrap;background:#081018;border-radius:10px;padding:14px;overflow:auto;max-height:280px}
+</style></head><body><main>
+<div class="top"><div><h1>Scraping Agent Hub</h1><p class="muted">Uploaded zip + public repo ideas converted into SuperSender extractors, queues, and WhatsApp-ready drafts.</p></div><div><a class="btn secondary" href="/">Dashboard</a> <a class="btn secondary" href="/api/scraping-agent/status">JSON Status</a></div></div>
+<section class="grid"><div class="card"><div class="muted">Jobs</div><div class="value">${status.totals.jobs}</div></div><div class="card"><div class="muted">Done</div><div class="value">${status.totals.done}</div></div><div class="card"><div class="muted">Failed</div><div class="value">${status.totals.failed}</div></div><div class="card"><div class="muted">Tavily Search</div><div class="value">${status.tavilyConfigured ? 'ON' : 'OFF'}</div></div></section>
+<section class="card"><h2>Create extraction job</h2><label>URL</label><input id="url" placeholder="https://example.com/page"><label>Or search query</label><input id="query" placeholder="latest scholarships Pakistan deadline"><label>Target/use case</label><select id="target"><option>scholarship_update</option><option>product_import</option><option>competitor_monitor</option><option>lead_capture</option><option>social_post_research</option></select><button onclick="runJob()">Run Now</button><button class="secondary" onclick="copyPrompt()">Copy Build Prompt</button><pre id="out"></pre></section>
+<h2>Imported zip blueprints</h2><div class="grid">${imported}</div>
+<h2>Public repo blueprints</h2><table><thead><tr><th>Repo</th><th>Mode</th><th>Best use</th></tr></thead><tbody>${repos}</tbody></table>
+<h2>Recent jobs</h2><table><thead><tr><th>Type</th><th>Status</th><th>Source</th><th>Updated</th></tr></thead><tbody>${jobs}</tbody></table>
+</main><script>
+async function runJob(){
+ const payload={url:document.getElementById('url').value,query:document.getElementById('query').value,target:document.getElementById('target').value,source:'scraping-agent-hub'};
+ const r=await fetch('/api/scraping-agent/jobs',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+ const d=await r.json(); document.getElementById('out').innerText=JSON.stringify(d,null,2);
+}
+async function copyPrompt(){ const t=await (await fetch('/api/scraping-agent/prompt')).text(); await navigator.clipboard.writeText(t); alert('Prompt copied'); }
+</script></body></html>`);
+  } catch (error) {
+    res.status(500).send(`Scraping Agent Hub failed: ${htmlEscape(error.message)}`);
   }
 });
 
@@ -39602,6 +40130,123 @@ const ECOMMERCE_PLATFORM_DIRECTORY = [
     notes: 'Use public feed, webhook, or n8n connector.'
   },
   {
+    slug: 'amazon',
+    label: 'Amazon Seller / SP-API',
+    auth: 'SP-API bridge or JSON feed',
+    productSync: true,
+    orderSync: true,
+    webhookPath: '/api/ecommerce/webhook/amazon',
+    notes: 'Use n8n/custom bridge for SP-API signing, then post normalized JSON here.'
+  },
+  {
+    slug: 'ebay',
+    label: 'eBay',
+    auth: 'OAuth bridge or JSON feed',
+    productSync: true,
+    orderSync: true,
+    webhookPath: '/api/ecommerce/webhook/ebay',
+    notes: 'Use OAuth/n8n bridge for listings and order webhooks.'
+  },
+  {
+    slug: 'etsy',
+    label: 'Etsy',
+    auth: 'OAuth bridge or JSON feed',
+    productSync: true,
+    orderSync: true,
+    webhookPath: '/api/ecommerce/webhook/etsy',
+    notes: 'Good for handmade/digital products through custom feed or n8n.'
+  },
+  {
+    slug: 'lazada',
+    label: 'Lazada',
+    auth: 'Seller API bridge or JSON feed',
+    productSync: true,
+    orderSync: true,
+    webhookPath: '/api/ecommerce/webhook/lazada',
+    notes: 'Regional marketplace connector through signed bridge.'
+  },
+  {
+    slug: 'aliexpress',
+    label: 'AliExpress / Dropshipping',
+    auth: 'Affiliate/feed/API bridge',
+    productSync: true,
+    orderSync: false,
+    webhookPath: '/api/ecommerce/webhook/aliexpress',
+    notes: 'Use product/deal feeds for dropshipping and affiliate campaigns.'
+  },
+  {
+    slug: 'shopline',
+    label: 'SHOPLINE',
+    auth: 'API bridge or JSON feed',
+    productSync: true,
+    orderSync: true,
+    webhookPath: '/api/ecommerce/webhook/shopline',
+    notes: 'Use custom feed or n8n bridge for product/order sync.'
+  },
+  {
+    slug: 'shopware',
+    label: 'Shopware',
+    auth: 'Admin API token or JSON feed',
+    productSync: true,
+    orderSync: true,
+    webhookPath: '/api/ecommerce/webhook/shopware',
+    notes: 'European commerce stack; use Admin API bridge or feed.'
+  },
+  {
+    slug: 'commercetools',
+    label: 'commercetools',
+    auth: 'OAuth client bridge or JSON feed',
+    productSync: true,
+    orderSync: true,
+    webhookPath: '/api/ecommerce/webhook/commercetools',
+    notes: 'Enterprise composable commerce through middleware bridge.'
+  },
+  {
+    slug: 'square',
+    label: 'Square Online',
+    auth: 'Access token or JSON feed',
+    productSync: true,
+    orderSync: true,
+    webhookPath: '/api/ecommerce/webhook/square',
+    notes: 'Use Square catalog/order API through token or feed bridge.'
+  },
+  {
+    slug: 'lightspeed',
+    label: 'Lightspeed',
+    auth: 'API bridge or JSON feed',
+    productSync: true,
+    orderSync: true,
+    webhookPath: '/api/ecommerce/webhook/lightspeed',
+    notes: 'Retail/ecommerce inventory sync through bridge.'
+  },
+  {
+    slug: 'odoo',
+    label: 'Odoo Ecommerce',
+    auth: 'Odoo API key or JSON feed',
+    productSync: true,
+    orderSync: true,
+    webhookPath: '/api/ecommerce/webhook/odoo',
+    notes: 'Good for ERP + inventory + website sync.'
+  },
+  {
+    slug: 'zoho',
+    label: 'Zoho Commerce',
+    auth: 'OAuth bridge or JSON feed',
+    productSync: true,
+    orderSync: true,
+    webhookPath: '/api/ecommerce/webhook/zoho',
+    notes: 'Use Zoho Inventory/Commerce bridge for SMEs.'
+  },
+  {
+    slug: 'whatsapp-catalog',
+    label: 'WhatsApp Catalog / Manual Store',
+    auth: 'Manual feed or WhatsApp Business export',
+    productSync: true,
+    orderSync: true,
+    webhookPath: '/api/ecommerce/webhook/whatsapp-catalog',
+    notes: 'Use when the business sells only through WhatsApp and needs catalog/order automation.'
+  },
+  {
     slug: 'custom',
     label: 'Custom Website / API',
     auth: 'Bearer/API key optional',
@@ -39722,6 +40367,83 @@ const ECOMMERCE_REPO_BLUEPRINTS = [
     useInSuperSender: 'Use event-driven order/catalog patterns for automation queue expansion.',
     integrationMode: 'event-pattern',
     priority: 10
+  },
+  {
+    slug: 'magento2',
+    name: 'Magento Open Source',
+    repo: 'magento/magento2',
+    url: 'https://github.com/magento/magento2',
+    category: 'enterprise-commerce',
+    bestFor: 'Large catalog, customer groups, promotions, order and inventory models',
+    useInSuperSender: 'Use integration ideas for enterprise-grade catalog/order/status sync.',
+    integrationMode: 'connector-blueprint',
+    priority: 11
+  },
+  {
+    slug: 'shopware',
+    name: 'Shopware',
+    repo: 'shopware/shopware',
+    url: 'https://github.com/shopware/shopware',
+    category: 'api-commerce',
+    bestFor: 'API-driven commerce, rules, promotions, and storefront content',
+    useInSuperSender: 'Use Admin API and rule-builder concepts for advanced automations.',
+    integrationMode: 'api-adapter',
+    priority: 12
+  },
+  {
+    slug: 'nopcommerce',
+    name: 'nopCommerce',
+    repo: 'nopSolutions/nopCommerce',
+    url: 'https://github.com/nopSolutions/nopCommerce',
+    category: 'dotnet-commerce',
+    bestFor: 'Windows/.NET stores, plugins, discounts, vendors, and order workflows',
+    useInSuperSender: 'Use plugin connector concepts for older business stores.',
+    integrationMode: 'plugin-pattern',
+    priority: 13
+  },
+  {
+    slug: 'odoo',
+    name: 'Odoo',
+    repo: 'odoo/odoo',
+    url: 'https://github.com/odoo/odoo',
+    category: 'erp-commerce',
+    bestFor: 'ERP, ecommerce, inventory, invoices, CRM, and accounting combined',
+    useInSuperSender: 'Use ERP/inventory model ideas for stock, invoicing, and recurring customer flows.',
+    integrationMode: 'erp-pattern',
+    priority: 14
+  },
+  {
+    slug: 'erpnext',
+    name: 'ERPNext',
+    repo: 'frappe/erpnext',
+    url: 'https://github.com/frappe/erpnext',
+    category: 'erp-commerce',
+    bestFor: 'Open-source ERP with sales orders, inventory, CRM, and accounting',
+    useInSuperSender: 'Use stock ledger and sales order ideas for dealer/product accounting.',
+    integrationMode: 'erp-pattern',
+    priority: 15
+  },
+  {
+    slug: 'aimeos',
+    name: 'Aimeos',
+    repo: 'aimeos/aimeos',
+    url: 'https://github.com/aimeos/aimeos',
+    category: 'laravel-commerce',
+    bestFor: 'Laravel ecommerce packages and marketplace components',
+    useInSuperSender: 'Use modular package ideas for future ecommerce backend split.',
+    integrationMode: 'architecture-pattern',
+    priority: 16
+  },
+  {
+    slug: 'broadleaf',
+    name: 'Broadleaf Commerce',
+    repo: 'BroadleafCommerce/BroadleafCommerce',
+    url: 'https://github.com/BroadleafCommerce/BroadleafCommerce',
+    category: 'java-commerce',
+    bestFor: 'Enterprise catalog, pricing, promotions, and order architecture',
+    useInSuperSender: 'Use enterprise pricing and promotion model ideas for bigger clients.',
+    integrationMode: 'enterprise-pattern',
+    priority: 17
   }
 ];
 
@@ -39797,6 +40519,60 @@ const ECOMMERCE_AUTOMATION_RECIPES = [
     whatsappTemplate: '{product} ki price drop ho gayi: Rs.{oldPrice} se Rs.{newPrice}. Reply ORDER to buy.',
     action: 'draft_hot_leads_campaign',
     priority: 'P2'
+  },
+  {
+    id: 'payment-pending',
+    name: 'Payment Pending Recovery',
+    trigger: 'order_created_unpaid_2h',
+    platforms: ['all'],
+    whatsappTemplate: 'Hi {name}, order #{orderNumber} reserve hai. Payment complete kar dein taake delivery start ho sake. Total Rs.{total}.',
+    action: 'send_payment_reminder',
+    priority: 'P0'
+  },
+  {
+    id: 'failed-payment',
+    name: 'Failed Payment Help',
+    trigger: 'payment_failed',
+    platforms: ['all'],
+    whatsappTemplate: 'Payment issue aa gaya for order #{orderNumber}. Aap screenshot/TXN ID bhej dein, hum verify kar dete hain.',
+    action: 'open_payment_support',
+    priority: 'P0'
+  },
+  {
+    id: 'refund-update',
+    name: 'Refund / Return Update',
+    trigger: 'refund_or_return_status',
+    platforms: ['shopify', 'woocommerce', 'magento', 'bigcommerce', 'custom'],
+    whatsappTemplate: 'Order #{orderNumber} refund/return update: {status}. Details ke liye reply karein.',
+    action: 'send_return_status',
+    priority: 'P1'
+  },
+  {
+    id: 'loyalty-vip',
+    name: 'VIP Loyalty Offer',
+    trigger: 'customer_vip_threshold',
+    platforms: ['all'],
+    whatsappTemplate: 'Hi {name}, aap VIP customer hain. {product} par special bundle offer Rs.{price}. Interested?',
+    action: 'draft_vip_offer',
+    priority: 'P1'
+  },
+  {
+    id: 'reorder-reminder',
+    name: 'Reorder Reminder',
+    trigger: 'last_order_30d',
+    platforms: ['all'],
+    whatsappTemplate: 'Hi {name}, aap ne pehle {product} order kiya tha. Reorder ya renewal chahiye? Reply YES.',
+    action: 'send_reorder_message',
+    priority: 'P1'
+  },
+  {
+    id: 'bundle-builder',
+    name: 'Bundle Builder',
+    trigger: 'multi_item_interest',
+    platforms: ['all'],
+    whatsappTemplate: '{product} ke sath {recommendation} best combo hai. Bundle total Rs.{price}. Confirm karna hai?',
+    action: 'draft_bundle_offer',
+    priority: 'P2'
   }
 ];
 
@@ -39811,6 +40587,15 @@ function normalizeEcommercePlatform(value = '') {
     big: 'bigcommerce',
     bc: 'bigcommerce',
     darazpk: 'daraz',
+    lazada_seller: 'lazada',
+    ali: 'aliexpress',
+    shoplineapp: 'shopline',
+    woo_store: 'woocommerce',
+    squareup: 'square',
+    lightspeedhq: 'lightspeed',
+    whatsapp: 'whatsapp-catalog',
+    wa: 'whatsapp-catalog',
+    manual: 'whatsapp-catalog',
     website: 'custom',
     api: 'custom'
   };
@@ -39853,7 +40638,10 @@ function normalizeCommerceConnection(input = {}) {
     storeHash: input.storeHash ?? input.credentials?.storeHash ?? '',
     storeId: input.storeId ?? input.credentials?.storeId ?? '',
     apiVersion: input.apiVersion ?? input.credentials?.apiVersion ?? '',
-    feedUrl: input.feedUrl ?? input.credentials?.feedUrl ?? ''
+    feedUrl: input.feedUrl ?? input.credentials?.feedUrl ?? '',
+    ordersFeedUrl: input.ordersFeedUrl ?? input.credentials?.ordersFeedUrl ?? '',
+    clientId: input.clientId ?? input.credentials?.clientId ?? '',
+    clientSecret: input.clientSecret ?? input.credentials?.clientSecret ?? ''
   };
   return {
     id,
@@ -39861,6 +40649,7 @@ function normalizeCommerceConnection(input = {}) {
     name: String(input.name || commercePlatformInfo(platform)?.label || platform).trim(),
     storeUrl: String(input.storeUrl || input.url || '').trim().replace(/\/+$/g, ''),
     feedUrl: String(input.feedUrl || credentials.feedUrl || '').trim(),
+    ordersFeedUrl: String(input.ordersFeedUrl || credentials.ordersFeedUrl || '').trim(),
     defaultCategory: String(input.defaultCategory || input.category || 'ecommerce').trim(),
     enabled: input.enabled !== false,
     autoSyncProducts: input.autoSyncProducts === true,
@@ -39898,7 +40687,7 @@ function ecommerceRequestHeaders(connection = {}, extra = {}) {
     headers['X-Auth-Token'] = c.accessToken;
     headers['Content-Type'] = 'application/json';
   }
-  if (['magento', 'ecwid', 'custom', 'daraz', 'dukaan', 'wix', 'squarespace', 'opencart'].includes(connection.platform)) {
+  if (['magento', 'ecwid', 'custom', 'daraz', 'dukaan', 'wix', 'squarespace', 'opencart', 'amazon', 'ebay', 'etsy', 'lazada', 'aliexpress', 'shopline', 'shopware', 'commercetools', 'square', 'lightspeed', 'odoo', 'zoho', 'whatsapp-catalog'].includes(connection.platform)) {
     const token = c.bearerToken || c.accessToken || c.apiToken || '';
     if (token) headers.Authorization = /^bearer\s+/i.test(token) ? token : `Bearer ${token}`;
   }
@@ -40019,6 +40808,9 @@ function ecommerceProductsUrl(connection = {}) {
   if (connection.platform === 'bigcommerce') return `https://api.bigcommerce.com/stores/${c.storeHash}/v3/catalog/products?limit=250&include=images,variants`;
   if (connection.platform === 'magento') return absoluteCommerceUrl(connection, '/rest/V1/products?searchCriteria[pageSize]=100&searchCriteria[currentPage]=1');
   if (connection.platform === 'ecwid') return `https://app.ecwid.com/api/v3/${c.storeId}/products`;
+  if (connection.platform === 'square') return absoluteCommerceUrl(connection, '/v2/catalog/list?types=ITEM');
+  if (connection.platform === 'shopware') return absoluteCommerceUrl(connection, '/api/product');
+  if (connection.platform === 'odoo') return absoluteCommerceUrl(connection, '/api/products');
   throw new Error(`${commercePlatformInfo(connection.platform)?.label || connection.platform} product sync needs feedUrl or supported API credentials.`);
 }
 
@@ -40036,6 +40828,9 @@ function ecommerceOrdersUrl(connection = {}) {
   if (connection.platform === 'bigcommerce') return `https://api.bigcommerce.com/stores/${c.storeHash}/v2/orders?limit=250`;
   if (connection.platform === 'magento') return absoluteCommerceUrl(connection, '/rest/V1/orders?searchCriteria[pageSize]=100&searchCriteria[currentPage]=1');
   if (connection.platform === 'ecwid') return `https://app.ecwid.com/api/v3/${c.storeId}/orders`;
+  if (connection.platform === 'square') return absoluteCommerceUrl(connection, '/v2/orders/search');
+  if (connection.platform === 'shopware') return absoluteCommerceUrl(connection, '/api/order');
+  if (connection.platform === 'odoo') return absoluteCommerceUrl(connection, '/api/orders');
   throw new Error(`${commercePlatformInfo(connection.platform)?.label || connection.platform} order sync needs ordersFeedUrl or supported API credentials.`);
 }
 
@@ -40083,6 +40878,7 @@ function ecommerceHubSummary() {
   return {
     enabled: commerceSettings.enabled !== false,
     platforms: ECOMMERCE_PLATFORM_DIRECTORY,
+    features: ecommerceFeatureMatrix(),
     repoBlueprints: ECOMMERCE_REPO_BLUEPRINTS,
     automationRecipes: ECOMMERCE_AUTOMATION_RECIPES,
     connections,
@@ -40090,6 +40886,70 @@ function ecommerceHubSummary() {
     importedProducts,
     commerceOrders: commerceOrders.length,
     recentEvents: (commerceEvents || []).slice(-20).reverse()
+  };
+}
+
+function ecommerceFeatureMatrix() {
+  const directApi = new Set(['shopify', 'woocommerce', 'magento', 'bigcommerce', 'ecwid', 'square', 'shopware', 'odoo']);
+  const marketplaces = new Set(['daraz', 'amazon', 'ebay', 'etsy', 'lazada', 'aliexpress']);
+  return ECOMMERCE_PLATFORM_DIRECTORY.map(platform => {
+    const native = directApi.has(platform.slug);
+    const marketplace = marketplaces.has(platform.slug);
+    const feedBridge = !native || marketplace || ['wix', 'squarespace', 'opencart', 'dukaan', 'shopline', 'commercetools', 'lightspeed', 'zoho', 'whatsapp-catalog', 'custom'].includes(platform.slug);
+    return {
+      slug: platform.slug,
+      label: platform.label,
+      directProductSync: native,
+      directOrderSync: native && platform.slug !== 'square',
+      feedBridge,
+      webhookIngestion: true,
+      abandonedCart: ['shopify', 'woocommerce', 'bigcommerce', 'magento', 'custom', 'wix', 'squarespace'].includes(platform.slug) || feedBridge,
+      codConfirmation: true,
+      paymentRecovery: true,
+      stockAlerts: true,
+      reviewRequests: true,
+      whatsappCatalog: true,
+      recommendedMode: native ? 'direct-api-or-webhook' : 'n8n-or-json-feed-bridge'
+    };
+  });
+}
+
+function buildEcommerceAutomationPlan(input = {}) {
+  const platform = commercePlatformInfo(input.platform || input.source || 'custom');
+  const feature = String(input.feature || input.goal || 'full_sync').trim().toLowerCase();
+  const matrix = ecommerceFeatureMatrix().find(row => row.slug === platform.slug) || ecommerceFeatureMatrix().find(row => row.slug === 'custom');
+  const recipes = ECOMMERCE_AUTOMATION_RECIPES
+    .filter(recipe => recipe.platforms.includes('all') || recipe.platforms.includes(platform.slug) || (feature && recipe.id.includes(feature)))
+    .slice(0, 8);
+  const steps = [
+    `Create ${platform.label} connection in /ecommerce-hub.`,
+    matrix.directProductSync ? 'Use direct product API credentials or feedUrl for catalog sync.' : 'Use n8n/custom JSON feed bridge for product sync.',
+    matrix.directOrderSync ? 'Use direct order API credentials or ordersFeedUrl for order sync.' : 'Post order webhook payloads to the generated webhook URL.',
+    'Map products into SuperSender catalog and keep sourceProductId for dedupe.',
+    'Enable WhatsApp customer/admin notifications only for opted-in customers.',
+    'Use automation recipes for COD, abandoned cart, payment pending, review request, and reorder.'
+  ];
+  return {
+    success: true,
+    platform: matrix,
+    feature,
+    steps,
+    webhookExample: `/api/ecommerce/webhook/${platform.slug}`,
+    productFeedExample: {
+      products: [
+        { id: 'SKU-1', name: 'Product name', price: 2500, image: 'https://example.com/product.jpg', url: 'https://example.com/product' }
+      ]
+    },
+    orderWebhookExample: {
+      order: {
+        id: 'ORDER-1',
+        customer_name: 'Customer',
+        phone: '03001234567',
+        total: 2500,
+        items: [{ name: 'Product name', quantity: 1, price: 2500 }]
+      }
+    },
+    recipes
   };
 }
 
@@ -40191,6 +41051,14 @@ function buildEcommerceHubPage(req) {
       <small>${htmlEscape(item.auth)}</small>
       <p>${htmlEscape(item.notes)}</p>
     </div>`).join('');
+  const featureRows = ecommerceFeatureMatrix().map(item => `
+    <tr>
+      <td><b>${htmlEscape(item.label)}</b><br><small>${htmlEscape(item.recommendedMode)}</small></td>
+      <td>${item.directProductSync ? '<span class="ok">Direct</span>' : '<span class="warn">Feed/Bridge</span>'}</td>
+      <td>${item.directOrderSync ? '<span class="ok">Direct</span>' : '<span class="warn">Webhook/Bridge</span>'}</td>
+      <td>${item.abandonedCart ? '<span class="ok">Yes</span>' : '<span class="warn">Bridge</span>'}</td>
+      <td>${item.whatsappCatalog ? '<span class="ok">Yes</span>' : '-'}</td>
+    </tr>`).join('');
   const recipeCards = ECOMMERCE_AUTOMATION_RECIPES.map(item => `
     <div class="platform">
       <b>${htmlEscape(item.name)}</b>
@@ -40238,6 +41106,7 @@ function buildEcommerceHubPage(req) {
         <label>Name</label><input id="name" placeholder="Main Shopify Store">
         <label>Store URL</label><input id="storeUrl" placeholder="https://your-store.myshopify.com">
         <label>Product Feed URL (optional)</label><input id="feedUrl" placeholder="https://site.com/products.json">
+        <label>Orders Feed URL (optional)</label><input id="ordersFeedUrl" placeholder="https://site.com/orders.json">
         <label>Access Token / Bearer Token</label><input id="accessToken" placeholder="Paste token locally">
         <label>Consumer Key (WooCommerce)</label><input id="consumerKey" placeholder="ck_...">
         <label>Consumer Secret (WooCommerce)</label><input id="consumerSecret" placeholder="cs_...">
@@ -40250,6 +41119,18 @@ function buildEcommerceHubPage(req) {
         <div class="grid">${platformCards}</div>
       </section>
     </div>
+    <section class="card" style="margin-top:16px">
+      <h2>Automation Planner</h2>
+      <p class="muted">Platform select karein, system exact setup steps, webhook format, and recipe list ready kar dega.</p>
+      <div class="grid">
+        <div><label>Platform</label><select id="planPlatform">${platformOptions}</select></div>
+        <div><label>Goal</label><select id="planFeature"><option value="full_sync">Full sync</option><option value="abandoned-cart">Abandoned cart</option><option value="payment-pending">Payment recovery</option><option value="stock">Stock alerts</option><option value="review">Reviews</option></select></div>
+      </div>
+      <button onclick="buildPlan()">Build Plan</button>
+      <button class="secondary" onclick="copyText('${htmlEscape(base + '/api/ecommerce/features')}')">Copy Feature API</button>
+      <pre id="planOut"></pre>
+    </section>
+    <section class="card" style="margin-top:16px"><h2>Platform Feature Matrix</h2><table><thead><tr><th>Platform</th><th>Products</th><th>Orders</th><th>Cart Recovery</th><th>WA Catalog</th></tr></thead><tbody>${featureRows}</tbody></table></section>
     <section class="card" style="margin-top:16px"><h2>Connections</h2><table><thead><tr><th>Name</th><th>Platform</th><th>Store/Feed</th><th>Status</th><th>Actions</th></tr></thead><tbody>${connectionRows}</tbody></table></section>
     <section class="card" style="margin-top:16px"><h2>Automation Recipes</h2><p class="muted">Ready WhatsApp ecommerce automations. Generate draft, then send/broadcast safely after review.</p><div class="grid">${recipeCards}</div></section>
     <section class="card" style="margin-top:16px"><h2>GitHub Repo Blueprints</h2><p class="muted">Best public ecommerce repo ideas converted into safe SuperSender integration patterns.</p><div class="grid">${repoCards}</div></section>
@@ -40259,7 +41140,7 @@ function buildEcommerceHubPage(req) {
     async function saveConnection(){
       const platform=document.getElementById('platform').value;
       const storeHash=document.getElementById('storeHash').value.trim();
-      const payload={platform,name:document.getElementById('name').value||platform,storeUrl:document.getElementById('storeUrl').value,feedUrl:document.getElementById('feedUrl').value,defaultCategory:document.getElementById('defaultCategory').value,credentials:{accessToken:document.getElementById('accessToken').value,consumerKey:document.getElementById('consumerKey').value,consumerSecret:document.getElementById('consumerSecret').value,storeHash:platform==='bigcommerce'?storeHash:'',storeId:platform==='ecwid'?storeHash:''}};
+      const payload={platform,name:document.getElementById('name').value||platform,storeUrl:document.getElementById('storeUrl').value,feedUrl:document.getElementById('feedUrl').value,ordersFeedUrl:document.getElementById('ordersFeedUrl').value,defaultCategory:document.getElementById('defaultCategory').value,credentials:{accessToken:document.getElementById('accessToken').value,consumerKey:document.getElementById('consumerKey').value,consumerSecret:document.getElementById('consumerSecret').value,storeHash:platform==='bigcommerce'?storeHash:'',storeId:platform==='ecwid'?storeHash:''}};
       await api('/api/ecommerce/connections',{method:'POST',body:JSON.stringify(payload)}); location.reload();
     }
     async function syncProducts(id){ try{ const d=await api('/api/ecommerce/connections/'+id+'/sync-products',{method:'POST'}); alert('Products synced: '+d.imported+' imported, '+d.added+' added, '+d.updated+' updated'); location.reload(); }catch(e){ alert(e.message); } }
@@ -40267,6 +41148,7 @@ function buildEcommerceHubPage(req) {
     async function copyText(text){ await navigator.clipboard.writeText(text); alert('Copied: '+text); }
     async function recipeDraft(id){ try{ const d=await api('/api/ecommerce/automation-recipes/'+id+'/draft',{method:'POST',body:JSON.stringify({})}); await navigator.clipboard.writeText(d.draft.message); alert('Draft copied:\\n\\n'+d.draft.message); }catch(e){ alert(e.message); } }
     async function copyRepoPrompt(slug){ try{ const d=await api('/api/ecommerce/repo-blueprints/'+slug+'/prompt'); await navigator.clipboard.writeText(d.prompt); alert('Prompt copied for '+slug); }catch(e){ alert(e.message); } }
+    async function buildPlan(){ try{ const d=await api('/api/ecommerce/automation-plan',{method:'POST',body:JSON.stringify({platform:document.getElementById('planPlatform').value,feature:document.getElementById('planFeature').value})}); document.getElementById('planOut').innerText=JSON.stringify(d,null,2); }catch(e){ alert(e.message); } }
   </script></body></html>`;
 }
 
@@ -40472,6 +41354,18 @@ app.get('/api/ecommerce/status', (req, res) => {
 
 app.get('/api/ecommerce/platforms', (req, res) => {
   res.json({ success: true, platforms: ECOMMERCE_PLATFORM_DIRECTORY });
+});
+
+app.get('/api/ecommerce/features', (req, res) => {
+  res.json({ success: true, features: ecommerceFeatureMatrix() });
+});
+
+app.post('/api/ecommerce/automation-plan', (req, res) => {
+  try {
+    res.json(buildEcommerceAutomationPlan(req.body || {}));
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
 });
 
 app.get('/api/ecommerce/repo-blueprints', (req, res) => {
