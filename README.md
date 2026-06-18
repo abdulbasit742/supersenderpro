@@ -238,6 +238,12 @@ Main APIs:
 ```text
 GET    /api/ecommerce/status
 GET    /api/ecommerce/platforms
+GET    /api/ecommerce/repo-blueprints
+GET    /api/ecommerce/repo-blueprints/:slug/prompt
+GET    /api/ecommerce/repo-blueprints-prompt
+GET    /api/ecommerce/automation-recipes
+POST   /api/ecommerce/automation-recipes/:id/draft
+POST   /api/ecommerce/automation-recipes/:id/send
 GET    /api/ecommerce/connections
 POST   /api/ecommerce/connections
 PUT    /api/ecommerce/connections/:id
@@ -248,6 +254,30 @@ POST   /api/ecommerce/connections/:id/sync-orders
 POST   /api/ecommerce/sync-all
 POST   /api/ecommerce/webhook/:platform/:connectionId?
 ```
+
+Built-in open-source repo blueprints:
+
+- Medusa: headless commerce backend pattern
+- Saleor: GraphQL commerce/channel pattern
+- Vendure: TypeScript plugin architecture pattern
+- Spree/Solidus: mature order/payment/stock lifecycle patterns
+- Bagisto: marketplace/vendor concepts for dealer intelligence
+- Sylius: state-machine/workflow pattern
+- PrestaShop/WooCommerce: legacy store connector targets
+- Reaction Commerce: event-driven marketplace concepts
+
+These are used as implementation blueprints and connector patterns, not copied blindly into the codebase.
+
+Automation recipes included:
+
+- COD confirmation
+- Abandoned cart recovery
+- Back-in-stock alert
+- Low-stock urgency
+- Review request
+- Smart cross-sell
+- Proactive delay notification
+- Price-drop campaign
 
 How it works:
 
