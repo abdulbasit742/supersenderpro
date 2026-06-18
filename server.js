@@ -45641,6 +45641,31 @@ if (videoAgent) {
   setTimeout(runVideoAgentTick, 12000);
 }
 
+function shouldServeDashboardSpa(req) {
+  const urlPath = String(req.path || '');
+  if (req.method !== 'GET') return false;
+  if (urlPath.startsWith('/api/')) return false;
+  if (urlPath.startsWith('/socket.io/')) return false;
+  if (urlPath.startsWith('/uploads/')) return false;
+  if (urlPath.startsWith('/social-auto-media/')) return false;
+  if (urlPath.startsWith('/video-auto-assets/')) return false;
+  if (urlPath.startsWith('/video-auto-generated/')) return false;
+  if (path.extname(urlPath)) return false;
+  const accept = String(req.headers.accept || '');
+  return !accept || accept.includes('text/html') || accept.includes('*/*');
+}
+
+app.get('*', (req, res, next) => {
+  if (!shouldServeDashboardSpa(req)) return next();
+  try {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.send(readCachedIndexHtml());
+  } catch (error) {
+    next(error);
+  }
+});
+
 const httpServer = server.listen(PORT, () => console.log(`SuperSender Pro Server running on http://localhost:${PORT}`));
 
 setTimeout(() => {
