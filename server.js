@@ -9211,6 +9211,155 @@ function buildAgenticPlaybook(input = {}) {
   };
 }
 
+function normalizeAgenticMission(row = {}) {
+  const id = String(row.id || uuid()).trim();
+  const goal = cleanOutgoingText(row.goal || row.name || 'SuperSender automation mission');
+  const channels = Array.isArray(row.channels)
+    ? row.channels.map(item => cleanOutgoingText(item)).filter(Boolean)
+    : String(row.channels || '').split(',').map(item => cleanOutgoingText(item)).filter(Boolean);
+  const skillIds = Array.isArray(row.skillIds)
+    ? row.skillIds.map(item => String(item || '').trim()).filter(Boolean)
+    : String(row.skillIds || '').split(',').map(item => item.trim()).filter(Boolean);
+  const status = ['draft', 'dry_run_ready', 'dry_run_complete', 'approved', 'paused', 'failed'].includes(String(row.status || '').toLowerCase())
+    ? String(row.status).toLowerCase()
+    : 'draft';
+  return {
+    id,
+    name: cleanOutgoingText(row.name || goal).slice(0, 120),
+    goal,
+    channels,
+    skillIds,
+    status,
+    liveEnabled: row.liveEnabled === true,
+    approvalRequired: row.approvalRequired !== false,
+    lastRunAt: row.lastRunAt || '',
+    lastRunStatus: row.lastRunStatus || '',
+    lastRunSummary: row.lastRunSummary || '',
+    createdAt: row.createdAt || new Date().toISOString(),
+    updatedAt: row.updatedAt || row.createdAt || new Date().toISOString()
+  };
+}
+
+function getAgenticMissions() {
+  const rows = loadJSON('agenticMissions.json', []);
+  return (Array.isArray(rows) ? rows : []).map(normalizeAgenticMission)
+    .sort((a, b) => Date.parse(b.updatedAt || 0) - Date.parse(a.updatedAt || 0));
+}
+
+function saveAgenticMissions(rows = []) {
+  saveJSON('agenticMissions.json', (Array.isArray(rows) ? rows : []).map(normalizeAgenticMission).slice(-500));
+}
+
+function createAgenticMission(input = {}) {
+  const playbook = buildAgenticPlaybook(input);
+  const selectedSkills = Array.isArray(input.skillIds) && input.skillIds.length
+    ? input.skillIds.map(item => String(item || '').trim()).filter(Boolean)
+    : playbook.recommendedPacks.slice(0, 3).map(pack => pack.id);
+  const mission = normalizeAgenticMission({
+    id: input.id || uuid(),
+    name: input.name || playbook.goal,
+    goal: playbook.goal,
+    channels: playbook.channels,
+    skillIds: selectedSkills,
+    status: 'dry_run_ready',
+    liveEnabled: false,
+    approvalRequired: true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  });
+  const rows = getAgenticMissions().filter(row => row.id !== mission.id);
+  rows.unshift(mission);
+  saveAgenticMissions(rows);
+  return { success: true, mission, playbook };
+}
+
+function updateAgenticMission(id = '', patch = {}) {
+  const missionId = String(id || '').trim();
+  if (!missionId) throw new Error('Mission id is required.');
+  const rows = getAgenticMissions();
+  const index = rows.findIndex(row => row.id === missionId);
+  if (index < 0) throw new Error('Mission not found.');
+  const updated = normalizeAgenticMission({
+    ...rows[index],
+    ...patch,
+    id: missionId,
+    updatedAt: new Date().toISOString()
+  });
+  rows[index] = updated;
+  saveAgenticMissions(rows);
+  return { success: true, mission: updated };
+}
+
+function runAgenticMission(input = {}) {
+  const missionId = String(input.id || input.missionId || '').trim();
+  const rows = getAgenticMissions();
+  const mission = rows.find(row => row.id === missionId);
+  if (!mission) throw new Error('Mission not found.');
+  const allPacks = getAgenticSkillPacks();
+  const selected = mission.skillIds.length
+    ? mission.skillIds.map(id => allPacks.find(pack => pack.id === id)).filter(Boolean)
+    : buildAgenticPlaybook({ goal: mission.goal, channels: mission.channels }).recommendedPacks.slice(0, 3);
+  const dryRun = input.dryRun !== false || mission.liveEnabled !== true;
+  const run = {
+    id: uuid(),
+    missionId: mission.id,
+    missionName: mission.name,
+    dryRun,
+    status: dryRun ? 'dry_run_complete' : 'approval_required',
+    actions: selected.map((pack, index) => ({
+      order: index + 1,
+      skillPack: pack.id,
+      agent: pack.recommendedAgent,
+      action: pack.installPlan?.[0] || 'Review and prepare safe task.',
+      triggers: pack.triggers || [],
+      tools: pack.tools || []
+    })),
+    safety: [
+      dryRun ? 'No live messages/posts/payments were triggered.' : 'Live mode still requires admin approval.',
+      'Runtime data stays in local JSON audit files.',
+      'External agents receive goals only, not secrets or customer/session files.'
+    ],
+    createdAt: new Date().toISOString()
+  };
+
+  const tasks = loadJSON('aiAutomationTasks.json', []);
+  for (const action of run.actions) {
+    tasks.push({
+      id: uuid(),
+      repo: action.agent,
+      repoName: action.agent,
+      type: dryRun ? 'mission_dry_run' : 'mission_approval_required',
+      prompt: `${mission.name}: ${action.action}`,
+      status: dryRun ? 'dry_run_complete' : 'queued',
+      source: input.source || 'mission-runner',
+      result: dryRun ? 'Dry-run action generated. Admin can approve the mission before live execution.' : 'Queued for approval before live action.',
+      missionId: mission.id,
+      skillPack: action.skillPack,
+      createdAt: run.createdAt,
+      updatedAt: run.createdAt
+    });
+  }
+  saveJSON('aiAutomationTasks.json', tasks.slice(-500));
+
+  const runs = loadJSON('agenticMissionRuns.json', []);
+  const nextRuns = Array.isArray(runs) ? runs : [];
+  nextRuns.unshift(run);
+  saveJSON('agenticMissionRuns.json', nextRuns.slice(0, 500));
+
+  const updatedMission = {
+    ...mission,
+    status: dryRun ? 'dry_run_complete' : 'approved',
+    lastRunAt: run.createdAt,
+    lastRunStatus: run.status,
+    lastRunSummary: `${run.actions.length} actions prepared in ${dryRun ? 'dry-run' : 'approval'} mode.`,
+    updatedAt: run.createdAt
+  };
+  const updatedRows = rows.map(row => row.id === mission.id ? updatedMission : row);
+  saveAgenticMissions(updatedRows);
+
+  return { success: true, mission: updatedMission, run };
+}
+
 function getAgenticAgentRegistry() {
   const customRows = loadJSON('agenticAgentRegistry.json', []);
   const normalizedCustom = (Array.isArray(customRows) ? customRows : []).map((row, index) => {
@@ -9480,6 +9629,7 @@ function getAiAutomationStatus() {
   const repos = getAiAutomationRepoPlan();
   const agenticAgents = getAgenticAgentRegistry();
   const skillPacks = getAgenticSkillPacks();
+  const missions = getAgenticMissions();
   const tasks = loadJSON('aiAutomationTasks.json', []);
   const configured = repos.filter(row => row.configured).length;
   const highPriority = repos.filter(row => Number(row.priority || 99) <= 5);
@@ -9496,6 +9646,8 @@ function getAiAutomationStatus() {
       agenticConfigured: agenticAgents.filter(row => row.configured).length,
       skillPacks: skillPacks.length,
       installedSkillPacks: skillPacks.filter(row => row.installed).length,
+      missions: missions.length,
+      dryRunMissions: missions.filter(row => row.status === 'dry_run_complete').length,
       queuedTasks: tasks.filter(task => task.status === 'queued').length,
       completedTasks: tasks.filter(task => task.status === 'done').length,
       failedTasks: tasks.filter(task => task.status === 'failed').length
@@ -9503,6 +9655,7 @@ function getAiAutomationStatus() {
     repos,
     agenticAgents,
     skillPacks,
+    missions,
     recentTasks: tasks.slice(-20).reverse(),
     nextRecommended: repos
       .filter(row => !row.configured || row.status !== 'done')
@@ -18072,6 +18225,39 @@ app.post('/api/ai-automation/playbook', (req, res) => {
   }
 });
 
+app.get('/api/ai-automation/missions', (_req, res) => {
+  try {
+    const runs = loadJSON('agenticMissionRuns.json', []);
+    res.json({ success: true, missions: getAgenticMissions(), recentRuns: (Array.isArray(runs) ? runs : []).slice(0, 50), updatedAt: new Date().toISOString() });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/ai-automation/missions', (req, res) => {
+  try {
+    res.json(createAgenticMission(req.body || {}));
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.patch('/api/ai-automation/missions/:id', (req, res) => {
+  try {
+    res.json(updateAgenticMission(req.params.id, req.body || {}));
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/ai-automation/missions/:id/run', (req, res) => {
+  try {
+    res.json(runAgenticMission({ ...(req.body || {}), id: req.params.id, source: req.body?.source || 'api' }));
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
 app.get('/api/ai-automation/agent-prompt', (_req, res) => {
   try {
     const agents = getAgenticAgentRegistry().slice(0, 8).map(row => `- ${row.name} (${row.slug}): ${row.bestUse}`).join('\n');
@@ -18104,6 +18290,15 @@ app.post('/api/ai-automation/run-task', (req, res) => {
 app.get('/ai-automation-hub', (_req, res) => {
   try {
     const status = getAiAutomationStatus();
+    const missionRows = status.missions.length
+      ? status.missions.map(mission => `<tr>
+        <td><b>${htmlEscape(mission.name)}</b><br><small>${htmlEscape(mission.id)}</small></td>
+        <td>${htmlEscape(mission.goal)}<br><small>${htmlEscape((mission.channels || []).join(', '))}</small></td>
+        <td><span class="pill ${mission.status === 'dry_run_complete' ? 'ok' : 'warn'}">${htmlEscape(mission.status)}</span><br><small>${htmlEscape(mission.lastRunSummary || 'Not run yet')}</small></td>
+        <td>${htmlEscape((mission.skillIds || []).join(', ') || 'Auto-selected')}</td>
+        <td><button onclick="runMission('${htmlEscape(mission.id)}')">Dry Run</button></td>
+      </tr>`).join('')
+      : '<tr><td colspan="5" class="muted">No missions yet. Create one from the form above.</td></tr>';
     const skillRows = status.skillPacks
       .map(pack => `<tr>
         <td><b>${htmlEscape(pack.name)}</b><br><small>${htmlEscape(pack.id)}</small></td>
@@ -18156,9 +18351,21 @@ pre{white-space:pre-wrap;background:#081018;border-radius:10px;padding:14px;over
     <div class="card"><div class="muted">Repos</div><div class="value">${status.totals.repos}</div></div>
     <div class="card"><div class="muted">Configured</div><div class="value">${status.totals.configured}</div></div>
     <div class="card"><div class="muted">Skill Packs</div><div class="value">${status.totals.skillPacks}</div></div>
-    <div class="card"><div class="muted">Agentic Agents</div><div class="value">${status.totals.agenticAgents}</div></div>
+    <div class="card"><div class="muted">Missions</div><div class="value">${status.totals.missions}</div></div>
   </section>
   <div class="card"><b>WhatsApp command:</b> <code>!aihub</code><br><span class="muted">If a worker/API key is missing, this hub keeps the project running and marks the adapter as Not configured.</span></div>
+  <h2>Automation Mission Control</h2>
+  <div class="grid">
+    <div class="card">
+      <input id="missionName" placeholder="Mission name, e.g. Daily Ecommerce Growth" style="width:100%;padding:10px;margin:6px 0;border-radius:8px;border:1px solid #284150;background:#081018;color:#eaf7f3">
+      <input id="missionGoal" placeholder="Goal, e.g. recover carts and post best offers" style="width:100%;padding:10px;margin:6px 0;border-radius:8px;border:1px solid #284150;background:#081018;color:#eaf7f3">
+      <input id="missionChannels" placeholder="Channels, e.g. whatsapp, facebook, website" style="width:100%;padding:10px;margin:6px 0;border-radius:8px;border:1px solid #284150;background:#081018;color:#eaf7f3">
+      <input id="missionSkills" placeholder="Optional skill ids, comma separated" style="width:100%;padding:10px;margin:6px 0;border-radius:8px;border:1px solid #284150;background:#081018;color:#eaf7f3">
+      <button onclick="createMission()">Create Mission</button>
+    </div>
+    <div class="card"><pre id="missionOut">Create a mission, then run a dry-run before live approval.</pre></div>
+  </div>
+  <table><thead><tr><th>Mission</th><th>Goal</th><th>Status</th><th>Skills</th><th>Action</th></tr></thead><tbody>${missionRows}</tbody></table>
   <h2>Automation Playbook Builder</h2>
   <div class="grid">
     <div class="card">
@@ -18227,6 +18434,24 @@ async function buildPlaybook(){
   const payload = {goal:document.getElementById('playbookGoal').value,channels:document.getElementById('playbookChannels').value};
   const r = await fetch('/api/ai-automation/playbook',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
   document.getElementById('playbookOut').innerText = JSON.stringify(await r.json(), null, 2);
+}
+async function createMission(){
+  const payload = {
+    name: document.getElementById('missionName').value,
+    goal: document.getElementById('missionGoal').value,
+    channels: document.getElementById('missionChannels').value,
+    skillIds: document.getElementById('missionSkills').value.split(',').map(x=>x.trim()).filter(Boolean)
+  };
+  const r = await fetch('/api/ai-automation/missions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  const data = await r.json();
+  document.getElementById('missionOut').innerText = JSON.stringify(data, null, 2);
+  if(data.success) setTimeout(()=>location.reload(), 800);
+}
+async function runMission(id){
+  const r = await fetch('/api/ai-automation/missions/'+encodeURIComponent(id)+'/run',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dryRun:true,source:'dashboard'})});
+  const data = await r.json();
+  document.getElementById('missionOut').innerText = JSON.stringify(data, null, 2);
+  if(data.success) setTimeout(()=>location.reload(), 800);
 }
 </script>
 </body></html>`);

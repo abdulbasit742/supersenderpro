@@ -204,6 +204,10 @@ GET  /api/ai-automation/agent-prompt
 GET  /api/ai-automation/skills
 POST /api/ai-automation/skills/install
 POST /api/ai-automation/playbook
+GET  /api/ai-automation/missions
+POST /api/ai-automation/missions
+PATCH /api/ai-automation/missions/:id
+POST /api/ai-automation/missions/:id/run
 POST /api/ai-automation/run-task
 ```
 
@@ -226,6 +230,8 @@ OPENHANDS_API_KEY=
 AGENTIC_AGENT_WEBHOOK_URL=
 AGENTIC_SKILLS_ENABLED=true
 AGENTIC_SKILLS_DRY_RUN_DEFAULT=true
+AGENTIC_MISSIONS_ENABLED=true
+AGENTIC_MISSIONS_REQUIRE_APPROVAL=true
 ```
 
 Built-in Agentic Skill Packs:
@@ -253,6 +259,24 @@ To install a pack in dry-run mode:
 curl -X POST http://localhost:3001/api/ai-automation/skills/install \
   -H "Content-Type: application/json" \
   -d "{\"id\":\"ecommerce-autopilot\",\"source\":\"admin\"}"
+```
+
+Automation Missions:
+
+Missions turn a business goal into a saved, auditable dry-run workflow. They do not send live WhatsApp, social, payment, or ecommerce actions by default.
+
+```bash
+curl -X POST http://localhost:3001/api/ai-automation/missions \
+  -H "Content-Type: application/json" \
+  -d "{\"name\":\"Daily Growth Mission\",\"goal\":\"recover ecommerce carts and post best channel offers\",\"channels\":\"whatsapp,facebook,website\"}"
+```
+
+Run mission dry-run:
+
+```bash
+curl -X POST http://localhost:3001/api/ai-automation/missions/MISSION_ID/run \
+  -H "Content-Type: application/json" \
+  -d "{\"dryRun\":true,\"source\":\"admin\"}"
 ```
 
 Safe operating rules:
