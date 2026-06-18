@@ -925,13 +925,13 @@ This creates:
 C:\Users\<you>\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\SuperSenderPro-Server.bat
 ```
 
-On the next Windows login it runs:
+On the next Windows login it runs a self-healing watchdog:
 
 ```powershell
-.\scripts\live\start-supersender-server.ps1
+.\scripts\live\watch-supersender-live.ps1
 ```
 
-The launcher starts `node-local.exe server.js`, writes logs to `logs/supersender-live.*.log`, and checks `http://localhost:3001/api/health`.
+The watchdog checks `http://localhost:3001/api/health` every 30 seconds. If the local server is down, it starts `node-local.exe server.js` again. Server logs are written to `logs/supersender-live.*.log`; watchdog decisions are written to `logs/supersender-watchdog.log`.
 
 If you run PowerShell as Administrator, you can alternatively register a Scheduled Task:
 
