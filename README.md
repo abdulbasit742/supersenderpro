@@ -132,6 +132,8 @@ POST /api/wa/automation-settings/preset
 POST /api/wa/automation-settings/test-reply
 GET  /api/wa/automation-settings/client-pack
 POST /api/wa/automation-settings/client-pack
+GET  /api/wa/automation-settings/onboarding
+POST /api/wa/automation-settings/onboarding
 ```
 
 WhatsApp admin commands:
@@ -143,6 +145,7 @@ WhatsApp admin commands:
 !waauto preset ecommerce_store
 !waauto test price kya hai
 !waauto pack founder_growth Client Name
+!waauto onboard ecommerce_store Client Name
 ```
 
 Business presets:
@@ -157,6 +160,14 @@ Business presets:
 Safe defaults are enabled: structured task-bot mode, explicit opt-in, promotional caps, unsubscribe footer, dry-run live actions, and human handoff keywords.
 
 The Client Pack Generator on the same page creates a sellable proposal for any preset. It includes the client pitch, setup checklist, demo WhatsApp replies, suggested setup/monthly pricing, API references, and safe operating rules. Generated packs are saved in runtime data as `waAutomationClientPacks.json` and should not be committed.
+
+Open the Client Onboarding Wizard when you need to hand this system to another founder/business:
+
+```text
+http://localhost:3001/wa-client-onboarding
+```
+
+It generates the data-collection list, required env keys, dashboard setup steps, WhatsApp admin commands, 7-day rollout plan, acceptance tests, and risk controls. Generated onboarding packets are saved in runtime data as `waAutomationOnboardingPackets.json` and should not be committed.
 
 ## Auto Stock Sourcing
 
@@ -807,6 +818,47 @@ http://localhost:3000/zero-touch
 
 Customer memory tracks purchase history, communication style, preferred payment method, preferred tools, tier (`Bronze`, `Silver`, `Gold`, `VIP`), and promotion frequency. Promotional WhatsApp sends are capped at two per customer per week.
 
+## Imported Skill Packs
+
+Uploaded project zips are integrated as safe SuperSender skill blueprints, not blindly copied into production. The current hub understands:
+
+- `pes_payments_activation` - payment verification, Gmail/IMAP parser, product activation, proposals, leads, and public API patterns.
+- `bolt_supabase_chat` - authenticated chat inbox, conversation history, Supabase schema, and edge chat worker patterns.
+- `dealradar_growth_marketplace` - offer scoring, marketplace cards, monetization widgets, retention prompts, SEO pages, and WhatsApp subscribe patterns.
+
+Dashboard:
+
+```text
+http://localhost:3001/imported-skills
+```
+
+APIs:
+
+```text
+GET  /api/imported-skills/status
+GET  /api/imported-skills/packs
+POST /api/imported-skills/plan
+POST /api/imported-skills/queue
+GET  /api/imported-skills/prompt?packId=pes_payments_activation
+```
+
+WhatsApp admin commands:
+
+```text
+!importskills
+!importskills plan pes_payments_activation
+!importskills queue dealradar_growth_marketplace
+!importskills prompt bolt_supabase_chat
+```
+
+The default import root is:
+
+```text
+D:\SuperSenderPro\imports\2026-06-18-uploaded-packs
+```
+
+Override with `UPLOADED_IMPORT_PACKS_ROOT` if the extracted packs move to another laptop or server. Keep `.env`, `.git`, WhatsApp auth sessions, customer logs, payment records, and token-bearing files out of Git.
+
 ## Admin Commands
 
 Send these from `ADMIN_NUMBER` in private chat or any group:
@@ -835,6 +887,10 @@ Send these from `ADMIN_NUMBER` in private chat or any group:
 !trust number
 !untrust number
 !pending
+!importskills
+!importskills plan pes_payments_activation
+!importskills queue dealradar_growth_marketplace
+!importskills prompt bolt_supabase_chat
 !sync
 !help
 ```

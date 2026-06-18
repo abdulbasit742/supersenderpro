@@ -10298,11 +10298,425 @@ Dashboard:
 http://localhost:3001/wa-automation-settings`;
 }
 
+function buildWhatsAppAutomationOnboardingPacket(input = {}) {
+  const presetId = String(input.preset || input.profile || settings.whatsapp_automation_profile || 'ai_tools_reseller').trim().toLowerCase();
+  const preset = WHATSAPP_AUTOMATION_PRESETS.find(row => row.id === presetId) || WHATSAPP_AUTOMATION_PRESETS[0];
+  const clientName = cleanOutgoingText(input.clientName || input.businessName || `${preset.label} Client`).slice(0, 120);
+  const ownerName = cleanOutgoingText(input.ownerName || input.founderName || 'Owner').slice(0, 80);
+  const adminNumber = cleanOutgoingText(input.adminNumber || settings.admin_number || settings.owner_whatsapp || process.env.ADMIN_NUMBER || '').slice(0, 32);
+  const publicBaseUrl = cleanOutgoingText(input.publicBaseUrl || settings.social_public_base_url || settings.gmail_public_base_url || 'http://localhost:3001').replace(/\/+$/, '');
+  const dailyMessages = Math.max(0, Number(input.dailyMessages || 50));
+  const launchMode = String(input.launchMode || 'dry_run_first').trim();
+  const packet = {
+    success: true,
+    id: `ONB-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 5).toUpperCase()}`,
+    generatedAt: new Date().toISOString(),
+    clientName,
+    ownerName,
+    adminNumber,
+    preset: preset.id,
+    presetLabel: preset.label,
+    launchMode,
+    dailyMessages,
+    links: {
+      automationSettings: `${publicBaseUrl}/wa-automation-settings`,
+      whatsappQr: `${publicBaseUrl}/wa-qr`,
+      apiSettings: `${publicBaseUrl}/api/wa/automation-settings`,
+      testReply: `${publicBaseUrl}/api/wa/automation-settings/test-reply`
+    },
+    collectFromClient: [
+      'Business name, owner/admin WhatsApp number, support timings.',
+      'Products/services list with prices, stock/availability policy, delivery timeline.',
+      'Payment methods, refund/claim policy, warranty/support policy.',
+      'Top 20 FAQs and 10 real customer messages for reply testing.',
+      'Opt-in source for customers and groups allowed for broadcasts.',
+      'Human handoff rules: complaint, refund, urgent, call, admin keywords.',
+      'Brand voice: friendly, professional, Urdu/English mix, or formal.'
+    ],
+    envChecklist: [
+      'ADMIN_NUMBER',
+      'WA_AUTO_CONNECT',
+      'WA_CUSTOMER_SESSION',
+      'CUSTOMER_GROUPS',
+      'WHATSAPP_AUTOMATION_ENABLED',
+      'WHATSAPP_AUTOMATION_PROFILE',
+      'WHATSAPP_AUTOMATION_OPT_IN_REQUIRED',
+      'WHATSAPP_AUTOMATION_DRY_RUN_LIVE_ACTIONS'
+    ],
+    dashboardSteps: [
+      `Open ${publicBaseUrl}/wa-automation-settings.`,
+      `Apply preset "${preset.id}" for ${preset.label}.`,
+      'Set first reply target, promo weekly limit, follow-up hours, renewal days, and handoff keywords.',
+      'Use Reply Simulator with real customer messages.',
+      'Open WhatsApp QR page and connect the client number.',
+      'Run dry-run for payment/order/broadcast flows.',
+      'Enable live replies only after admin approves test outputs.'
+    ],
+    whatsappCommands: [
+      `!waauto preset ${preset.id}`,
+      '!waauto test price kya hai',
+      `!waauto onboard ${preset.id} ${clientName}`,
+      `!waauto pack ${preset.id} ${clientName}`,
+      '!waauto on'
+    ],
+    sevenDayRollout: [
+      { day: 1, goal: 'Connect WhatsApp, collect FAQs, apply preset, test 10 messages.' },
+      { day: 2, goal: 'Enable structured replies for price, availability, order, and support.' },
+      { day: 3, goal: 'Add payment/order handoff rules and admin alert templates.' },
+      { day: 4, goal: 'Enable follow-ups for abandoned leads and pending payments.' },
+      { day: 5, goal: 'Connect groups/customer segments and test one opt-in broadcast.' },
+      { day: 6, goal: 'Review logs, blocked replies, and handoff quality.' },
+      { day: 7, goal: 'Launch live mode with weekly promo cap and daily admin report.' }
+    ],
+    acceptanceTests: [
+      'Customer sends "price" and gets correct price/menu within target seconds.',
+      'Customer sends "order" and bot starts structured purchase/booking flow.',
+      'Customer sends "issue/refund/urgent" and admin handoff is triggered.',
+      'Promo broadcast does not exceed weekly cap.',
+      'STOP/unsubscribe footer is visible when promotional content is generated.',
+      'Dashboard shows selected preset and WhatsApp connection status.'
+    ],
+    riskControls: [
+      'Keep dry-run live actions ON until owner approves.',
+      'Do not import cold contacts without opt-in.',
+      'Do not enable open-ended AI for business-critical customer support.',
+      'Do not store real API keys in GitHub; use .env only.',
+      'Use human handoff for refund, payment dispute, complaint, and legal questions.'
+    ],
+    salesPositioning: dailyMessages >= 100
+      ? 'High-volume business: sell as revenue recovery, response-speed, and support workload reduction.'
+      : 'Starter business: sell as fast response, lead capture, and structured customer support.',
+    nextAction: `Send this packet to ${ownerName}, collect missing data, then run ${preset.id} dry-run tests.`
+  };
+  const rows = loadJSON('waAutomationOnboardingPackets.json', []);
+  const nextRows = Array.isArray(rows) ? rows : [];
+  nextRows.unshift(packet);
+  saveJSON('waAutomationOnboardingPackets.json', nextRows.slice(0, 200));
+  return packet;
+}
+
+function formatWhatsAppAutomationOnboardingReply(packet = {}) {
+  const collect = (packet.collectFromClient || []).slice(0, 7).map((item, index) => `${index + 1}. ${item}`).join('\n');
+  const steps = (packet.dashboardSteps || []).slice(0, 7).map((item, index) => `${index + 1}. ${item}`).join('\n');
+  const tests = (packet.acceptanceTests || []).slice(0, 6).map(item => `• ${item}`).join('\n');
+  return `🚀 *Client Onboarding Packet*
+
+Client: *${packet.clientName || '-'}*
+Owner: *${packet.ownerName || '-'}*
+Preset: *${packet.presetLabel || packet.preset || '-'}*
+Mode: *${packet.launchMode || '-'}*
+
+*Collect From Client*
+${collect}
+
+*Launch Steps*
+${steps}
+
+*Acceptance Tests*
+${tests}
+
+*Important Links*
+Settings: ${packet.links?.automationSettings || '-'}
+QR: ${packet.links?.whatsappQr || '-'}
+
+Next: ${packet.nextAction || 'Run dry-run tests before live launch.'}`;
+}
+
+const UPLOADED_IMPORT_PACKS_ROOT = process.env.UPLOADED_IMPORT_PACKS_ROOT || path.join(path.dirname(__dirname), 'imports', '2026-06-18-uploaded-packs');
+
+const UPLOADED_IMPORT_SKILL_BLUEPRINTS = [
+  {
+    id: 'pes_payments_activation',
+    name: 'PES Payments + Activation Engine',
+    sourceZip: 'PES Automation and Payments Engine Requirements.zip',
+    sourceFolder: 'pes',
+    priority: 1,
+    category: 'payments',
+    bestFor: 'JazzCash/EasyPaisa/bank payment verification, Gmail parsing, product activation, proposals, leads, and public API patterns.',
+    sourceFiles: [
+      'pes/productActivationService.ts',
+      'pes/gmailService.ts',
+      'pes/schema.ts',
+      'pes/routers.ts',
+      'pes/publicApi.ts',
+      'pes/whatsappService.ts',
+      'pes/api.test.ts'
+    ],
+    skills: [
+      { id: 'payment-verifier', title: 'Payment verifier', value: 'Parse payment emails, match pending orders, prevent duplicate transaction IDs.' },
+      { id: 'product-activation', title: 'Product activation', value: 'Convert paid order into account/key delivery and audit trail.' },
+      { id: 'gmail-parser', title: 'Gmail/IMAP parser', value: 'Poll payment notification inbox and surface parsed receipts for admin review.' },
+      { id: 'proposal-pipeline', title: 'Proposal pipeline', value: 'Turn leads into quoted proposals with follow-up reminders.' },
+      { id: 'public-api', title: 'Public API blueprint', value: 'Expose safe partner endpoints without exposing secrets.' }
+    ],
+    env: ['EMAIL_USER', 'EMAIL_PASSWORD', 'EMAIL_IMAP_HOST', 'JAZZCASH_MERCHANT_NUMBER', 'EASYPAISA_MERCHANT_NUMBER'],
+    safeAdapters: [
+      'Create payment-parser adapter that writes to existing orders/payments JSON or DB tables.',
+      'Run all matching in dry-run first; admin approves before delivery.',
+      'Hash transaction IDs and reject duplicates before changing order status.',
+      'Send admin WhatsApp alert for unmatched or suspicious receipts.'
+    ],
+    acceptanceTests: [
+      'Sample JazzCash/EasyPaisa email parses amount, transaction ID, sender, method, and time.',
+      'Exact amount plus/minus PKR 5 matches a pending order within 24 hours.',
+      'Duplicate transaction ID is rejected and logged.',
+      'Successful dry-run creates a delivery-ready admin packet.'
+    ]
+  },
+  {
+    id: 'bolt_supabase_chat',
+    name: 'Bolt Supabase Chat + Auth Pack',
+    sourceZip: 'project-bolt-sb1-dwm4snsw.zip',
+    sourceFolder: 'bolt/project',
+    priority: 2,
+    category: 'chat-inbox',
+    bestFor: 'Authenticated chat inbox, conversation history, Supabase schema, and edge-function chat routing.',
+    sourceFiles: [
+      'bolt/project/src/components/ChatInterface.tsx',
+      'bolt/project/src/components/Auth.tsx',
+      'bolt/project/src/contexts/AuthContext.tsx',
+      'bolt/project/src/lib/supabase.ts',
+      'bolt/project/supabase/functions/chat/index.ts',
+      'bolt/project/supabase/migrations/20260116171733_create_chat_schema.sql'
+    ],
+    skills: [
+      { id: 'chat-inbox', title: 'Chat inbox', value: 'Reusable UI logic for customer/admin conversation timelines.' },
+      { id: 'auth-gated-dashboard', title: 'Auth-gated dashboard', value: 'Supabase auth pattern for staff/client portals.' },
+      { id: 'edge-chat-worker', title: 'Edge chat worker', value: 'Serverless chat endpoint pattern for external AI replies.' },
+      { id: 'conversation-history', title: 'Conversation history', value: 'Structured message storage blueprint.' }
+    ],
+    env: ['SUPABASE_URL', 'SUPABASE_ANON_KEY', 'SUPABASE_SERVICE_ROLE_KEY'],
+    safeAdapters: [
+      'Use as optional Supabase adapter; do not replace current local dashboard.',
+      'Map WhatsApp conversations into a normalized inbox timeline.',
+      'Keep service role key server-only and never expose it in client code.',
+      'Add read-only mode before enabling agent replies.'
+    ],
+    acceptanceTests: [
+      'Inbox page can render a customer timeline from existing local data.',
+      'Supabase env validation reports missing keys without crashing.',
+      'Chat worker stays dry-run unless AI provider and admin approval are configured.'
+    ]
+  },
+  {
+    id: 'dealradar_growth_marketplace',
+    name: 'DealRadar Growth + Offer Intelligence',
+    sourceZip: 'dealradar-project.zip',
+    sourceFolder: 'dealradar',
+    priority: 3,
+    category: 'growth',
+    bestFor: 'Offer cards, score badges, deal radar UI, monetization widgets, retention prompts, SEO pages, and WhatsApp subscribe funnels.',
+    sourceFiles: [
+      'dealradar/src/components/dashboard/OfferGrid.tsx',
+      'dealradar/src/components/offers/OfferCard.tsx',
+      'dealradar/src/components/offers/ScoreBadge.tsx',
+      'dealradar/src/components/monetization/WhatsAppSubscribeWidget.tsx',
+      'dealradar/src/components/notifications/RetentionPrompts.tsx',
+      'dealradar/src/hooks/useEngagementTracking.ts',
+      'dealradar/src/lib/mockData.ts'
+    ],
+    skills: [
+      { id: 'deal-scoring', title: 'Deal scoring', value: 'Rank plans, products, and scraped offers by urgency, trust, margin, and conversion potential.' },
+      { id: 'offer-grid', title: 'Offer grid UI', value: 'Reusable marketplace-style product/deal cards for SuperSender dashboard.' },
+      { id: 'monetization-widgets', title: 'Monetization widgets', value: 'Lead capture, upsell, cross-promotion, and WhatsApp subscribe patterns.' },
+      { id: 'retention-prompts', title: 'Retention prompts', value: 'Win-back and follow-up copy for inactive users.' },
+      { id: 'seo-pages', title: 'SEO pages', value: 'Landing page structure for public deal/scholarship/product pages.' }
+    ],
+    env: ['PUBLIC_SITE_URL', 'WHATSAPP_SUBSCRIBE_NUMBER'],
+    safeAdapters: [
+      'Extract scoring formulas and UI patterns; do not vendor the full app into server.js.',
+      'Use generated scores for AI tools, laptops, accessories, scholarships, channels, and ecommerce deals.',
+      'Track clicks and conversions before turning on automated boosts.',
+      'Respect opt-in and promo frequency limits for WhatsApp subscribers.'
+    ],
+    acceptanceTests: [
+      'Offer score returns 0-100 with reasons: margin, stock, demand, trust, urgency.',
+      'Dashboard can show top opportunities without crashing if no imported source exists.',
+      'WhatsApp subscribe CTA creates an opted-in lead record, not a cold broadcast target.'
+    ]
+  }
+];
+
+function uploadedPackSourcePath(pack = {}) {
+  return path.join(UPLOADED_IMPORT_PACKS_ROOT, String(pack.sourceFolder || ''));
+}
+
+function getUploadedImportSkillPacks() {
+  const queueRows = loadJSON('uploadedImportSkillQueue.json', []);
+  const queue = Array.isArray(queueRows) ? queueRows : [];
+  return UPLOADED_IMPORT_SKILL_BLUEPRINTS.map(pack => {
+    const sourceRoot = uploadedPackSourcePath(pack);
+    const sourcePresent = fs.existsSync(sourceRoot);
+    const fileChecks = (pack.sourceFiles || []).map(file => ({
+      file,
+      present: fs.existsSync(path.join(UPLOADED_IMPORT_PACKS_ROOT, file))
+    }));
+    const queued = queue.filter(row => row.packId === pack.id);
+    const missingEnv = (pack.env || []).filter(key => !process.env[key] && !settings[String(key).toLowerCase()]);
+    return {
+      ...pack,
+      sourceRoot,
+      sourcePresent,
+      sourceFilesPresent: fileChecks.filter(row => row.present).length,
+      sourceFilesTotal: fileChecks.length,
+      fileChecks,
+      missingEnv,
+      status: sourcePresent ? 'source_ready_blueprint' : 'blueprint_ready_source_missing',
+      queuedTasks: queued.length,
+      lastQueuedAt: queued[0]?.createdAt || '',
+      safeMode: process.env.UPLOADED_IMPORT_PACKS_DRY_RUN_DEFAULT !== 'false'
+    };
+  }).sort((a, b) => Number(a.priority || 999) - Number(b.priority || 999));
+}
+
+function findUploadedImportSkillPack(input = {}) {
+  const requested = String(input.packId || input.pack || input.id || input.name || '').trim().toLowerCase();
+  const packs = getUploadedImportSkillPacks();
+  if (!requested) return packs[0];
+  return packs.find(pack =>
+    pack.id === requested ||
+    pack.name.toLowerCase() === requested ||
+    pack.category.toLowerCase() === requested ||
+    pack.skills.some(skill => skill.id === requested)
+  ) || null;
+}
+
+function buildUploadedPackIntegrationPlan(input = {}) {
+  const pack = findUploadedImportSkillPack(input);
+  if (!pack) throw new Error('Known imported pack id is required.');
+  const selectedSkill = String(input.skill || input.skillId || '').trim().toLowerCase();
+  const skills = selectedSkill
+    ? pack.skills.filter(skill => skill.id === selectedSkill || skill.title.toLowerCase().includes(selectedSkill))
+    : pack.skills;
+  const chosenSkills = skills.length ? skills : pack.skills;
+  return {
+    success: true,
+    pack: {
+      id: pack.id,
+      name: pack.name,
+      category: pack.category,
+      sourceZip: pack.sourceZip,
+      sourcePresent: pack.sourcePresent,
+      missingEnv: pack.missingEnv,
+      sourceRoot: pack.sourceRoot
+    },
+    chosenSkills,
+    phases: [
+      {
+        phase: 'Intake and safety',
+        actions: [
+          'Use uploaded source files as reference only.',
+          'Do not copy .env, .git, runtime logs, customer data, or auth sessions.',
+          'List all required environment keys and keep live actions in dry-run.'
+        ]
+      },
+      {
+        phase: 'Adapter design',
+        actions: pack.safeAdapters || []
+      },
+      {
+        phase: 'Implementation',
+        actions: chosenSkills.map(skill => `Build ${skill.title}: ${skill.value}`)
+      },
+      {
+        phase: 'Verification',
+        actions: pack.acceptanceTests || []
+      },
+      {
+        phase: 'Go-live',
+        actions: [
+          'Run endpoint smoke tests.',
+          'Send admin WhatsApp summary.',
+          'Enable live mode only after owner approval.'
+        ]
+      }
+    ],
+    recommendedFiles: pack.sourceFiles,
+    nextCommand: `!importskills queue ${pack.id}`,
+    dashboard: 'http://localhost:3001/imported-skills',
+    createdAt: new Date().toISOString()
+  };
+}
+
+function queueUploadedPackSkill(input = {}) {
+  const plan = buildUploadedPackIntegrationPlan(input);
+  const queue = loadJSON('uploadedImportSkillQueue.json', []);
+  const rows = Array.isArray(queue) ? queue : [];
+  const row = {
+    id: uuid(),
+    packId: plan.pack.id,
+    packName: plan.pack.name,
+    skills: plan.chosenSkills.map(skill => skill.id),
+    status: plan.pack.sourcePresent ? 'queued_blueprint_ready' : 'queued_source_missing',
+    dryRun: input.dryRun !== false || process.env.UPLOADED_IMPORT_PACKS_DRY_RUN_DEFAULT !== 'false',
+    source: cleanOutgoingText(input.source || 'api'),
+    notes: cleanOutgoingText(input.notes || ''),
+    plan,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+  rows.unshift(row);
+  saveJSON('uploadedImportSkillQueue.json', rows.slice(0, 500));
+  return { success: true, task: row };
+}
+
+function buildUploadedPackPrompt(input = {}) {
+  const plan = buildUploadedPackIntegrationPlan(input);
+  const skillLines = plan.chosenSkills.map(skill => `- ${skill.id}: ${skill.title} — ${skill.value}`).join('\n');
+  const phaseLines = plan.phases.map(phase => `## ${phase.phase}\n${phase.actions.map(action => `- ${action}`).join('\n')}`).join('\n\n');
+  const prompt = `You are continuing SuperSender Pro. Integrate the uploaded pack safely.
+
+Pack: ${plan.pack.name}
+Pack ID: ${plan.pack.id}
+Category: ${plan.pack.category}
+Source root: ${plan.pack.sourceRoot}
+Source present: ${plan.pack.sourcePresent ? 'yes' : 'no'}
+
+Skills to implement:
+${skillLines}
+
+Rules:
+- Use source files as blueprints. Do not copy .env, .git, auth sessions, logs, customer data, or tokens.
+- Add small adapters into the existing SuperSender server/dashboard style.
+- Keep WhatsApp/social/payment actions in dry-run until admin approval.
+- Add APIs, dashboard controls, WhatsApp admin commands, README docs, and smoke tests.
+- Preserve existing WhatsApp bot, channel automation, social hub, plans, products, and AI automation features.
+
+Plan:
+${phaseLines}
+
+Acceptance tests:
+${plan.phases.find(phase => phase.phase === 'Verification')?.actions.map(action => `- ${action}`).join('\n') || '- Run syntax and API smoke checks.'}
+`;
+  return { success: true, pack: plan.pack, prompt, plan };
+}
+
+function formatImportedSkillPacksReply() {
+  const packs = getUploadedImportSkillPacks();
+  const lines = packs.map(pack => {
+    const skills = pack.skills.map(skill => skill.id).join(', ');
+    return `*${pack.priority}. ${pack.name}*\nID: ${pack.id}\nStatus: ${pack.status}\nFiles: ${pack.sourceFilesPresent}/${pack.sourceFilesTotal}\nSkills: ${skills}\nNext: !importskills queue ${pack.id}`;
+  }).join('\n\n');
+  return `📦 *Imported Skill Packs*
+
+${lines}
+
+Commands:
+*!importskills*
+*!importskills plan pes_payments_activation*
+*!importskills queue dealradar_growth_marketplace*
+*!importskills prompt bolt_supabase_chat*
+
+Dashboard:
+http://localhost:3001/imported-skills`;
+}
+
 function getAiAutomationStatus() {
   const repos = getAiAutomationRepoPlan();
   const repoCatalog = getAgenticPublicRepoCatalog();
   const repoImportQueue = loadJSON('agenticRepoImportQueue.json', []);
   const algorithms = getAiAlgorithmCatalog();
+  const importedSkillPacks = getUploadedImportSkillPacks();
   const algorithmRuns = loadJSON('aiAlgorithmRuns.json', []);
   const agenticAgents = getAgenticAgentRegistry();
   const skillPacks = getAgenticSkillPacks();
@@ -10331,6 +10745,9 @@ function getAiAutomationStatus() {
       repoCatalog: repoCatalog.length,
       repoImportsQueued: Array.isArray(repoImportQueue) ? repoImportQueue.length : 0,
       highRiskRepos: repoCatalog.filter(row => String(row.licenseRisk || '').toLowerCase() === 'high').length,
+      importedSkillPacks: importedSkillPacks.length,
+      importedSkillPacksReady: importedSkillPacks.filter(row => row.sourcePresent).length,
+      importedSkillTasks: importedSkillPacks.reduce((sum, row) => sum + Number(row.queuedTasks || 0), 0),
       algorithms: algorithms.length,
       algorithmsReady: algorithms.filter(row => row.enabled).length,
       algorithmRuns: Array.isArray(algorithmRuns) ? algorithmRuns.length : 0
@@ -10338,6 +10755,7 @@ function getAiAutomationStatus() {
     repos,
     repoCatalog,
     repoImportQueue: (Array.isArray(repoImportQueue) ? repoImportQueue : []).slice(0, 50),
+    importedSkillPacks,
     algorithms,
     recentAlgorithmRuns: (Array.isArray(algorithmRuns) ? algorithmRuns : []).slice(0, 25),
     agenticAgents,
@@ -19075,6 +19493,213 @@ app.post('/api/wa/automation-settings/client-pack', (req, res) => {
   }
 });
 
+app.get('/api/wa/automation-settings/onboarding', (req, res) => {
+  try {
+    res.json(buildWhatsAppAutomationOnboardingPacket(req.query || {}));
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/wa/automation-settings/onboarding', (req, res) => {
+  try {
+    res.json(buildWhatsAppAutomationOnboardingPacket(req.body || {}));
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/wa-client-onboarding', (_req, res) => {
+  try {
+    const cfg = getWhatsAppAutomationSettings();
+    const presetOptions = cfg.presets.map(row => `<option value="${htmlEscape(row.id)}" ${row.active ? 'selected' : ''}>${htmlEscape(row.label)}</option>`).join('');
+    res.type('html').send(`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Client Onboarding Wizard</title>
+<style>
+body{font-family:Inter,Arial,sans-serif;background:#071014;color:#eaf7f3;margin:0;padding:24px;line-height:1.45}
+.top{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap;margin-bottom:18px}
+h1,h2{margin-top:0}.muted,small{color:#9fb3c8}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:16px 0}
+.card{background:#13212b;border:1px solid #284150;border-radius:14px;padding:16px}
+label{display:block;color:#b8d8ee;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;margin:12px 0 6px}
+input,select{width:100%;box-sizing:border-box;padding:10px;border-radius:9px;border:1px solid #284150;background:#081018;color:#eaf7f3}
+button,.btn{background:#10b981;color:#06120d;border:0;border-radius:9px;padding:10px 13px;font-weight:850;text-decoration:none;cursor:pointer;margin-top:10px}.secondary{background:#223442;color:#d8f3ff}
+pre{white-space:pre-wrap;background:#081018;border:1px solid #263946;border-radius:12px;padding:14px;overflow:auto;min-height:260px}
+</style></head><body><main>
+  <div class="top">
+    <div><h1>Client Onboarding Wizard</h1><p class="muted">Generate a ready handoff packet for founders/businesses before WhatsApp automation launch.</p></div>
+    <div><a class="btn secondary" href="/wa-automation-settings">Automation Settings</a> <a class="btn secondary" href="/wa-qr">WhatsApp QR</a></div>
+  </div>
+  <section class="grid">
+    <div class="card">
+      <h2>Client Details</h2>
+      <label>Client / Business Name</label><input id="clientName" value="New Client">
+      <label>Owner Name</label><input id="ownerName" value="Owner">
+      <label>Admin WhatsApp Number</label><input id="adminNumber" value="${htmlEscape(settings.admin_number || settings.owner_whatsapp || '')}">
+      <label>Preset</label><select id="preset">${presetOptions}</select>
+      <label>Daily Messages</label><input id="dailyMessages" type="number" min="0" value="80">
+      <label>Public Base URL</label><input id="publicBaseUrl" value="${htmlEscape(settings.social_public_base_url || settings.gmail_public_base_url || 'http://localhost:3001')}">
+      <button onclick="generatePacket()">Generate Onboarding Packet</button>
+      <button class="secondary" onclick="copyPacket()">Copy Packet</button>
+    </div>
+    <div class="card">
+      <h2>Output</h2>
+      <pre id="out">Click Generate Onboarding Packet.</pre>
+    </div>
+  </section>
+</main>
+<script>
+async function generatePacket(){
+  const payload = {
+    clientName: document.getElementById('clientName').value,
+    ownerName: document.getElementById('ownerName').value,
+    adminNumber: document.getElementById('adminNumber').value,
+    preset: document.getElementById('preset').value,
+    dailyMessages: Number(document.getElementById('dailyMessages').value || 0),
+    publicBaseUrl: document.getElementById('publicBaseUrl').value,
+    source: 'dashboard'
+  };
+  const response = await fetch('/api/wa/automation-settings/onboarding',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  const data = await response.json();
+  document.getElementById('out').innerText = JSON.stringify(data, null, 2);
+}
+async function copyPacket(){
+  await navigator.clipboard.writeText(document.getElementById('out').innerText);
+  alert('Onboarding packet copied');
+}
+</script></body></html>`);
+  } catch (error) {
+    res.status(500).send(`Client Onboarding Wizard failed: ${htmlEscape(error.message)}`);
+  }
+});
+
+app.get('/api/imported-skills/packs', (_req, res) => {
+  try {
+    res.json({ success: true, root: UPLOADED_IMPORT_PACKS_ROOT, packs: getUploadedImportSkillPacks() });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/imported-skills/status', (_req, res) => {
+  try {
+    const packs = getUploadedImportSkillPacks();
+    const queue = loadJSON('uploadedImportSkillQueue.json', []);
+    res.json({
+      success: true,
+      title: 'Imported Skill Packs',
+      updatedAt: new Date().toISOString(),
+      root: UPLOADED_IMPORT_PACKS_ROOT,
+      totals: {
+        packs: packs.length,
+        sourceReady: packs.filter(pack => pack.sourcePresent).length,
+        skills: packs.reduce((sum, pack) => sum + pack.skills.length, 0),
+        queued: Array.isArray(queue) ? queue.length : 0,
+        missingEnv: [...new Set(packs.flatMap(pack => pack.missingEnv || []))].length
+      },
+      packs,
+      recentQueue: (Array.isArray(queue) ? queue : []).slice(0, 50)
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/imported-skills/plan', (req, res) => {
+  try {
+    res.json(buildUploadedPackIntegrationPlan(req.body || {}));
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/imported-skills/queue', (req, res) => {
+  try {
+    res.json(queueUploadedPackSkill({ ...(req.body || {}), source: req.body?.source || 'api' }));
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/imported-skills/prompt', (req, res) => {
+  try {
+    res.json(buildUploadedPackPrompt(req.query || {}));
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/imported-skills', (_req, res) => {
+  try {
+    const status = {
+      root: UPLOADED_IMPORT_PACKS_ROOT,
+      packs: getUploadedImportSkillPacks(),
+      queue: loadJSON('uploadedImportSkillQueue.json', [])
+    };
+    const packCards = status.packs.map(pack => `<article class="card">
+      <div class="row"><h2>${htmlEscape(pack.name)}</h2><span class="pill ${pack.sourcePresent ? 'ok' : 'warn'}">${pack.sourcePresent ? 'Source ready' : 'Blueprint only'}</span></div>
+      <p>${htmlEscape(pack.bestFor)}</p>
+      <div class="meta">ID: <code>${htmlEscape(pack.id)}</code> · Files: ${pack.sourceFilesPresent}/${pack.sourceFilesTotal} · Queue: ${pack.queuedTasks}</div>
+      <h3>Skills</h3>
+      <ul>${pack.skills.map(skill => `<li><strong>${htmlEscape(skill.title)}</strong><br><span>${htmlEscape(skill.value)}</span></li>`).join('')}</ul>
+      <h3>Missing Env</h3>
+      <p class="muted">${pack.missingEnv.length ? htmlEscape(pack.missingEnv.join(', ')) : 'No required env missing for blueprint mode.'}</p>
+      <button onclick="makePlan('${htmlEscape(pack.id)}')">Build Plan</button>
+      <button class="secondary" onclick="queuePack('${htmlEscape(pack.id)}')">Queue Skill Pack</button>
+      <button class="secondary" onclick="copyPrompt('${htmlEscape(pack.id)}')">Copy Prompt</button>
+    </article>`).join('');
+    res.type('html').send(`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Imported Skill Packs</title>
+<style>
+body{font-family:Inter,Arial,sans-serif;background:#071014;color:#eaf7f3;margin:0;padding:24px;line-height:1.45}
+.top{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap;margin-bottom:18px}
+h1,h2,h3{margin-top:0}.muted,.meta,small{color:#9fb3c8}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin:16px 0}
+.card{background:#13212b;border:1px solid #284150;border-radius:14px;padding:16px}.row{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.pill{display:inline-flex;border-radius:999px;padding:4px 9px;font-size:12px;font-weight:850}.ok{background:#063d31;color:#6ee7b7}.warn{background:#3d3210;color:#fde68a}
+button,.btn{background:#10b981;color:#06120d;border:0;border-radius:9px;padding:10px 13px;font-weight:850;text-decoration:none;cursor:pointer;margin:6px 6px 0 0}.secondary{background:#223442;color:#d8f3ff}
+code{color:#67e8f9}pre{white-space:pre-wrap;background:#081018;border:1px solid #263946;border-radius:12px;padding:14px;overflow:auto;min-height:260px}
+ul{padding-left:18px}li{margin:8px 0}
+</style></head><body><main>
+  <div class="top">
+    <div><h1>Imported Skill Packs</h1><p class="muted">Use uploaded apps as safe blueprints for SuperSender skills. No .env, auth, or runtime data is copied into Git.</p></div>
+    <div><a class="btn secondary" href="/">Dashboard</a> <a class="btn secondary" href="/wa-automation-settings">WA Automation</a> <a class="btn secondary" href="/api/imported-skills/status">JSON</a></div>
+  </div>
+  <section class="card">
+    <h2>Import Root</h2>
+    <code>${htmlEscape(status.root)}</code>
+    <p class="muted">Set UPLOADED_IMPORT_PACKS_ROOT if this folder moves to another laptop/server.</p>
+  </section>
+  <section class="grid">${packCards}</section>
+  <section class="card">
+    <h2>Output</h2>
+    <pre id="out">Select a pack action.</pre>
+  </section>
+</main>
+<script>
+async function postJson(url, payload){
+  const response = await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  const data = await response.json();
+  if(!data.success) throw new Error(data.error || 'Request failed');
+  return data;
+}
+async function makePlan(packId){
+  const data = await postJson('/api/imported-skills/plan',{packId,source:'dashboard'});
+  document.getElementById('out').innerText = JSON.stringify(data,null,2);
+}
+async function queuePack(packId){
+  const data = await postJson('/api/imported-skills/queue',{packId,source:'dashboard'});
+  document.getElementById('out').innerText = JSON.stringify(data,null,2);
+}
+async function copyPrompt(packId){
+  const response = await fetch('/api/imported-skills/prompt?packId=' + encodeURIComponent(packId));
+  const data = await response.json();
+  document.getElementById('out').innerText = data.prompt || JSON.stringify(data,null,2);
+  await navigator.clipboard.writeText(document.getElementById('out').innerText);
+  alert('Prompt copied');
+}
+</script></body></html>`);
+  } catch (error) {
+    res.status(500).send(`Imported Skill Packs failed: ${htmlEscape(error.message)}`);
+  }
+});
+
 app.get('/wa-automation-settings', (_req, res) => {
   try {
     const cfg = getWhatsAppAutomationSettings();
@@ -19105,7 +19730,7 @@ pre{white-space:pre-wrap;background:#081018;border:1px solid #263946;border-radi
 </style></head><body><main>
   <div class="top">
     <div><h1>WhatsApp Automation Settings</h1><p class="muted">Reusable automation presets for AI tools, founders, ecommerce, education, real estate, and support businesses.</p></div>
-    <div><a class="btn secondary" href="/">Dashboard</a> <a class="btn secondary" href="/wa-qr">WhatsApp QR</a> <a class="btn secondary" href="/api/wa/automation-settings">JSON</a></div>
+    <div><a class="btn secondary" href="/">Dashboard</a> <a class="btn secondary" href="/wa-qr">WhatsApp QR</a> <a class="btn secondary" href="/wa-client-onboarding">Onboarding Wizard</a> <a class="btn secondary" href="/imported-skills">Imported Skills</a> <a class="btn secondary" href="/api/wa/automation-settings">JSON</a></div>
   </div>
   <section class="grid">
     <div class="card"><div class="muted">Automation</div><div class="value">${cfg.enabled ? 'ON' : 'OFF'}</div><button onclick="toggleEnabled(${cfg.enabled ? 'false' : 'true'})">${cfg.enabled ? 'Turn Off' : 'Turn On'}</button></div>
@@ -19171,7 +19796,8 @@ pre{white-space:pre-wrap;background:#081018;border:1px solid #263946;border-radi
 !waauto on
 !waauto off
 !waauto preset ecommerce_store
-!waauto test price kya hai</pre>
+!waauto test price kya hai
+!waauto onboard ecommerce_store Client Name</pre>
     </div>
   </section>
 </main>
@@ -28585,7 +29211,7 @@ function splitSocialCommandArgs(text = '') {
 }
 
 function isWhatsAppSocialCommand(text = '') {
-  return /^!(social|connect|post|draft|approvepost|sharepost|poststatus|comment|telegram|control|admin|menuadmin|server|status|health|watchdog|next50|antigravity|aihub|automationhub|waauto|automation|autosettings|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelfix|channelwatch|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
+  return /^!(social|connect|post|draft|approvepost|sharepost|poststatus|comment|telegram|control|admin|menuadmin|server|status|health|watchdog|next50|antigravity|aihub|automationhub|importskills|skillpacks|packs|waauto|automation|autosettings|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelfix|channelwatch|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
 }
 
 function adminNumberCandidates() {
@@ -29744,6 +30370,29 @@ async function handleWhatsAppSocialAdminCommand(ctx = {}) {
       return true;
     }
 
+    if (command === '!importskills' || command === '!skillpacks' || command === '!packs') {
+      const mode = String(args[1] || 'status').toLowerCase();
+      const packId = String(args[2] || '').trim();
+      if (['plan', 'map'].includes(mode)) {
+        const plan = buildUploadedPackIntegrationPlan({ packId: packId || 'pes_payments_activation', source: 'whatsapp_admin' });
+        const phases = plan.phases.map(phase => `*${phase.phase}*\n${phase.actions.slice(0, 4).map(action => `• ${action}`).join('\n')}`).join('\n\n');
+        await reply(`📦 *Imported Pack Plan*\n\nPack: *${plan.pack.name}*\nID: ${plan.pack.id}\nSource: ${plan.pack.sourcePresent ? 'ready' : 'missing'}\n\n${phases}\n\nNext: *${plan.nextCommand}*`);
+        return true;
+      }
+      if (['queue', 'run', 'use'].includes(mode)) {
+        const result = queueUploadedPackSkill({ packId: packId || 'pes_payments_activation', source: 'whatsapp_admin' });
+        await reply(`✅ *Imported Skill Pack Queued*\n\nPack: *${result.task.packName}*\nStatus: *${result.task.status}*\nDry-run: *${result.task.dryRun ? 'YES' : 'NO'}*\nSkills: ${result.task.skills.join(', ')}\n\nDashboard:\nhttp://localhost:3001/imported-skills`);
+        return true;
+      }
+      if (['prompt', 'claude', 'antigravity'].includes(mode)) {
+        const built = buildUploadedPackPrompt({ packId: packId || 'pes_payments_activation', source: 'whatsapp_admin' });
+        await reply(`🧠 *Imported Pack Prompt*\n\nPack: *${built.pack.name}*\n\n${built.prompt.slice(0, 3000)}${built.prompt.length > 3000 ? '\n\n...continued in dashboard /api/imported-skills/prompt' : ''}`);
+        return true;
+      }
+      await reply(formatImportedSkillPacksReply());
+      return true;
+    }
+
     if (command === '!waauto' || command === '!automation' || command === '!autosettings') {
       const mode = String(args[1] || 'status').toLowerCase();
       if (['on', 'enable', 'enabled'].includes(mode)) {
@@ -29783,6 +30432,19 @@ async function handleWhatsAppSocialAdminCommand(ctx = {}) {
           source: 'whatsapp_admin'
         });
         await reply(formatWhatsAppAutomationClientPackReply(pack));
+        return true;
+      }
+      if (['onboard', 'onboarding', 'setup', 'launch'].includes(mode)) {
+        const preset = String(args[2] || settings.whatsapp_automation_profile || 'ai_tools_reseller').trim();
+        const clientName = args.slice(3).join(' ').trim() || `${preset} client`;
+        const packet = buildWhatsAppAutomationOnboardingPacket({
+          preset,
+          clientName,
+          ownerName: 'Owner',
+          adminNumber: settings.admin_number || settings.owner_whatsapp || process.env.ADMIN_NUMBER || '',
+          source: 'whatsapp_admin'
+        });
+        await reply(formatWhatsAppAutomationOnboardingReply(packet));
         return true;
       }
       await reply(buildWhatsAppAutomationSettingsReply());
