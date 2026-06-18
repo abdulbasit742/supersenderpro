@@ -113,6 +113,46 @@ Use the customer session for customer sales, dealer session for rate monitoring,
 
 `WA_AUTO_CONNECT=true` reconnects the saved WhatsApp session automatically after a server restart, so customers still receive menu/welcome replies without pressing Connect again.
 
+## WhatsApp Automation Settings Center
+
+SuperSender Pro now includes a reusable automation-settings layer that can be sold to other businesses and founders, not only AI tools resellers.
+
+Dashboard:
+
+```text
+http://localhost:3001/wa-automation-settings
+```
+
+API:
+
+```text
+GET  /api/wa/automation-settings
+POST /api/wa/automation-settings
+POST /api/wa/automation-settings/preset
+POST /api/wa/automation-settings/test-reply
+```
+
+WhatsApp admin commands:
+
+```text
+!waauto
+!waauto on
+!waauto off
+!waauto preset ecommerce_store
+!waauto test price kya hai
+```
+
+Business presets:
+
+- `ai_tools_reseller` - pricing, availability, orders, warranty, renewals, dealer rates.
+- `founder_growth` - lead capture, demo booking, founder/client follow-ups.
+- `ecommerce_store` - product questions, cart recovery, COD confirmation, tracking, stock alerts.
+- `education_admissions` - admissions FAQ, eligibility, forms, documents, deadline reminders.
+- `real_estate` - budget/location qualification, property media, visit scheduling.
+- `support_center` - ticket triage, SLA alerts, issue routing, feedback recovery.
+
+Safe defaults are enabled: structured task-bot mode, explicit opt-in, promotional caps, unsubscribe footer, dry-run live actions, and human handoff keywords.
+
 ## Auto Stock Sourcing
 
 When a customer asks for an AI tool/account type that has zero stock, the bot now starts a live sourcing request instead of losing the sale.

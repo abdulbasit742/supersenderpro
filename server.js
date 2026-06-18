@@ -1625,6 +1625,30 @@ let settings = loadJSON('settings.json', {
   marketing_api_enabled: true,
   marketing_default_ttl_hours: 24,
   marketing_weekly_limit: 2,
+  whatsapp_automation_enabled: String(process.env.WHATSAPP_AUTOMATION_ENABLED || 'true').toLowerCase() !== 'false',
+  whatsapp_automation_profile: process.env.WHATSAPP_AUTOMATION_PROFILE || 'ai_tools_reseller',
+  whatsapp_automation_business_type: 'ai_tools',
+  whatsapp_automation_mode: 'structured_autopilot',
+  whatsapp_automation_first_reply_seconds: Number(process.env.WHATSAPP_AUTOMATION_FIRST_REPLY_SECONDS || 3),
+  whatsapp_automation_promo_weekly_limit: Number(process.env.WHATSAPP_AUTOMATION_PROMO_WEEKLY_LIMIT || 2),
+  whatsapp_automation_daily_broadcast_limit: Number(process.env.WHATSAPP_AUTOMATION_DAILY_BROADCAST_LIMIT || 250),
+  whatsapp_automation_delay_between_messages_sec: Number(process.env.WHATSAPP_AUTOMATION_DELAY_BETWEEN_MESSAGES_SEC || 8),
+  whatsapp_automation_followup_hours: [2, 24, 72],
+  whatsapp_automation_renewal_days: [7, 3, 1],
+  whatsapp_automation_use_cases: ['pricing', 'availability', 'orders', 'payment', 'warranty', 'renewal'],
+  whatsapp_automation_handoff_keywords: 'urgent,agent,human,complaint,refund,call,admin',
+  whatsapp_automation_opt_in_required: String(process.env.WHATSAPP_AUTOMATION_OPT_IN_REQUIRED || 'true').toLowerCase() !== 'false',
+  whatsapp_automation_dry_run_live_actions: String(process.env.WHATSAPP_AUTOMATION_DRY_RUN_LIVE_ACTIONS || 'true').toLowerCase() !== 'false',
+  whatsapp_automation_ai_reply_enabled: true,
+  whatsapp_automation_lead_scoring_enabled: true,
+  whatsapp_automation_payment_reminders_enabled: true,
+  whatsapp_automation_abandoned_recovery_enabled: true,
+  whatsapp_automation_renewal_enabled: true,
+  whatsapp_automation_after_sale_enabled: true,
+  whatsapp_automation_handoff_enabled: true,
+  whatsapp_automation_quiet_hours_enabled: true,
+  whatsapp_automation_quiet_hours_start: '22:00',
+  whatsapp_automation_quiet_hours_end: '09:00',
   performance_reach_mode: 'engagement',
   utility_window_hours: 24,
   account_rotation_enabled: true,
@@ -1863,6 +1887,30 @@ settings.product_extractor_enabled = settings.product_extractor_enabled ?? true;
 settings.marketing_api_enabled = settings.marketing_api_enabled ?? true;
 settings.marketing_default_ttl_hours = Math.max(1, Number(settings.marketing_default_ttl_hours || 24));
 settings.marketing_weekly_limit = Math.max(1, Number(settings.marketing_weekly_limit || 2));
+settings.whatsapp_automation_enabled = settings.whatsapp_automation_enabled ?? (String(process.env.WHATSAPP_AUTOMATION_ENABLED || 'true').toLowerCase() !== 'false');
+settings.whatsapp_automation_profile = settings.whatsapp_automation_profile || process.env.WHATSAPP_AUTOMATION_PROFILE || 'ai_tools_reseller';
+settings.whatsapp_automation_business_type = settings.whatsapp_automation_business_type || 'ai_tools';
+settings.whatsapp_automation_mode = settings.whatsapp_automation_mode || 'structured_autopilot';
+settings.whatsapp_automation_first_reply_seconds = Math.max(1, Math.min(120, Number(settings.whatsapp_automation_first_reply_seconds || process.env.WHATSAPP_AUTOMATION_FIRST_REPLY_SECONDS || 3)));
+settings.whatsapp_automation_promo_weekly_limit = Math.max(0, Math.min(14, Number(settings.whatsapp_automation_promo_weekly_limit || process.env.WHATSAPP_AUTOMATION_PROMO_WEEKLY_LIMIT || settings.marketing_weekly_limit || 2)));
+settings.whatsapp_automation_daily_broadcast_limit = Math.max(0, Math.min(5000, Number(settings.whatsapp_automation_daily_broadcast_limit || process.env.WHATSAPP_AUTOMATION_DAILY_BROADCAST_LIMIT || 250)));
+settings.whatsapp_automation_delay_between_messages_sec = Math.max(2, Math.min(300, Number(settings.whatsapp_automation_delay_between_messages_sec || process.env.WHATSAPP_AUTOMATION_DELAY_BETWEEN_MESSAGES_SEC || 8)));
+settings.whatsapp_automation_followup_hours = Array.isArray(settings.whatsapp_automation_followup_hours) ? settings.whatsapp_automation_followup_hours : [2, 24, 72];
+settings.whatsapp_automation_renewal_days = Array.isArray(settings.whatsapp_automation_renewal_days) ? settings.whatsapp_automation_renewal_days : [7, 3, 1];
+settings.whatsapp_automation_use_cases = Array.isArray(settings.whatsapp_automation_use_cases) ? settings.whatsapp_automation_use_cases : ['pricing', 'availability', 'orders', 'payment', 'warranty', 'renewal'];
+settings.whatsapp_automation_handoff_keywords = settings.whatsapp_automation_handoff_keywords || 'urgent,agent,human,complaint,refund,call,admin';
+settings.whatsapp_automation_opt_in_required = settings.whatsapp_automation_opt_in_required ?? (String(process.env.WHATSAPP_AUTOMATION_OPT_IN_REQUIRED || 'true').toLowerCase() !== 'false');
+settings.whatsapp_automation_dry_run_live_actions = settings.whatsapp_automation_dry_run_live_actions ?? (String(process.env.WHATSAPP_AUTOMATION_DRY_RUN_LIVE_ACTIONS || 'true').toLowerCase() !== 'false');
+settings.whatsapp_automation_ai_reply_enabled = settings.whatsapp_automation_ai_reply_enabled ?? true;
+settings.whatsapp_automation_lead_scoring_enabled = settings.whatsapp_automation_lead_scoring_enabled ?? true;
+settings.whatsapp_automation_payment_reminders_enabled = settings.whatsapp_automation_payment_reminders_enabled ?? true;
+settings.whatsapp_automation_abandoned_recovery_enabled = settings.whatsapp_automation_abandoned_recovery_enabled ?? true;
+settings.whatsapp_automation_renewal_enabled = settings.whatsapp_automation_renewal_enabled ?? true;
+settings.whatsapp_automation_after_sale_enabled = settings.whatsapp_automation_after_sale_enabled ?? true;
+settings.whatsapp_automation_handoff_enabled = settings.whatsapp_automation_handoff_enabled ?? true;
+settings.whatsapp_automation_quiet_hours_enabled = settings.whatsapp_automation_quiet_hours_enabled ?? true;
+settings.whatsapp_automation_quiet_hours_start = settings.whatsapp_automation_quiet_hours_start || '22:00';
+settings.whatsapp_automation_quiet_hours_end = settings.whatsapp_automation_quiet_hours_end || '09:00';
 settings.performance_reach_mode = settings.performance_reach_mode || 'engagement';
 settings.utility_window_hours = Math.max(1, Number(settings.utility_window_hours || 24));
 settings.account_rotation_enabled = settings.account_rotation_enabled ?? true;
@@ -9805,6 +9853,337 @@ Implementation rules:
 - Use PII/Secret Redactor before any external agent/model/tool call.
 - Keep runtime data in data/*.json and do not commit it.
 - Verify with GET /api/ai-algorithms/catalog, POST /api/ai-algorithms/recommend, POST /api/ai-algorithms/run, and node --check server.js.`;
+}
+
+const WHATSAPP_AUTOMATION_PRESETS = [
+  {
+    id: 'ai_tools_reseller',
+    label: 'AI Tools Reseller',
+    businessType: 'ai_tools',
+    description: 'Rates, availability, order flow, warranty support, renewal reminders, and dealer intelligence.',
+    settings: {
+      firstReplyTargetSeconds: 3,
+      promoWeeklyLimit: 2,
+      dailyBroadcastLimit: 250,
+      delayBetweenMessagesSec: 8,
+      tone: 'friendly_sales',
+      useCases: ['pricing', 'availability', 'orders', 'payment', 'warranty', 'renewal', 'dealer_rates'],
+      followupHours: [2, 24, 72],
+      renewalDays: [7, 3, 1]
+    }
+  },
+  {
+    id: 'founder_growth',
+    label: 'Founder Growth',
+    businessType: 'founder',
+    description: 'Lead capture, qualification, demo booking, founder updates, investor/client follow-ups.',
+    settings: {
+      firstReplyTargetSeconds: 3,
+      promoWeeklyLimit: 1,
+      dailyBroadcastLimit: 150,
+      delayBetweenMessagesSec: 10,
+      tone: 'professional_founder',
+      useCases: ['lead_capture', 'qualification', 'demo_booking', 'followup', 'handoff'],
+      followupHours: [2, 24, 72],
+      renewalDays: [14, 7, 3]
+    }
+  },
+  {
+    id: 'ecommerce_store',
+    label: 'Ecommerce Store',
+    businessType: 'ecommerce',
+    description: 'Product questions, cart recovery, COD confirmation, order tracking, back-in-stock alerts.',
+    settings: {
+      firstReplyTargetSeconds: 3,
+      promoWeeklyLimit: 2,
+      dailyBroadcastLimit: 500,
+      delayBetweenMessagesSec: 6,
+      tone: 'helpful_commerce',
+      useCases: ['catalog', 'cart_recovery', 'order_tracking', 'cod_confirm', 'stock_alert'],
+      followupHours: [2, 24, 48],
+      renewalDays: [7, 3, 1]
+    }
+  },
+  {
+    id: 'education_admissions',
+    label: 'Education / Admissions',
+    businessType: 'education',
+    description: 'Admissions FAQ, eligibility, form links, document guidance, deadline reminders.',
+    settings: {
+      firstReplyTargetSeconds: 5,
+      promoWeeklyLimit: 1,
+      dailyBroadcastLimit: 300,
+      delayBetweenMessagesSec: 8,
+      tone: 'clear_guidance',
+      useCases: ['admissions', 'eligibility', 'forms', 'deadlines', 'support'],
+      followupHours: [6, 24, 72],
+      renewalDays: [10, 5, 1]
+    }
+  },
+  {
+    id: 'real_estate',
+    label: 'Real Estate',
+    businessType: 'real_estate',
+    description: 'Lead qualification, budget/location matching, property media sharing, visit scheduling.',
+    settings: {
+      firstReplyTargetSeconds: 3,
+      promoWeeklyLimit: 2,
+      dailyBroadcastLimit: 200,
+      delayBetweenMessagesSec: 10,
+      tone: 'consultative_sales',
+      useCases: ['lead_capture', 'budget', 'location', 'visit_booking', 'followup'],
+      followupHours: [2, 24, 96],
+      renewalDays: [14, 7, 3]
+    }
+  },
+  {
+    id: 'support_center',
+    label: 'Support Center',
+    businessType: 'support',
+    description: 'Ticket triage, issue classification, SLA alerts, handoff, feedback and recovery.',
+    settings: {
+      firstReplyTargetSeconds: 10,
+      promoWeeklyLimit: 1,
+      dailyBroadcastLimit: 100,
+      delayBetweenMessagesSec: 6,
+      tone: 'empathetic_support',
+      useCases: ['faq', 'issue_triage', 'sla', 'handoff', 'feedback'],
+      followupHours: [4, 24, 72],
+      renewalDays: [7, 3, 1]
+    }
+  }
+];
+
+function normalizeStringList(value, fallback = []) {
+  if (Array.isArray(value)) return value.map(item => String(item || '').trim()).filter(Boolean);
+  if (typeof value === 'string') return value.split(/[,\n]/).map(item => item.trim()).filter(Boolean);
+  return Array.isArray(fallback) ? fallback : [];
+}
+
+function normalizeNumberList(value, fallback = []) {
+  return normalizeStringList(value, fallback).map(item => Number(item)).filter(item => Number.isFinite(item) && item >= 0);
+}
+
+function getWhatsAppAutomationPresets() {
+  return WHATSAPP_AUTOMATION_PRESETS.map(preset => ({
+    ...preset,
+    active: String(settings.whatsapp_automation_profile || 'ai_tools_reseller') === preset.id
+  }));
+}
+
+function getWhatsAppAutomationSettings() {
+  const preset = WHATSAPP_AUTOMATION_PRESETS.find(row => row.id === settings.whatsapp_automation_profile) || WHATSAPP_AUTOMATION_PRESETS[0];
+  const firstReplyTargetSeconds = Math.max(1, Math.min(120, Number(settings.whatsapp_automation_first_reply_seconds || preset.settings.firstReplyTargetSeconds || 3)));
+  const promoWeeklyLimit = Math.max(0, Math.min(14, Number(settings.whatsapp_automation_promo_weekly_limit ?? settings.marketing_weekly_limit ?? preset.settings.promoWeeklyLimit ?? 2)));
+  const dailyBroadcastLimit = Math.max(0, Math.min(5000, Number(settings.whatsapp_automation_daily_broadcast_limit || preset.settings.dailyBroadcastLimit || 250)));
+  const delayBetweenMessagesSec = Math.max(2, Math.min(300, Number(settings.whatsapp_automation_delay_between_messages_sec || preset.settings.delayBetweenMessagesSec || 8)));
+  const followupHours = normalizeNumberList(settings.whatsapp_automation_followup_hours, preset.settings.followupHours || [2, 24, 72]).slice(0, 8);
+  const renewalDays = normalizeNumberList(settings.whatsapp_automation_renewal_days, preset.settings.renewalDays || [7, 3, 1]).slice(0, 8);
+  const useCases = normalizeStringList(settings.whatsapp_automation_use_cases, preset.settings.useCases || []);
+  const handoffKeywords = normalizeStringList(settings.whatsapp_automation_handoff_keywords || 'urgent,agent,human,complaint,refund,call,admin');
+  const quietHoursStart = String(settings.whatsapp_automation_quiet_hours_start || '22:00').trim();
+  const quietHoursEnd = String(settings.whatsapp_automation_quiet_hours_end || '09:00').trim();
+  const waDiag = buildWAConnectionDiagnostics('default', { includeLogs: false });
+  const safeMode = {
+    optInRequired: settings.whatsapp_automation_opt_in_required !== false || settings.explicit_opt_in_required === true,
+    unsubscribeFooter: settings.unsubscribe_footer_enabled !== false,
+    structuredOnly: settings.ai_policy_mode !== 'open_ended' && settings.allow_open_ended_ai !== true,
+    dryRunLiveActions: settings.whatsapp_automation_dry_run_live_actions !== false,
+    maxPromosPerWeek: promoWeeklyLimit
+  };
+  const enabledFeatures = [
+    ['AI auto replies', settings.whatsapp_automation_ai_reply_enabled !== false],
+    ['Lead scoring', settings.whatsapp_automation_lead_scoring_enabled !== false],
+    ['Payment reminders', settings.whatsapp_automation_payment_reminders_enabled !== false],
+    ['Abandoned order recovery', settings.whatsapp_automation_abandoned_recovery_enabled !== false],
+    ['Renewal reminders', settings.whatsapp_automation_renewal_enabled !== false],
+    ['After-sale followups', settings.whatsapp_automation_after_sale_enabled !== false],
+    ['Human handoff', settings.whatsapp_automation_handoff_enabled !== false],
+    ['Voice note understanding', settings.voice_transcripts_enabled !== false && settings.audio_ai_reply_enabled !== false],
+    ['Media/document support', settings.product_extractor_enabled !== false],
+    ['Click hot-lead tracking', settings.click_hot_lead_enabled !== false]
+  ].map(([label, enabled]) => ({ label, enabled }));
+  return {
+    success: true,
+    profile: preset.id,
+    label: preset.label,
+    businessType: settings.whatsapp_automation_business_type || preset.businessType,
+    enabled: settings.whatsapp_automation_enabled !== false,
+    mode: settings.whatsapp_automation_mode || 'structured_autopilot',
+    firstReplyTargetSeconds,
+    promoWeeklyLimit,
+    dailyBroadcastLimit,
+    delayBetweenMessagesSec,
+    followupHours,
+    renewalDays,
+    useCases,
+    handoffKeywords,
+    quietHours: {
+      enabled: settings.whatsapp_automation_quiet_hours_enabled !== false,
+      start: quietHoursStart,
+      end: quietHoursEnd
+    },
+    safeMode,
+    enabledFeatures,
+    presets: getWhatsAppAutomationPresets(),
+    whatsapp: {
+      connected: waDiag.connected,
+      status: waDiag.status,
+      message: waDiag.message
+    },
+    sellableSummary: [
+      `${preset.label} preset`,
+      `${firstReplyTargetSeconds}s first reply target`,
+      `${promoWeeklyLimit}/week promo limit`,
+      `${followupHours.join(', ')} hour follow-up sequence`,
+      safeMode.optInRequired ? 'Opt-in compliance ON' : 'Opt-in compliance relaxed',
+      safeMode.structuredOnly ? 'Structured task bot mode' : 'Open AI mode'
+    ],
+    updatedAt: new Date().toISOString()
+  };
+}
+
+function applyWhatsAppAutomationPreset(input = {}) {
+  const presetId = String(input.preset || input.id || input.profile || 'ai_tools_reseller').trim().toLowerCase();
+  const preset = WHATSAPP_AUTOMATION_PRESETS.find(row => row.id === presetId);
+  if (!preset) throw new Error('Unknown WhatsApp automation preset.');
+  settings.whatsapp_automation_profile = preset.id;
+  settings.whatsapp_automation_business_type = preset.businessType;
+  settings.whatsapp_automation_enabled = input.enabled !== false;
+  settings.whatsapp_automation_mode = 'structured_autopilot';
+  settings.whatsapp_automation_first_reply_seconds = preset.settings.firstReplyTargetSeconds;
+  settings.whatsapp_automation_promo_weekly_limit = preset.settings.promoWeeklyLimit;
+  settings.whatsapp_automation_daily_broadcast_limit = preset.settings.dailyBroadcastLimit;
+  settings.whatsapp_automation_delay_between_messages_sec = preset.settings.delayBetweenMessagesSec;
+  settings.whatsapp_automation_followup_hours = preset.settings.followupHours;
+  settings.whatsapp_automation_renewal_days = preset.settings.renewalDays;
+  settings.whatsapp_automation_use_cases = preset.settings.useCases;
+  settings.ai_reply_tone = preset.settings.tone;
+  settings.ai_policy_mode = 'structured_only';
+  settings.allow_open_ended_ai = false;
+  settings.message_variation_enabled = true;
+  settings.click_hot_lead_enabled = true;
+  settings.reply_speed_tracking_enabled = true;
+  settings.marketing_weekly_limit = preset.settings.promoWeeklyLimit;
+  settings.unsubscribe_footer_enabled = true;
+  settings.whatsapp_automation_ai_reply_enabled = true;
+  settings.whatsapp_automation_lead_scoring_enabled = true;
+  settings.whatsapp_automation_payment_reminders_enabled = true;
+  settings.whatsapp_automation_abandoned_recovery_enabled = true;
+  settings.whatsapp_automation_renewal_enabled = true;
+  settings.whatsapp_automation_after_sale_enabled = true;
+  settings.whatsapp_automation_handoff_enabled = true;
+  settings.whatsapp_automation_opt_in_required = input.optInRequired !== false;
+  settings.explicit_opt_in_required = settings.whatsapp_automation_opt_in_required === true;
+  saveJSON('settings.json', settings);
+  return { success: true, preset, settings: getWhatsAppAutomationSettings() };
+}
+
+function updateWhatsAppAutomationSettings(input = {}) {
+  const current = getWhatsAppAutomationSettings();
+  const boolFields = {
+    enabled: 'whatsapp_automation_enabled',
+    aiReplyEnabled: 'whatsapp_automation_ai_reply_enabled',
+    leadScoringEnabled: 'whatsapp_automation_lead_scoring_enabled',
+    paymentRemindersEnabled: 'whatsapp_automation_payment_reminders_enabled',
+    abandonedRecoveryEnabled: 'whatsapp_automation_abandoned_recovery_enabled',
+    renewalEnabled: 'whatsapp_automation_renewal_enabled',
+    afterSaleEnabled: 'whatsapp_automation_after_sale_enabled',
+    handoffEnabled: 'whatsapp_automation_handoff_enabled',
+    optInRequired: 'whatsapp_automation_opt_in_required',
+    quietHoursEnabled: 'whatsapp_automation_quiet_hours_enabled',
+    dryRunLiveActions: 'whatsapp_automation_dry_run_live_actions'
+  };
+  for (const [inputKey, settingKey] of Object.entries(boolFields)) {
+    if (input[inputKey] !== undefined) settings[settingKey] = input[inputKey] === true;
+  }
+  if (input.businessType !== undefined) settings.whatsapp_automation_business_type = cleanOutgoingText(input.businessType);
+  if (input.mode !== undefined) settings.whatsapp_automation_mode = cleanOutgoingText(input.mode || 'structured_autopilot');
+  if (input.firstReplyTargetSeconds !== undefined) settings.whatsapp_automation_first_reply_seconds = Math.max(1, Math.min(120, Number(input.firstReplyTargetSeconds || current.firstReplyTargetSeconds)));
+  if (input.promoWeeklyLimit !== undefined) {
+    settings.whatsapp_automation_promo_weekly_limit = Math.max(0, Math.min(14, Number(input.promoWeeklyLimit || current.promoWeeklyLimit)));
+    settings.marketing_weekly_limit = settings.whatsapp_automation_promo_weekly_limit;
+  }
+  if (input.dailyBroadcastLimit !== undefined) settings.whatsapp_automation_daily_broadcast_limit = Math.max(0, Math.min(5000, Number(input.dailyBroadcastLimit || current.dailyBroadcastLimit)));
+  if (input.delayBetweenMessagesSec !== undefined) settings.whatsapp_automation_delay_between_messages_sec = Math.max(2, Math.min(300, Number(input.delayBetweenMessagesSec || current.delayBetweenMessagesSec)));
+  if (input.followupHours !== undefined) settings.whatsapp_automation_followup_hours = normalizeNumberList(input.followupHours, current.followupHours);
+  if (input.renewalDays !== undefined) settings.whatsapp_automation_renewal_days = normalizeNumberList(input.renewalDays, current.renewalDays);
+  if (input.useCases !== undefined) settings.whatsapp_automation_use_cases = normalizeStringList(input.useCases, current.useCases);
+  if (input.handoffKeywords !== undefined) settings.whatsapp_automation_handoff_keywords = normalizeStringList(input.handoffKeywords, current.handoffKeywords).join(',');
+  if (input.quietHoursStart !== undefined) settings.whatsapp_automation_quiet_hours_start = String(input.quietHoursStart || current.quietHours.start).trim();
+  if (input.quietHoursEnd !== undefined) settings.whatsapp_automation_quiet_hours_end = String(input.quietHoursEnd || current.quietHours.end).trim();
+  if (settings.whatsapp_automation_opt_in_required !== undefined) settings.explicit_opt_in_required = settings.whatsapp_automation_opt_in_required === true;
+  saveJSON('settings.json', settings);
+  return getWhatsAppAutomationSettings();
+}
+
+function buildWhatsAppAutomationTestReply(input = {}) {
+  const cfg = getWhatsAppAutomationSettings();
+  const message = cleanOutgoingText(input.message || 'price kya hai?');
+  const lower = message.toLowerCase();
+  let intent = 'general';
+  let reply = `Assalam o Alaikum! Main ${cfg.label} automation se help kar raha hoon. Aap apni requirement bhej dein, main best option share karta hoon.`;
+  if (/price|rate|rs|kitna|qeemat|قیمت/i.test(lower)) {
+    intent = 'price';
+    reply = 'Bilkul. Aap ko rates/price chahiye. Main available plans, price aur stock status share kar deta hoon.';
+  } else if (/available|stock|slot|hai\?|hy\?/i.test(lower)) {
+    intent = 'availability';
+    reply = 'Availability check kar raha hoon. Jo item in stock ho ga us ka price aur delivery time share kar deta hoon.';
+  } else if (/order|buy| lena| chahiye|payment/i.test(lower)) {
+    intent = 'order';
+    reply = 'Order ke liye pehle plan confirm karein. Phir payment details milengi, payment verify hotay hi delivery ho jayegi.';
+  } else if (/issue|problem|not working|support|warranty/i.test(lower)) {
+    intent = 'support';
+    reply = 'Issue note kar liya. Main warranty/support policy check kar ke solution ya admin handoff arrange karta hoon.';
+  } else if (/bot|automation|website|system/i.test(lower)) {
+    intent = 'bot_service';
+    reply = 'Aap automation/bot service chahte hain. Main business type, daily messages aur required features collect kar leta hoon.';
+  }
+  const leadScore = cfg.enabledFeatures.find(row => row.label === 'Lead scoring')?.enabled
+    ? Math.min(100, 40 + (intent === 'order' ? 35 : intent === 'price' ? 25 : intent === 'support' ? 20 : 10))
+    : null;
+  return {
+    success: true,
+    dryRun: true,
+    input: message,
+    intent,
+    leadScore,
+    reply: `${reply}\n\n${cfg.safeMode.unsubscribeFooter ? (settings.unsubscribe_footer || 'Reply STOP to unsubscribe.') : ''}`.trim(),
+    settings: cfg
+  };
+}
+
+function buildWhatsAppAutomationSettingsReply() {
+  const cfg = getWhatsAppAutomationSettings();
+  const features = cfg.enabledFeatures.map(row => `${row.enabled ? '✅' : '❌'} ${row.label}`).join('\n');
+  const presets = cfg.presets.map(row => `${row.active ? '➡️' : '•'} ${row.id} — ${row.label}`).join('\n');
+  return `⚙️ *WhatsApp Automation Settings*
+
+Status: *${cfg.enabled ? 'ON' : 'OFF'}*
+Profile: *${cfg.label}*
+Business type: *${cfg.businessType}*
+Reply target: *${cfg.firstReplyTargetSeconds}s*
+Promo limit: *${cfg.promoWeeklyLimit}/week*
+Daily broadcast cap: *${cfg.dailyBroadcastLimit}*
+Follow-ups: *${cfg.followupHours.join('h, ')}h*
+Renewals: *${cfg.renewalDays.join(', ')} days*
+Opt-in: *${cfg.safeMode.optInRequired ? 'ON' : 'OFF'}*
+Mode: *${cfg.safeMode.structuredOnly ? 'structured task bot' : 'open AI'}*
+
+*Features*
+${features}
+
+*Presets*
+${presets}
+
+Commands:
+*!waauto on*
+*!waauto off*
+*!waauto preset ecommerce_store*
+*!waauto test price kya hai*
+
+Dashboard:
+http://localhost:3001/wa-automation-settings`;
 }
 
 function getAiAutomationStatus() {
@@ -18517,6 +18896,181 @@ pre{white-space:pre-wrap;background:#081018;border-radius:10px;padding:14px;over
 </main></body></html>`);
   } catch (error) {
     res.status(500).send(error.message);
+  }
+});
+
+app.get('/api/wa/automation-settings', (_req, res) => {
+  try {
+    res.json(getWhatsAppAutomationSettings());
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/whatsapp/automation-settings', (_req, res) => {
+  try {
+    res.json(getWhatsAppAutomationSettings());
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/wa/automation-settings', (req, res) => {
+  try {
+    res.json({ success: true, settings: updateWhatsAppAutomationSettings(req.body || {}) });
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/whatsapp/automation-settings', (req, res) => {
+  try {
+    res.json({ success: true, settings: updateWhatsAppAutomationSettings(req.body || {}) });
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/wa/automation-settings/preset', (req, res) => {
+  try {
+    res.json(applyWhatsAppAutomationPreset(req.body || {}));
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/wa/automation-settings/test-reply', (req, res) => {
+  try {
+    res.json(buildWhatsAppAutomationTestReply(req.body || {}));
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/wa-automation-settings', (_req, res) => {
+  try {
+    const cfg = getWhatsAppAutomationSettings();
+    const presetCards = cfg.presets.map(preset => `<article class="card preset ${preset.active ? 'active' : ''}">
+      <div class="row"><h3>${htmlEscape(preset.label)}</h3><span class="pill ${preset.active ? 'ok' : 'warn'}">${preset.active ? 'Active' : 'Preset'}</span></div>
+      <p>${htmlEscape(preset.description)}</p>
+      <small>${htmlEscape((preset.settings.useCases || []).join(', '))}</small>
+      <button onclick="applyPreset('${htmlEscape(preset.id)}')">Use Preset</button>
+    </article>`).join('');
+    const featureRows = cfg.enabledFeatures.map(feature => `<tr>
+      <td>${htmlEscape(feature.label)}</td>
+      <td><span class="pill ${feature.enabled ? 'ok' : 'warn'}">${feature.enabled ? 'ON' : 'OFF'}</span></td>
+    </tr>`).join('');
+    res.type('html').send(`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WhatsApp Automation Settings</title>
+<style>
+body{font-family:Inter,Arial,sans-serif;background:#071014;color:#eaf7f3;margin:0;padding:24px;line-height:1.45}
+.top{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap;margin-bottom:18px}
+h1,h2,h3{margin-top:0}.muted,small{color:#9fb3c8}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin:16px 0}
+.card{background:#13212b;border:1px solid #284150;border-radius:14px;padding:16px}.preset.active{border-color:#10b981;box-shadow:0 0 0 1px rgba(16,185,129,.35)}
+.value{font-size:30px;font-weight:900;color:#19c79a}.row{display:flex;justify-content:space-between;gap:10px;align-items:center}
+label{display:block;color:#b8d8ee;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;margin:12px 0 6px}
+input,select,textarea{width:100%;box-sizing:border-box;padding:10px;border-radius:9px;border:1px solid #284150;background:#081018;color:#eaf7f3}
+textarea{min-height:92px}button,.btn{background:#10b981;color:#06120d;border:0;border-radius:9px;padding:10px 13px;font-weight:850;text-decoration:none;cursor:pointer;margin-top:10px}.secondary{background:#223442;color:#d8f3ff}
+.pill{display:inline-flex;border-radius:999px;padding:4px 9px;font-size:12px;font-weight:850}.ok{background:#063d31;color:#6ee7b7}.warn{background:#3d3210;color:#fde68a}
+table{width:100%;border-collapse:collapse;background:#101d26;border:1px solid #263946;border-radius:14px;overflow:hidden;margin-top:14px}
+th,td{text-align:left;padding:12px;border-bottom:1px solid #263946;vertical-align:top}th{background:#162734;color:#b8d8ee}
+pre{white-space:pre-wrap;background:#081018;border:1px solid #263946;border-radius:12px;padding:14px;overflow:auto}
+</style></head><body><main>
+  <div class="top">
+    <div><h1>WhatsApp Automation Settings</h1><p class="muted">Reusable automation presets for AI tools, founders, ecommerce, education, real estate, and support businesses.</p></div>
+    <div><a class="btn secondary" href="/">Dashboard</a> <a class="btn secondary" href="/wa-qr">WhatsApp QR</a> <a class="btn secondary" href="/api/wa/automation-settings">JSON</a></div>
+  </div>
+  <section class="grid">
+    <div class="card"><div class="muted">Automation</div><div class="value">${cfg.enabled ? 'ON' : 'OFF'}</div><button onclick="toggleEnabled(${cfg.enabled ? 'false' : 'true'})">${cfg.enabled ? 'Turn Off' : 'Turn On'}</button></div>
+    <div class="card"><div class="muted">Profile</div><div class="value">${htmlEscape(cfg.label)}</div><small>${htmlEscape(cfg.businessType)}</small></div>
+    <div class="card"><div class="muted">First Reply Target</div><div class="value">${Number(cfg.firstReplyTargetSeconds)}s</div><small>3 second reply keeps hot leads warm.</small></div>
+    <div class="card"><div class="muted">Safety Policy</div><div class="value">${cfg.safeMode.optInRequired ? 'OPT-IN' : 'RELAXED'}</div><small>${cfg.safeMode.structuredOnly ? 'Structured task bot mode' : 'Open AI mode'}</small></div>
+  </section>
+  <h2>Business Presets</h2>
+  <section class="grid">${presetCards}</section>
+  <section class="grid">
+    <div class="card">
+      <h2>Core Controls</h2>
+      <label>Business Type</label><input id="businessType" value="${htmlEscape(cfg.businessType)}">
+      <label>First Reply Seconds</label><input id="firstReply" type="number" min="1" max="120" value="${Number(cfg.firstReplyTargetSeconds)}">
+      <label>Promo Weekly Limit</label><input id="promoLimit" type="number" min="0" max="14" value="${Number(cfg.promoWeeklyLimit)}">
+      <label>Daily Broadcast Cap</label><input id="dailyLimit" type="number" min="0" max="5000" value="${Number(cfg.dailyBroadcastLimit)}">
+      <label>Delay Between Messages (seconds)</label><input id="delaySec" type="number" min="2" max="300" value="${Number(cfg.delayBetweenMessagesSec)}">
+      <label>Follow-up Hours</label><input id="followups" value="${htmlEscape(cfg.followupHours.join(', '))}">
+      <label>Renewal Reminder Days</label><input id="renewals" value="${htmlEscape(cfg.renewalDays.join(', '))}">
+      <label>Handoff Keywords</label><input id="handoff" value="${htmlEscape(cfg.handoffKeywords.join(', '))}">
+      <button onclick="saveSettings()">Save Settings</button>
+    </div>
+    <div class="card">
+      <h2>Safe Selling Rules</h2>
+      <label><input id="optIn" type="checkbox" ${cfg.safeMode.optInRequired ? 'checked' : ''} style="width:auto"> Explicit opt-in required</label>
+      <label><input id="aiReply" type="checkbox" ${cfg.enabledFeatures.find(row => row.label === 'AI auto replies')?.enabled ? 'checked' : ''} style="width:auto"> AI auto replies</label>
+      <label><input id="leadScoring" type="checkbox" ${cfg.enabledFeatures.find(row => row.label === 'Lead scoring')?.enabled ? 'checked' : ''} style="width:auto"> Lead scoring</label>
+      <label><input id="paymentReminders" type="checkbox" ${cfg.enabledFeatures.find(row => row.label === 'Payment reminders')?.enabled ? 'checked' : ''} style="width:auto"> Payment reminders</label>
+      <label><input id="abandonedRecovery" type="checkbox" ${cfg.enabledFeatures.find(row => row.label === 'Abandoned order recovery')?.enabled ? 'checked' : ''} style="width:auto"> Abandoned order recovery</label>
+      <label><input id="renewalEnabled" type="checkbox" ${cfg.enabledFeatures.find(row => row.label === 'Renewal reminders')?.enabled ? 'checked' : ''} style="width:auto"> Renewal reminders</label>
+      <label><input id="afterSale" type="checkbox" ${cfg.enabledFeatures.find(row => row.label === 'After-sale followups')?.enabled ? 'checked' : ''} style="width:auto"> After-sale followups</label>
+      <label><input id="handoffEnabled" type="checkbox" ${cfg.enabledFeatures.find(row => row.label === 'Human handoff')?.enabled ? 'checked' : ''} style="width:auto"> Human handoff</label>
+      <table><thead><tr><th>Feature</th><th>Status</th></tr></thead><tbody>${featureRows}</tbody></table>
+    </div>
+    <div class="card">
+      <h2>Reply Simulator</h2>
+      <textarea id="testMessage">price kya hai?</textarea>
+      <button onclick="testReply()">Preview Reply</button>
+      <pre id="testOutput">${htmlEscape(JSON.stringify(buildWhatsAppAutomationTestReply({ message: 'price kya hai?' }), null, 2))}</pre>
+      <h3>WhatsApp Admin Commands</h3>
+      <pre>!waauto
+!waauto on
+!waauto off
+!waauto preset ecommerce_store
+!waauto test price kya hai</pre>
+    </div>
+  </section>
+</main>
+<script>
+async function postJson(url, payload){
+  const response = await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  const data = await response.json();
+  if(!data.success) throw new Error(data.error || 'Request failed');
+  return data;
+}
+async function applyPreset(preset){
+  await postJson('/api/wa/automation-settings/preset',{preset,source:'dashboard'});
+  location.reload();
+}
+async function toggleEnabled(enabled){
+  await postJson('/api/wa/automation-settings',{enabled});
+  location.reload();
+}
+async function saveSettings(){
+  const payload = {
+    businessType: document.getElementById('businessType').value,
+    firstReplyTargetSeconds: Number(document.getElementById('firstReply').value),
+    promoWeeklyLimit: Number(document.getElementById('promoLimit').value),
+    dailyBroadcastLimit: Number(document.getElementById('dailyLimit').value),
+    delayBetweenMessagesSec: Number(document.getElementById('delaySec').value),
+    followupHours: document.getElementById('followups').value,
+    renewalDays: document.getElementById('renewals').value,
+    handoffKeywords: document.getElementById('handoff').value,
+    optInRequired: document.getElementById('optIn').checked,
+    aiReplyEnabled: document.getElementById('aiReply').checked,
+    leadScoringEnabled: document.getElementById('leadScoring').checked,
+    paymentRemindersEnabled: document.getElementById('paymentReminders').checked,
+    abandonedRecoveryEnabled: document.getElementById('abandonedRecovery').checked,
+    renewalEnabled: document.getElementById('renewalEnabled').checked,
+    afterSaleEnabled: document.getElementById('afterSale').checked,
+    handoffEnabled: document.getElementById('handoffEnabled').checked
+  };
+  await postJson('/api/wa/automation-settings', payload);
+  alert('WhatsApp automation settings saved');
+  location.reload();
+}
+async function testReply(){
+  const data = await postJson('/api/wa/automation-settings/test-reply',{message:document.getElementById('testMessage').value,source:'dashboard'});
+  document.getElementById('testOutput').innerText = JSON.stringify(data, null, 2);
+}
+</script></body></html>`);
+  } catch (error) {
+    res.status(500).send(`WhatsApp Automation Settings failed: ${htmlEscape(error.message)}`);
   }
 });
 
@@ -27867,7 +28421,7 @@ function splitSocialCommandArgs(text = '') {
 }
 
 function isWhatsAppSocialCommand(text = '') {
-  return /^!(social|connect|post|draft|approvepost|sharepost|poststatus|comment|telegram|control|admin|menuadmin|server|status|health|watchdog|next50|antigravity|aihub|automationhub|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelfix|channelwatch|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
+  return /^!(social|connect|post|draft|approvepost|sharepost|poststatus|comment|telegram|control|admin|menuadmin|server|status|health|watchdog|next50|antigravity|aihub|automationhub|waauto|automation|autosettings|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelfix|channelwatch|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
 }
 
 function adminNumberCandidates() {
@@ -29023,6 +29577,39 @@ async function handleWhatsAppSocialAdminCommand(ctx = {}) {
 
     if (command === '!aihub' || command === '!automationhub') {
       await reply(buildAiAutomationHubReply());
+      return true;
+    }
+
+    if (command === '!waauto' || command === '!automation' || command === '!autosettings') {
+      const mode = String(args[1] || 'status').toLowerCase();
+      if (['on', 'enable', 'enabled'].includes(mode)) {
+        updateWhatsAppAutomationSettings({ enabled: true });
+        await reply(`✅ *WhatsApp Automation ON*\n\n${buildWhatsAppAutomationSettingsReply()}`);
+        return true;
+      }
+      if (['off', 'disable', 'disabled'].includes(mode)) {
+        updateWhatsAppAutomationSettings({ enabled: false });
+        await reply(`⏸️ *WhatsApp Automation OFF*\n\n${buildWhatsAppAutomationSettingsReply()}`);
+        return true;
+      }
+      if (['preset', 'profile'].includes(mode)) {
+        const preset = String(args[2] || '').trim();
+        if (!preset) {
+          const presets = getWhatsAppAutomationPresets().map(row => `• ${row.id} — ${row.label}`).join('\n');
+          await reply(`Format:\n*!waauto preset ecommerce_store*\n\nAvailable presets:\n${presets}`);
+          return true;
+        }
+        const result = applyWhatsAppAutomationPreset({ preset, source: 'whatsapp_admin' });
+        await reply(`✅ *Preset Applied*\n${result.preset.label}\n\n${buildWhatsAppAutomationSettingsReply()}`);
+        return true;
+      }
+      if (['test', 'preview'].includes(mode)) {
+        const message = args.slice(2).join(' ').trim() || 'price kya hai?';
+        const result = buildWhatsAppAutomationTestReply({ message, source: 'whatsapp_admin' });
+        await reply(`🧪 *Automation Reply Preview*\nIntent: *${result.intent}*\nLead score: *${result.leadScore ?? '-'}*\n\n${result.reply}`);
+        return true;
+      }
+      await reply(buildWhatsAppAutomationSettingsReply());
       return true;
     }
 
