@@ -197,6 +197,10 @@ Main APIs:
 ```text
 GET  /api/ai-automation/status
 GET  /api/ai-automation/repos
+GET  /api/ai-automation/repo-catalog
+POST /api/ai-automation/repo-plan
+POST /api/ai-automation/repo-import
+GET  /api/ai-automation/repo-catalog-prompt
 GET  /api/ai-automation/agent-registry
 POST /api/ai-automation/agent-registry
 POST /api/ai-automation/agent-task-plan
@@ -232,6 +236,9 @@ AGENTIC_SKILLS_ENABLED=true
 AGENTIC_SKILLS_DRY_RUN_DEFAULT=true
 AGENTIC_MISSIONS_ENABLED=true
 AGENTIC_MISSIONS_REQUIRE_APPROVAL=true
+AGENTIC_REPO_IMPORTS_ENABLED=true
+AGENTIC_REPO_IMPORT_DRY_RUN_DEFAULT=true
+AGENTIC_REPO_ALLOW_VENDOR_COPY=false
 ```
 
 Built-in Agentic Skill Packs:
@@ -279,12 +286,38 @@ curl -X POST http://localhost:3001/api/ai-automation/missions/MISSION_ID/run \
   -d "{\"dryRun\":true,\"source\":\"admin\"}"
 ```
 
+Public Repo Import Center:
+
+SuperSender Pro includes a safe public repo catalog for agentic AI, ecommerce, social scheduling, scraping, monitoring, support inboxes, MCP, and browser automation. Repos are used as blueprints/adapters first. The system queues integration plans and dry-runs instead of blindly copying third-party code into production.
+
+Included catalog examples:
+
+- OpenHands, Hermes Agent, OpenClaw, CrewAI, LangGraph, Browser Use, n8n.
+- OpenAI Agents JS/Python, AutoGen, Agent Browser, Bytebot, Crawlee, Firecrawl.
+- Composio, MCP Servers, Awesome MCP Servers, PraisonAI, SuperAGI, AutoGPT, AgentGPT.
+- Chatwoot, Postiz, Langfuse, Opik, Helicone, Uptime Kuma, Flowise, Langflow, Dify.
+
+Useful API calls:
+
+```bash
+curl http://localhost:3001/api/ai-automation/repo-catalog
+
+curl -X POST http://localhost:3001/api/ai-automation/repo-plan \
+  -H "Content-Type: application/json" \
+  -d "{\"repo\":\"crewai\",\"goal\":\"Build ecommerce automation agents\"}"
+
+curl -X POST http://localhost:3001/api/ai-automation/repo-import \
+  -H "Content-Type: application/json" \
+  -d "{\"repo\":\"firecrawl\",\"dryRun\":true,\"source\":\"admin\"}"
+```
+
 Safe operating rules:
 
 - Do not send `.env`, WhatsApp sessions, customer logs, or API tokens to external agents.
 - Keep every live-posting/payment/WhatsApp action in dry-run until admin approves it.
 - Use `/api/ai-automation/agent-task-plan` before wiring a new agent so the system records safety steps and missing env keys.
 - Custom agents are stored in `data/agenticAgentRegistry.json`; this runtime file should not be committed.
+- Public repo import queue is stored in `data/agenticRepoImportQueue.json`; this runtime file should not be committed.
 
 ## Facebook, Instagram, and LinkedIn Setup
 

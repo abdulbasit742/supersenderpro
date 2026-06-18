@@ -9106,6 +9106,49 @@ const AGENTIC_SKILL_PACKS = [
   }
 ];
 
+const AGENTIC_PUBLIC_REPO_CATALOG = [
+  { slug: 'openhands', name: 'OpenHands', repo: 'OpenHands/OpenHands', url: 'https://github.com/OpenHands/OpenHands', category: 'developer-agent', mode: 'external-worker', priority: 1, risk: 'medium', bestUse: 'Internal build agent, bug fixing, repo maintenance, testing, and developer automation.', env: ['OPENHANDS_WORKER_URL', 'OPENHANDS_API_KEY'], skillPack: 'dev-maintainer' },
+  { slug: 'hermes-agent', name: 'Hermes Agent', repo: 'NousResearch/hermes-agent', url: 'https://github.com/NousResearch/hermes-agent', category: 'self-improving-agent', mode: 'external-gateway', priority: 2, risk: 'medium', bestUse: 'Long-running memory, self-improvement, customer-history learning, and prompt evolution.', env: ['HERMES_AGENT_URL', 'HERMES_AGENT_API_KEY'], skillPack: 'support-recovery' },
+  { slug: 'openclaw', name: 'OpenClaw', repo: 'openclaw/openclaw', url: 'https://github.com/openclaw/openclaw', category: 'personal-operator', mode: 'external-gateway', priority: 3, risk: 'medium', bestUse: 'Personal business operator for WhatsApp-style admin commands, local tools, memory, and workflows.', env: ['OPENCLAW_GATEWAY_URL', 'OPENCLAW_API_KEY'], skillPack: 'channel-publisher-copilot' },
+  { slug: 'crewai', name: 'CrewAI', repo: 'crewAIInc/crewAI', url: 'https://github.com/crewAIInc/crewAI', category: 'multi-agent', mode: 'external-worker', priority: 4, risk: 'medium', bestUse: 'Multi-agent team for sales, scraping, support, compliance, captions, and growth tasks.', env: ['CREWAI_WORKER_URL'], skillPack: 'ecommerce-autopilot' },
+  { slug: 'langgraph', name: 'LangGraph', repo: 'langchain-ai/langgraph', url: 'https://github.com/langchain-ai/langgraph', category: 'state-machine-agent', mode: 'external-worker', priority: 5, risk: 'low', bestUse: 'Stateful order/payment/support/renewal workflow graphs with retries and memory.', env: ['LANGGRAPH_WORKER_URL'], skillPack: 'dealer-intelligence' },
+  { slug: 'browser-use', name: 'Browser Use', repo: 'browser-use/browser-use', url: 'https://github.com/browser-use/browser-use', category: 'browser-automation', mode: 'external-worker', priority: 6, risk: 'medium', bestUse: 'Website automation, source verification, scraping, screenshots, and form-filling workers.', env: ['BROWSER_USE_WORKER_URL'], skillPack: 'scholarship-scout' },
+  { slug: 'n8n', name: 'n8n', repo: 'n8n-io/n8n', url: 'https://github.com/n8n-io/n8n', category: 'workflow-automation', mode: 'webhook-workflow', priority: 7, risk: 'medium', bestUse: 'Visual workflows for orders, payment alerts, Google Sheets, Slack, broadcasts, and approvals.', env: ['N8N_WEBHOOK_URL', 'N8N_WEBHOOK_SECRET'], skillPack: 'payment-verifier' },
+  { slug: 'openai-agents-js', name: 'OpenAI Agents JS', repo: 'openai/openai-agents-js', url: 'https://github.com/openai/openai-agents-js', category: 'node-agent-sdk', mode: 'runtime-sdk', priority: 8, risk: 'low', bestUse: 'Native Node/JS agents for SuperSender backend workflows and tool orchestration.', env: ['OPENAI_API_KEY'], skillPack: 'support-recovery' },
+  { slug: 'openai-agents-python', name: 'OpenAI Agents Python', repo: 'openai/openai-agents-python', url: 'https://github.com/openai/openai-agents-python', category: 'python-agent-sdk', mode: 'python-worker', priority: 9, risk: 'low', bestUse: 'Python worker agents for heavier AI tasks, scraping analysis, evals, and tools.', env: ['OPENAI_API_KEY', 'PYTHON_AGENT_WORKER_URL'], skillPack: 'scholarship-scout' },
+  { slug: 'autogen', name: 'Microsoft AutoGen', repo: 'microsoft/autogen', url: 'https://github.com/microsoft/autogen', category: 'multi-agent', mode: 'external-worker', priority: 10, risk: 'medium', bestUse: 'Enterprise multi-agent conversations, human-in-loop, planning, and tool collaboration.', env: ['AUTOGEN_WORKER_URL'], skillPack: 'dev-maintainer' },
+  { slug: 'agent-browser', name: 'Vercel Agent Browser', repo: 'vercel-labs/agent-browser', url: 'https://github.com/vercel-labs/agent-browser', category: 'browser-automation', mode: 'cli-worker', priority: 11, risk: 'low', bestUse: 'Agent browser checks for dashboard verification and web workflows.', env: ['AGENT_BROWSER_WORKER_URL'], skillPack: 'scholarship-scout' },
+  { slug: 'bytebot', name: 'Bytebot', repo: 'bytebot-ai/bytebot', url: 'https://github.com/bytebot-ai/bytebot', category: 'computer-use', mode: 'external-worker', priority: 12, risk: 'high', bestUse: 'Self-hosted computer-use automation for operator-only tasks.', env: ['BYTEBOT_WORKER_URL'], skillPack: 'dev-maintainer' },
+  { slug: 'open-computer-use', name: 'Open Computer Use', repo: 'coasty-ai/open-computer-use', url: 'https://github.com/coasty-ai/open-computer-use', category: 'computer-use', mode: 'research-blueprint', priority: 13, risk: 'high', bestUse: 'Local machine automation concepts for guarded operator mode.', env: ['COMPUTER_USE_WORKER_URL'], skillPack: 'dev-maintainer' },
+  { slug: 'windows-agent-arena', name: 'Windows Agent Arena', repo: 'microsoft/WindowsAgentArena', url: 'https://github.com/microsoft/WindowsAgentArena', category: 'windows-agent-eval', mode: 'research-blueprint', priority: 14, risk: 'medium', bestUse: 'Windows task evaluation ideas for your local operator workflows.', env: [], skillPack: 'dev-maintainer' },
+  { slug: 'trycua-acu', name: 'trycua ACU', repo: 'trycua/acu', url: 'https://github.com/trycua/acu', category: 'computer-use-directory', mode: 'directory', priority: 15, risk: 'low', bestUse: 'Computer-use agent resources and implementation ideas.', env: [], skillPack: 'dev-maintainer' },
+  { slug: 'crawlee', name: 'Crawlee', repo: 'apify/crawlee', url: 'https://github.com/apify/crawlee', category: 'crawler', mode: 'worker-blueprint', priority: 16, risk: 'low', bestUse: 'Queue-based scraping, retries, proxy-aware crawling, and scheduled source checks.', env: ['CRAWLEE_WORKER_URL'], skillPack: 'scholarship-scout' },
+  { slug: 'firecrawl', name: 'Firecrawl', repo: 'mendableai/firecrawl', url: 'https://github.com/mendableai/firecrawl', category: 'web-extraction', mode: 'api-adapter', priority: 17, risk: 'low', bestUse: 'Website to clean markdown/data extraction for scholarships, products, and competitor pages.', env: ['FIRECRAWL_API_KEY'], skillPack: 'scholarship-scout' },
+  { slug: 'composio', name: 'Composio', repo: 'ComposioHQ/composio', url: 'https://github.com/ComposioHQ/composio', category: 'agent-tools', mode: 'connector-gateway', priority: 18, risk: 'medium', bestUse: 'Large tool connector set for future agent actions and SaaS integrations.', env: ['COMPOSIO_API_KEY'], skillPack: 'social-growth-engine' },
+  { slug: 'mcp-servers', name: 'MCP Servers', repo: 'modelcontextprotocol/servers', url: 'https://github.com/modelcontextprotocol/servers', category: 'mcp', mode: 'connector-blueprint', priority: 19, risk: 'low', bestUse: 'Official MCP server examples for filesystem, GitHub, fetch, and database connectors.', env: [], skillPack: 'dev-maintainer' },
+  { slug: 'awesome-mcp-servers', name: 'Awesome MCP Servers', repo: 'punkpeye/awesome-mcp-servers', url: 'https://github.com/punkpeye/awesome-mcp-servers', category: 'mcp-directory', mode: 'directory', priority: 20, risk: 'low', bestUse: 'Find new MCP connectors for Sheets, Notion, Slack, browser, and databases.', env: [], skillPack: 'social-growth-engine' },
+  { slug: 'praisonai', name: 'PraisonAI', repo: 'MervinPraison/PraisonAI', url: 'https://github.com/MervinPraison/PraisonAI', category: 'multi-agent-platform', mode: 'external-worker', priority: 21, risk: 'medium', bestUse: '24/7 multi-agent workforce with memory and RAG concepts.', env: ['PRAISONAI_WORKER_URL'], skillPack: 'support-recovery' },
+  { slug: 'superagi', name: 'SuperAGI', repo: 'TransformerOptimus/SuperAGI', url: 'https://github.com/TransformerOptimus/SuperAGI', category: 'autonomous-agent-platform', mode: 'architecture-pattern', priority: 22, risk: 'medium', bestUse: 'Autonomous agent platform ideas, tool permissions, and agent dashboard patterns.', env: ['SUPERAGI_WORKER_URL'], skillPack: 'dev-maintainer' },
+  { slug: 'autogpt', name: 'AutoGPT', repo: 'Significant-Gravitas/AutoGPT', url: 'https://github.com/Significant-Gravitas/AutoGPT', category: 'autonomous-agent', mode: 'architecture-pattern', priority: 23, risk: 'medium', bestUse: 'Autonomous task loops, planning, tool use, and guardrail ideas.', env: ['AUTOGPT_WORKER_URL'], skillPack: 'dev-maintainer' },
+  { slug: 'agentgpt', name: 'AgentGPT', repo: 'reworkd/AgentGPT', url: 'https://github.com/reworkd/AgentGPT', category: 'agent-ui', mode: 'ui-pattern', priority: 24, risk: 'medium', bestUse: 'Autonomous agent UI and goal-to-task flow ideas.', env: [], skillPack: 'social-growth-engine' },
+  { slug: 'babyagi', name: 'BabyAGI', repo: 'yoheinakajima/babyagi', url: 'https://github.com/yoheinakajima/babyagi', category: 'task-loop', mode: 'algorithm-pattern', priority: 25, risk: 'low', bestUse: 'Task creation, prioritization, and autonomous backlog loop patterns.', env: [], skillPack: 'dev-maintainer' },
+  { slug: 'metagpt', name: 'MetaGPT', repo: 'geekan/MetaGPT', url: 'https://github.com/geekan/MetaGPT', category: 'software-company-agents', mode: 'external-worker', priority: 26, risk: 'medium', bestUse: 'Multi-role software team agents for larger feature planning and implementation.', env: ['METAGPT_WORKER_URL'], skillPack: 'dev-maintainer' },
+  { slug: 'openlegion', name: 'OpenLegion', repo: 'openlegion-ai/openlegion', url: 'https://github.com/openlegion-ai/openlegion', category: 'agent-orchestration', mode: 'research-blueprint', priority: 27, risk: 'medium', bestUse: 'Agent team orchestration ideas for business workflows.', env: ['OPENLEGION_WORKER_URL'], skillPack: 'social-growth-engine' },
+  { slug: 'n8n-claw', name: 'n8n-claw', repo: 'freddy-schuetz/n8n-claw', url: 'https://github.com/freddy-schuetz/n8n-claw', category: 'openclaw-n8n', mode: 'workflow-blueprint', priority: 28, risk: 'medium', bestUse: 'OpenClaw-like autonomous flows inside n8n.', env: ['N8N_WEBHOOK_URL'], skillPack: 'channel-publisher-copilot' },
+  { slug: 'awesome-hermes-agent', name: 'Awesome Hermes Agent', repo: '0xNyk/awesome-hermes-agent', url: 'https://github.com/0xNyk/awesome-hermes-agent', category: 'hermes-directory', mode: 'directory', priority: 29, risk: 'low', bestUse: 'Hermes-related tools and templates for learning agents.', env: [], skillPack: 'support-recovery' },
+  { slug: 'awesome-openclaw-agents', name: 'Awesome OpenClaw Agents', repo: 'mergisi/awesome-openclaw-agents', url: 'https://github.com/mergisi/awesome-openclaw-agents', category: 'openclaw-directory', mode: 'template-directory', priority: 30, risk: 'low', bestUse: 'OpenClaw agent templates for business operator personas.', env: [], skillPack: 'channel-publisher-copilot' },
+  { slug: 'chatwoot', name: 'Chatwoot', repo: 'chatwoot/chatwoot', url: 'https://github.com/chatwoot/chatwoot', category: 'support-inbox', mode: 'architecture-pattern', priority: 31, risk: 'medium', bestUse: 'AI inbox, assignment, tags, notes, customer timeline, and support workflows.', env: ['CHATWOOT_BASE_URL', 'CHATWOOT_TOKEN'], skillPack: 'support-recovery' },
+  { slug: 'postiz', name: 'Postiz', repo: 'gitroomhq/postiz-app', url: 'https://github.com/gitroomhq/postiz-app', category: 'social-calendar', mode: 'ui-pattern', priority: 32, risk: 'medium', bestUse: 'Social calendar, approval queue, post scheduling, and publishing UX patterns.', env: ['POSTIZ_WORKER_URL'], skillPack: 'social-growth-engine' },
+  { slug: 'langfuse', name: 'Langfuse', repo: 'langfuse/langfuse', url: 'https://github.com/langfuse/langfuse', category: 'llm-observability', mode: 'observability-adapter', priority: 33, risk: 'low', bestUse: 'LLM traces, prompt monitoring, costs, evals, and agent quality tracking.', env: ['LANGFUSE_PUBLIC_KEY', 'LANGFUSE_SECRET_KEY'], skillPack: 'dev-maintainer' },
+  { slug: 'opik', name: 'Opik', repo: 'comet-ml/opik', url: 'https://github.com/comet-ml/opik', category: 'llm-evals', mode: 'observability-adapter', priority: 34, risk: 'low', bestUse: 'LLM evaluation, traces, datasets, and quality tracking.', env: ['OPIK_API_KEY'], skillPack: 'dev-maintainer' },
+  { slug: 'helicone', name: 'Helicone', repo: 'Helicone/helicone', url: 'https://github.com/Helicone/helicone', category: 'llm-gateway', mode: 'observability-adapter', priority: 35, risk: 'low', bestUse: 'LLM usage, cost tracking, request logging, and AI spend controls.', env: ['HELICONE_API_KEY'], skillPack: 'dev-maintainer' },
+  { slug: 'uptime-kuma', name: 'Uptime Kuma', repo: 'louislam/uptime-kuma', url: 'https://github.com/louislam/uptime-kuma', category: 'monitoring', mode: 'monitoring-pattern', priority: 36, risk: 'low', bestUse: 'Server, bot, channel, webhook, and worker health monitoring dashboards.', env: ['UPTIME_KUMA_URL'], skillPack: 'dev-maintainer' },
+  { slug: 'flowise', name: 'Flowise', repo: 'FlowiseAI/Flowise', url: 'https://github.com/FlowiseAI/Flowise', category: 'visual-agent-builder', mode: 'external-builder', priority: 37, risk: 'medium', bestUse: 'Visual LLM and agent workflows for non-developer configuration.', env: ['FLOWISE_BASE_URL', 'FLOWISE_API_KEY'], skillPack: 'support-recovery' },
+  { slug: 'langflow', name: 'Langflow', repo: 'langflow-ai/langflow', url: 'https://github.com/langflow-ai/langflow', category: 'visual-agent-builder', mode: 'external-builder', priority: 38, risk: 'medium', bestUse: 'Visual agent pipelines, RAG flows, and prompt experimentation.', env: ['LANGFLOW_BASE_URL', 'LANGFLOW_API_KEY'], skillPack: 'scholarship-scout' },
+  { slug: 'dify', name: 'Dify', repo: 'langgenius/dify', url: 'https://github.com/langgenius/dify', category: 'agent-app-builder', mode: 'external-builder', priority: 39, risk: 'medium', bestUse: 'Agent app builder, RAG apps, workflows, prompt ops, and assistant deployment.', env: ['DIFY_BASE_URL', 'DIFY_API_KEY'], skillPack: 'support-recovery' },
+  { slug: 'ai-agents-for-beginners', name: 'AI Agents for Beginners', repo: 'microsoft/ai-agents-for-beginners', url: 'https://github.com/microsoft/ai-agents-for-beginners', category: 'learning-blueprint', mode: 'reference', priority: 40, risk: 'low', bestUse: 'Learning examples and architecture references for future agent features.', env: [], skillPack: 'dev-maintainer' }
+];
+
 function agenticEnvConfigured(row = {}) {
   const keys = Array.isArray(row.workerEnv) ? row.workerEnv : [];
   if (!keys.length) return true;
@@ -9627,6 +9670,8 @@ function getAiAutomationRepoPlan() {
 
 function getAiAutomationStatus() {
   const repos = getAiAutomationRepoPlan();
+  const repoCatalog = getAgenticPublicRepoCatalog();
+  const repoImportQueue = loadJSON('agenticRepoImportQueue.json', []);
   const agenticAgents = getAgenticAgentRegistry();
   const skillPacks = getAgenticSkillPacks();
   const missions = getAgenticMissions();
@@ -9650,9 +9695,14 @@ function getAiAutomationStatus() {
       dryRunMissions: missions.filter(row => row.status === 'dry_run_complete').length,
       queuedTasks: tasks.filter(task => task.status === 'queued').length,
       completedTasks: tasks.filter(task => task.status === 'done').length,
-      failedTasks: tasks.filter(task => task.status === 'failed').length
+      failedTasks: tasks.filter(task => task.status === 'failed').length,
+      repoCatalog: repoCatalog.length,
+      repoImportsQueued: Array.isArray(repoImportQueue) ? repoImportQueue.length : 0,
+      highRiskRepos: repoCatalog.filter(row => String(row.licenseRisk || '').toLowerCase() === 'high').length
     },
     repos,
+    repoCatalog,
+    repoImportQueue: (Array.isArray(repoImportQueue) ? repoImportQueue : []).slice(0, 50),
     agenticAgents,
     skillPacks,
     missions,
@@ -9692,6 +9742,168 @@ function runAiAutomationTask(input = {}) {
   return { success: true, task, repo };
 }
 
+function getAgenticPublicRepoCatalog() {
+  const queuedRows = loadJSON('agenticRepoImportQueue.json', []);
+  const queueBySlug = {};
+  for (const row of Array.isArray(queuedRows) ? queuedRows : []) {
+    if (row?.repoSlug && !queueBySlug[row.repoSlug]) queueBySlug[row.repoSlug] = row;
+  }
+  return AGENTIC_PUBLIC_REPO_CATALOG
+    .map(row => {
+      const env = Array.isArray(row.env) ? row.env : [];
+      const missingEnv = env.filter(key => !process.env[key] && !settings[String(key).toLowerCase()]);
+      const configured = env.length === 0 || missingEnv.length < env.length;
+      const queued = queueBySlug[row.slug] || null;
+      return {
+        ...row,
+        integrationMode: row.integrationMode || row.mode || 'blueprint',
+        licenseRisk: row.licenseRisk || row.risk || 'unknown',
+        configured,
+        missingEnv,
+        queued: Boolean(queued),
+        queueStatus: queued?.status || '',
+        queuedAt: queued?.createdAt || '',
+        safeUsePolicy: [
+          'Use adapter/webhook/worker patterns first; do not paste third-party repo code directly into production files.',
+          'Keep live WhatsApp, payment, social posting, and computer-use actions in dry-run until admin approval.',
+          'Never send .env, WhatsApp sessions, customer logs, or payment data to external agent workers.'
+        ]
+      };
+    })
+    .sort((a, b) => Number(a.priority || 999) - Number(b.priority || 999));
+}
+
+function findAgenticPublicRepo(input = {}) {
+  const requested = String(input.repo || input.slug || input.name || '').trim().toLowerCase();
+  if (!requested) throw new Error('repo slug/name is required.');
+  const catalog = getAgenticPublicRepoCatalog();
+  const repo = catalog.find(row =>
+    row.slug === requested ||
+    row.name.toLowerCase() === requested ||
+    row.repo.toLowerCase() === requested ||
+    row.repo.toLowerCase().endsWith(`/${requested}`)
+  );
+  if (!repo) throw new Error('Unknown public repo catalog entry.');
+  return repo;
+}
+
+function buildAgenticRepoIntegrationPlan(input = {}) {
+  const repo = findAgenticPublicRepo(input);
+  const goal = cleanOutgoingText(input.goal || input.prompt || `Use ${repo.name} to improve SuperSender Pro automation.`);
+  const risk = String(repo.licenseRisk || 'unknown').toLowerCase();
+  const liveAllowed = input.live === true && risk !== 'high';
+  const phases = [
+    {
+      phase: 1,
+      name: 'Blueprint review',
+      output: `Document exactly which ${repo.name} ideas map to SuperSender modules.`,
+      acceptance: 'No vendor code copied; only architecture/API/UX ideas are selected.'
+    },
+    {
+      phase: 2,
+      name: 'Adapter shell',
+      output: `Create a small adapter around ${repo.integrationMode || repo.mode || 'external worker'} with env validation.`,
+      acceptance: 'Adapter returns dry-run payloads when keys or worker URLs are missing.'
+    },
+    {
+      phase: 3,
+      name: 'Dashboard and WhatsApp control',
+      output: 'Expose status, queue, dry-run, and admin command controls in AI Automation Hub.',
+      acceptance: 'Admin can queue/retry safely without exposing secrets.'
+    },
+    {
+      phase: 4,
+      name: 'Verification',
+      output: 'Run syntax check, API smoke test, and secret scan before commit.',
+      acceptance: 'Only safe source/docs/env-example files are staged.'
+    }
+  ];
+  return {
+    success: true,
+    repo,
+    goal,
+    liveAllowed,
+    plan: {
+      id: uuid(),
+      title: `${repo.name} -> SuperSender Pro integration plan`,
+      recommendedSkillPack: repo.skillPack,
+      missingEnv: repo.missingEnv || [],
+      phases,
+      dryRunFirst: true,
+      noVendorCopy: true,
+      safety: repo.safeUsePolicy,
+      createdAt: new Date().toISOString()
+    }
+  };
+}
+
+function queueAgenticRepoImport(input = {}) {
+  if (process.env.AGENTIC_REPO_IMPORTS_ENABLED === 'false') {
+    throw new Error('Agentic repo imports are disabled by AGENTIC_REPO_IMPORTS_ENABLED=false.');
+  }
+  if (input.copyVendorCode === true && process.env.AGENTIC_REPO_ALLOW_VENDOR_COPY !== 'true') {
+    throw new Error('Vendor code copy is disabled. Use adapter/blueprint mode or set AGENTIC_REPO_ALLOW_VENDOR_COPY=true deliberately.');
+  }
+  const plan = buildAgenticRepoIntegrationPlan(input);
+  const repo = plan.repo;
+  const now = new Date().toISOString();
+  const queue = loadJSON('agenticRepoImportQueue.json', []);
+  const rows = Array.isArray(queue) ? queue.filter(row => row.repoSlug !== repo.slug) : [];
+  const dryRun = input.dryRun !== false || process.env.AGENTIC_REPO_IMPORT_DRY_RUN_DEFAULT !== 'false';
+  const item = {
+    id: uuid(),
+    repoSlug: repo.slug,
+    repoName: repo.name,
+    repoUrl: repo.url,
+    category: repo.category,
+    status: dryRun ? 'dry_run_queued' : 'approval_required',
+    dryRun,
+    skillPack: repo.skillPack,
+    goal: plan.goal,
+    plan: plan.plan,
+    source: cleanOutgoingText(input.source || 'api'),
+    createdAt: now,
+    updatedAt: now
+  };
+  rows.unshift(item);
+  saveJSON('agenticRepoImportQueue.json', rows.slice(0, 500));
+
+  const tasks = loadJSON('aiAutomationTasks.json', []);
+  tasks.push({
+    id: uuid(),
+    repo: repo.slug,
+    repoName: repo.name,
+    type: 'public_repo_import_plan',
+    prompt: plan.goal,
+    status: item.status,
+    source: item.source,
+    result: `Safe integration plan queued for ${repo.name}. Vendor source code was not copied.`,
+    skillPack: repo.skillPack,
+    createdAt: now,
+    updatedAt: now
+  });
+  saveJSON('aiAutomationTasks.json', tasks.slice(-500));
+  return { success: true, queued: item, plan: plan.plan };
+}
+
+function buildAgenticRepoCatalogPrompt() {
+  const catalog = getAgenticPublicRepoCatalog();
+  const top = catalog.slice(0, 20).map(row => `- ${row.name} (${row.repo}) -> ${row.bestUse}`).join('\n');
+  return `SuperSender Pro Public Repo Integration Prompt
+
+Goal: use public agentic/ecommerce/social automation repositories as safe blueprints and adapters, not as blind code copies.
+
+Top repo catalog:
+${top}
+
+Rules:
+- Build adapter modules, queues, dashboards, and dry-run endpoints first.
+- Never commit .env, WhatsApp auth sessions, customer/order logs, token files, uploads, node_modules, or runtime JSON data.
+- Keep platform posting/payment/WhatsApp actions behind admin approval.
+- Verify with node --check server.js, API smoke tests, and secret scan before pushing.
+- Use GET /api/ai-automation/repo-catalog and POST /api/ai-automation/repo-plan for exact per-repo tasks.`;
+}
+
 function buildAiAutomationHubReply() {
   const status = getAiAutomationStatus();
   const lines = status.repos
@@ -9707,6 +9919,7 @@ Missing: *${status.totals.missing}*
 Queued tasks: *${status.totals.queuedTasks}*
 Agentic agents: *${status.totals.agenticAgents}*
 Skill packs: *${status.totals.skillPacks}* (${status.totals.installedSkillPacks} installed)
+Public repo catalog: *${status.totals.repoCatalog}* (${status.totals.repoImportsQueued} queued)
 
 Top priorities:
 ${lines}
@@ -18169,6 +18382,46 @@ app.get('/api/ai-automation/repos', (_req, res) => {
   }
 });
 
+app.get('/api/ai-automation/repo-catalog', (_req, res) => {
+  try {
+    const catalog = getAgenticPublicRepoCatalog();
+    res.json({
+      success: true,
+      count: catalog.length,
+      queued: catalog.filter(row => row.queued).length,
+      highRisk: catalog.filter(row => String(row.licenseRisk || '').toLowerCase() === 'high').length,
+      catalog,
+      updatedAt: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/ai-automation/repo-plan', (req, res) => {
+  try {
+    res.json(buildAgenticRepoIntegrationPlan(req.body || {}));
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/ai-automation/repo-import', (req, res) => {
+  try {
+    res.json(queueAgenticRepoImport({ ...(req.body || {}), source: req.body?.source || 'api' }));
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/ai-automation/repo-catalog-prompt', (_req, res) => {
+  try {
+    res.type('text/plain').send(buildAgenticRepoCatalogPrompt());
+  } catch (error) {
+    res.status(500).type('text/plain').send(error.message);
+  }
+});
+
 app.get('/api/ai-automation/status', (_req, res) => {
   try {
     res.json(getAiAutomationStatus());
@@ -18333,6 +18586,18 @@ app.get('/ai-automation-hub', (_req, res) => {
     const recent = status.recentTasks.length
       ? status.recentTasks.map(task => `<tr><td>${htmlEscape(task.repoName || task.repo)}</td><td>${htmlEscape(task.status)}</td><td>${htmlEscape(task.prompt || '')}</td><td>${htmlEscape(task.createdAt || '')}</td></tr>`).join('')
       : '<tr><td colspan="4" class="muted">No AI automation tasks queued yet.</td></tr>';
+    const repoCatalogRows = status.repoCatalog
+      .sort((a, b) => Number(a.priority || 999) - Number(b.priority || 999))
+      .map(repo => `<tr>
+        <td><b>${htmlEscape(repo.name)}</b><br><small>${htmlEscape(repo.repo)}</small></td>
+        <td>${htmlEscape(repo.category)}<br><small>${htmlEscape(repo.integrationMode || repo.mode || '')}</small></td>
+        <td><span class="pill ${repo.configured ? 'ok' : 'warn'}">${repo.configured ? 'Ready/Blueprint' : 'Needs keys'}</span>${repo.queued ? `<br><span class="pill ok">${htmlEscape(repo.queueStatus || 'queued')}</span>` : ''}${repo.missingEnv?.length ? `<br><small class="warn-text">${htmlEscape(repo.missingEnv.join(', '))}</small>` : ''}</td>
+        <td>${Number(repo.priority || 0)}<br><small>Risk: ${htmlEscape(repo.licenseRisk || repo.risk || 'unknown')}</small></td>
+        <td>${htmlEscape(repo.bestUse)}</td>
+        <td>${htmlEscape(repo.safeFirstStep || repo.bestUse || '')}<br><small>Skill: ${htmlEscape(repo.skillPack || 'auto')}</small></td>
+        <td><button onclick="buildRepoPlan('${htmlEscape(repo.slug)}')">Plan</button> <button onclick="queueRepoImport('${htmlEscape(repo.slug)}')">Queue</button></td>
+      </tr>`)
+      .join('');
     res.type('html').send(`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI Automation Hub</title>
 <style>
 body{font-family:Inter,Arial,sans-serif;background:#071014;color:#eaf7f3;margin:0;padding:24px;line-height:1.45}
@@ -18352,8 +18617,19 @@ pre{white-space:pre-wrap;background:#081018;border-radius:10px;padding:14px;over
     <div class="card"><div class="muted">Configured</div><div class="value">${status.totals.configured}</div></div>
     <div class="card"><div class="muted">Skill Packs</div><div class="value">${status.totals.skillPacks}</div></div>
     <div class="card"><div class="muted">Missions</div><div class="value">${status.totals.missions}</div></div>
+    <div class="card"><div class="muted">Public Repos</div><div class="value">${status.totals.repoCatalog}</div><small>${status.totals.repoImportsQueued} queued</small></div>
   </section>
   <div class="card"><b>WhatsApp command:</b> <code>!aihub</code><br><span class="muted">If a worker/API key is missing, this hub keeps the project running and marks the adapter as Not configured.</span></div>
+  <h2>Public Repo Import Center</h2>
+  <div class="grid">
+    <div class="card">
+      <p class="muted">Use public repos as safe blueprints/adapters. The system queues plans and dry-runs; it does not blindly copy vendor code into production.</p>
+      <button onclick="copyRepoCatalogPrompt()">Copy Repo Integration Prompt</button>
+      <a class="btn secondary" href="/api/ai-automation/repo-catalog">Catalog JSON</a>
+    </div>
+    <div class="card"><pre id="repoPlanOut">Click Plan or Queue on any repo below.</pre></div>
+  </div>
+  <table><thead><tr><th>Repo</th><th>Category</th><th>Status</th><th>Priority</th><th>Best use</th><th>Safe first step</th><th>Action</th></tr></thead><tbody>${repoCatalogRows}</tbody></table>
   <h2>Automation Mission Control</h2>
   <div class="grid">
     <div class="card">
@@ -18406,6 +18682,21 @@ async function queueTask(repo){
   const data = await r.json();
   alert(data.success ? 'Queued task for '+data.repo.name : data.error);
   if(data.success) location.reload();
+}
+async function buildRepoPlan(repo){
+  const r = await fetch('/api/ai-automation/repo-plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({repo,source:'dashboard'})});
+  document.getElementById('repoPlanOut').innerText = JSON.stringify(await r.json(), null, 2);
+}
+async function queueRepoImport(repo){
+  const r = await fetch('/api/ai-automation/repo-import',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({repo,source:'dashboard',dryRun:true})});
+  const data = await r.json();
+  document.getElementById('repoPlanOut').innerText = JSON.stringify(data, null, 2);
+  if(data.success) setTimeout(()=>location.reload(), 900);
+}
+async function copyRepoCatalogPrompt(){
+  const t = await (await fetch('/api/ai-automation/repo-catalog-prompt')).text();
+  await navigator.clipboard.writeText(t);
+  alert('Repo integration prompt copied');
 }
 async function buildAgentPlan(agent){
   const r = await fetch('/api/ai-automation/agent-task-plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({agent,goal:'Make SuperSender Pro smarter, safer, and more automated.'})});
