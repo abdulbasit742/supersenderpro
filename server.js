@@ -1794,6 +1794,10 @@ let settings = loadJSON('settings.json', {
   tiktok_open_id: '',
   tiktok_display_name: '',
   tiktok_publish_mode: 'draft',
+  telegram_token: '',
+  telegram_chat_id: '',
+  telegram_channel_chat_id: '',
+  telegram_parse_mode: '',
   social_auto_reply_enabled: false,
   social_auto_poster_enabled: true,
   social_auto_post_interval_seconds: 60,
@@ -1900,7 +1904,7 @@ settings.whatsapp_channel_bridge_enabled = settings.whatsapp_channel_bridge_enab
 settings.whatsapp_channel_bridge_platforms = Array.isArray(settings.whatsapp_channel_bridge_platforms) && settings.whatsapp_channel_bridge_platforms.length
   ? settings.whatsapp_channel_bridge_platforms.map(item => normalizeSocialPlatform(item === 'telegram' ? 'telegram' : item) || String(item || '').trim().toLowerCase()).filter(Boolean)
   : String(process.env.WHATSAPP_CHANNEL_BRIDGE_PLATFORMS || 'telegram,instagram,facebook').split(',').map(item => String(item || '').trim().toLowerCase()).filter(Boolean);
-settings.telegram_channel_chat_id = settings.telegram_channel_chat_id || process.env.TELEGRAM_CHANNEL_CHAT_ID || '';
+settings.telegram_channel_chat_id = settings.telegram_channel_chat_id || process.env.TELEGRAM_CHANNEL_CHAT_ID || settings.telegram_chat_id || '';
 settings.whatsapp_channel_source_links = Array.isArray(settings.whatsapp_channel_source_links) ? settings.whatsapp_channel_source_links : [];
 settings.whatsapp_channel_max_sources = Math.max(1, Math.min(250, Number(settings.whatsapp_channel_max_sources || 60)));
 settings.whatsapp_channel_max_media_mb = Math.max(1, Math.min(200, Number(settings.whatsapp_channel_max_media_mb || 25)));
@@ -2040,6 +2044,12 @@ settings.tiktok_display_name = settings.tiktok_display_name || process.env.TIKTO
 settings.tiktok_publish_mode = ['draft', 'direct'].includes(String(settings.tiktok_publish_mode || process.env.TIKTOK_PUBLISH_MODE || 'draft').toLowerCase())
   ? String(settings.tiktok_publish_mode || process.env.TIKTOK_PUBLISH_MODE || 'draft').toLowerCase()
   : 'draft';
+settings.telegram_token = settings.telegram_token || process.env.TELEGRAM_TOKEN || process.env.TELEGRAM_BOT_TOKEN || '';
+settings.telegram_chat_id = settings.telegram_chat_id || process.env.TELEGRAM_CHAT_ID || '';
+settings.telegram_channel_chat_id = settings.telegram_channel_chat_id || process.env.TELEGRAM_CHANNEL_CHAT_ID || settings.telegram_chat_id || '';
+settings.telegram_parse_mode = ['Markdown', 'MarkdownV2', 'HTML'].includes(String(settings.telegram_parse_mode || process.env.TELEGRAM_PARSE_MODE || '').trim())
+  ? String(settings.telegram_parse_mode || process.env.TELEGRAM_PARSE_MODE || '').trim()
+  : '';
 settings.social_auto_reply_enabled = settings.social_auto_reply_enabled ?? false;
 settings.social_auto_poster_enabled = settings.social_auto_poster_enabled ?? true;
 settings.social_auto_post_interval_seconds = Math.max(30, Number(settings.social_auto_post_interval_seconds || process.env.SOCIAL_AUTO_POST_INTERVAL_SECONDS || 60));
@@ -6743,7 +6753,7 @@ function shouldUseAICaptionForChannelPost({ message = '', mediaUrl = '' } = {}) 
 }
 
 async function sendTelegramBridgePost({ message = '', mediaUrl = '', parseMode = '' } = {}) {
-  const token = String(settings.telegram_token || process.env.TELEGRAM_TOKEN || '').trim();
+  const token = String(settings.telegram_token || process.env.TELEGRAM_TOKEN || process.env.TELEGRAM_BOT_TOKEN || '').trim();
   const chatId = String(settings.telegram_channel_chat_id || process.env.TELEGRAM_CHANNEL_CHAT_ID || settings.telegram_chat_id || process.env.TELEGRAM_CHAT_ID || '').trim();
   if (!token) throw new Error('Telegram bot token missing');
   if (!chatId) throw new Error('Telegram channel/chat ID missing');
@@ -23133,14 +23143,16 @@ app.post('/api/integrations/:type/test', async (req, res) => {
   try {
     const type = (req.params.type || '').toString().toLowerCase();
     if (type === 'telegram') {
-      if (!settings.telegram_token || !settings.telegram_chat_id) {
+      const telegramChatId = settings.telegram_channel_chat_id || settings.telegram_chat_id || process.env.TELEGRAM_CHANNEL_CHAT_ID || process.env.TELEGRAM_CHAT_ID || '';
+      const telegramToken = settings.telegram_token || process.env.TELEGRAM_TOKEN || process.env.TELEGRAM_BOT_TOKEN || '';
+      if (!telegramToken || !telegramChatId) {
         return res.status(400).json({ error: 'Telegram token/chat ID missing in Settings' });
       }
-      const url = `https://api.telegram.org/bot${settings.telegram_token}/sendMessage`;
+      const url = `https://api.telegram.org/bot${telegramToken}/sendMessage`;
       const r = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: settings.telegram_chat_id, text: 'SuperSender Pro test message' })
+        body: JSON.stringify({ chat_id: telegramChatId, text: 'SuperSender Pro test message' })
       });
       const data = await r.json().catch(() => ({}));
       if (!r.ok || data.ok === false) throw new Error(data.description || `Telegram test failed (${r.status})`);
@@ -23272,6 +23284,14 @@ const SOCIAL_PLATFORMS = {
       'video.upload',
       'video.publish'
     ]
+  },
+  telegram: {
+    label: 'Telegram Channel',
+    icon: 'ðŸ“¨',
+    scopes: [
+      'bot_token',
+      'chat_id'
+    ]
   }
 };
 const SOCIAL_IMAGE_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.webp']);
@@ -23282,6 +23302,7 @@ function normalizeSocialPlatform(platform = '') {
   if (['ig', 'instagram', 'instagram_business'].includes(value)) return 'instagram';
   if (['linkedin', 'linked_in'].includes(value)) return 'linkedin';
   if (['tt', 'tik_tok', 'tiktok', 'tik-tok'].includes(value)) return 'tiktok';
+  if (['tg', 'telegram', 'telegram_channel', 'telegram-chat'].includes(value)) return 'telegram';
   return value;
 }
 
@@ -23533,6 +23554,20 @@ function settingsBackedSocialAccounts() {
       source: 'settings'
     });
   }
+  const telegramToken = settings.telegram_token || process.env.TELEGRAM_TOKEN || process.env.TELEGRAM_BOT_TOKEN || '';
+  const telegramChatId = settings.telegram_channel_chat_id || process.env.TELEGRAM_CHANNEL_CHAT_ID || settings.telegram_chat_id || process.env.TELEGRAM_CHAT_ID || '';
+  if (telegramToken || telegramChatId) {
+    rows.push({
+      id: 'settings-telegram',
+      platform: 'telegram',
+      name: 'Telegram Channel (Settings)',
+      chatId: telegramChatId,
+      accessToken: telegramToken,
+      parseMode: settings.telegram_parse_mode || process.env.TELEGRAM_PARSE_MODE || '',
+      enabled: true,
+      source: 'settings'
+    });
+  }
   return rows;
 }
 
@@ -23552,7 +23587,9 @@ function publicSocialAccount(account = {}) {
         ? !!(token && (account.authorUrn || settings.linkedin_author_urn || process.env.LINKEDIN_AUTHOR_URN))
         : platform === 'tiktok'
           ? !!(token && (account.openId || settings.tiktok_open_id || process.env.TIKTOK_OPEN_ID))
-          : false;
+          : platform === 'telegram'
+            ? !!(token && (account.chatId || settings.telegram_channel_chat_id || settings.telegram_chat_id || process.env.TELEGRAM_CHANNEL_CHAT_ID || process.env.TELEGRAM_CHAT_ID))
+            : false;
   const { accessToken, pageAccessToken, appSecret, clientSecret, refreshToken, ...safe } = account;
   return {
     ...safe,
@@ -23693,6 +23730,7 @@ function upsertSocialAccount(account = {}, syncToSettings = true) {
     account.igUserId || '',
     account.openId || '',
     account.authorUrn || '',
+    account.chatId || '',
     account.name || ''
   ].join(':');
   const existingIndex = socialAccounts.findIndex(row =>
@@ -23700,6 +23738,7 @@ function upsertSocialAccount(account = {}, syncToSettings = true) {
     (platform === 'facebook' && row.platform === 'facebook' && row.pageId && row.pageId === account.pageId) ||
     (platform === 'instagram' && row.platform === 'instagram' && row.igUserId && row.igUserId === account.igUserId) ||
     (platform === 'tiktok' && row.platform === 'tiktok' && row.openId && row.openId === account.openId) ||
+    (platform === 'telegram' && row.platform === 'telegram' && row.chatId && row.chatId === account.chatId) ||
     (platform === 'linkedin' && row.platform === 'linkedin' && row.authorUrn && row.authorUrn === account.authorUrn)
   );
   const record = {
@@ -23710,6 +23749,7 @@ function upsertSocialAccount(account = {}, syncToSettings = true) {
     igUserId: account.igUserId || '',
     openId: account.openId || '',
     authorUrn: account.authorUrn || '',
+    chatId: account.chatId || account.remoteId || '',
     accessToken: account.accessToken || '',
     refreshToken: account.refreshToken || '',
     appId: account.appId || '',
@@ -23718,6 +23758,7 @@ function upsertSocialAccount(account = {}, syncToSettings = true) {
     clientId: account.clientId || '',
     clientSecret: account.clientSecret || '',
     publishMode: account.publishMode || '',
+    parseMode: account.parseMode || '',
     verifyToken: account.verifyToken || '',
     enabled: account.enabled !== false,
     source: account.source || 'oauth',
@@ -23750,6 +23791,11 @@ function upsertSocialAccount(account = {}, syncToSettings = true) {
       settings.tiktok_client_key = record.clientKey || settings.tiktok_client_key || '';
       settings.tiktok_client_secret = record.clientSecret || settings.tiktok_client_secret || '';
       settings.tiktok_publish_mode = record.publishMode || settings.tiktok_publish_mode || 'draft';
+    } else if (platform === 'telegram') {
+      settings.telegram_token = record.accessToken || settings.telegram_token || '';
+      settings.telegram_chat_id = record.chatId || settings.telegram_chat_id || '';
+      settings.telegram_channel_chat_id = record.chatId || settings.telegram_channel_chat_id || '';
+      settings.telegram_parse_mode = record.parseMode || settings.telegram_parse_mode || '';
     }
     saveJSON('settings.json', settings);
   }
@@ -25568,8 +25614,9 @@ function buildSocialConnectPage(req, notice = '') {
   const metaReady = Boolean(settings.facebook_app_id && settings.facebook_app_secret);
   const linkedinReady = Boolean(settings.linkedin_client_id && settings.linkedin_client_secret);
   const tiktokReady = Boolean(settings.tiktok_client_key && settings.tiktok_client_secret);
+  const telegramReady = Boolean(settings.telegram_token && (settings.telegram_channel_chat_id || settings.telegram_chat_id));
   const rows = accounts.length
-    ? accounts.map(row => `<tr><td>${htmlEscape(row.label || row.platform)}</td><td>${htmlEscape(row.name || '-')}</td><td>${htmlEscape(row.pageId || row.igUserId || row.authorUrn || '-')}</td><td>${row.configured ? '<span class="good">Ready</span>' : '<span class="warn">Missing</span>'}</td><td>${htmlEscape(row.tokenMasked || '-')}</td></tr>`).join('')
+    ? accounts.map(row => `<tr><td>${htmlEscape(row.label || row.platform)}</td><td>${htmlEscape(row.name || '-')}</td><td>${htmlEscape(row.pageId || row.igUserId || row.authorUrn || row.chatId || '-')}</td><td>${row.configured ? '<span class="good">Ready</span>' : '<span class="warn">Missing</span>'}</td><td>${htmlEscape(row.tokenMasked || '-')}</td></tr>`).join('')
     : '<tr><td colspan="5" class="muted">No connected accounts yet.</td></tr>';
   const connectButton = (platform, label, ready) => urls[platform]
     ? `<a class="btn primary" href="${htmlEscape(urls[platform])}">Connect ${htmlEscape(label)}</a>`
@@ -25598,7 +25645,7 @@ function buildSocialConnectPage(req, notice = '') {
 <body>
 <main>
   <h1>Social Connect</h1>
-  <p class="muted">Meta/Facebook, Instagram Business aur LinkedIn OAuth ko backend se direct connect karein. Dashboard/npm ki zaroorat nahi.</p>
+  <p class="muted">Meta/Facebook, Instagram Business, LinkedIn OAuth aur Telegram channel posting ko backend se direct connect karein.</p>
   ${notice ? `<div class="card notice"><b>${htmlEscape(notice)}</b></div><br>` : ''}
   <div class="grid">
     <section class="card">
@@ -25618,6 +25665,12 @@ function buildSocialConnectPage(req, notice = '') {
         <input name="tiktok_client_secret" value="${htmlEscape(settings.tiktok_client_secret ? '********' : '')}" placeholder="Paste secret, leave ******** to keep existing">
         <label>TikTok Publish Mode</label>
         <input name="tiktok_publish_mode" value="${htmlEscape(settings.tiktok_publish_mode || 'draft')}" placeholder="draft or direct">
+        <label>Telegram Bot Token</label>
+        <input name="telegram_token" value="${htmlEscape(settings.telegram_token ? '********' : '')}" placeholder="BotFather token, leave ******** to keep existing">
+        <label>Telegram Channel / Chat ID</label>
+        <input name="telegram_channel_chat_id" value="${htmlEscape(settings.telegram_channel_chat_id || settings.telegram_chat_id || '')}" placeholder="@yourchannel or -100xxxxxxxxxx">
+        <label>Telegram Parse Mode</label>
+        <input name="telegram_parse_mode" value="${htmlEscape(settings.telegram_parse_mode || '')}" placeholder="Markdown, MarkdownV2, HTML, or blank">
         <label>Public Base URL</label>
         <input name="social_public_base_url" value="${htmlEscape(settings.social_public_base_url || baseUrl)}" placeholder="https://app.pakentrepreneur.me">
         <div class="actions"><button class="btn primary" type="submit">Save Credentials</button><a class="btn" href="/api/social/status">View JSON Status</a></div>
@@ -25637,6 +25690,7 @@ function buildSocialConnectPage(req, notice = '') {
         ${connectButton('instagram', 'Instagram', metaReady)}
         ${connectButton('linkedin', 'LinkedIn', linkedinReady)}
         ${connectButton('tiktok', 'TikTok', tiktokReady)}
+        <span class="btn ${telegramReady ? 'primary' : ''}">${telegramReady ? 'Telegram Ready' : 'Save Telegram token first'}</span>
       </div>
       <p class="small muted">Cloudflare active hone ke baad isi page ko <code>https://app.pakentrepreneur.me/social-connect</code> se open karein.</p>
     </section>
@@ -25756,6 +25810,39 @@ async function publishTikTokVideo(account, payload) {
   });
 }
 
+async function publishTelegramSocialPost(account, payload = {}) {
+  const token = String(account?.accessToken || settings.telegram_token || process.env.TELEGRAM_TOKEN || process.env.TELEGRAM_BOT_TOKEN || '').trim();
+  const chatId = String(account?.chatId || account?.remoteId || settings.telegram_channel_chat_id || process.env.TELEGRAM_CHANNEL_CHAT_ID || settings.telegram_chat_id || process.env.TELEGRAM_CHAT_ID || '').trim();
+  if (!token) throw new Error('Telegram bot token missing');
+  if (!chatId) throw new Error('Telegram channel/chat ID missing');
+
+  const parseMode = String(account?.parseMode || settings.telegram_parse_mode || process.env.TELEGRAM_PARSE_MODE || '').trim();
+  const endpointBase = `https://api.telegram.org/bot${token}`;
+  const message = cleanOutgoingText(payload.message || '').trim();
+  const imageUrl = channelMediaPublicUrl(payload.imageUrl || '');
+  const videoUrl = channelMediaPublicUrl(payload.videoUrl || '');
+  let endpoint = '/sendMessage';
+  let body = { chat_id: chatId, text: message.slice(0, 3900) || 'SuperSender Pro update', disable_web_page_preview: false };
+
+  if (imageUrl) {
+    endpoint = '/sendPhoto';
+    body = { chat_id: chatId, photo: imageUrl, caption: message.slice(0, 1024) };
+  } else if (videoUrl) {
+    endpoint = '/sendVideo';
+    body = { chat_id: chatId, video: videoUrl, caption: message.slice(0, 1024) };
+  }
+  if (parseMode) body.parse_mode = parseMode;
+
+  const response = await fetchOutbound(`${endpointBase}${endpoint}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || data.ok === false) throw new Error(data.description || `Telegram publish failed (${response.status})`);
+  return data.result || data;
+}
+
 async function publishSocialPayloadToPlatform(platform, payload = {}) {
   const normalized = normalizeSocialPlatform(platform);
   if (!SOCIAL_PLATFORMS[normalized]) throw new Error('Unsupported social platform');
@@ -25774,7 +25861,9 @@ async function publishSocialPayloadToPlatform(platform, payload = {}) {
       ? await publishInstagramBusinessPost(account, publishPayload)
       : normalized === 'tiktok'
         ? await publishTikTokVideo(account, { ...publishPayload, publishMode: payload.publishMode, privacyLevel: payload.privacyLevel })
-        : await publishLinkedInTextPost(account, publishPayload);
+        : normalized === 'telegram'
+          ? await publishTelegramSocialPost(account, publishPayload)
+          : await publishLinkedInTextPost(account, publishPayload);
   const externalId = response.id || response.post_id || response.message_id || '';
   const post = recordSocialPost({
     platform: normalized,
@@ -25816,6 +25905,8 @@ async function sendSocialCommentToPlatform(platform, payload = {}) {
     }
   } else if (normalized === 'tiktok') {
     throw new Error('TikTok public comment/reply API is not enabled in this connector yet. Posting videos is ready.');
+  } else if (normalized === 'telegram') {
+    throw new Error('Telegram channel comments are not supported in this connector. Use Telegram posting instead.');
   } else {
     const token = account.accessToken || settings.linkedin_access_token || process.env.LINKEDIN_ACCESS_TOKEN || '';
     const authorUrn = account.authorUrn || settings.linkedin_author_urn || process.env.LINKEDIN_AUTHOR_URN || '';
@@ -25904,7 +25995,7 @@ function splitSocialCommandArgs(text = '') {
 }
 
 function isWhatsAppSocialCommand(text = '') {
-  return /^!(social|connect|post|draft|approvepost|sharepost|poststatus|comment|control|admin|menuadmin|server|status|health|watchdog|next50|antigravity|aihub|automationhub|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelfix|channelwatch|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
+  return /^!(social|connect|post|draft|approvepost|sharepost|poststatus|comment|telegram|control|admin|menuadmin|server|status|health|watchdog|next50|antigravity|aihub|automationhub|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelfix|channelwatch|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
 }
 
 function adminNumberCandidates() {
@@ -25968,13 +26059,17 @@ Buttons / quick commands:
 [Instagram]  *!connect insta*
 [LinkedIn]   *!connect linkedin*
 [TikTok]     *!connect tiktok*
+[Telegram]   *!connect telegram*
 
 Post commands:
 * !draft all AI tools offer Rs 999
 * !post fb ChatGPT Plus limited slots
+* !telegram post AI Tools Store update
 * !approvepost SOC-XXXXX
 * !sharepost SOC-XXXXX
 * !poststatus
+* !telegram set BOT_TOKEN @yourchannel
+* !telegram test
 
 Safe engagement:
 * !comment fb POST_ID | reply text
@@ -26000,7 +26095,24 @@ function buildSocialConnectReply(platform = '') {
   const urls = socialOAuthUrlsForWhatsApp();
   const label = SOCIAL_PLATFORMS[normalized]?.label || normalized || 'Social';
   const url = urls[normalized] || '';
-  if (!SOCIAL_PLATFORMS[normalized]) return `Unknown platform. Use: fb, insta, linkedin, tiktok.`;
+  if (!SOCIAL_PLATFORMS[normalized]) return `Unknown platform. Use: fb, insta, linkedin, tiktok, telegram.`;
+  if (normalized === 'telegram') {
+    return `ðŸ“¨ *Connect Telegram Channel*
+
+Telegram OAuth nahi hota. Setup:
+1. BotFather se bot banayein aur token lein.
+2. Bot ko apne Telegram channel ka admin banayein.
+3. Channel ID bhejein: @yourchannel ya -100xxxxxxxxxx
+
+WhatsApp command:
+*!telegram set BOT_TOKEN @yourchannel*
+
+Test:
+*!telegram test*
+
+Post:
+*!telegram post Your message here*`;
+  }
   if (!url) {
     const missing = normalized === 'linkedin'
       ? 'LinkedIn Client ID/Secret'
@@ -27039,6 +27151,54 @@ async function handleWhatsAppSocialAdminCommand(ctx = {}) {
 
     if (command === '!aihub' || command === '!automationhub') {
       await reply(buildAiAutomationHubReply());
+      return true;
+    }
+
+    if (command === '!telegram') {
+      const mode = String(args[1] || 'status').toLowerCase();
+      if (mode === 'set') {
+        const token = String(args[2] || '').trim();
+        const chatId = String(args[3] || '').trim();
+        if (!token || !chatId) {
+          await reply('Format:\n*!telegram set BOT_TOKEN @yourchannel*\n\nBot ko channel admin banana lazmi hai.');
+          return true;
+        }
+        settings.telegram_token = token;
+        settings.telegram_chat_id = chatId;
+        settings.telegram_channel_chat_id = chatId;
+        if (!settings.telegram_parse_mode) settings.telegram_parse_mode = '';
+        saveJSON('settings.json', settings);
+        upsertSocialAccount({
+          id: 'settings-telegram',
+          platform: 'telegram',
+          name: 'Telegram Channel (WhatsApp setup)',
+          chatId,
+          accessToken: token,
+          parseMode: settings.telegram_parse_mode || '',
+          source: 'settings'
+        }, true);
+        await reply(`✅ *Telegram connected*\nChannel: *${chatId}*\nToken: ${maskSecret(token)}\n\nTest: *!telegram test*\nPost: *!telegram post Your message*`);
+        return true;
+      }
+      if (mode === 'test') {
+        await publishTelegramSocialPost(findSocialAccount({ platform: 'telegram' }) || {}, {
+          message: `✅ SuperSender Pro Telegram test\n${new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' })}`
+        });
+        await reply('✅ Telegram test message sent.');
+        return true;
+      }
+      if (mode === 'post') {
+        const message = args.slice(2).join(' ').trim();
+        if (!message) {
+          await reply('Format:\n*!telegram post Your update here*');
+          return true;
+        }
+        const result = await publishSocialPayloadToPlatform('telegram', { message });
+        await reply(`✅ Telegram post published.\nID: ${result.externalId || result.response?.message_id || '-'}`);
+        return true;
+      }
+      const ready = !!(settings.telegram_token && (settings.telegram_channel_chat_id || settings.telegram_chat_id));
+      await reply(`📨 *Telegram Status*\nReady: *${ready ? 'YES' : 'NO'}*\nChannel: *${settings.telegram_channel_chat_id || settings.telegram_chat_id || '-'}*\nToken: ${settings.telegram_token ? maskSecret(settings.telegram_token) : '-'}\n\nSetup: *!telegram set BOT_TOKEN @yourchannel*`);
       return true;
     }
 
@@ -28921,6 +29081,28 @@ app.post('/social-connect/credentials', (req, res) => {
   if (tiktokSecret && tiktokSecret !== '********') settings.tiktok_client_secret = tiktokSecret;
   const tiktokMode = String(body.tiktok_publish_mode || settings.tiktok_publish_mode || 'draft').trim().toLowerCase();
   settings.tiktok_publish_mode = ['draft', 'direct'].includes(tiktokMode) ? tiktokMode : 'draft';
+  const telegramToken = String(body.telegram_token || '').trim();
+  if (telegramToken && telegramToken !== '********') settings.telegram_token = telegramToken;
+  if (body.telegram_channel_chat_id !== undefined || body.telegram_chat_id !== undefined) {
+    const chatId = String(body.telegram_channel_chat_id || body.telegram_chat_id || '').trim();
+    settings.telegram_channel_chat_id = chatId;
+    settings.telegram_chat_id = chatId || settings.telegram_chat_id || '';
+  }
+  if (body.telegram_parse_mode !== undefined) {
+    const parseMode = String(body.telegram_parse_mode || '').trim();
+    settings.telegram_parse_mode = ['Markdown', 'MarkdownV2', 'HTML'].includes(parseMode) ? parseMode : '';
+  }
+  if (settings.telegram_token && (settings.telegram_channel_chat_id || settings.telegram_chat_id)) {
+    upsertSocialAccount({
+      id: 'settings-telegram',
+      platform: 'telegram',
+      name: 'Telegram Channel (Settings)',
+      chatId: settings.telegram_channel_chat_id || settings.telegram_chat_id,
+      accessToken: settings.telegram_token,
+      parseMode: settings.telegram_parse_mode || '',
+      source: 'settings'
+    }, false);
+  }
   settings.social_public_base_url = String(body.social_public_base_url || settings.social_public_base_url || '').trim();
   saveJSON('settings.json', settings);
   res.redirect('/social-connect?saved=1');
@@ -28939,6 +29121,27 @@ app.post('/api/social/app-credentials', (req, res) => {
       const mode = String(body.tiktok_publish_mode || 'draft').trim().toLowerCase();
       settings.tiktok_publish_mode = ['draft', 'direct'].includes(mode) ? mode : 'draft';
     }
+    if (body.telegram_token !== undefined && String(body.telegram_token || '').trim()) settings.telegram_token = String(body.telegram_token || '').trim();
+    if (body.telegram_channel_chat_id !== undefined || body.telegram_chat_id !== undefined) {
+      const chatId = String(body.telegram_channel_chat_id ?? body.telegram_chat_id ?? '').trim();
+      settings.telegram_channel_chat_id = chatId;
+      settings.telegram_chat_id = chatId || settings.telegram_chat_id || '';
+    }
+    if (body.telegram_parse_mode !== undefined) {
+      const parseMode = String(body.telegram_parse_mode || '').trim();
+      settings.telegram_parse_mode = ['Markdown', 'MarkdownV2', 'HTML'].includes(parseMode) ? parseMode : '';
+    }
+    if (settings.telegram_token && (settings.telegram_channel_chat_id || settings.telegram_chat_id)) {
+      upsertSocialAccount({
+        id: 'settings-telegram',
+        platform: 'telegram',
+        name: 'Telegram Channel (Settings)',
+        chatId: settings.telegram_channel_chat_id || settings.telegram_chat_id,
+        accessToken: settings.telegram_token,
+        parseMode: settings.telegram_parse_mode || '',
+        source: 'settings'
+      }, false);
+    }
     if (body.social_public_base_url !== undefined) settings.social_public_base_url = String(body.social_public_base_url || '').trim();
     saveJSON('settings.json', settings);
     res.json({
@@ -28946,6 +29149,7 @@ app.post('/api/social/app-credentials', (req, res) => {
       facebook: { appId: settings.facebook_app_id || '', hasSecret: Boolean(settings.facebook_app_secret) },
       linkedin: { clientId: settings.linkedin_client_id || '', hasSecret: Boolean(settings.linkedin_client_secret) },
       tiktok: { clientKey: settings.tiktok_client_key || '', hasSecret: Boolean(settings.tiktok_client_secret), publishMode: settings.tiktok_publish_mode || 'draft' },
+      telegram: { chatId: settings.telegram_channel_chat_id || settings.telegram_chat_id || '', hasToken: Boolean(settings.telegram_token), parseMode: settings.telegram_parse_mode || '' },
       socialPublicBaseUrl: settings.social_public_base_url || ''
     });
   } catch (error) {
@@ -29470,6 +29674,7 @@ app.post('/api/social/accounts', (req, res) => {
       igUserId: req.body?.igUserId || '',
       openId: req.body?.openId || '',
       authorUrn: req.body?.authorUrn || '',
+      chatId: req.body?.chatId || req.body?.remoteId || '',
       accessToken: req.body?.accessToken || '',
       refreshToken: req.body?.refreshToken || '',
       appId: req.body?.appId || '',
@@ -29478,6 +29683,7 @@ app.post('/api/social/accounts', (req, res) => {
       clientId: req.body?.clientId || '',
       clientSecret: req.body?.clientSecret || '',
       publishMode: req.body?.publishMode || '',
+      parseMode: req.body?.parseMode || '',
       verifyToken: req.body?.verifyToken || '',
       enabled: req.body?.enabled !== false,
       notes: req.body?.notes || '',
@@ -29512,6 +29718,11 @@ app.post('/api/social/accounts', (req, res) => {
         settings.tiktok_client_key = account.clientKey || settings.tiktok_client_key || '';
         settings.tiktok_client_secret = account.clientSecret || settings.tiktok_client_secret || '';
         settings.tiktok_publish_mode = account.publishMode || settings.tiktok_publish_mode || 'draft';
+      } else if (platform === 'telegram') {
+        settings.telegram_token = account.accessToken || settings.telegram_token || '';
+        settings.telegram_chat_id = account.chatId || settings.telegram_chat_id || '';
+        settings.telegram_channel_chat_id = account.chatId || settings.telegram_channel_chat_id || '';
+        settings.telegram_parse_mode = account.parseMode || settings.telegram_parse_mode || '';
       }
       saveJSON('settings.json', settings);
     }
@@ -29549,16 +29760,36 @@ app.delete('/api/social/accounts/:id', (req, res) => {
   res.json({ success: true, removed: before - socialAccounts.length });
 });
 
-app.post('/api/social/test/:platform', (req, res) => {
-  const platform = normalizeSocialPlatform(req.params.platform);
-  const account = findSocialAccount({ id: req.body?.accountId, platform });
-  res.json({
-    success: true,
-    platform,
-    configured: !!(account && publicSocialAccount(account).configured),
-    account: account ? publicSocialAccount(account) : null,
-    message: account ? 'Account config loaded. Live publish will work after valid platform tokens are added.' : 'No account configured yet.'
-  });
+app.post('/api/social/test/:platform', async (req, res) => {
+  try {
+    const platform = normalizeSocialPlatform(req.params.platform);
+    const account = findSocialAccount({ id: req.body?.accountId, platform });
+    if (!SOCIAL_PLATFORMS[platform]) return res.status(400).json({ success: false, error: 'Unsupported social platform' });
+    if (platform === 'telegram') {
+      if (!account || !publicSocialAccount(account).configured) {
+        return res.status(400).json({ success: false, platform, configured: false, account: account ? publicSocialAccount(account) : null, error: 'Telegram bot token/chat ID missing' });
+      }
+      const token = String(account.accessToken || settings.telegram_token || process.env.TELEGRAM_TOKEN || process.env.TELEGRAM_BOT_TOKEN || '').trim();
+      const check = await fetchOutbound(`https://api.telegram.org/bot${token}/getMe`);
+      const bot = await check.json().catch(() => ({}));
+      if (!check.ok || bot.ok === false) throw new Error(bot.description || `Telegram getMe failed (${check.status})`);
+      if (req.body?.sendMessage !== false) {
+        await publishTelegramSocialPost(account, {
+          message: `✅ SuperSender Pro Telegram test\n${new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' })}`
+        });
+      }
+      return res.json({ success: true, platform, configured: true, account: publicSocialAccount(account), bot: bot.result || null, message: 'Telegram bot verified and test message sent.' });
+    }
+    res.json({
+      success: true,
+      platform,
+      configured: !!(account && publicSocialAccount(account).configured),
+      account: account ? publicSocialAccount(account) : null,
+      message: account ? 'Account config loaded. Live publish will work after valid platform tokens are added.' : 'No account configured yet.'
+    });
+  } catch (error) {
+    res.status(502).json({ success: false, error: error.message });
+  }
 });
 
 app.post('/api/social/publish', async (req, res) => {
@@ -30243,7 +30474,10 @@ app.get('/api/channels/deploy-summary', (req, res) => {
       }
       if (key === 'facebook') return { channel: key, enabled: settings.messenger_enabled !== false, ready: !!settings.fb_page_access_token, note: settings.fb_page_access_token ? 'Token configured' : 'Page token missing' };
       if (key === 'instagram') return { channel: key, enabled: settings.messenger_enabled !== false, ready: !!settings.fb_instagram_id, note: settings.fb_instagram_id ? 'Instagram Page ID configured' : 'Instagram Page ID missing' };
-      if (key === 'telegram') return { channel: key, enabled: !!settings.telegram_token, ready: !!settings.telegram_token && !!settings.telegram_chat_id, note: settings.telegram_token ? 'Bot token configured' : 'Telegram token missing' };
+      if (key === 'telegram') {
+        const telegramReady = !!(settings.telegram_token && (settings.telegram_channel_chat_id || settings.telegram_chat_id));
+        return { channel: key, enabled: !!settings.telegram_token, ready: telegramReady, note: telegramReady ? 'Bot token + channel configured' : 'Telegram token/channel missing' };
+      }
       return { channel: key, enabled: true, ready: false, note: 'Custom connector pending' };
     });
     res.json({
@@ -39243,6 +39477,7 @@ let commerceSettings = loadJSON('commerce_settings.json', {
   magentoWebhookSecret: ''
 });
 let commerceEvents = loadJSON('commerce_events.json', []);
+let commerceConnections = loadJSON('commerce_connections.json', []);
 const saveCarouselTemplates = () => saveJSON('carousel_templates.json', carouselTemplates);
 const saveWhatsAppForms = () => saveJSON('whatsapp_forms.json', whatsappForms);
 const saveWhatsAppFormSubmissions = () => saveJSON('whatsapp_form_submissions.json', whatsappFormSubmissions);
@@ -39259,6 +39494,11 @@ function saveCommerceEvents() {
   saveJSON('commerce_events.json', commerceEvents);
 }
 
+function saveCommerceConnections() {
+  commerceConnections = (commerceConnections || []).slice(0, 300);
+  saveJSON('commerce_connections.json', commerceConnections);
+}
+
 function logCommerceEvent(type, payload = {}, source = '') {
   commerceEvents.push({
     id: uuid(),
@@ -39268,6 +39508,483 @@ function logCommerceEvent(type, payload = {}, source = '') {
     createdAt: new Date().toISOString()
   });
   saveCommerceEvents();
+}
+
+const ECOMMERCE_PLATFORM_DIRECTORY = [
+  {
+    slug: 'shopify',
+    label: 'Shopify',
+    auth: 'Admin API access token',
+    productSync: true,
+    orderSync: true,
+    webhookPath: '/api/commerce/webhook/shopify',
+    notes: 'Use custom app token with read_products/read_orders.'
+  },
+  {
+    slug: 'woocommerce',
+    label: 'WooCommerce',
+    auth: 'Consumer key + consumer secret',
+    productSync: true,
+    orderSync: true,
+    webhookPath: '/api/commerce/webhook/woocommerce',
+    notes: 'Works with wc/v3 API; can also use public Store API for products.'
+  },
+  {
+    slug: 'magento',
+    label: 'Magento / Adobe Commerce',
+    auth: 'Bearer access token',
+    productSync: true,
+    orderSync: true,
+    webhookPath: '/api/commerce/webhook/magento',
+    notes: 'Uses REST /rest/V1 products and orders.'
+  },
+  {
+    slug: 'bigcommerce',
+    label: 'BigCommerce',
+    auth: 'Store hash + X-Auth-Token',
+    productSync: true,
+    orderSync: true,
+    webhookPath: '/api/ecommerce/webhook/bigcommerce',
+    notes: 'Uses v3 catalog products and v2 orders.'
+  },
+  {
+    slug: 'ecwid',
+    label: 'Ecwid',
+    auth: 'Store ID + token',
+    productSync: true,
+    orderSync: true,
+    webhookPath: '/api/ecommerce/webhook/ecwid',
+    notes: 'Uses Ecwid v3 APIs.'
+  },
+  {
+    slug: 'opencart',
+    label: 'OpenCart',
+    auth: 'Custom JSON feed or webhook',
+    productSync: true,
+    orderSync: true,
+    webhookPath: '/api/ecommerce/webhook/opencart',
+    notes: 'Configure feedUrl or send order webhook payload.'
+  },
+  {
+    slug: 'wix',
+    label: 'Wix Stores',
+    auth: 'Custom JSON feed or webhook',
+    productSync: true,
+    orderSync: true,
+    webhookPath: '/api/ecommerce/webhook/wix',
+    notes: 'Best through webhook/custom API feed.'
+  },
+  {
+    slug: 'squarespace',
+    label: 'Squarespace Commerce',
+    auth: 'Custom JSON feed or webhook',
+    productSync: true,
+    orderSync: true,
+    webhookPath: '/api/ecommerce/webhook/squarespace',
+    notes: 'Best through webhook/custom API feed.'
+  },
+  {
+    slug: 'daraz',
+    label: 'Daraz Seller Center',
+    auth: 'Feed/API bridge token',
+    productSync: true,
+    orderSync: true,
+    webhookPath: '/api/ecommerce/webhook/daraz',
+    notes: 'Use feedUrl or n8n/Daraz bridge for signed Seller Center calls.'
+  },
+  {
+    slug: 'dukaan',
+    label: 'Dukaan',
+    auth: 'Custom JSON feed or webhook',
+    productSync: true,
+    orderSync: true,
+    webhookPath: '/api/ecommerce/webhook/dukaan',
+    notes: 'Use public feed, webhook, or n8n connector.'
+  },
+  {
+    slug: 'custom',
+    label: 'Custom Website / API',
+    auth: 'Bearer/API key optional',
+    productSync: true,
+    orderSync: true,
+    webhookPath: '/api/ecommerce/webhook/custom',
+    notes: 'Universal JSON importer for any website/backend.'
+  }
+];
+
+function normalizeEcommercePlatform(value = '') {
+  const raw = String(value || '').trim().toLowerCase().replace(/\s+/g, '-');
+  const aliases = {
+    woo: 'woocommerce',
+    wp: 'woocommerce',
+    wordpress: 'woocommerce',
+    adobe: 'magento',
+    adobecommerce: 'magento',
+    big: 'bigcommerce',
+    bc: 'bigcommerce',
+    darazpk: 'daraz',
+    website: 'custom',
+    api: 'custom'
+  };
+  return aliases[raw] || raw || 'custom';
+}
+
+function commercePlatformInfo(platform = '') {
+  const normalized = normalizeEcommercePlatform(platform);
+  return ECOMMERCE_PLATFORM_DIRECTORY.find(item => item.slug === normalized) || ECOMMERCE_PLATFORM_DIRECTORY.find(item => item.slug === 'custom');
+}
+
+function publicCommerceConnection(row = {}) {
+  const platform = normalizeEcommercePlatform(row.platform || 'custom');
+  const credentials = row.credentials || {};
+  const hasCredential = ['accessToken', 'apiToken', 'consumerKey', 'consumerSecret', 'bearerToken', 'storeHash', 'storeId', 'feedUrl']
+    .some(key => !!credentials[key] || !!row[key]);
+  const { accessToken, apiToken, consumerKey, consumerSecret, bearerToken, appSecret, ...safeCredentials } = credentials;
+  return {
+    ...row,
+    platform,
+    label: commercePlatformInfo(platform)?.label || platform,
+    credentials: safeCredentials,
+    configured: !!(row.feedUrl || credentials.feedUrl || row.storeUrl || credentials.storeHash || credentials.storeId || hasCredential),
+    hasSecret: hasCredential,
+    tokenMasked: maskSecret(accessToken || apiToken || bearerToken || consumerSecret || consumerKey || appSecret || ''),
+    webhookUrl: `/api/ecommerce/webhook/${platform}/${row.id || ''}`.replace(/\/+$/g, '')
+  };
+}
+
+function normalizeCommerceConnection(input = {}) {
+  const platform = normalizeEcommercePlatform(input.platform || input.type || 'custom');
+  const id = String(input.id || `${platform}-${uuid()}`).trim();
+  const credentials = {
+    ...(input.credentials || {}),
+    accessToken: input.accessToken ?? input.credentials?.accessToken ?? '',
+    apiToken: input.apiToken ?? input.credentials?.apiToken ?? '',
+    consumerKey: input.consumerKey ?? input.credentials?.consumerKey ?? '',
+    consumerSecret: input.consumerSecret ?? input.credentials?.consumerSecret ?? '',
+    bearerToken: input.bearerToken ?? input.credentials?.bearerToken ?? '',
+    storeHash: input.storeHash ?? input.credentials?.storeHash ?? '',
+    storeId: input.storeId ?? input.credentials?.storeId ?? '',
+    apiVersion: input.apiVersion ?? input.credentials?.apiVersion ?? '',
+    feedUrl: input.feedUrl ?? input.credentials?.feedUrl ?? ''
+  };
+  return {
+    id,
+    platform,
+    name: String(input.name || commercePlatformInfo(platform)?.label || platform).trim(),
+    storeUrl: String(input.storeUrl || input.url || '').trim().replace(/\/+$/g, ''),
+    feedUrl: String(input.feedUrl || credentials.feedUrl || '').trim(),
+    defaultCategory: String(input.defaultCategory || input.category || 'ecommerce').trim(),
+    enabled: input.enabled !== false,
+    autoSyncProducts: input.autoSyncProducts === true,
+    autoSyncOrders: input.autoSyncOrders === true,
+    syncIntervalMinutes: Math.max(5, Math.min(1440, Number(input.syncIntervalMinutes || 60))),
+    credentials,
+    mappings: input.mappings || {},
+    lastProductSyncAt: input.lastProductSyncAt || null,
+    lastOrderSyncAt: input.lastOrderSyncAt || null,
+    createdAt: input.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+}
+
+function upsertCommerceConnection(input = {}) {
+  const record = normalizeCommerceConnection(input);
+  const idx = (commerceConnections || []).findIndex(row => row.id === record.id);
+  if (idx >= 0) commerceConnections[idx] = { ...commerceConnections[idx], ...record, createdAt: commerceConnections[idx].createdAt || record.createdAt };
+  else commerceConnections.unshift(record);
+  saveCommerceConnections();
+  logCommerceEvent('connection_saved', publicCommerceConnection(record), record.platform);
+  return record;
+}
+
+function commerceConnectionById(id = '') {
+  const raw = String(id || '').trim();
+  return (commerceConnections || []).find(row => row.id === raw) || null;
+}
+
+function ecommerceRequestHeaders(connection = {}, extra = {}) {
+  const c = connection.credentials || {};
+  const headers = { Accept: 'application/json', ...extra };
+  if (connection.platform === 'shopify' && c.accessToken) headers['X-Shopify-Access-Token'] = c.accessToken;
+  if (connection.platform === 'bigcommerce' && c.accessToken) {
+    headers['X-Auth-Token'] = c.accessToken;
+    headers['Content-Type'] = 'application/json';
+  }
+  if (['magento', 'ecwid', 'custom', 'daraz', 'dukaan', 'wix', 'squarespace', 'opencart'].includes(connection.platform)) {
+    const token = c.bearerToken || c.accessToken || c.apiToken || '';
+    if (token) headers.Authorization = /^bearer\s+/i.test(token) ? token : `Bearer ${token}`;
+  }
+  return headers;
+}
+
+async function ecommerceFetchJson(url, connection = {}, options = {}) {
+  const response = await fetchOutbound(url, {
+    method: options.method || 'GET',
+    headers: ecommerceRequestHeaders(connection, options.headers || {}),
+    body: options.body
+  });
+  const text = await response.text();
+  let data = {};
+  try { data = text ? JSON.parse(text) : {}; } catch { data = { raw: text }; }
+  if (!response.ok) throw new Error(data.message || data.error || data.errors?.[0]?.message || `Ecommerce API failed (${response.status})`);
+  return data;
+}
+
+function absoluteCommerceUrl(connection = {}, pathName = '') {
+  const root = String(connection.storeUrl || '').replace(/\/+$/g, '');
+  if (!root) throw new Error('storeUrl is required');
+  if (/^https?:\/\//i.test(pathName)) return pathName;
+  return `${root}${pathName.startsWith('/') ? '' : '/'}${pathName}`;
+}
+
+function normalizeCommerceProductsPayload(data = {}, platform = 'custom') {
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data.products)) return data.products;
+  if (Array.isArray(data.items)) return data.items;
+  if (Array.isArray(data.data)) return data.data;
+  if (Array.isArray(data.product)) return data.product;
+  if (platform === 'magento' && Array.isArray(data.items)) return data.items;
+  return [];
+}
+
+function normalizeCommerceOrdersPayload(data = {}, platform = 'custom') {
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data.orders)) return data.orders;
+  if (Array.isArray(data.items)) return data.items;
+  if (Array.isArray(data.data)) return data.data;
+  if (Array.isArray(data.order)) return data.order;
+  return [];
+}
+
+function mapAnyCommerceProduct(product = {}, connection = {}) {
+  const platform = normalizeEcommercePlatform(connection.platform || product.platform || 'custom');
+  const variants = Array.isArray(product.variants) ? product.variants : [];
+  const images = Array.isArray(product.images) ? product.images : [];
+  const image = product.image?.src || product.image?.url || product.image || images[0]?.src || images[0]?.url || images[0]?.url_standard || product.thumbnail || '';
+  const variant = variants[0] || {};
+  const price = Number(product.price || product.sale_price || product.regular_price || product.total || variant.price || product.price_inc_tax || product.calculated_price || 0);
+  const sourceProductId = String(product.id || product.product_id || product.sku || product.entity_id || product.slug || product.name || uuid());
+  const description = stripHTML(product.body_html || product.description || product.short_description || product.meta_description || product.custom_url?.url || '').slice(0, 1800);
+  return {
+    id: `ec-${platform}-${sourceProductId}`.replace(/[^a-zA-Z0-9_-]/g, '-').slice(0, 120),
+    source: connection.name || platform,
+    sourceConnectionId: connection.id || '',
+    sourceProductId,
+    platform,
+    name: decodeHtmlEntities(product.title || product.name || product.product_name || product.sku || 'Product').trim(),
+    category: connection.defaultCategory || product.category || product.product_type || 'ecommerce',
+    subcategory: product.product_type || product.type || '',
+    price,
+    regularPrice: Number(product.compare_at_price || product.regular_price || product.retail_price || price || 0),
+    currency: product.currency || product.currency_code || 'PKR',
+    brand: product.vendor || product.brand || product.manufacturer || '',
+    condition: product.condition || 'New',
+    specs: description.slice(0, 650),
+    description,
+    image,
+    gallery: images.map(img => img.src || img.url || img.url_standard || '').filter(Boolean),
+    url: product.handle && connection.storeUrl ? `${connection.storeUrl.replace(/\/+$/g, '')}/products/${product.handle}` : (product.permalink || product.url || product.custom_url?.url || ''),
+    stock: product.available !== false && product.in_stock !== false && product.inventory_level !== 0 && product.status !== 'disabled',
+    sku: product.sku || variant.sku || '',
+    onSale: Number(product.compare_at_price || product.regular_price || 0) > price,
+    tags: [
+      'ecommerce-import',
+      platform,
+      connection.name || '',
+      ...(Array.isArray(product.tags) ? product.tags : String(product.tags || '').split(','))
+    ].map(tag => String(tag || '').trim()).filter(Boolean),
+    importedAt: new Date().toISOString()
+  };
+}
+
+function upsertEcommerceCatalogProducts(imported = []) {
+  let added = 0;
+  let updated = 0;
+  const byKey = new Map(laptopProducts.map((p, index) => [`${p.sourceConnectionId || p.source || ''}:${p.sourceProductId || p.id || p.url || index}`, index]));
+  for (const item of imported) {
+    const key = `${item.sourceConnectionId || item.source || ''}:${item.sourceProductId || item.id}`;
+    const existingIndex = byKey.get(key);
+    if (existingIndex === undefined) {
+      laptopProducts.push(item);
+      byKey.set(key, laptopProducts.length - 1);
+      added += 1;
+    } else {
+      laptopProducts[existingIndex] = { ...laptopProducts[existingIndex], ...item, updated: new Date().toISOString() };
+      updated += 1;
+    }
+  }
+  saveJSON('laptop_products.json', laptopProducts);
+  return { added, updated, total: laptopProducts.length };
+}
+
+function ecommerceProductsUrl(connection = {}) {
+  const c = connection.credentials || {};
+  if (connection.feedUrl || c.feedUrl) return connection.feedUrl || c.feedUrl;
+  if (connection.platform === 'shopify') return absoluteCommerceUrl(connection, `/admin/api/${c.apiVersion || '2024-10'}/products.json?limit=250`);
+  if (connection.platform === 'woocommerce') {
+    const url = new URL(absoluteCommerceUrl(connection, '/wp-json/wc/v3/products'));
+    url.searchParams.set('per_page', '100');
+    if (c.consumerKey) url.searchParams.set('consumer_key', c.consumerKey);
+    if (c.consumerSecret) url.searchParams.set('consumer_secret', c.consumerSecret);
+    return url.toString();
+  }
+  if (connection.platform === 'bigcommerce') return `https://api.bigcommerce.com/stores/${c.storeHash}/v3/catalog/products?limit=250&include=images,variants`;
+  if (connection.platform === 'magento') return absoluteCommerceUrl(connection, '/rest/V1/products?searchCriteria[pageSize]=100&searchCriteria[currentPage]=1');
+  if (connection.platform === 'ecwid') return `https://app.ecwid.com/api/v3/${c.storeId}/products`;
+  throw new Error(`${commercePlatformInfo(connection.platform)?.label || connection.platform} product sync needs feedUrl or supported API credentials.`);
+}
+
+function ecommerceOrdersUrl(connection = {}) {
+  const c = connection.credentials || {};
+  if (c.ordersFeedUrl || connection.ordersFeedUrl) return c.ordersFeedUrl || connection.ordersFeedUrl;
+  if (connection.platform === 'shopify') return absoluteCommerceUrl(connection, `/admin/api/${c.apiVersion || '2024-10'}/orders.json?status=any&limit=250`);
+  if (connection.platform === 'woocommerce') {
+    const url = new URL(absoluteCommerceUrl(connection, '/wp-json/wc/v3/orders'));
+    url.searchParams.set('per_page', '100');
+    if (c.consumerKey) url.searchParams.set('consumer_key', c.consumerKey);
+    if (c.consumerSecret) url.searchParams.set('consumer_secret', c.consumerSecret);
+    return url.toString();
+  }
+  if (connection.platform === 'bigcommerce') return `https://api.bigcommerce.com/stores/${c.storeHash}/v2/orders?limit=250`;
+  if (connection.platform === 'magento') return absoluteCommerceUrl(connection, '/rest/V1/orders?searchCriteria[pageSize]=100&searchCriteria[currentPage]=1');
+  if (connection.platform === 'ecwid') return `https://app.ecwid.com/api/v3/${c.storeId}/orders`;
+  throw new Error(`${commercePlatformInfo(connection.platform)?.label || connection.platform} order sync needs ordersFeedUrl or supported API credentials.`);
+}
+
+async function syncCommerceProducts(connectionId = '') {
+  const connection = commerceConnectionById(connectionId);
+  if (!connection) throw new Error('Commerce connection not found');
+  const url = ecommerceProductsUrl(connection);
+  const data = await ecommerceFetchJson(url, connection);
+  const rows = normalizeCommerceProductsPayload(data, connection.platform);
+  const imported = rows.map(row => mapAnyCommerceProduct(row, connection)).filter(item => item.name);
+  const result = upsertEcommerceCatalogProducts(imported);
+  connection.lastProductSyncAt = new Date().toISOString();
+  connection.updatedAt = new Date().toISOString();
+  saveCommerceConnections();
+  logCommerceEvent('products_synced', { connection: publicCommerceConnection(connection), fetched: rows.length, imported: imported.length, ...result }, connection.platform);
+  return { success: true, connection: publicCommerceConnection(connection), fetched: rows.length, imported: imported.length, ...result };
+}
+
+async function syncCommerceOrders(connectionId = '') {
+  const connection = commerceConnectionById(connectionId);
+  if (!connection) throw new Error('Commerce connection not found');
+  const url = ecommerceOrdersUrl(connection);
+  const data = await ecommerceFetchJson(url, connection);
+  const rows = normalizeCommerceOrdersPayload(data, connection.platform);
+  const processed = [];
+  for (const row of rows.slice(0, 250)) {
+    const order = await processCommerceOrderWebhook(connection.platform, { ...row, sourceConnectionId: connection.id });
+    processed.push(order);
+  }
+  connection.lastOrderSyncAt = new Date().toISOString();
+  connection.updatedAt = new Date().toISOString();
+  saveCommerceConnections();
+  logCommerceEvent('orders_synced', { connection: publicCommerceConnection(connection), fetched: rows.length, processed: processed.length }, connection.platform);
+  return { success: true, connection: publicCommerceConnection(connection), fetched: rows.length, processed: processed.length };
+}
+
+function ecommerceHubSummary() {
+  const connections = (commerceConnections || []).map(publicCommerceConnection);
+  const platformCounts = connections.reduce((acc, row) => {
+    acc[row.platform] = (acc[row.platform] || 0) + 1;
+    return acc;
+  }, {});
+  const importedProducts = (laptopProducts || []).filter(item => item.tags?.includes?.('ecommerce-import') || item.platform || item.sourceConnectionId).length;
+  const commerceOrders = (orders || []).filter(item => item.source || item.sourceConnectionId || item.platform);
+  return {
+    enabled: commerceSettings.enabled !== false,
+    platforms: ECOMMERCE_PLATFORM_DIRECTORY,
+    connections,
+    platformCounts,
+    importedProducts,
+    commerceOrders: commerceOrders.length,
+    recentEvents: (commerceEvents || []).slice(-20).reverse()
+  };
+}
+
+function buildEcommerceHubPage(req) {
+  const base = currentBaseUrl(req);
+  const summary = ecommerceHubSummary();
+  const platformOptions = ECOMMERCE_PLATFORM_DIRECTORY.map(item => `<option value="${htmlEscape(item.slug)}">${htmlEscape(item.label)}</option>`).join('');
+  const connectionRows = summary.connections.length
+    ? summary.connections.map(row => `
+      <tr>
+        <td><b>${htmlEscape(row.name)}</b><br><small>${htmlEscape(row.id)}</small></td>
+        <td>${htmlEscape(row.label)}<br><small>${row.configured ? 'Configured' : 'Needs credentials/feed'}</small></td>
+        <td>${htmlEscape(row.storeUrl || row.feedUrl || '-')}</td>
+        <td>${row.enabled ? '<span class="ok">Active</span>' : '<span class="warn">Paused</span>'}</td>
+        <td>
+          <button onclick="syncProducts('${htmlEscape(row.id)}')">Sync Products</button>
+          <button onclick="syncOrders('${htmlEscape(row.id)}')">Sync Orders</button>
+          <button class="secondary" onclick="copyText('${htmlEscape(base + row.webhookUrl)}')">Copy Webhook</button>
+        </td>
+      </tr>`).join('')
+    : '<tr><td colspan="5" class="muted">No ecommerce connections yet.</td></tr>';
+  const platformCards = ECOMMERCE_PLATFORM_DIRECTORY.map(item => `
+    <div class="platform">
+      <b>${htmlEscape(item.label)}</b>
+      <small>${htmlEscape(item.auth)}</small>
+      <p>${htmlEscape(item.notes)}</p>
+    </div>`).join('');
+  const eventRows = summary.recentEvents.map(event => `
+    <tr>
+      <td>${htmlEscape(event.createdAt || '')}</td>
+      <td>${htmlEscape(event.type || '')}</td>
+      <td>${htmlEscape(event.source || '')}</td>
+      <td><code>${htmlEscape(JSON.stringify(event.payload || {}).slice(0, 180))}</code></td>
+    </tr>`).join('');
+  return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ecommerce Hub - SuperSender Pro</title><style>
+    :root{color-scheme:dark;--bg:#071014;--panel:#122029;--line:#263946;--text:#eaf7f3;--muted:#93a7b1;--accent:#14b8a6;--warn:#f59e0b}
+    *{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#071014,#10212b);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif}
+    main{max-width:1260px;margin:0 auto;padding:26px}.top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.muted,small{color:var(--muted)}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}.card,.platform{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 14px 50px rgba(0,0,0,.24)}
+    .kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:16px 0}.kpi b{font-size:28px;color:#5eead4}label{display:block;margin:10px 0 5px;color:#b7c8d1;font-size:12px;text-transform:uppercase;font-weight:800}
+    input,select,textarea{width:100%;background:#0b151c;color:var(--text);border:1px solid #324655;border-radius:10px;padding:11px;font:inherit}textarea{min-height:76px}
+    button,.btn{border:0;border-radius:10px;background:var(--accent);color:#06231c;font-weight:900;padding:9px 11px;cursor:pointer;text-decoration:none;display:inline-flex;gap:6px;margin:2px}.secondary{background:#223541;color:var(--text);border:1px solid #36505e}
+    table{width:100%;border-collapse:collapse;margin-top:10px}th,td{text-align:left;border-bottom:1px solid var(--line);padding:10px;vertical-align:top}th{font-size:12px;color:#9db0bb;text-transform:uppercase;letter-spacing:.06em}.ok{color:#2dd4bf;font-weight:800}.warn{color:var(--warn);font-weight:800}code{white-space:pre-wrap;color:#bae6fd}
+    @media(max-width:780px){.top{display:block}table{font-size:12px}}
+  </style></head><body><main>
+    <div class="top"><div><h1>Ecommerce Integration Hub</h1><p class="muted">All major ecommerce platforms ko WhatsApp orders, product catalog, abandoned cart, and admin alerts ke sath connect karein.</p></div><p><a class="btn secondary" href="/">Dashboard</a><a class="btn secondary" href="/api/ecommerce/status">JSON Status</a></p></div>
+    <div class="kpi">
+      <div class="card"><small>Connections</small><br><b>${summary.connections.length}</b></div>
+      <div class="card"><small>Imported Products</small><br><b>${summary.importedProducts}</b></div>
+      <div class="card"><small>Commerce Orders</small><br><b>${summary.commerceOrders}</b></div>
+      <div class="card"><small>Platforms Ready</small><br><b>${ECOMMERCE_PLATFORM_DIRECTORY.length}</b></div>
+    </div>
+    <div class="grid">
+      <section class="card">
+        <h2>Add Store Connection</h2>
+        <label>Platform</label><select id="platform">${platformOptions}</select>
+        <label>Name</label><input id="name" placeholder="Main Shopify Store">
+        <label>Store URL</label><input id="storeUrl" placeholder="https://your-store.myshopify.com">
+        <label>Product Feed URL (optional)</label><input id="feedUrl" placeholder="https://site.com/products.json">
+        <label>Access Token / Bearer Token</label><input id="accessToken" placeholder="Paste token locally">
+        <label>Consumer Key (WooCommerce)</label><input id="consumerKey" placeholder="ck_...">
+        <label>Consumer Secret (WooCommerce)</label><input id="consumerSecret" placeholder="cs_...">
+        <label>Store Hash / Store ID</label><input id="storeHash" placeholder="BigCommerce hash or Ecwid store ID">
+        <label>Default Category</label><input id="defaultCategory" value="ecommerce">
+        <button onclick="saveConnection()">Save Connection</button>
+      </section>
+      <section class="card">
+        <h2>Platform Directory</h2>
+        <div class="grid">${platformCards}</div>
+      </section>
+    </div>
+    <section class="card" style="margin-top:16px"><h2>Connections</h2><table><thead><tr><th>Name</th><th>Platform</th><th>Store/Feed</th><th>Status</th><th>Actions</th></tr></thead><tbody>${connectionRows}</tbody></table></section>
+    <section class="card" style="margin-top:16px"><h2>Recent Commerce Events</h2><table><thead><tr><th>Time</th><th>Type</th><th>Source</th><th>Payload</th></tr></thead><tbody>${eventRows || '<tr><td colspan="4" class="muted">No events yet.</td></tr>'}</tbody></table></section>
+  </main><script>
+    async function api(url, options={}){ const r=await fetch(url,{headers:{'Content-Type':'application/json'},...options}); const d=await r.json().catch(()=>({})); if(!r.ok||d.success===false) throw new Error(d.error||'Request failed'); return d; }
+    async function saveConnection(){
+      const platform=document.getElementById('platform').value;
+      const storeHash=document.getElementById('storeHash').value.trim();
+      const payload={platform,name:document.getElementById('name').value||platform,storeUrl:document.getElementById('storeUrl').value,feedUrl:document.getElementById('feedUrl').value,defaultCategory:document.getElementById('defaultCategory').value,credentials:{accessToken:document.getElementById('accessToken').value,consumerKey:document.getElementById('consumerKey').value,consumerSecret:document.getElementById('consumerSecret').value,storeHash:platform==='bigcommerce'?storeHash:'',storeId:platform==='ecwid'?storeHash:''}};
+      await api('/api/ecommerce/connections',{method:'POST',body:JSON.stringify(payload)}); location.reload();
+    }
+    async function syncProducts(id){ try{ const d=await api('/api/ecommerce/connections/'+id+'/sync-products',{method:'POST'}); alert('Products synced: '+d.imported+' imported, '+d.added+' added, '+d.updated+' updated'); location.reload(); }catch(e){ alert(e.message); } }
+    async function syncOrders(id){ try{ const d=await api('/api/ecommerce/connections/'+id+'/sync-orders',{method:'POST'}); alert('Orders synced: '+d.processed); location.reload(); }catch(e){ alert(e.message); } }
+    async function copyText(text){ await navigator.clipboard.writeText(text); alert('Copied: '+text); }
+  </script></body></html>`;
 }
 
 function normalizeCommercePhone(phone = '') {
@@ -39458,6 +40175,111 @@ function buildCommerceOrderUpdateMessage(order = {}, payload = {}) {
 
 app.get('/api/commerce/settings', (req, res) => {
   res.json({ success: true, settings: commerceSettings });
+});
+
+app.get('/ecommerce-hub', (req, res) => {
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.send(buildEcommerceHubPage(req));
+});
+
+app.get('/api/ecommerce/status', (req, res) => {
+  res.json({ success: true, ...ecommerceHubSummary() });
+});
+
+app.get('/api/ecommerce/platforms', (req, res) => {
+  res.json({ success: true, platforms: ECOMMERCE_PLATFORM_DIRECTORY });
+});
+
+app.get('/api/ecommerce/connections', (req, res) => {
+  res.json({ success: true, connections: (commerceConnections || []).map(publicCommerceConnection) });
+});
+
+app.post('/api/ecommerce/connections', (req, res) => {
+  try {
+    const record = upsertCommerceConnection(req.body || {});
+    res.json({ success: true, connection: publicCommerceConnection(record) });
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.put('/api/ecommerce/connections/:id', (req, res) => {
+  try {
+    const existing = commerceConnectionById(req.params.id);
+    if (!existing) return res.status(404).json({ success: false, error: 'Commerce connection not found' });
+    const record = upsertCommerceConnection({ ...existing, ...(req.body || {}), id: existing.id });
+    res.json({ success: true, connection: publicCommerceConnection(record) });
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.delete('/api/ecommerce/connections/:id', (req, res) => {
+  const before = commerceConnections.length;
+  commerceConnections = commerceConnections.filter(row => row.id !== req.params.id);
+  saveCommerceConnections();
+  logCommerceEvent('connection_deleted', { id: req.params.id }, 'ecommerce');
+  res.json({ success: true, removed: before - commerceConnections.length });
+});
+
+app.post('/api/ecommerce/connections/:id/test', async (req, res) => {
+  try {
+    const connection = commerceConnectionById(req.params.id);
+    if (!connection) return res.status(404).json({ success: false, error: 'Commerce connection not found' });
+    const url = req.body?.url || connection.feedUrl || connection.credentials?.feedUrl || (connection.platform === 'custom' ? connection.storeUrl : ecommerceProductsUrl(connection));
+    const data = await ecommerceFetchJson(url, connection);
+    const products = normalizeCommerceProductsPayload(data, connection.platform);
+    const ordersList = normalizeCommerceOrdersPayload(data, connection.platform);
+    logCommerceEvent('connection_tested', { connection: publicCommerceConnection(connection), productsDetected: products.length, ordersDetected: ordersList.length }, connection.platform);
+    res.json({ success: true, connection: publicCommerceConnection(connection), productsDetected: products.length, ordersDetected: ordersList.length });
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/ecommerce/connections/:id/sync-products', async (req, res) => {
+  try {
+    res.json(await syncCommerceProducts(req.params.id));
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/ecommerce/connections/:id/sync-orders', async (req, res) => {
+  try {
+    res.json(await syncCommerceOrders(req.params.id));
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/ecommerce/sync-all', async (req, res) => {
+  const results = [];
+  for (const connection of (commerceConnections || []).filter(row => row.enabled !== false)) {
+    const entry = { id: connection.id, platform: connection.platform, products: null, orders: null };
+    if (req.body?.products !== false && connection.autoSyncProducts !== false) {
+      try { entry.products = await syncCommerceProducts(connection.id); } catch (error) { entry.products = { success: false, error: error.message }; }
+    }
+    if (req.body?.orders === true || connection.autoSyncOrders === true) {
+      try { entry.orders = await syncCommerceOrders(connection.id); } catch (error) { entry.orders = { success: false, error: error.message }; }
+    }
+    results.push(entry);
+  }
+  res.json({ success: true, results });
+});
+
+app.post('/api/ecommerce/webhook/:platform/:connectionId?', async (req, res) => {
+  try {
+    const platform = normalizeEcommercePlatform(req.params.platform || 'custom');
+    const connection = commerceConnectionById(req.params.connectionId || '') || { id: '', platform, name: commercePlatformInfo(platform)?.label || platform };
+    const payload = req.body?.order || req.body?.data || req.body || {};
+    const record = await processCommerceOrderWebhook(platform, { ...payload, sourceConnectionId: connection.id || '' });
+    logCommerceEvent('universal_webhook_order', { platform, connectionId: connection.id || '', orderNumber: record.orderNumber }, platform);
+    res.json({ success: true, order: record });
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
 });
 
 app.post('/api/commerce/settings', (req, res) => {
