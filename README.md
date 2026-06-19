@@ -113,6 +113,52 @@ Use the customer session for customer sales, dealer session for rate monitoring,
 
 `WA_AUTO_CONNECT=true` reconnects the saved WhatsApp session automatically after a server restart, so customers still receive menu/welcome replies without pressing Connect again.
 
+## Official WhatsApp Cloud API Lane
+
+SuperSender Pro can now run Baileys / whatsapp-web.js and the official Meta WhatsApp Cloud API side by side. Use the QR bot for local admin/internal workflows, and use Cloud API for client SaaS, compliant templates, webhooks, support, and production delivery.
+
+Dashboard:
+
+```text
+http://localhost:3001/whatsapp-cloud-api
+```
+
+Required `.env` keys:
+
+```env
+WHATSAPP_SEND_PROVIDER=unofficial
+WHATSAPP_CLOUD_API_ENABLED=false
+WHATSAPP_CLOUD_FALLBACK_ENABLED=true
+WHATSAPP_CLOUD_DRY_RUN=true
+WHATSAPP_CLOUD_GRAPH_VERSION=v21.0
+WHATSAPP_CLOUD_PHONE_NUMBER_ID=
+WHATSAPP_CLOUD_BUSINESS_ACCOUNT_ID=
+WHATSAPP_CLOUD_ACCESS_TOKEN=
+WHATSAPP_CLOUD_VERIFY_TOKEN=
+WHATSAPP_CLOUD_DEFAULT_TEMPLATE=hello_world
+WHATSAPP_CLOUD_DEFAULT_LANGUAGE=en_US
+```
+
+API:
+
+```text
+GET  /api/whatsapp-cloud/status
+POST /api/whatsapp-cloud/settings
+POST /api/whatsapp-cloud/send-text
+POST /api/whatsapp-cloud/send-template
+GET  /api/whatsapp-cloud/webhook
+POST /api/whatsapp-cloud/webhook
+POST /api/wa/send-official
+```
+
+WhatsApp admin command:
+
+```text
+!cloudapi
+```
+
+Meta setup: add the webhook URL shown on `/whatsapp-cloud-api` to Meta Developer Console > WhatsApp > Configuration. Use the same verify token in Meta and in SuperSender settings. Keep `WHATSAPP_CLOUD_DRY_RUN=true` until a test template and test recipient are confirmed.
+
 ## WhatsApp Automation Settings Center
 
 SuperSender Pro now includes a reusable automation-settings layer that can be sold to other businesses and founders, not only AI tools resellers.
