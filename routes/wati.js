@@ -329,5 +329,80 @@ module.exports = function(watiBroadcast, watiCopilot) {
     }
   });
 
-  return router;
+  
+  // ========================================================================
+  // GLOBAL ADVANCED COMPETITOR ENDPOINTS
+  // ========================================================================
+
+  // 20. Charles-Style "Chat-Out" Pre-filled checkout carts (Competitor: Charles)
+  router.post('/wati/checkout/chat-out', (req, res) => {
+    try {
+      const { productId, qty = 1, discountCode = '' } = req.body;
+      if (!productId) {
+        return res.status(400).json({ success: false, error: 'productId is required.' });
+      }
+      const chatOut = competitorParity.createChatOutLink(productId, qty, discountCode);
+      res.json({ success: true, chatOut });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // 21. AiSensy-Style Smart Retargeting Broadcast (Competitor: AiSensy)
+  router.post('/wati/campaigns/retarget', (req, res) => {
+    try {
+      const { tenantId = 'default-tenant', parentCampaignId, followUpTemplateId } = req.body;
+      if (!parentCampaignId || !followUpTemplateId) {
+        return res.status(400).json({ success: false, error: 'parentCampaignId and followUpTemplateId are required.' });
+      }
+      const result = competitorParity.triggerRetargetingBroadcast(tenantId, parentCampaignId, followUpTemplateId);
+      res.json(result);
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // 22. QuickReply AI-Style eCommerce Abandoned Cart Recovery Trigger (Competitor: QuickReply AI)
+  router.post('/wati/cart-recovery', (req, res) => {
+    try {
+      const { tenantId = 'default-tenant', phone, cartItems = [] } = req.body;
+      if (!phone || !cartItems.length) {
+        return res.status(400).json({ success: false, error: 'phone and cartItems are required.' });
+      }
+      const recoveryFlow = competitorParity.generateCartRecoveryFlow(tenantId, phone, cartItems);
+      res.json({ success: true, recoveryFlow });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // 23. GoHighLevel-Style CRM Stage Transition alert triggers (Competitor: GoHighLevel)
+  router.post('/wati/crm/transition', (req, res) => {
+    try {
+      const { tenantId = 'default-tenant', leadId, phone, previousStage, newStage } = req.body;
+      if (!leadId || !phone || !previousStage || !newStage) {
+        return res.status(400).json({ success: false, error: 'leadId, phone, previousStage, and newStage are required.' });
+      }
+      const transitionReport = competitorParity.handleCrmStageTransition(tenantId, leadId, phone, previousStage, newStage);
+      res.json({ success: true, transitionReport });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // 24. WANotifier-Style Real-time Google Sheet data synchronization (Competitor: WANotifier)
+  router.post('/wati/sync/sheets', (req, res) => {
+    try {
+      const { tenantId = 'default-tenant', sheetId, rowData } = req.body;
+      if (!sheetId || !rowData) {
+        return res.status(400).json({ success: false, error: 'sheetId and rowData are required.' });
+      }
+      const syncReport = competitorParity.syncToGoogleSheets(tenantId, sheetId, rowData);
+      res.json({ success: true, syncReport });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+    return router;
 };
