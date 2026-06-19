@@ -1,5 +1,5 @@
 const { generateWithGroq } = require('./providers/groq');
-const { detectLanguage, getLanguageSpecificSystemPrompt } = require('../languageDetector');
+const { detectLanguage, getLanguageSpecificSystemPrompt } = require('./languageDetector');
 
 module.exports = {
   generateAIResponse: async function(prompt, provider, apiKeys, model, context = {}) {
