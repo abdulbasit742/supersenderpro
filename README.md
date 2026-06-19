@@ -1135,6 +1135,21 @@ Backend:
 GET http://localhost:3001/api/health
 ```
 
+Setup validator:
+
+```text
+GET http://localhost:3001/setup-validator
+GET http://localhost:3001/api/system/setup-validator
+```
+
+WhatsApp admin command:
+
+```text
+!setupcheck
+```
+
+Use this before debugging a dead bot/server. It checks the live `server.js`, `.env`, data/uploads folders, WhatsApp auth folders, admin number, selling/customer group IDs, public tunnel URL, Google Sheets, n8n, Redis, Tavily, NVIDIA, Meta/LinkedIn/TikTok app keys, Official WhatsApp Cloud API readiness, active QR sessions, and module load errors. It returns exact next fixes without exposing secrets.
+
 Frontend:
 
 ```text

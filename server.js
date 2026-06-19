@@ -11550,6 +11550,169 @@ API:
 /api/ai-automation/status`;
 }
 
+function firstConfiguredValue(keys = []) {
+  for (const key of keys) {
+    const envValue = String(process.env[key] || '').trim();
+    if (envValue) return { key, value: envValue, source: 'env' };
+    const settingKey = key.toLowerCase();
+    const settingValue = String(settings?.[settingKey] || '').trim();
+    if (settingValue) return { key: settingKey, value: settingValue, source: 'settings' };
+  }
+  return { key: keys[0] || '', value: '', source: '' };
+}
+
+function makeSetupCheck(input = {}) {
+  const keys = Array.isArray(input.keys) ? input.keys : [input.key].filter(Boolean);
+  const found = firstConfiguredValue(keys);
+  const ok = !!found.value;
+  return {
+    id: input.id || (keys[0] || '').toLowerCase(),
+    label: input.label || keys[0] || 'Config',
+    category: input.category || 'config',
+    severity: input.severity || 'recommended',
+    ok,
+    configuredBy: ok ? found.source : '',
+    key: found.key || keys[0] || '',
+    keys,
+    valueMasked: ok ? maskSecret(found.value) : '',
+    message: ok ? (input.okMessage || 'Configured') : (input.missingMessage || 'Missing'),
+    fix: input.fix || `Set ${keys.join(' or ')} in .env or Settings.`
+  };
+}
+
+function makeSetupPathCheck(input = {}) {
+  const fullPath = input.path || '';
+  let exists = false;
+  let count = 0;
+  try {
+    exists = !!fullPath && fs.existsSync(fullPath);
+    if (exists && fs.statSync(fullPath).isDirectory()) count = fs.readdirSync(fullPath).length;
+  } catch {}
+  return {
+    id: input.id || path.basename(fullPath || 'path'),
+    label: input.label || fullPath,
+    category: input.category || 'paths',
+    severity: input.severity || 'recommended',
+    ok: input.mustBeNonEmpty ? (exists && count > 0) : exists,
+    path: fullPath,
+    count,
+    message: exists ? (count ? `${count} items` : 'Exists') : 'Missing',
+    fix: input.fix || `Create ${fullPath}`
+  };
+}
+
+function buildSystemSetupValidator() {
+  const publicBaseUrl = String(settings.social_public_base_url || settings.gmail_public_base_url || process.env.PUBLIC_BASE_URL || '').trim();
+  const cloud = getWhatsAppCloudStatus();
+  const checks = [
+    makeSetupPathCheck({ id: 'server_js', label: 'Live server.js', severity: 'critical', path: path.join(__dirname, 'server.js') }),
+    makeSetupPathCheck({ id: 'data_dir', label: 'Runtime data folder', severity: 'critical', path: dataDir }),
+    makeSetupPathCheck({ id: 'uploads_dir', label: 'Uploads folder', severity: 'recommended', path: path.join(__dirname, 'uploads') }),
+    makeSetupPathCheck({ id: 'env_file', label: '.env file', severity: 'critical', path: path.join(__dirname, '.env'), fix: 'Copy .env.example to .env and fill live values.' }),
+    makeSetupPathCheck({ id: 'env_example', label: '.env.example', severity: 'recommended', path: path.join(__dirname, '.env.example') }),
+    makeSetupPathCheck({ id: 'readme', label: 'README.md', severity: 'recommended', path: path.join(__dirname, 'README.md') }),
+    makeSetupPathCheck({ id: 'node_local', label: 'Bundled node-local.exe', severity: 'recommended', path: path.join(__dirname, 'node-local.exe'), fix: 'Keep node-local.exe locally only; do not commit it.' }),
+    makeSetupPathCheck({ id: 'wwebjs_auth', label: 'WhatsApp Web auth folder', severity: 'recommended', path: path.join(__dirname, '.wwebjs_auth'), mustBeNonEmpty: true, fix: 'Open /wa-qr and scan QR from the WhatsApp account.' }),
+    makeSetupPathCheck({ id: 'wa_auth', label: 'Baileys auth folder', severity: 'optional', path: path.join(__dirname, '.wa-auth'), mustBeNonEmpty: true, fix: 'Only needed if Baileys session mode is used.' }),
+    makeSetupCheck({ id: 'admin_number', label: 'Admin WhatsApp number', category: 'whatsapp', severity: 'critical', keys: ['ADMIN_NUMBER', 'OWNER_WHATSAPP'], fix: 'Set ADMIN_NUMBER=923xxxxxxxxx in .env.' }),
+    makeSetupCheck({ id: 'selling_groups', label: 'Selling groups', category: 'dealer intelligence', severity: 'recommended', keys: ['SELLING_GROUPS'], fix: 'Add comma-separated WhatsApp selling group IDs.' }),
+    makeSetupCheck({ id: 'customer_groups', label: 'Customer groups', category: 'broadcast', severity: 'recommended', keys: ['CUSTOMER_GROUPS'], fix: 'Add comma-separated customer group IDs.' }),
+    makeSetupCheck({ id: 'public_base_url', label: 'Public base URL', category: 'deployment', severity: 'recommended', keys: ['PUBLIC_BASE_URL', 'SOCIAL_PUBLIC_BASE_URL', 'GMAIL_PUBLIC_BASE_URL'], okMessage: publicBaseUrl ? publicBaseUrl : 'Configured', fix: 'Set PUBLIC_BASE_URL or social_public_base_url to your Cloudflare tunnel/domain.' }),
+    makeSetupCheck({ id: 'jwt_secret', label: 'JWT secret', category: 'security', severity: 'recommended', keys: ['JWT_SECRET'], fix: 'Set a long random JWT_SECRET in .env.' }),
+    makeSetupCheck({ id: 'n8n_secret', label: 'n8n webhook secret', category: 'automation', severity: 'optional', keys: ['N8N_WEBHOOK_SECRET'], fix: 'Set N8N_WEBHOOK_SECRET if n8n workflows are active.' }),
+    makeSetupCheck({ id: 'redis_url', label: 'Redis URL for queues', category: 'queues', severity: 'optional', keys: ['REDIS_URL'], fix: 'Set REDIS_URL=redis://localhost:6379 or Docker redis service.' }),
+    makeSetupCheck({ id: 'tavily_api', label: 'Tavily web intelligence', category: 'ai', severity: 'optional', keys: ['TAVILY_API_KEY'], fix: 'Set TAVILY_API_KEY for web research/fetch automation.' }),
+    makeSetupCheck({ id: 'nvidia_api', label: 'NVIDIA/Nemotron API', category: 'ai', severity: 'optional', keys: ['NVIDIA_API_KEY'], fix: 'Set NVIDIA_API_KEY if using NVIDIA hosted LLMs.' }),
+    makeSetupCheck({ id: 'google_sheets', label: 'Google Sheets ID', category: 'sync', severity: 'optional', keys: ['GOOGLE_SHEETS_ID'], fix: 'Set GOOGLE_SHEETS_ID and service account fields for Sheets sync.' }),
+    makeSetupCheck({ id: 'facebook_app', label: 'Meta app credentials', category: 'social', severity: 'optional', keys: ['FACEBOOK_APP_ID', 'META_APP_ID'], fix: 'Set FACEBOOK_APP_ID and FACEBOOK_APP_SECRET for OAuth.' }),
+    makeSetupCheck({ id: 'linkedin_app', label: 'LinkedIn app credentials', category: 'social', severity: 'optional', keys: ['LINKEDIN_CLIENT_ID'], fix: 'Set LINKEDIN_CLIENT_ID and LINKEDIN_CLIENT_SECRET for OAuth.' }),
+    makeSetupCheck({ id: 'tiktok_app', label: 'TikTok app credentials', category: 'social', severity: 'optional', keys: ['TIKTOK_CLIENT_KEY', 'TIKTOK_CLIENT_ID'], fix: 'Set TikTok client key/secret when TikTok posting is active.' }),
+    {
+      id: 'whatsapp_cloud_api',
+      label: 'Official WhatsApp Cloud API',
+      category: 'whatsapp',
+      severity: cloud.enabled ? 'critical' : 'optional',
+      ok: !cloud.enabled || cloud.ready,
+      message: cloud.enabled ? (cloud.ready ? 'Ready' : `Missing ${cloud.missing.join(', ')}`) : 'Disabled',
+      fix: 'Open /whatsapp-cloud-api and set phone_number_id, access token, verify token.'
+    },
+    {
+      id: 'active_whatsapp_session',
+      label: 'Active WhatsApp QR session',
+      category: 'whatsapp',
+      severity: 'recommended',
+      ok: Array.from(waClients.values()).some(client => client?.isReady),
+      message: `${Array.from(waClients.values()).filter(client => client?.isReady).length}/${waClients.size || 1} ready`,
+      fix: 'Open /wa-qr and scan again if no session is ready.'
+    }
+  ];
+
+  const moduleErrors = [
+    ...Object.entries(automationLoadErrors || {}).map(([name, error]) => ({ name, error, type: 'automation' })),
+    ...Object.entries(integrationLoadErrors || {}).map(([name, error]) => ({ name, error, type: 'integration' }))
+  ].filter(row => row.error);
+
+  const critical = checks.filter(row => row.severity === 'critical');
+  const recommended = checks.filter(row => row.severity === 'recommended');
+  const failedCritical = critical.filter(row => !row.ok);
+  const failedRecommended = recommended.filter(row => !row.ok);
+  const passed = checks.filter(row => row.ok).length;
+  const score = Math.round((passed / Math.max(1, checks.length)) * 100);
+
+  return {
+    success: true,
+    generatedAt: new Date().toISOString(),
+    root: __dirname,
+    dataDir,
+    score,
+    status: failedCritical.length ? 'needs_attention' : (failedRecommended.length ? 'ready_with_warnings' : 'ready'),
+    summary: {
+      total: checks.length,
+      passed,
+      failedCritical: failedCritical.length,
+      failedRecommended: failedRecommended.length,
+      moduleErrors: moduleErrors.length
+    },
+    checks,
+    moduleErrors,
+    nextFixes: checks
+      .filter(row => !row.ok && ['critical', 'recommended'].includes(row.severity))
+      .slice(0, 12)
+      .map(row => ({ id: row.id, label: row.label, severity: row.severity, fix: row.fix })),
+    links: {
+      dashboard: '/setup-validator',
+      health: '/api/health',
+      whatsappQr: '/wa-qr',
+      cloudApi: '/whatsapp-cloud-api',
+      aiAutomation: '/ai-automation-hub'
+    }
+  };
+}
+
+function buildSystemSetupValidatorReply() {
+  const report = buildSystemSetupValidator();
+  const fixes = report.nextFixes.length
+    ? report.nextFixes.map((row, index) => `${index + 1}. [${row.severity}] ${row.label}\n   ${row.fix}`).join('\n')
+    : 'No critical/recommended fixes pending.';
+  return `*SuperSender Setup Validator*
+
+Status: *${report.status}*
+Score: *${report.score}%*
+Passed: *${report.summary.passed}/${report.summary.total}*
+Critical missing: *${report.summary.failedCritical}*
+Recommended missing: *${report.summary.failedRecommended}*
+Module errors: *${report.summary.moduleErrors}*
+
+Next fixes:
+${fixes}
+
+Dashboard:
+http://localhost:3001/setup-validator
+
+API:
+/api/system/setup-validator`;
+}
+
 function markWhatsAppChannelManualPacketDone(packetId = '', note = '') {
   const id = String(packetId || '').trim();
   if (!id) throw new Error('packetId is required');
@@ -20359,6 +20522,66 @@ pre{white-space:pre-wrap;background:#081018;border-radius:10px;padding:14px;over
 </main></body></html>`);
   } catch (error) {
     res.status(500).send(error.message);
+  }
+});
+
+app.get('/api/system/setup-validator', (_req, res) => {
+  try {
+    res.json(buildSystemSetupValidator());
+  } catch (error) {
+    console.error('[SetupValidator] failed:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/setup-validator', (_req, res) => {
+  try {
+    const report = buildSystemSetupValidator();
+    const statusClass = report.status === 'ready' ? 'ok' : (report.summary.failedCritical ? 'bad' : 'warn');
+    const byCategory = report.checks.reduce((acc, row) => {
+      const category = row.category || 'other';
+      acc[category] = acc[category] || [];
+      acc[category].push(row);
+      return acc;
+    }, {});
+    const categoryHtml = Object.entries(byCategory).map(([category, rows]) => `<section class="card">
+<h2>${htmlEscape(category)}</h2>
+<div class="checks">${rows.map(row => `<div class="check ${row.ok ? 'okline' : row.severity === 'critical' ? 'badline' : 'warnline'}">
+<div><strong>${htmlEscape(row.label)}</strong><p>${htmlEscape(row.message || '')}</p><small>${htmlEscape(row.fix || '')}</small></div>
+<span>${row.ok ? 'OK' : row.severity.toUpperCase()}</span>
+</div>`).join('')}</div>
+</section>`).join('');
+    const fixesHtml = report.nextFixes.length
+      ? report.nextFixes.map(row => `<li><strong>${htmlEscape(row.label)}</strong><br><span>${htmlEscape(row.fix)}</span></li>`).join('')
+      : '<li>No critical or recommended fixes pending.</li>';
+    res.type('html').send(`<!doctype html><html><head><meta charset="utf-8"><title>Setup Validator</title>
+<style>
+body{font-family:Inter,Arial,sans-serif;background:#0f1720;color:#e8f3ff;margin:0;padding:28px;line-height:1.5}
+main{max-width:1180px;margin:auto}.top{display:flex;gap:14px;flex-wrap:wrap;align-items:stretch}.hero,.card{background:#17232e;border:1px solid #284052;border-radius:14px;padding:20px;box-shadow:0 12px 32px rgba(0,0,0,.18)}
+.hero{flex:1 1 420px}.score{font-size:54px;font-weight:900;color:#5eead4}.pill{display:inline-flex;padding:6px 10px;border-radius:999px;font-weight:800;font-size:12px;text-transform:uppercase}
+.pill.ok{background:#064e3b;color:#86efac}.pill.warn{background:#713f12;color:#fde68a}.pill.bad{background:#7f1d1d;color:#fecaca}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;margin-top:14px}.checks{display:grid;gap:8px}
+.check{display:flex;justify-content:space-between;gap:12px;border-radius:10px;padding:12px;background:#0d1720;border:1px solid #243746}.check p{margin:4px 0;color:#b6c7d8}.check small{color:#7f95a8}.check span{font-weight:900;white-space:nowrap}
+.okline{border-color:#14532d}.warnline{border-color:#854d0e}.badline{border-color:#7f1d1d}
+a{color:#5eead4}.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.btn{background:#10b981;color:#06120d;padding:10px 14px;border-radius:8px;text-decoration:none;font-weight:800}
+ul{margin:0;padding-left:20px}.muted{color:#96aabd}
+</style></head><body><main>
+<div class="top"><section class="hero">
+<span class="pill ${statusClass}">${htmlEscape(report.status)}</span>
+<h1>SuperSender Setup Validator</h1>
+<div class="score">${report.score}%</div>
+<p class="muted">Root: <code>${htmlEscape(report.root)}</code></p>
+<p>Passed ${report.summary.passed}/${report.summary.total} checks. Critical missing: ${report.summary.failedCritical}. Recommended missing: ${report.summary.failedRecommended}.</p>
+<div class="toolbar"><a class="btn" href="/api/system/setup-validator">JSON API</a><a class="btn" href="/api/health">Health API</a><a class="btn" href="/wa-qr">WhatsApp QR</a><a class="btn" href="/whatsapp-cloud-api">Cloud API</a></div>
+</section><section class="card" style="flex:1 1 320px">
+<h2>Next fixes</h2><ul>${fixesHtml}</ul>
+<p class="muted">WhatsApp admin command: <code>!setupcheck</code></p>
+</section></div>
+<div class="grid">${categoryHtml}</div>
+</main></body></html>`);
+  } catch (error) {
+    console.error('[SetupValidatorPage] failed:', error);
+    res.status(500).send(`Setup Validator failed: ${htmlEscape(error.message)}`);
   }
 });
 
@@ -30446,7 +30669,7 @@ function splitSocialCommandArgs(text = '') {
 }
 
 function isWhatsAppSocialCommand(text = '') {
-  return /^!(social|connect|post|draft|approvepost|sharepost|poststatus|comment|telegram|control|admin|menuadmin|server|status|health|watchdog|cloudapi|officialwa|next50|antigravity|aihub|automationhub|agents|agentcontrol|agenttask|autobuild|claw|claws|zeroclaw|pcagents|importskills|skillpacks|packs|waauto|automation|autosettings|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelfix|channelwatch|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
+  return /^!(social|connect|post|draft|approvepost|sharepost|poststatus|comment|telegram|control|admin|menuadmin|server|status|health|setupcheck|setupvalidator|doctor|watchdog|cloudapi|officialwa|next50|antigravity|aihub|automationhub|agents|agentcontrol|agenttask|autobuild|claw|claws|zeroclaw|pcagents|importskills|skillpacks|packs|waauto|automation|autosettings|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelfix|channelwatch|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
 }
 
 function adminNumberCandidates() {
@@ -31624,6 +31847,11 @@ async function handleWhatsAppSocialAdminCommand(ctx = {}) {
 
     if (command === '!server' || command === '!status' || command === '!health') {
       await reply(buildServerStatusReply());
+      return true;
+    }
+
+    if (command === '!setupcheck' || command === '!setupvalidator' || command === '!doctor') {
+      await reply(buildSystemSetupValidatorReply());
       return true;
     }
 
