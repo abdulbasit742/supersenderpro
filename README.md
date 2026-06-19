@@ -1140,15 +1140,19 @@ Setup validator:
 ```text
 GET http://localhost:3001/setup-validator
 GET http://localhost:3001/api/system/setup-validator
+POST http://localhost:3001/api/system/setup-autofix
 ```
 
 WhatsApp admin command:
 
 ```text
 !setupcheck
+!setupfix
 ```
 
 Use this before debugging a dead bot/server. It checks the live `server.js`, `.env`, data/uploads folders, WhatsApp auth folders, admin number, selling/customer group IDs, public tunnel URL, Google Sheets, n8n, Redis, Tavily, NVIDIA, Meta/LinkedIn/TikTok app keys, Official WhatsApp Cloud API readiness, active QR sessions, and module load errors. It returns exact next fixes without exposing secrets.
+
+Safe Auto-Fix creates non-secret runtime folders (`uploads`, `logs`, `exports`, `tmp`), writes a setup report under `data/setup-validator-report.json`, and writes `data/setup-required-values.sample.json` with the remaining keys you must fill. It does not overwrite an existing `.env`, does not create WhatsApp sessions, and does not commit secrets.
 
 Frontend:
 
