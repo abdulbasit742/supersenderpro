@@ -1154,6 +1154,21 @@ Use this before debugging a dead bot/server. It checks the live `server.js`, `.e
 
 Safe Auto-Fix creates non-secret runtime folders (`uploads`, `logs`, `exports`, `tmp`), writes a setup report under `data/setup-validator-report.json`, and writes `data/setup-required-values.sample.json` with the remaining keys you must fill. It does not overwrite an existing `.env`, does not create WhatsApp sessions, and does not commit secrets.
 
+Project completion center:
+
+```text
+GET http://localhost:3001/project-completion
+GET http://localhost:3001/api/project/completion-report
+```
+
+WhatsApp admin command:
+
+```text
+!complete
+```
+
+The completion report combines setup readiness, WhatsApp QR status, Official WhatsApp Cloud API status, channel automation, social publishing, AI automation agents, and SaaS automation settings into one score with P0/P1/P2 blockers. It also generates a paste-ready Antigravity prompt for the next completion sprint.
+
 Frontend:
 
 ```text

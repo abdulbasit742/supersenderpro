@@ -11826,6 +11826,191 @@ Dashboard:
 http://localhost:3001/setup-validator`;
 }
 
+function safeCompletionProbe(label, fn, fallback = null) {
+  try {
+    return { ok: true, label, value: fn() };
+  } catch (error) {
+    return { ok: false, label, value: fallback, error: error.message };
+  }
+}
+
+function buildProjectCompletionReport() {
+  const setup = buildSystemSetupValidator();
+  const cloud = safeCompletionProbe('whatsappCloud', () => getWhatsAppCloudStatus(), {}).value || {};
+  const aiHub = safeCompletionProbe('aiAutomation', () => getAiAutomationStatus(), {}).value || {};
+  const automation = safeCompletionProbe('waAutomation', () => getWhatsAppAutomationSettings(), {}).value || {};
+  const channelWatchdog = safeCompletionProbe('channelWatchdog', () => (
+    typeof buildWhatsAppChannelWatchdogStatus === 'function' ? buildWhatsAppChannelWatchdogStatus() : {}
+  ), {}).value || {};
+  const channelCenter = safeCompletionProbe('channelCenter', () => (
+    typeof buildWhatsAppChannelCommandCenter === 'function' ? buildWhatsAppChannelCommandCenter() : {}
+  ), {}).value || {};
+  const activeWaSessions = typeof waClients !== 'undefined'
+    ? Array.from(waClients.values()).filter(client => client?.isReady).length
+    : 0;
+  const totalWaSessions = typeof waClients !== 'undefined' ? Math.max(1, waClients.size || 1) : 1;
+  const socialCount = Array.isArray(socialAccounts) ? socialAccounts.length : 0;
+  const configuredChannels = typeof getConfiguredWhatsAppChannels === 'function' ? getConfiguredWhatsAppChannels() : [];
+  const relayQueue = Array.isArray(channelRelayInbox) ? channelRelayInbox : [];
+  const openRelayCount = relayQueue.filter(row => !['published', 'rejected', 'done'].includes(String(row.status || '').toLowerCase())).length;
+
+  const modules = [
+    {
+      id: 'server',
+      label: 'Local server runtime',
+      score: 100,
+      status: 'ready',
+      detail: `Uptime ${Math.round(process.uptime())}s on port ${PORT}`
+    },
+    {
+      id: 'setup',
+      label: 'Setup validator',
+      score: setup.score,
+      status: setup.status,
+      detail: `${setup.summary.failedCritical} critical, ${setup.summary.failedRecommended} recommended missing`
+    },
+    {
+      id: 'whatsapp_qr',
+      label: 'WhatsApp QR bot',
+      score: activeWaSessions > 0 ? 90 : 45,
+      status: activeWaSessions > 0 ? 'ready' : 'needs_session',
+      detail: `${activeWaSessions}/${totalWaSessions} sessions ready`
+    },
+    {
+      id: 'whatsapp_cloud',
+      label: 'Official WhatsApp Cloud API',
+      score: cloud.ready ? 95 : (cloud.enabled ? 55 : 35),
+      status: cloud.ready ? 'ready' : (cloud.enabled ? 'missing_config' : 'optional_disabled'),
+      detail: cloud.ready ? 'Cloud API ready' : (cloud.missing?.length ? `Missing ${cloud.missing.join(', ')}` : 'Disabled')
+    },
+    {
+      id: 'channels',
+      label: 'WhatsApp Channel automation',
+      score: configuredChannels.length ? 75 : 45,
+      status: configuredChannels.length ? 'configured' : 'needs_targets',
+      detail: `${configuredChannels.length} target channels, ${openRelayCount} open relay items`
+    },
+    {
+      id: 'social',
+      label: 'Social publishing',
+      score: socialCount ? 70 : 40,
+      status: socialCount ? 'accounts_saved' : 'needs_oauth',
+      detail: `${socialCount} social accounts saved`
+    },
+    {
+      id: 'ai_agents',
+      label: 'AI automation agents',
+      score: aiHub.totals?.repoCatalog ? 80 : 55,
+      status: aiHub.totals?.repoCatalog ? 'planned' : 'basic',
+      detail: `${aiHub.totals?.repoCatalog || 0} repo blueprints, ${aiHub.totals?.queuedTasks || 0} queued tasks`
+    },
+    {
+      id: 'business_automation',
+      label: 'WhatsApp automation SaaS settings',
+      score: automation.enabled ? 80 : 60,
+      status: automation.enabled ? 'enabled' : 'configured_off',
+      detail: `${automation.label || automation.businessType || 'Automation'} profile`
+    }
+  ];
+
+  const weightedScore = Math.round(modules.reduce((sum, row) => sum + Number(row.score || 0), 0) / Math.max(1, modules.length));
+  const p0 = [];
+  const p1 = [];
+  const p2 = [];
+
+  if (setup.summary.failedCritical > 0) {
+    p0.push('Fix critical setup-validator items first: .env/admin/server/data path issues.');
+  }
+  if (activeWaSessions < 1) {
+    p0.push('Reconnect at least one WhatsApp QR session from /wa-qr.');
+  }
+  if (setup.summary.failedRecommended > 0) {
+    p1.push('Fill recommended setup values: groups, JWT secret, and live public URL.');
+  }
+  if (!cloud.ready) {
+    p1.push('Complete Official WhatsApp Cloud API credentials for production fallback.');
+  }
+  if (!configuredChannels.length) {
+    p1.push('Add target WhatsApp channel IDs and source channels in Channel Center.');
+  }
+  if (!socialCount) {
+    p1.push('Connect Meta/LinkedIn/TikTok OAuth accounts in Social Hub.');
+  }
+  if (!String(process.env.REDIS_URL || '').trim()) {
+    p2.push('Add Redis/BullMQ for durable automation jobs.');
+  }
+  if (!String(process.env.GOOGLE_SHEETS_ID || '').trim() && !String(settings.google_sheets_id || '').trim()) {
+    p2.push('Configure Google Sheets sync for reports and seller-rate exports.');
+  }
+  if (!String(process.env.TAVILY_API_KEY || '').trim() && !String(settings.tavily_api_key || '').trim()) {
+    p2.push('Configure Tavily API for scholarship/web intelligence automations.');
+  }
+
+  const completionStatus = p0.length
+    ? 'not_complete'
+    : weightedScore >= 85
+      ? 'production_ready'
+      : weightedScore >= 65
+        ? 'usable_needs_hardening'
+        : 'prototype_needs_setup';
+
+  const antigravityPrompt = `Antigravity, review SuperSender Pro and execute the next completion sprint.\n\nCurrent status: ${completionStatus}, score ${weightedScore}%.\nP0:\n${p0.map(x => '- ' + x).join('\n') || '- none'}\nP1:\n${p1.map(x => '- ' + x).join('\n') || '- none'}\n\nRules: do not commit .env, tokens, WhatsApp auth/session folders, uploads, logs, customer/order runtime JSON, node_modules, node-local.exe. Run node-local.exe --check server.js, smoke-test /api/system/setup-validator and /api/project/completion-report, then push only safe source/docs changes.`;
+
+  const report = {
+    success: true,
+    generatedAt: new Date().toISOString(),
+    root: __dirname,
+    status: completionStatus,
+    score: weightedScore,
+    modules,
+    blockers: { p0, p1, p2 },
+    setupSummary: setup.summary,
+    setupNextFixes: setup.nextFixes,
+    links: {
+      completion: '/project-completion',
+      completionApi: '/api/project/completion-report',
+      setupValidator: '/setup-validator',
+      health: '/api/health',
+      whatsappQr: '/wa-qr',
+      cloudApi: '/whatsapp-cloud-api',
+      channelCenter: '/wa-channel-qr',
+      aiAutomation: '/ai-automation-hub'
+    },
+    antigravityPrompt
+  };
+  try {
+    fs.writeFileSync(path.join(dataDir, 'project-completion-report.json'), stringifyJsonPayload(report), 'utf8');
+  } catch (error) {
+    report.reportSaveError = error.message;
+  }
+  return report;
+}
+
+function formatProjectCompletionReply(report = buildProjectCompletionReport()) {
+  const modules = report.modules.map(row => `• *${row.label}* — ${row.score}% (${row.status})`).join('\n');
+  const p0 = report.blockers.p0.length ? report.blockers.p0.map((x, i) => `${i + 1}. ${x}`).join('\n') : 'None';
+  const p1 = report.blockers.p1.length ? report.blockers.p1.slice(0, 6).map((x, i) => `${i + 1}. ${x}`).join('\n') : 'None';
+  return `*SuperSender Project Completion*
+
+Status: *${report.status}*
+Score: *${report.score}%*
+
+Modules:
+${modules}
+
+P0 blockers:
+${p0}
+
+P1 next:
+${p1}
+
+Dashboard:
+http://localhost:3001/project-completion
+
+API:
+/api/project/completion-report`;
+}
+
 function markWhatsAppChannelManualPacketDone(packetId = '', note = '') {
   const id = String(packetId || '').trim();
   if (!id) throw new Error('packetId is required');
@@ -20653,6 +20838,61 @@ app.post('/api/system/setup-autofix', (req, res) => {
   } catch (error) {
     console.error('[SetupAutofix] failed:', error);
     res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/project/completion-report', (_req, res) => {
+  try {
+    res.json(buildProjectCompletionReport());
+  } catch (error) {
+    console.error('[CompletionReport] failed:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/project-completion', (_req, res) => {
+  try {
+    const report = buildProjectCompletionReport();
+    const statusClass = report.status === 'production_ready' ? 'ok' : (report.blockers.p0.length ? 'bad' : 'warn');
+    const moduleCards = report.modules.map(row => `<article class="card">
+<div class="row"><h2>${htmlEscape(row.label)}</h2><span class="score">${Number(row.score || 0)}%</span></div>
+<span class="pill ${row.score >= 80 ? 'ok' : row.score >= 60 ? 'warn' : 'bad'}">${htmlEscape(row.status)}</span>
+<p>${htmlEscape(row.detail || '')}</p>
+</article>`).join('');
+    const list = rows => rows.length ? rows.map(item => `<li>${htmlEscape(item)}</li>`).join('') : '<li>None</li>';
+    res.type('html').send(`<!doctype html><html><head><meta charset="utf-8"><title>Project Completion Center</title>
+<style>
+body{font-family:Inter,Arial,sans-serif;background:#0f1720;color:#e8f3ff;margin:0;padding:28px;line-height:1.5}
+main{max-width:1180px;margin:auto}.hero,.card{background:#17232e;border:1px solid #284052;border-radius:14px;padding:20px;box-shadow:0 12px 32px rgba(0,0,0,.18)}
+.hero{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center}.big{font-size:64px;font-weight:950;color:#5eead4}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:14px}.row{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.pill{display:inline-flex;padding:6px 10px;border-radius:999px;font-weight:850;font-size:12px;text-transform:uppercase}.ok{background:#064e3b;color:#86efac}.warn{background:#713f12;color:#fde68a}.bad{background:#7f1d1d;color:#fecaca}
+.score{font-size:28px;font-weight:900;color:#5eead4}a{color:#5eead4}.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.btn{background:#10b981;color:#06120d;padding:10px 14px;border-radius:8px;text-decoration:none;font-weight:800;border:0;cursor:pointer}
+pre{white-space:pre-wrap;background:#081018;border:1px solid #243746;border-radius:10px;padding:12px;overflow:auto}.muted{color:#96aabd}li{margin:7px 0}
+</style></head><body><main>
+<section class="hero"><div>
+<span class="pill ${statusClass}">${htmlEscape(report.status)}</span>
+<h1>Project Completion Center</h1>
+<p class="muted">One factual readiness report for SuperSender Pro before handing work to Antigravity, Lovable, or another laptop.</p>
+<div class="toolbar"><a class="btn" href="/api/project/completion-report">JSON API</a><a class="btn" href="/setup-validator">Setup Validator</a><a class="btn" href="/wa-qr">WhatsApp QR</a><button class="btn" onclick="copyPrompt()">Copy Antigravity Prompt</button></div>
+</div><div class="big">${report.score}%</div></section>
+<section class="grid">${moduleCards}</section>
+<section class="grid">
+<article class="card"><h2>P0 Blockers</h2><ul>${list(report.blockers.p0)}</ul></article>
+<article class="card"><h2>P1 Next</h2><ul>${list(report.blockers.p1)}</ul></article>
+<article class="card"><h2>P2 Hardening</h2><ul>${list(report.blockers.p2)}</ul></article>
+</section>
+<section class="card" style="margin-top:14px"><h2>Antigravity Prompt</h2><pre id="prompt">${htmlEscape(report.antigravityPrompt)}</pre></section>
+<script>
+async function copyPrompt(){
+  await navigator.clipboard.writeText(document.getElementById('prompt').innerText);
+  alert('Antigravity prompt copied');
+}
+</script>
+</main></body></html>`);
+  } catch (error) {
+    console.error('[CompletionPage] failed:', error);
+    res.status(500).send(`Completion page failed: ${htmlEscape(error.message)}`);
   }
 });
 
@@ -30805,7 +31045,7 @@ function splitSocialCommandArgs(text = '') {
 }
 
 function isWhatsAppSocialCommand(text = '') {
-  return /^!(social|connect|post|draft|approvepost|sharepost|poststatus|comment|telegram|control|admin|menuadmin|server|status|health|setupcheck|setupvalidator|setupfix|doctor|watchdog|cloudapi|officialwa|next50|antigravity|aihub|automationhub|agents|agentcontrol|agenttask|autobuild|claw|claws|zeroclaw|pcagents|importskills|skillpacks|packs|waauto|automation|autosettings|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelfix|channelwatch|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
+  return /^!(social|connect|post|draft|approvepost|sharepost|poststatus|comment|telegram|control|admin|menuadmin|server|status|health|complete|completion|setupcheck|setupvalidator|setupfix|doctor|watchdog|cloudapi|officialwa|next50|antigravity|aihub|automationhub|agents|agentcontrol|agenttask|autobuild|claw|claws|zeroclaw|pcagents|importskills|skillpacks|packs|waauto|automation|autosettings|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelfix|channelwatch|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
 }
 
 function adminNumberCandidates() {
@@ -31983,6 +32223,11 @@ async function handleWhatsAppSocialAdminCommand(ctx = {}) {
 
     if (command === '!server' || command === '!status' || command === '!health') {
       await reply(buildServerStatusReply());
+      return true;
+    }
+
+    if (command === '!complete' || command === '!completion') {
+      await reply(formatProjectCompletionReply());
       return true;
     }
 
