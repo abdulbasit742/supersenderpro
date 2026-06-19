@@ -822,6 +822,20 @@ The sync writes six sheets:
 
 Automatic sync runs daily at 11 PM. Admin can trigger it manually with `!sync`.
 
+The root live server also exposes a durable queue + reporting bridge:
+
+```text
+GET  /api/queue/status
+GET  /api/queue/jobs
+POST /api/queue/process-due
+GET  /api/reports/connectors/status
+POST /api/reports/sync/google-sheets
+POST /api/reports/trigger/n8n
+POST /api/reports/sync/all
+```
+
+If Google Sheets or n8n is not configured, the system stores a durable fallback job in `data/job_queue.json` and writes a local `data/google_sheets_export.json` snapshot instead of crashing. Full details: `docs/durable-queue-n8n-sheets.md`.
+
 ## Zero-Touch Order Engine
 
 The backend now includes an autopilot layer for renewals, smart pricing, payment recovery, upsells, and review requests. It uses Bull.js + Redis when available and falls back to inline execution if Bull is not installed.

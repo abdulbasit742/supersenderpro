@@ -28,6 +28,8 @@ const {
   renderMergeFields
 } = require('./lib/mergeFields');
 const { createN8nBridge } = require('./integrations/n8nBridge');
+const queueManager = require('./lib/queueManager');
+const { createReportingConnectors } = require('./lib/reportingConnectors');
 const { createTavilyClient, formatSearchForWhatsApp } = require('./integrations/tavilyClient');
 
 function loadLocalEnv() {
@@ -2077,15 +2079,19 @@ settings.scholarship_source_urls = settings.scholarship_source_urls || process.e
 settings.scholarship_auto_fetch_enabled = settings.scholarship_auto_fetch_enabled === true;
 settings.scholarship_auto_fetch_interval_minutes = Math.max(10, Number(settings.scholarship_auto_fetch_interval_minutes || 60));
 settings.scholarship_last_auto_fetch_at = settings.scholarship_last_auto_fetch_at || '';
-settings.n8n_enabled = settings.n8n_enabled ?? false;
-settings.n8n_base_url = settings.n8n_base_url || 'http://localhost:5678';
-settings.n8n_webhook_secret = settings.n8n_webhook_secret || '';
-settings.n8n_order_webhook_url = settings.n8n_order_webhook_url || '';
-settings.n8n_dealer_rate_webhook_url = settings.n8n_dealer_rate_webhook_url || '';
-settings.n8n_broadcast_webhook_url = settings.n8n_broadcast_webhook_url || '';
-settings.n8n_payment_webhook_url = settings.n8n_payment_webhook_url || '';
-settings.n8n_followup_webhook_url = settings.n8n_followup_webhook_url || '';
-settings.n8n_dashboard_sync_webhook_url = settings.n8n_dashboard_sync_webhook_url || '';
+settings.google_sheets_id = settings.google_sheets_id || process.env.GOOGLE_SHEETS_ID || '';
+settings.google_service_account_email = settings.google_service_account_email || process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || '';
+settings.google_private_key = settings.google_private_key || process.env.GOOGLE_PRIVATE_KEY || '';
+settings.google_service_account_json = settings.google_service_account_json || process.env.GOOGLE_SERVICE_ACCOUNT_JSON || '';
+settings.n8n_enabled = settings.n8n_enabled === true || String(process.env.N8N_ENABLED || '').toLowerCase() === 'true';
+settings.n8n_base_url = settings.n8n_base_url || process.env.N8N_BASE_URL || 'http://localhost:5678';
+settings.n8n_webhook_secret = settings.n8n_webhook_secret || process.env.N8N_WEBHOOK_SECRET || '';
+settings.n8n_order_webhook_url = settings.n8n_order_webhook_url || process.env.N8N_ORDER_WEBHOOK_URL || '';
+settings.n8n_dealer_rate_webhook_url = settings.n8n_dealer_rate_webhook_url || process.env.N8N_DEALER_RATE_WEBHOOK_URL || '';
+settings.n8n_broadcast_webhook_url = settings.n8n_broadcast_webhook_url || process.env.N8N_BROADCAST_WEBHOOK_URL || '';
+settings.n8n_payment_webhook_url = settings.n8n_payment_webhook_url || process.env.N8N_PAYMENT_WEBHOOK_URL || '';
+settings.n8n_followup_webhook_url = settings.n8n_followup_webhook_url || process.env.N8N_FOLLOWUP_WEBHOOK_URL || '';
+settings.n8n_dashboard_sync_webhook_url = settings.n8n_dashboard_sync_webhook_url || process.env.N8N_DASHBOARD_SYNC_WEBHOOK_URL || process.env.N8N_WEBHOOK_URL || '';
 settings.whatsapp_send_provider = ['unofficial', 'cloud', 'auto'].includes(String(settings.whatsapp_send_provider || '').toLowerCase())
   ? String(settings.whatsapp_send_provider || '').toLowerCase()
   : String(process.env.WHATSAPP_SEND_PROVIDER || 'unofficial').toLowerCase();
@@ -2149,6 +2155,13 @@ const n8nBridge = createN8nBridge({
   dataDir,
   getSettings: () => settings,
   io
+});
+const reportingConnectors = createReportingConnectors({
+  dataDir,
+  getSettings: () => settings,
+  queue: queueManager,
+  n8nBridge,
+  buildDetailedReport: days => buildDetailedReport(days)
 });
 const webDataBridge = createWebDataBridge
   ? createWebDataBridge({ dataDir, getSettings: () => settings, createAlert: input => createSystemAlert(input) })
@@ -28365,6 +28378,139 @@ app.post('/api/n8n/test', async (req, res) => {
   }
 });
 
+app.get('/api/queue/status', (_req, res) => {
+  try {
+    res.json({ success: true, ...queueManager.getQueueHealth() });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/queue/jobs', (req, res) => {
+  try {
+    const limit = Math.max(1, Math.min(500, Number(req.query.limit || 100)));
+    const jobs = queueManager.getJobs({
+      status: req.query.status || '',
+      type: req.query.type || '',
+      limit
+    });
+    res.json({ success: true, jobs });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/queue/jobs/:id', (req, res) => {
+  try {
+    const job = queueManager.getJob(req.params.id);
+    if (!job) return res.status(404).json({ success: false, error: 'Job not found' });
+    return res.json({ success: true, job });
+  } catch (error) {
+    return res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/queue/enqueue', (req, res) => {
+  try {
+    const type = String(req.body?.type || '').trim();
+    if (!type) return res.status(400).json({ success: false, error: 'type is required' });
+    const job = queueManager.addJob(type, req.body?.payload || {}, {
+      source: req.body?.source || 'api',
+      priority: req.body?.priority,
+      maxAttempts: req.body?.maxAttempts
+    });
+    return res.json({ success: true, job });
+  } catch (error) {
+    return res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/queue/jobs/:id/retry', (req, res) => {
+  try {
+    const job = queueManager.retryJob(req.params.id);
+    if (!job) return res.status(404).json({ success: false, error: 'Job not found' });
+    return res.json({ success: true, job });
+  } catch (error) {
+    return res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/queue/jobs/:id/complete', (req, res) => {
+  try {
+    const job = queueManager.completeJob(req.params.id, req.body?.result || null);
+    if (!job) return res.status(404).json({ success: false, error: 'Job not found' });
+    return res.json({ success: true, job });
+  } catch (error) {
+    return res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/queue/jobs/:id/fail', (req, res) => {
+  try {
+    const job = queueManager.failJob(req.params.id, req.body?.error || 'Marked failed by API');
+    if (!job) return res.status(404).json({ success: false, error: 'Job not found' });
+    return res.json({ success: true, job });
+  } catch (error) {
+    return res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/queue/process-due', async (req, res) => {
+  try {
+    const result = await reportingConnectors.processPendingJobs({ limit: req.body?.limit || req.query?.limit || 20 });
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/reports/connectors/status', (_req, res) => {
+  try {
+    res.json(reportingConnectors.getStatus());
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/reports/sync/google-sheets', async (req, res) => {
+  try {
+    const result = await reportingConnectors.syncGoogleSheets({
+      sheet: req.body?.sheet || req.query?.sheet || 'all',
+      dryRun: req.body?.dryRun === true || boolQuery(req.query?.dryRun),
+      source: req.body?.source || 'api'
+    });
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/reports/trigger/n8n', async (req, res) => {
+  try {
+    const result = await reportingConnectors.triggerN8nWorkflow({
+      event: req.body?.event || 'dashboard_sync',
+      payload: req.body?.payload || {},
+      meta: req.body?.meta || {},
+      source: req.body?.source || 'api'
+    });
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/reports/sync/all', async (req, res) => {
+  try {
+    const result = await reportingConnectors.syncAll({
+      dryRun: req.body?.dryRun === true || boolQuery(req.query?.dryRun),
+      source: req.body?.source || 'api'
+    });
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 app.get('/api/ai/providers', (req, res) => {
   const providers = ['groq', 'anthropic', 'gemini', 'openai'].map(id => {
     const cfg = aiProviderConfig(id);
@@ -38597,6 +38743,21 @@ function queueWebhookEvent(eventName, payload) {
           meta: { queued: true }
         });
       });
+      if (/^(order_|payment_|dealer_rate|daily_broadcast|followup_|product_updated)/i.test(String(eventName || ''))) {
+        reportingConnectors.triggerN8nWorkflow({
+          event: eventName,
+          payload,
+          source: 'internal_business_event',
+          meta: { queuedFrom: 'queueWebhookEvent' }
+        }).catch(error => {
+          logWebhookDelivery({
+            event: eventName,
+            status: 'failed',
+            error: error.message,
+            meta: { n8n: true, queued: true }
+          });
+        });
+      }
     });
   } catch (error) {
     logWebhookDelivery({
@@ -47483,6 +47644,18 @@ app.post('/api/reports/daily-sales/send', async (req, res) => {
 
 cron.schedule('0 22 * * *', () => {
   sendDailySalesReportToAdmin().catch(error => console.error('Daily sales report failed:', error.message));
+}, { timezone: 'Asia/Karachi' });
+
+cron.schedule('*/5 * * * *', () => {
+  reportingConnectors.processPendingJobs({ limit: 25 }).catch(error => {
+    console.error('Durable report queue processing failed:', error.message);
+  });
+}, { timezone: 'Asia/Karachi' });
+
+cron.schedule('0 23 * * *', () => {
+  reportingConnectors.syncAll({ source: 'daily_11pm_cron' }).catch(error => {
+    console.error('Daily reporting sync failed:', error.message);
+  });
 }, { timezone: 'Asia/Karachi' });
 
 cron.schedule('* * * * *', () => {
