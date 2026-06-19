@@ -29,6 +29,7 @@ const {
 } = require('./lib/mergeFields');
 const { createN8nBridge } = require('./integrations/n8nBridge');
 const { createTavilyClient, formatSearchForWhatsApp } = require('./integrations/tavilyClient');
+const queueManager = require('./lib/queueManager');
 
 function loadLocalEnv() {
   const envPath = path.join(__dirname, '.env');
@@ -7317,6 +7318,7 @@ async function triggerChannelPostIntegrations(row = {}, stage = 'ingested') {
   try {
     const n8nResult = await n8nBridge.triggerWorkflow('whatsapp_channel_post', payload);
     results.push({ name: 'n8n', ...n8nResult });
+    bridgeAutomationJob('n8n_webhook', { event: 'whatsapp_channel_post', success: !!(n8nResult && n8nResult.success) });
   } catch (error) {
     results.push({ name: 'n8n', success: false, error: error.message });
   }
@@ -7943,6 +7945,7 @@ async function publishChannelRelayDraft(idOrRow = '', options = {}) {
     ? idOrRow
     : (idOrRow ? channelRelayInbox.find(item => item.id === idOrRow) : latestPendingChannelRelay());
   if (!row) throw new Error('No pending relay draft found');
+  bridgeAutomationJob('wa_channel_relay', { relayId: row.id || '', channelIds: Array.isArray(row.channelIds) ? row.channelIds : [] });
   const targetIds = (Array.isArray(row.channelIds) && row.channelIds.length ? row.channelIds : getConfiguredWhatsAppChannels())
     .map(normalizeWhatsAppChannelId)
     .filter(Boolean);
@@ -11889,6 +11892,7 @@ function buildProjectCompletionReport() {
     typeof buildWhatsAppChannelCommandCenter === 'function' ? buildWhatsAppChannelCommandCenter() : {}
   ), {}).value || {};
   const groupSetup = safeCompletionProbe('groupSetup', () => getGroupSetupSummary(), {}).value || {};
+  const queueHealth = safeCompletionProbe('queueHealth', () => queueManager.getQueueHealth(), {}).value || {};
   const activeWaSessions = typeof waClients !== 'undefined'
     ? Array.from(waClients.values()).filter(client => client?.isReady).length
     : 0;
@@ -11961,6 +11965,13 @@ function buildProjectCompletionReport() {
       score: Number(groupSetup.score) || 60,
       status: groupSetup.status || 'needs_setup',
       detail: `${groupSetup.configuredCategories || 0}/4 categories, ${groupSetup.totalGroups || 0} groups assigned`
+    },
+    {
+      id: 'durable_automation',
+      label: 'Durable automation queue',
+      score: (queueHealth.mode === 'bullmq' && queueHealth.ok) ? 95 : (queueHealth.ok ? 78 : 45),
+      status: queueHealth.status || 'degraded',
+      detail: `mode ${queueHealth.mode || 'unknown'}, ${(queueHealth.counts && queueHealth.counts.total) || 0} jobs, ${(queueHealth.counts && queueHealth.counts.failed) || 0} failed`
     }
   ];
 
@@ -11990,8 +12001,10 @@ function buildProjectCompletionReport() {
   if (!groupSetup.configuredCategories) {
     p1.push('Configure WhatsApp group categories (selling/customer/scholarship/channel) at /group-setup or via !setgroups.');
   }
-  if (!String(process.env.REDIS_URL || '').trim()) {
-    p2.push('Add Redis/BullMQ for durable automation jobs.');
+  if (!queueHealth.ok) {
+    p1.push('Durable queue degraded — set QUEUE_JSON_FALLBACK=true or configure REDIS_URL.');
+  } else if (queueHealth.mode !== 'bullmq') {
+    p2.push('Optional: set REDIS_URL and install bullmq for distributed durable jobs (JSON fallback is active and healthy).');
   }
   if (!String(process.env.GOOGLE_SHEETS_ID || '').trim() && !String(settings.google_sheets_id || '').trim()) {
     p2.push('Configure Google Sheets sync for reports and seller-rate exports.');
@@ -21004,6 +21017,14 @@ ul{margin:0;padding-left:20px}.muted{color:#96aabd}
 <div class="toolbar"><button class="btn" onclick="gsSave()">Save groups</button><button class="btn" onclick="gsLoad()">Reload detected groups</button></div>
 <pre id="gsLog" style="white-space:pre-wrap;background:#081018;border:1px solid #243746;border-radius:10px;padding:12px;max-height:160px;overflow:auto;margin-top:10px">Ready.</pre>
 </section>
+<section class="card" id="queueCard" style="margin-top:14px">
+<h2>Durable Queue</h2>
+<p class="muted">Automation jobs with BullMQ + JSON fallback. Mode: <strong id="qMode">checking...</strong></p>
+<div class="summary" id="qSummary"></div>
+<div id="qFailedWrap" style="margin-top:10px"></div>
+<div class="toolbar"><button class="btn" onclick="qLoad()">Reload queue</button><a class="btn" href="/api/queues/health">health JSON</a></div>
+<pre id="qLog" style="white-space:pre-wrap;background:#081018;border:1px solid #243746;border-radius:10px;padding:12px;max-height:140px;overflow:auto;margin-top:10px">Ready.</pre>
+</section>
 <div class="grid">${categoryHtml}</div>
 <script>
 var gsGroups=[];
@@ -21063,6 +21084,35 @@ async function gsSave(){
   }catch(e){gsLog('Save failed: '+e.message);}
 }
 gsLoad();
+async function qLoad(){
+  try{
+    var h=await (await fetch('/api/queues/health',{cache:'no-store'})).json();
+    document.getElementById('qMode').textContent=(h.mode||'?')+' ('+(h.status||'?')+')';
+    var c=h.counts||{};
+    var cells=[['Pending',c.pending||0],['Active',c.active||0],['Completed',c.completed||0],['Failed',c.failed||0]];
+    document.getElementById('qSummary').innerHTML=cells.map(function(x){return '<div>'+x[0]+'<b>'+x[1]+'</b></div>';}).join('');
+  }catch(e){document.getElementById('qMode').textContent='unavailable';}
+  try{
+    var d=await (await fetch('/api/queues/jobs?status=failed&limit=10',{cache:'no-store'})).json();
+    var jobs=(d&&d.jobs)||[];
+    if(!jobs.length){document.getElementById('qFailedWrap').innerHTML='<p class="muted">No failed jobs.</p>';return;}
+    var html='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead><tr><th style="text-align:left">Failed job</th><th style="text-align:left">ID</th><th></th></tr></thead><tbody>';
+    for(var i=0;i<jobs.length;i++){var j=jobs[i];
+      html+='<tr><td style="text-align:left"><strong>'+gsEsc(j.type)+'</strong><br><span class="muted">'+gsEsc(String(j.error||'').slice(0,90))+'</span></td><td style="text-align:left"><code>'+gsEsc(j.id)+'</code></td><td style="text-align:center"><button class="btn" onclick="qRetry(\''+gsEsc(j.id)+'\')">Retry</button></td></tr>';
+    }
+    html+='</tbody></table></div>';
+    document.getElementById('qFailedWrap').innerHTML=html;
+  }catch(e){}
+}
+async function qRetry(id){
+  document.getElementById('qLog').textContent='Retrying '+id+'...';
+  try{
+    var r=await (await fetch('/api/queues/jobs/'+encodeURIComponent(id)+'/retry',{method:'POST'})).json();
+    document.getElementById('qLog').textContent=r.success?('Re-queued '+id):(r.error||'Retry failed');
+    qLoad();
+  }catch(e){document.getElementById('qLog').textContent='Retry failed: '+e.message;}
+}
+qLoad();
 async function runAutofix(){
   const out = document.getElementById('autofixOut');
   out.textContent = 'Running safe auto-fix...';
@@ -28069,6 +28119,66 @@ app.put('/api/settings/groups', (req, res) => {
   }
 });
 
+// ------------------------------------------------------------------
+// DURABLE QUEUE / AUTOMATION RELIABILITY (BullMQ w/ JSON fallback)
+// ------------------------------------------------------------------
+// Mirror existing automation work into the durable queue WITHOUT changing the
+// direct execution path. Best-effort and never throws.
+function bridgeAutomationJob(type, payload = {}, options = {}) {
+  try {
+    if (!queueManager || typeof queueManager.addJob !== 'function') return null;
+    return queueManager.addJob(type, payload, { status: 'completed', source: 'bridge', ...options });
+  } catch (e) {
+    console.warn('[Queue] bridge failed:', e.message);
+    return null;
+  }
+}
+
+app.get('/api/queues/health', (req, res) => {
+  try { res.json({ success: true, ...queueManager.getQueueHealth() }); }
+  catch (e) { res.status(500).json({ success: false, error: e.message }); }
+});
+
+app.get('/api/queues/jobs', (req, res) => {
+  try {
+    const jobs = queueManager.getJobs({ status: req.query.status, type: req.query.type, limit: Number(req.query.limit || 100) });
+    res.json({ success: true, count: jobs.length, jobs });
+  } catch (e) { res.status(500).json({ success: false, error: e.message }); }
+});
+
+app.post('/api/queues/jobs', (req, res) => {
+  try {
+    const { type, payload, options } = req.body || {};
+    if (!type) return res.status(400).json({ success: false, error: 'type is required' });
+    const job = queueManager.addJob(type, payload || {}, options || {});
+    res.json({ success: true, job });
+  } catch (e) { res.status(500).json({ success: false, error: e.message }); }
+});
+
+app.post('/api/queues/jobs/:id/retry', (req, res) => {
+  try {
+    const job = queueManager.retryJob(req.params.id);
+    if (!job) return res.status(404).json({ success: false, error: 'Job not found' });
+    res.json({ success: true, job });
+  } catch (e) { res.status(500).json({ success: false, error: e.message }); }
+});
+
+app.post('/api/queues/jobs/:id/complete', (req, res) => {
+  try {
+    const job = queueManager.completeJob(req.params.id, (req.body && req.body.result) || null);
+    if (!job) return res.status(404).json({ success: false, error: 'Job not found' });
+    res.json({ success: true, job });
+  } catch (e) { res.status(500).json({ success: false, error: e.message }); }
+});
+
+app.post('/api/queues/jobs/:id/fail', (req, res) => {
+  try {
+    const job = queueManager.failJob(req.params.id, (req.body && (req.body.error || req.body.message)) || 'Manual fail');
+    if (!job) return res.status(404).json({ success: false, error: 'Job not found' });
+    res.json({ success: true, job });
+  } catch (e) { res.status(500).json({ success: false, error: e.message }); }
+});
+
 function normalizeActionTrigger(input = {}) {
   const priorityMap = { low: 1, normal: 1, medium: 2, high: 3, urgent: 4, critical: 4 };
   const priorityValue = typeof input.priority === 'string'
@@ -30510,6 +30620,7 @@ function upsertGmailPaymentMatch(match = {}) {
   if (existingIndex >= 0) gmailPaymentMatches[existingIndex] = row;
   else gmailPaymentMatches.unshift(row);
   saveGmailPaymentMatches();
+  bridgeAutomationJob('payment_verification', { matchId: row.id, txnId: row.txnId || '', amount: row.amount || '', status: row.status || '' });
   return row;
 }
 
@@ -31325,6 +31436,7 @@ async function publishTelegramSocialPost(account, payload = {}) {
 async function publishSocialPayloadToPlatform(platform, payload = {}) {
   const normalized = normalizeSocialPlatform(platform);
   if (!SOCIAL_PLATFORMS[normalized]) throw new Error('Unsupported social platform');
+  bridgeAutomationJob('social_auto_post', { platform: normalized, accountId: payload.accountId || '', mode: payload.publishMode || '' });
   const account = findSocialAccount({ id: payload.accountId, platform: normalized });
   if (!account || !publicSocialAccount(account).configured) {
     throw new Error(`${SOCIAL_PLATFORMS[normalized].label} credentials not configured`);
@@ -31474,7 +31586,7 @@ function splitSocialCommandArgs(text = '') {
 }
 
 function isWhatsAppSocialCommand(text = '') {
-  return /^!(social|connect|post|draft|approvepost|sharepost|poststatus|comment|telegram|control|admin|menuadmin|server|status|health|complete|completion|setupcheck|setupvalidator|setupfix|doctor|watchdog|cloudapi|officialwa|next50|antigravity|aihub|automationhub|agents|agentcontrol|agenttask|autobuild|claw|claws|zeroclaw|pcagents|importskills|skillpacks|packs|waauto|automation|autosettings|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelfix|channelwatch|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|setgroups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
+  return /^!(social|connect|post|draft|approvepost|sharepost|poststatus|comment|telegram|control|admin|menuadmin|server|status|health|complete|completion|setupcheck|setupvalidator|setupfix|doctor|watchdog|cloudapi|officialwa|next50|antigravity|aihub|automationhub|agents|agentcontrol|agenttask|autobuild|claw|claws|zeroclaw|pcagents|importskills|skillpacks|packs|waauto|automation|autosettings|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelfix|channelwatch|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|setgroups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|queue|retryjob|jobs|finder|find|report|backup)\b/i.test(String(text || '').trim());
 }
 
 function adminNumberCandidates() {
@@ -33371,6 +33483,38 @@ ${shouldWrite ? 'Done. Server replies/dashboard data should look cleaner now.' :
       const saved = setGroupCategory(categoryKey, idsRaw);
       const summary = getGroupSetupSummary();
       await reply(`✅ *${sub.toUpperCase()} groups saved* (${saved[categoryKey].length})\n${saved[categoryKey].join('\n') || 'None'}\n\nGroup setup: *${summary.configuredCategories}/4* categories configured.\nCompletion score updated — check *!complete*.`);
+      return true;
+    }
+
+    if (command === '!queue') {
+      const h = queueManager.getQueueHealth();
+      const c = h.counts || {};
+      const redisLine = h.redis.configured ? (h.redis.connected ? 'connected' : 'configured (not connected)') : 'not configured';
+      await reply(`🧵 *Queue Health*\n\nMode: *${h.mode}*\nStatus: *${h.status}*\nRedis: *${redisLine}*\nJSON fallback: *${h.fallbackEnabled ? 'ON' : 'OFF'}*\n\nPending: *${c.pending || 0}*\nActive: *${c.active || 0}*\nCompleted: *${c.completed || 0}*\nFailed: *${c.failed || 0}*\nTotal: *${c.total || 0}*\n\nUse:\n*!jobs failed*\n*!retryjob <id>*`);
+      return true;
+    }
+
+    if (command === '!retryjob') {
+      const id = String(args[1] || '').trim();
+      if (!id) {
+        await reply('Format:\n*!retryjob <jobId>*\nFailed jobs dekhne ke liye: *!jobs failed*');
+        return true;
+      }
+      const job = queueManager.retryJob(id);
+      if (!job) {
+        await reply(`❌ Job not found: ${id}`);
+        return true;
+      }
+      await reply(`🔁 Job *${job.id}* (${job.type}) re-queued. Status: *${job.status}*.`);
+      return true;
+    }
+
+    if (command === '!jobs') {
+      const sub = String(args[1] || 'failed').toLowerCase();
+      const status = ['failed', 'pending', 'completed', 'active', 'retrying'].includes(sub) ? sub : 'failed';
+      const jobs = queueManager.getJobs({ status, limit: 10 });
+      const lines = jobs.map((j, i) => `${i + 1}. *${j.type}*\n   ${j.id}\n   ${j.error ? 'Error: ' + String(j.error).slice(0, 80) : j.status}`).join('\n');
+      await reply(`🗂️ *${status.toUpperCase()} jobs* (latest ${jobs.length})\n\n${lines || 'None.'}\n\nRetry: *!retryjob <id>*`);
       return true;
     }
 
@@ -40324,6 +40468,7 @@ app.post('/api/leads/:id/ai-followup', async (req, res) => {
     } catch {}
     followups.push({ id: uuid(), number: lead.number, message, status: sent ? 'sent' : 'draft', created: new Date().toISOString(), leadId: lead.id });
     saveJSON('followups.json', followups);
+    bridgeAutomationJob('follow_up', { leadId: lead.id, number: lead.number, status: sent ? 'sent' : 'draft' });
     res.json({ success: true, sent, message });
   } catch (e) {
     res.status(500).json({ error: e.message });
