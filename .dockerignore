@@ -1,0 +1,39 @@
+# Dependencies
+node_modules
+**/node_modules
+npm-debug.log*
+
+# Version control / CI
+.git
+.github
+.gitignore
+
+# Secrets & local env
+.env
+.env.*
+!.env.example
+ssl/
+*.pem
+.wa-auth/
+.baileys-auth/
+backend/auth/
+backend/.baileys-auth/
+
+# Runtime / generated
+uploads/
+logs/
+*.log
+data/*.json
+!data/settings.example.json
+health_report.json
+live-status.json
+
+# Docs & tooling (not needed in image)
+*.md
+docs/
+*.ps1
+k8s/
+deploy/
+.vscode/
+.idea/
+coverage/
