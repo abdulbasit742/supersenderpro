@@ -1174,3 +1174,52 @@ Frontend:
 ```text
 http://localhost:3000
 ```
+
+
+## Kommo & amoCRM Advanced CRM Features Suite
+
+We have introduced a state-of-the-art, messenger-based CRM module in `/lib/kommoCRM.js` and `/routes/kommo.js` inspired by the best capabilities of **Kommo (formerly amoCRM)**. This integration provides a professional digital sales pipeline, automated Salesbot workflows, and round-robin agent routing fully integrated with our WhatsApp core.
+
+### Core Capabilities
+
+1. **Digital Sales Pipeline with Stage Tracking**
+   - Track lead progress through standard industry stages:
+     - `INBOX` (Incoming lead / Unassigned / First Contact)
+     - `QUALIFIED` (Requirements gathered / Lead interested)
+     - `PROPOSAL_SENT` (SaaS plan or AI tools pricing details shared)
+     - `AWAITING_PAYMENT` (Invoice sent / JazzCash & EasyPaisa details shared)
+     - `COMPLETED` (Won / Paid / Order delivered)
+     - `LOST` (Closed / Unresponsive / Lost to competitor)
+   - Lead stage transitions are fully logged with timestamp, reason, and actor (operator/system).
+
+2. **Kommo-style Salesbot Automation Engine**
+   - Custom trigger rules run automatically when a lead transitions to a new stage:
+     - **On `INBOX`**: Instantly assigns lead via Round-Robin, and sends a WhatsApp welcome message.
+     - **On `AWAITING_PAYMENT`**: Sends WhatsApp instructions for local payments (JazzCash / EasyPaisa / Bank Transfer).
+     - **On `COMPLETED`**: Sends order verification confirmation and activates their stock/credentials.
+     - **On `LOST`**: Triggers follow-up scheduler to queue a soft re-engagement campaign after 3 days.
+
+3. **Round-Robin Agent Auto-Routing**
+   - Register support/sales agents (e.g. `sales_ali`, `sales_sara`).
+   - Monitor agent online/offline availability.
+   - Automatically assigns incoming chats to the online agent with the lowest active workload (leads assigned) to optimize response times.
+
+4. **Lead Cards with Custom Fields**
+   - Exposes a unified lead record integrating customer profile, order history, tags, notes, communication status (`open`/`snoozed`/`closed`), and stage history.
+   - Support for custom field properties (e.g. `ai_tool_interest`, `pakistan_region`, `estimated_budget`).
+
+### Express REST API Endpoints
+
+Our new Express router is mounted under `/api` in `server.js` and exposes the following REST API:
+
+- **GET** `/api/kommo/pipelines` — Retrieve the digital pipeline structures and stage colors.
+- **GET** `/api/kommo/leads/:phone` — Fetch a detailed lead card, custom fields, and stage history.
+- **POST** `/api/kommo/leads/move` — Move a lead to a new stage (e.g., `INBOX` -> `AWAITING_PAYMENT`). Triggers Salesbot.
+- **POST** `/api/kommo/leads/custom-fields` — Update/merge custom field metadata on a lead.
+- **POST** `/api/kommo/leads/assign` — Manually assign/reassign a lead to a sales representative.
+- **GET** `/api/kommo/agents` — List all sales agents, their status, and active workload.
+- **POST** `/api/kommo/agents` — Register or update a sales agent.
+- **POST** `/api/kommo/agents/status` — Set agent online/offline status.
+- **POST** `/api/kommo/leads/route` — Explicitly trigger the round-robin routing algorithm for a lead.
+- **GET** `/api/kommo/triggers` — Get Salesbot trigger setups.
+- **POST** `/api/kommo/triggers` — Configure or update Salesbot triggers for a specific stage.
