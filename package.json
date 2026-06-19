@@ -1,7 +1,7 @@
 {
   "name": "supersender-pro",
   "version": "1.0.0",
-  "description": "SuperSender Pro — AI Business Command Center (WhatsApp CRM + Price Intel + Base44 Hub)",
+  "description": "SuperSender Pro \u2014 AI Business Command Center (WhatsApp CRM + Price Intel + Base44 Hub)",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -20,7 +20,16 @@
     "lovable:dev": "cd lovable-app && npm run dev",
     "lovable:build": "cd lovable-app && npm run build",
     "lovable:preview": "cd lovable-app && npm run preview",
-    "postinstall": "node scripts/patch-wwebjs.js"
+    "postinstall": "node scripts/patch-wwebjs.js",
+    "validate:env": "node scripts/env-validator.js",
+    "antigravity:start": "node scripts/antigravity-start.js",
+    "export:channels": "node scripts/export-channels.js export",
+    "import:channels": "node scripts/export-channels.js import",
+    "generate:secrets": "node scripts/generate-secrets.js",
+    "backup:data": "node scripts/backup-data.js",
+    "status": "node scripts/status.js",
+    "restore:data": "node scripts/restore-data.js",
+    "secret:scan": "node scripts/secret-scan.js"
   },
   "dependencies": {
     "@whiskeysockets/baileys": "^7.0.0-rc.9",
