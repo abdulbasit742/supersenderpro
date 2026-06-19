@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SuperSender Pro — Campaign Scheduler</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root { --bg:#0f172a; --card:#1e293b; --line:#334155; --txt:#e2e8f0; --muted:#94a3b8; --green:#22c55e; --red:#ef4444; --accent:#38bdf8; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background:var(--bg); color:var(--txt); }
+    header { padding:18px 24px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:12px; }
+    header h1 { font-size:18px; margin:0; }
+    .badge { font-size:12px; color:var(--muted); border:1px solid var(--line); padding:2px 8px; border-radius:999px; }
+    .wrap { max-width:1100px; margin:0 auto; padding:24px; display:grid; gap:20px; grid-template-columns:1fr; }
+    @media(min-width:820px){ .wrap{ grid-template-columns:380px 1fr; } }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px; }
+    .card h2 { font-size:14px; margin:0 0 14px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); }
+    label { display:block; font-size:13px; margin:10px 0 4px; color:var(--muted); }
+    input, textarea, select { width:100%; background:#0b1220; border:1px solid var(--line); color:var(--txt); border-radius:8px; padding:9px 10px; font-size:14px; }
+    textarea { min-height:80px; resize:vertical; }
+    .row { display:flex; gap:10px; }
+    .row > div { flex:1; }
+    button { background:var(--accent); color:#05202b; border:none; border-radius:8px; padding:10px 14px; font-weight:600; cursor:pointer; font-size:14px; }
+    button.ghost { background:transparent; color:var(--txt); border:1px solid var(--line); }
+    button.danger { background:transparent; color:var(--red); border:1px solid var(--red); }
+    .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:16px; }
+    .stat { background:#0b1220; border:1px solid var(--line); border-radius:10px; padding:12px; text-align:center; }
+    .stat b { display:block; font-size:22px; }
+    .stat span { font-size:11px; color:var(--muted); }
+    table { width:100%; border-collapse:collapse; font-size:13px; }
+    th, td { text-align:left; padding:8px; border-bottom:1px solid var(--line); }
+    .pill { font-size:11px; padding:2px 8px; border-radius:999px; }
+    .s-draft{background:#334155;} .s-scheduled{background:#0369a1;} .s-sending{background:#a16207;}
+    .s-completed{background:#15803d;} .s-paused{background:#7c2d12;} .s-cancelled{background:#7f1d1d;}
+    .muted{color:var(--muted);font-size:12px;}
+    canvas{max-height:240px;}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📣 Campaign Scheduler</h1>
+    <span class="badge">SuperSender Pro</span>
+    <span class="badge" id="modeBadge">loading…</span>
+  </header>
+
+  <div class="wrap">
+    <!-- Create form -->
+    <div class="card">
+      <h2>New Campaign</h2>
+      <label>Campaign name</label>
+      <input id="name" placeholder="June promo blast" />
+      <label>Message <span class="muted">— use {name} for personalization</span></label>
+      <textarea id="message" placeholder="Hi {name}! Aaj ka special offer…"></textarea>
+      <label>Recipients <span class="muted">— one per line: number,name</span></label>
+      <textarea id="recipients" placeholder="923001234567,Ali&#10;923119876543,Sara"></textarea>
+      <div class="row">
+        <div>
+          <label>Throttle (ms)</label>
+          <input id="throttleMs" type="number" value="2000" />
+        </div>
+        <div>
+          <label>Daily cap</label>
+          <input id="dailyCap" type="number" value="0" placeholder="0 = no cap" />
+        </div>
+      </div>
+      <label>Schedule at <span class="muted">(blank = save as draft)</span></label>
+      <input id="scheduleAt" type="datetime-local" />
+      <div style="margin-top:14px; display:flex; gap:8px;">
+        <button onclick="createCampaign()">Create</button>
+        <button class="ghost" onclick="loadAll()">Refresh</button>
+      </div>
+    </div>
+
+    <!-- Analytics + list -->
+    <div class="card">
+      <h2>Delivery Analytics</h2>
+      <div class="stats" id="stats"></div>
+      <canvas id="chart"></canvas>
+      <h2 style="margin-top:22px;">Campaigns</h2>
+      <div style="overflow-x:auto;">
+        <table id="tbl">
+          <thead><tr><th>Name</th><th>Status</th><th>Sent/Total</th><th>Rate</th><th>Actions</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+<script>
+const API = ''; // same origin
+let chart;
+
+async function api(path, opts) {
+  const r = await fetch(API + '/api' + path, Object.assign({ headers: { 'Content-Type': 'application/json' } }, opts));
+  return r.json();
+}
+
+function parseRecipients(text) {
+  return text.split('\n').map(l => l.trim()).filter(Boolean).map(l => {
+    const [to, ...rest] = l.split(',');
+    return { to: (to||'').trim(), name: rest.join(',').trim() };
+  }).filter(r => r.to);
+}
+
+async function createCampaign() {
+  const payload = {
+    name: document.getElementById('name').value || 'Untitled campaign',
+    message: document.getElementById('message').value,
+    recipients: parseRecipients(document.getElementById('recipients').value),
+    throttleMs: +document.getElementById('throttleMs').value || 0,
+    dailyCap: +document.getElementById('dailyCap').value || 0,
+    scheduleAt: document.getElementById('scheduleAt').value
+      ? new Date(document.getElementById('scheduleAt').value).toISOString() : null,
+  };
+  const res = await api('/campaigns', { method: 'POST', body: JSON.stringify(payload) });
+  if (!res.ok) return alert('Error: ' + (res.error || 'failed'));
+  document.getElementById('message').value = '';
+  document.getElementById('recipients').value = '';
+  loadAll();
+}
+
+async function action(id, verb) {
+  if (verb === 'delete' && !confirm('Delete this campaign?')) return;
+  const method = verb === 'delete' ? 'DELETE' : 'POST';
+  const path = verb === 'delete' ? '/campaigns/' + id : '/campaigns/' + id + '/' + verb;
+  await api(path, { method });
+  loadAll();
+}
+
+async function loadAll() {
+  const [list, summary] = await Promise.all([
+    api('/campaigns'),
+    api('/campaigns-analytics/summary'),
+  ]);
+  renderStats(summary.summary || {});
+  renderTable(list.campaigns || []);
+}
+
+function renderStats(s) {
+  document.getElementById('stats').innerHTML = `
+    <div class="stat"><b>${s.campaigns||0}</b><span>Campaigns</span></div>
+    <div class="stat"><b>${s.recipients||0}</b><span>Recipients</span></div>
+    <div class="stat"><b style="color:var(--green)">${s.sent||0}</b><span>Sent</span></div>
+    <div class="stat"><b style="color:var(--red)">${s.failed||0}</b><span>Failed</span></div>`;
+  const ctx = document.getElementById('chart');
+  const data = { labels:['Sent','Pending','Failed'], datasets:[{ data:[s.sent||0, s.pending||0, s.failed||0], backgroundColor:['#22c55e','#64748b','#ef4444'] }] };
+  if (chart) { chart.data = data; chart.update(); }
+  else chart = new Chart(ctx, { type:'doughnut', data, options:{ plugins:{ legend:{ labels:{ color:'#e2e8f0' } } } } });
+}
+
+function renderTable(rows) {
+  const tb = document.querySelector('#tbl tbody');
+  tb.innerHTML = rows.map(c => {
+    const total = c.log.length;
+    const sent = c.log.filter(l => ['sent','delivered','read'].includes(l.status)).length;
+    const rate = total ? Math.round(sent/total*100) : 0;
+    return `<tr>
+      <td>${escapeHtml(c.name)}<div class="muted">${total} recipients</div></td>
+      <td><span class="pill s-${c.status}">${c.status}</span></td>
+      <td>${sent}/${total}</td>
+      <td>${rate}%</td>
+      <td style="white-space:nowrap;">
+        <button onclick="action('${c.id}','start')">▶</button>
+        <button class="ghost" onclick="action('${c.id}','pause')">⏸</button>
+        <button class="danger" onclick="action('${c.id}','delete')">🗑</button>
+      </td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="5" class="muted">No campaigns yet.</td></tr>';
+}
+
+function escapeHtml(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+loadAll();
+setInterval(loadAll, 8000);
+</script>
+</body>
+</html>
