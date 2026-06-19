@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SuperSender Pro — Chatbot &amp; Quick Replies</title>
+  <style>
+    :root{--bg:#0f172a;--card:#1e293b;--line:#334155;--txt:#e2e8f0;--muted:#94a3b8;--accent:#38bdf8;--red:#ef4444;--green:#22c55e;}
+    *{box-sizing:border-box;}body{margin:0;font-family:system-ui,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--txt);}
+    header{padding:18px 24px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center;}
+    header h1{font-size:18px;margin:0;}.badge{font-size:12px;color:var(--muted);border:1px solid var(--line);padding:2px 8px;border-radius:999px;}
+    .wrap{max-width:1100px;margin:0 auto;padding:24px;display:grid;gap:20px;grid-template-columns:1fr;}
+    @media(min-width:820px){.wrap{grid-template-columns:1fr 1fr;}}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;}
+    .card h2{font-size:14px;margin:0 0 12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);}
+    label{display:block;font-size:13px;margin:10px 0 4px;color:var(--muted);}
+    input,textarea,select{width:100%;background:#0b1220;border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:9px 10px;font-size:14px;}
+    textarea{min-height:64px;resize:vertical;}
+    button{background:var(--accent);color:#05202b;border:none;border-radius:8px;padding:9px 13px;font-weight:600;cursor:pointer;font-size:13px;}
+    button.ghost{background:transparent;color:var(--txt);border:1px solid var(--line);}button.danger{background:transparent;color:var(--red);border:1px solid var(--red);}
+    table{width:100%;border-collapse:collapse;font-size:13px;}th,td{text-align:left;padding:7px;border-bottom:1px solid var(--line);}
+    .muted{color:var(--muted);font-size:12px;}.row{display:flex;gap:8px;}.row>div{flex:1;}
+    .preview{background:#0b1220;border:1px dashed var(--line);border-radius:8px;padding:10px;min-height:38px;font-size:13px;white-space:pre-wrap;margin-top:8px;}
+    .on{color:var(--green);}.off{color:var(--muted);}
+  </style>
+</head>
+<body>
+  <header><h1>🤖 Chatbot &amp; Quick Replies</h1><span class="badge">SuperSender Pro</span><span class="badge" id="botState">…</span></header>
+  <div class="wrap">
+    <!-- Rules -->
+    <div class="card">
+      <h2>Auto-reply Rules</h2>
+      <label>Rule name</label><input id="rName" placeholder="Greeting" />
+      <div class="row">
+        <div><label>Match type</label>
+          <select id="rType"><option value="contains">contains</option><option value="equals">equals</option><option value="starts">starts with</option><option value="regex">regex</option></select>
+        </div>
+        <div><label>Priority</label><input id="rPrio" type="number" value="10" /></div>
+      </div>
+      <label>Keywords <span class="muted">(comma separated)</span></label><input id="rKw" placeholder="hi, hello, salam" />
+      <label>Reply text <span class="muted">— {{name}} &amp; {a|b} supported</span></label>
+      <textarea id="rText" placeholder="Hi {{name}}, {welcome|hello}! How can we help?"></textarea>
+      <div style="margin-top:10px;"><button onclick="addRule()">Add rule</button></div>
+      <div style="overflow-x:auto;margin-top:12px;"><table id="rtbl"><thead><tr><th>Name</th><th>Match</th><th>Keywords</th><th></th></tr></thead><tbody></tbody></table></div>
+    </div>
+
+    <!-- Settings + Simulate + Quick replies -->
+    <div class="card">
+      <h2>Bot Settings</h2>
+      <label><input type="checkbox" id="sEnabled" style="width:auto;" onchange="saveSettings()" /> Bot enabled</label>
+      <label>Default reply (fallback)</label><input id="sDefault" placeholder="Sorry, I didn't get that." onchange="saveSettings()" />
+      <label><input type="checkbox" id="ohEnabled" style="width:auto;" onchange="saveSettings()" /> Enforce office hours</label>
+      <div class="row"><div><label>Start</label><input id="ohStart" value="09:00" onchange="saveSettings()" /></div>
+        <div><label>End</label><input id="ohEnd" value="18:00" onchange="saveSettings()" /></div></div>
+      <label>Outside-hours message</label><input id="ohMsg" placeholder="We're closed now." onchange="saveSettings()" />
+
+      <h2 style="margin-top:20px;">Simulate</h2>
+      <div class="row"><div><input id="simText" placeholder="type a customer message…" /></div><div style="flex:0 0 auto;"><button onclick="simulate()">Test</button></div></div>
+      <div class="preview" id="simOut">Bot reply appears here…</div>
+
+      <h2 style="margin-top:20px;">Quick Replies</h2>
+      <div class="row"><div><input id="qSc" placeholder="/price" /></div><div><input id="qBody" placeholder="Plans start at Rs 500/mo" /></div>
+        <div style="flex:0 0 auto;"><button onclick="addQR()">Add</button></div></div>
+      <div style="overflow-x:auto;margin-top:10px;"><table id="qtbl"><thead><tr><th>Shortcut</th><th>Body</th><th></th></tr></thead><tbody></tbody></table></div>
+    </div>
+  </div>
+
+<script>
+async function api(p,o){const r=await fetch('/api'+p,Object.assign({headers:{'Content-Type':'application/json'}},o));return r.json();}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+async function addRule(){
+  const kw=document.getElementById('rKw').value.split(',').map(s=>s.trim()).filter(Boolean);
+  if(!kw.length)return alert('Add at least one keyword');
+  const res=await api('/chatbot/rules',{method:'POST',body:JSON.stringify({
+    name:document.getElementById('rName').value, priority:+document.getElementById('rPrio').value||10,
+    match:{type:document.getElementById('rType').value,keywords:kw},
+    response:{type:'text',text:document.getElementById('rText').value}})});
+  if(!res.ok)return alert(res.error);
+  document.getElementById('rName').value='';document.getElementById('rKw').value='';document.getElementById('rText').value='';
+  loadRules();
+}
+async function delRule(id){if(!confirm('Delete rule?'))return;await api('/chatbot/rules/'+id,{method:'DELETE'});loadRules();}
+async function loadRules(){
+  const res=await api('/chatbot/rules');
+  document.querySelector('#rtbl tbody').innerHTML=(res.rules||[]).map(r=>`<tr><td>${esc(r.name)}</td><td>${r.match.type}</td>
+    <td>${(r.match.keywords||[]).map(esc).join(', ')}</td><td><button class="danger" onclick="delRule('${r.id}')">🗑</button></td></tr>`).join('')||'<tr><td colspan="4" class="muted">No rules.</td></tr>';
+}
+async function loadSettings(){
+  const res=await api('/chatbot/settings'); const s=res.settings||{};
+  document.getElementById('sEnabled').checked=!!s.enabled;
+  document.getElementById('sDefault').value=s.defaultReply||'';
+  const oh=s.officeHours||{};
+  document.getElementById('ohEnabled').checked=!!oh.enabled;
+  document.getElementById('ohStart').value=oh.start||'09:00';
+  document.getElementById('ohEnd').value=oh.end||'18:00';
+  document.getElementById('ohMsg').value=oh.outsideMessage||'';
+  document.getElementById('botState').innerHTML=s.enabled?'<span class="on">● enabled</span>':'<span class="off">○ disabled</span>';
+}
+async function saveSettings(){
+  await api('/chatbot/settings',{method:'PUT',body:JSON.stringify({
+    enabled:document.getElementById('sEnabled').checked,
+    defaultReply:document.getElementById('sDefault').value,
+    officeHours:{enabled:document.getElementById('ohEnabled').checked,start:document.getElementById('ohStart').value,end:document.getElementById('ohEnd').value,outsideMessage:document.getElementById('ohMsg').value}})});
+  loadSettings();
+}
+async function simulate(){
+  const res=await api('/chatbot/simulate',{method:'POST',body:JSON.stringify({text:document.getElementById('simText').value,vars:{name:'Ali'}})});
+  const r=res.result||{};
+  document.getElementById('simOut').textContent=r.reply?`[${r.source}] ${r.reply}`:`[${r.source}] (no reply)`;
+}
+async function addQR(){
+  const res=await api('/quick-replies',{method:'POST',body:JSON.stringify({shortcut:document.getElementById('qSc').value,body:document.getElementById('qBody').value})});
+  if(!res.ok)return alert(res.error);
+  document.getElementById('qSc').value='';document.getElementById('qBody').value='';loadQR();
+}
+async function delQR(id){if(!confirm('Delete?'))return;await api('/quick-replies/'+id,{method:'DELETE'});loadQR();}
+async function loadQR(){
+  const res=await api('/quick-replies');
+  document.querySelector('#qtbl tbody').innerHTML=(res.replies||[]).map(r=>`<tr><td><code>${esc(r.shortcut)}</code></td><td>${esc(r.body)}</td><td><button class="danger" onclick="delQR('${r.id}')">🗑</button></td></tr>`).join('')||'<tr><td colspan="3" class="muted">No quick replies.</td></tr>';
+}
+loadSettings();loadRules();loadQR();
+</script>
+</body>
+</html>
