@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "start:http": "node index.js --transport=http"
+    "start:http": "node index.js --transport=http",
+    "start:chatgpt": "node chatgpt/server.js",
+    "check:chatgpt": "node --check chatgpt/server.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
