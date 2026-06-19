@@ -11713,6 +11713,119 @@ API:
 /api/system/setup-validator`;
 }
 
+function runSystemSetupAutofix(input = {}) {
+  const before = buildSystemSetupValidator();
+  const actions = [];
+  const skipped = [];
+  const createdAt = new Date().toISOString();
+  const ensureDir = (dir, label) => {
+    try {
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+        actions.push(`Created ${label}: ${dir}`);
+      } else {
+        skipped.push(`${label} already exists`);
+      }
+    } catch (error) {
+      actions.push(`Failed ${label}: ${error.message}`);
+    }
+  };
+
+  ensureDir(dataDir, 'data folder');
+  ensureDir(path.join(__dirname, 'uploads'), 'uploads folder');
+  ensureDir(path.join(__dirname, 'logs'), 'logs folder');
+  ensureDir(path.join(__dirname, 'exports'), 'exports folder');
+  ensureDir(path.join(__dirname, 'tmp'), 'tmp folder');
+  ensureDir(path.join(__dirname, '.wwebjs_auth'), 'WhatsApp Web auth folder');
+
+  const envPath = path.join(__dirname, '.env');
+  const envExamplePath = path.join(__dirname, '.env.example');
+  if (!fs.existsSync(envPath) && fs.existsSync(envExamplePath) && input.createEnv !== false) {
+    try {
+      let envText = fs.readFileSync(envExamplePath, 'utf8');
+      if (!/^JWT_SECRET=/m.test(envText)) envText += `\nJWT_SECRET=${crypto.randomBytes(32).toString('hex')}\n`;
+      envText = envText.replace(/^JWT_SECRET=\s*$/m, `JWT_SECRET=${crypto.randomBytes(32).toString('hex')}`);
+      fs.writeFileSync(envPath, envText, 'utf8');
+      actions.push('Created .env from .env.example with a generated JWT_SECRET placeholder.');
+    } catch (error) {
+      actions.push(`Failed .env creation: ${error.message}`);
+    }
+  } else {
+    skipped.push(fs.existsSync(envPath) ? '.env already exists; not modified' : '.env.example missing; .env not created');
+  }
+
+  const requiredValues = before.checks
+    .filter(row => !row.ok && row.keys?.length)
+    .map(row => ({
+      id: row.id,
+      label: row.label,
+      severity: row.severity,
+      keys: row.keys,
+      fix: row.fix
+    }));
+  try {
+    fs.writeFileSync(path.join(dataDir, 'setup-required-values.sample.json'), stringifyJsonPayload({
+      generatedAt: createdAt,
+      note: 'Fill these values in .env or dashboard settings. No secrets are stored here.',
+      requiredValues
+    }), 'utf8');
+    actions.push('Wrote data/setup-required-values.sample.json');
+  } catch (error) {
+    actions.push(`Failed setup required-values file: ${error.message}`);
+  }
+
+  const after = buildSystemSetupValidator();
+  try {
+    fs.writeFileSync(path.join(dataDir, 'setup-validator-report.json'), stringifyJsonPayload(after), 'utf8');
+    actions.push('Wrote data/setup-validator-report.json');
+  } catch (error) {
+    actions.push(`Failed setup report file: ${error.message}`);
+  }
+
+  logs.push({
+    id: uuid(),
+    type: 'system_setup_autofix',
+    status: 'done',
+    beforeScore: before.score,
+    afterScore: after.score,
+    actions: actions.slice(0, 50),
+    skipped: skipped.slice(0, 50),
+    time: createdAt
+  });
+  saveJSON('logs.json', logs);
+
+  return {
+    success: true,
+    before: { status: before.status, score: before.score, summary: before.summary },
+    after: { status: after.status, score: after.score, summary: after.summary },
+    actions,
+    skipped,
+    nextFixes: after.nextFixes
+  };
+}
+
+function buildSystemSetupAutofixReply(result = runSystemSetupAutofix({ source: 'whatsapp_admin' })) {
+  const actions = result.actions.length
+    ? result.actions.slice(0, 8).map((item, index) => `${index + 1}. ${item}`).join('\n')
+    : 'No safe filesystem fixes were needed.';
+  const next = result.nextFixes.length
+    ? result.nextFixes.slice(0, 6).map((row, index) => `${index + 1}. ${row.label}: ${row.fix}`).join('\n')
+    : 'No critical/recommended fixes pending.';
+  return `*SuperSender Safe Setup Auto-Fix*
+
+Before: *${result.before.score}%* (${result.before.status})
+After: *${result.after.score}%* (${result.after.status})
+
+Actions:
+${actions}
+
+Still required:
+${next}
+
+Dashboard:
+http://localhost:3001/setup-validator`;
+}
+
 function markWhatsAppChannelManualPacketDone(packetId = '', note = '') {
   const id = String(packetId || '').trim();
   if (!id) throw new Error('packetId is required');
@@ -20534,6 +20647,15 @@ app.get('/api/system/setup-validator', (_req, res) => {
   }
 });
 
+app.post('/api/system/setup-autofix', (req, res) => {
+  try {
+    res.json(runSystemSetupAutofix(req.body || {}));
+  } catch (error) {
+    console.error('[SetupAutofix] failed:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 app.get('/setup-validator', (_req, res) => {
   try {
     const report = buildSystemSetupValidator();
@@ -20572,12 +20694,26 @@ ul{margin:0;padding-left:20px}.muted{color:#96aabd}
 <div class="score">${report.score}%</div>
 <p class="muted">Root: <code>${htmlEscape(report.root)}</code></p>
 <p>Passed ${report.summary.passed}/${report.summary.total} checks. Critical missing: ${report.summary.failedCritical}. Recommended missing: ${report.summary.failedRecommended}.</p>
-<div class="toolbar"><a class="btn" href="/api/system/setup-validator">JSON API</a><a class="btn" href="/api/health">Health API</a><a class="btn" href="/wa-qr">WhatsApp QR</a><a class="btn" href="/whatsapp-cloud-api">Cloud API</a></div>
+<div class="toolbar"><a class="btn" href="/api/system/setup-validator">JSON API</a><button class="btn" onclick="runAutofix()">Run Safe Auto-Fix</button><a class="btn" href="/api/health">Health API</a><a class="btn" href="/wa-qr">WhatsApp QR</a><a class="btn" href="/whatsapp-cloud-api">Cloud API</a></div>
 </section><section class="card" style="flex:1 1 320px">
 <h2>Next fixes</h2><ul>${fixesHtml}</ul>
-<p class="muted">WhatsApp admin command: <code>!setupcheck</code></p>
+<p class="muted">WhatsApp admin commands: <code>!setupcheck</code> and <code>!setupfix</code></p>
+<pre id="autofixOut" style="white-space:pre-wrap;background:#081018;border:1px solid #243746;border-radius:10px;padding:12px;max-height:220px;overflow:auto">Safe Auto-Fix creates only non-secret folders/reports and never overwrites existing .env.</pre>
 </section></div>
 <div class="grid">${categoryHtml}</div>
+<script>
+async function runAutofix(){
+  const out = document.getElementById('autofixOut');
+  out.textContent = 'Running safe auto-fix...';
+  try {
+    const response = await fetch('/api/system/setup-autofix',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({source:'dashboard'})});
+    const data = await response.json();
+    out.textContent = JSON.stringify(data, null, 2);
+  } catch (error) {
+    out.textContent = 'Auto-Fix failed: ' + error.message;
+  }
+}
+</script>
 </main></body></html>`);
   } catch (error) {
     console.error('[SetupValidatorPage] failed:', error);
@@ -30669,7 +30805,7 @@ function splitSocialCommandArgs(text = '') {
 }
 
 function isWhatsAppSocialCommand(text = '') {
-  return /^!(social|connect|post|draft|approvepost|sharepost|poststatus|comment|telegram|control|admin|menuadmin|server|status|health|setupcheck|setupvalidator|doctor|watchdog|cloudapi|officialwa|next50|antigravity|aihub|automationhub|agents|agentcontrol|agenttask|autobuild|claw|claws|zeroclaw|pcagents|importskills|skillpacks|packs|waauto|automation|autosettings|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelfix|channelwatch|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
+  return /^!(social|connect|post|draft|approvepost|sharepost|poststatus|comment|telegram|control|admin|menuadmin|server|status|health|setupcheck|setupvalidator|setupfix|doctor|watchdog|cloudapi|officialwa|next50|antigravity|aihub|automationhub|agents|agentcontrol|agenttask|autobuild|claw|claws|zeroclaw|pcagents|importskills|skillpacks|packs|waauto|automation|autosettings|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelfix|channelwatch|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
 }
 
 function adminNumberCandidates() {
@@ -31852,6 +31988,11 @@ async function handleWhatsAppSocialAdminCommand(ctx = {}) {
 
     if (command === '!setupcheck' || command === '!setupvalidator' || command === '!doctor') {
       await reply(buildSystemSetupValidatorReply());
+      return true;
+    }
+
+    if (command === '!setupfix') {
+      await reply(buildSystemSetupAutofixReply(runSystemSetupAutofix({ source: 'whatsapp_admin' })));
       return true;
     }
 
