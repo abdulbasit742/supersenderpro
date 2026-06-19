@@ -1340,6 +1340,7 @@ const JSON_FILE_LIMITS = {
   'alerts.json': { limit: Number(process.env.ALERTS_MAX_ROWS || 1500), keep: 'head' },
   'channel_relay_inbox.json': { limit: Number(process.env.CHANNEL_RELAY_MAX_ROWS || 500), keep: 'head' },
   'whatsapp_channel_posts.json': { limit: Number(process.env.CHANNEL_POSTS_MAX_ROWS || 500), keep: 'tail' },
+  'whatsapp_cloud_api_log.json': { limit: Number(process.env.WHATSAPP_CLOUD_API_LOG_MAX_ROWS || 1000), keep: 'tail' },
   'group_reply_log.json': { limit: Number(process.env.GROUP_REPLY_LOG_MAX_ROWS || 1000), keep: 'tail' },
   'send_safety_log.json': { limit: Number(process.env.SEND_SAFETY_LOG_MAX_ROWS || 5000), keep: 'tail' }
 };
@@ -1798,6 +1799,18 @@ let settings = loadJSON('settings.json', {
   n8n_payment_webhook_url: '',
   n8n_followup_webhook_url: '',
   n8n_dashboard_sync_webhook_url: '',
+  whatsapp_send_provider: process.env.WHATSAPP_SEND_PROVIDER || 'unofficial',
+  whatsapp_cloud_api_enabled: String(process.env.WHATSAPP_CLOUD_API_ENABLED || 'false').toLowerCase() === 'true',
+  whatsapp_cloud_fallback_enabled: String(process.env.WHATSAPP_CLOUD_FALLBACK_ENABLED || 'true').toLowerCase() !== 'false',
+  whatsapp_cloud_dry_run: String(process.env.WHATSAPP_CLOUD_DRY_RUN || 'true').toLowerCase() !== 'false',
+  whatsapp_cloud_graph_version: process.env.WHATSAPP_CLOUD_GRAPH_VERSION || process.env.META_GRAPH_VERSION || 'v21.0',
+  whatsapp_cloud_phone_number_id: process.env.WHATSAPP_CLOUD_PHONE_NUMBER_ID || '',
+  whatsapp_cloud_business_account_id: process.env.WHATSAPP_CLOUD_BUSINESS_ACCOUNT_ID || '',
+  whatsapp_cloud_access_token: process.env.WHATSAPP_CLOUD_ACCESS_TOKEN || '',
+  whatsapp_cloud_verify_token: process.env.WHATSAPP_CLOUD_VERIFY_TOKEN || process.env.FB_VERIFY_TOKEN || '',
+  whatsapp_cloud_webhook_secret: process.env.WHATSAPP_CLOUD_WEBHOOK_SECRET || '',
+  whatsapp_cloud_default_template: process.env.WHATSAPP_CLOUD_DEFAULT_TEMPLATE || 'hello_world',
+  whatsapp_cloud_default_language: process.env.WHATSAPP_CLOUD_DEFAULT_LANGUAGE || 'en_US',
   meta_graph_version: 'v21.0',
   facebook_app_id: '',
   facebook_app_secret: '',
@@ -2070,6 +2083,20 @@ settings.n8n_broadcast_webhook_url = settings.n8n_broadcast_webhook_url || '';
 settings.n8n_payment_webhook_url = settings.n8n_payment_webhook_url || '';
 settings.n8n_followup_webhook_url = settings.n8n_followup_webhook_url || '';
 settings.n8n_dashboard_sync_webhook_url = settings.n8n_dashboard_sync_webhook_url || '';
+settings.whatsapp_send_provider = ['unofficial', 'cloud', 'auto'].includes(String(settings.whatsapp_send_provider || '').toLowerCase())
+  ? String(settings.whatsapp_send_provider || '').toLowerCase()
+  : String(process.env.WHATSAPP_SEND_PROVIDER || 'unofficial').toLowerCase();
+settings.whatsapp_cloud_api_enabled = settings.whatsapp_cloud_api_enabled === true || String(process.env.WHATSAPP_CLOUD_API_ENABLED || '').toLowerCase() === 'true';
+settings.whatsapp_cloud_fallback_enabled = settings.whatsapp_cloud_fallback_enabled !== false && String(process.env.WHATSAPP_CLOUD_FALLBACK_ENABLED || 'true').toLowerCase() !== 'false';
+settings.whatsapp_cloud_dry_run = settings.whatsapp_cloud_dry_run !== false && String(process.env.WHATSAPP_CLOUD_DRY_RUN || 'true').toLowerCase() !== 'false';
+settings.whatsapp_cloud_graph_version = settings.whatsapp_cloud_graph_version || process.env.WHATSAPP_CLOUD_GRAPH_VERSION || process.env.META_GRAPH_VERSION || 'v21.0';
+settings.whatsapp_cloud_phone_number_id = settings.whatsapp_cloud_phone_number_id || process.env.WHATSAPP_CLOUD_PHONE_NUMBER_ID || '';
+settings.whatsapp_cloud_business_account_id = settings.whatsapp_cloud_business_account_id || process.env.WHATSAPP_CLOUD_BUSINESS_ACCOUNT_ID || '';
+settings.whatsapp_cloud_access_token = settings.whatsapp_cloud_access_token || process.env.WHATSAPP_CLOUD_ACCESS_TOKEN || '';
+settings.whatsapp_cloud_verify_token = settings.whatsapp_cloud_verify_token || process.env.WHATSAPP_CLOUD_VERIFY_TOKEN || process.env.FB_VERIFY_TOKEN || '';
+settings.whatsapp_cloud_webhook_secret = settings.whatsapp_cloud_webhook_secret || process.env.WHATSAPP_CLOUD_WEBHOOK_SECRET || '';
+settings.whatsapp_cloud_default_template = settings.whatsapp_cloud_default_template || process.env.WHATSAPP_CLOUD_DEFAULT_TEMPLATE || 'hello_world';
+settings.whatsapp_cloud_default_language = settings.whatsapp_cloud_default_language || process.env.WHATSAPP_CLOUD_DEFAULT_LANGUAGE || 'en_US';
 settings.meta_graph_version = settings.meta_graph_version || process.env.META_GRAPH_VERSION || 'v21.0';
 settings.facebook_app_id = settings.facebook_app_id || process.env.FACEBOOK_APP_ID || '';
 settings.facebook_app_secret = settings.facebook_app_secret || process.env.FACEBOOK_APP_SECRET || '';
@@ -5510,7 +5537,16 @@ async function sendDirect(number, text, options = {}) {
   const { accountId, inst } = resolveOutboundWAInstance(options || {});
   if (!number) throw new Error('number is required');
   if (!text) throw new Error('text is required');
-  if (!inst?.isReady) throw new Error('WhatsApp not connected');
+  const provider = resolveWhatsAppOutboundProvider(options || {});
+  if (provider === 'cloud') {
+    return sendWhatsAppCloudText(number, text, { source: options.source || 'sendDirect', dryRun: options.dryRun });
+  }
+  if (!inst?.isReady) {
+    if (provider === 'auto' && shouldUseWhatsAppCloudFallback(options || {})) {
+      return sendWhatsAppCloudText(number, text, { source: options.source || 'sendDirect_fallback', dryRun: options.dryRun });
+    }
+    throw new Error('WhatsApp not connected');
+  }
 
   const chatId = resolveOutboundChatId(number);
   const finalText = cleanOutgoingText(text);
@@ -5533,6 +5569,16 @@ async function sendDirect(number, text, options = {}) {
 
     return sentMsg;
   } catch (error) {
+    if (provider === 'auto' && shouldUseWhatsAppCloudFallback(options || {})) {
+      try {
+        return await sendWhatsAppCloudText(number, finalText, {
+          source: options.source || 'sendDirect_fallback',
+          dryRun: options.dryRun
+        });
+      } catch (cloudError) {
+        console.error('WhatsApp Cloud fallback failed:', cloudError.message);
+      }
+    }
     // Still record failed messages
     messageAnalytics.recordSentMessage({
       to: chatId,
@@ -11907,6 +11953,253 @@ async function sendDirectMedia(number, media, caption = '', options = {}) {
   }
 }
 
+function resolveWhatsAppOutboundProvider(options = {}) {
+  const requested = String(options.provider || options.channel || settings.whatsapp_send_provider || process.env.WHATSAPP_SEND_PROVIDER || 'unofficial').toLowerCase();
+  if (['cloud', 'official', 'meta', 'cloud_api'].includes(requested)) return 'cloud';
+  if (['auto', 'hybrid', 'fallback'].includes(requested)) return 'auto';
+  return 'unofficial';
+}
+
+function shouldUseWhatsAppCloudFallback(options = {}) {
+  if (options.allowCloudFallback === false) return false;
+  return settings.whatsapp_cloud_fallback_enabled !== false && getWhatsAppCloudStatus().ready;
+}
+
+function getWhatsAppCloudConfig() {
+  const token = String(settings.whatsapp_cloud_access_token || process.env.WHATSAPP_CLOUD_ACCESS_TOKEN || '').trim().replace(/^Bearer\s+/i, '');
+  const phoneNumberId = String(settings.whatsapp_cloud_phone_number_id || process.env.WHATSAPP_CLOUD_PHONE_NUMBER_ID || '').trim();
+  const graphVersion = String(settings.whatsapp_cloud_graph_version || process.env.WHATSAPP_CLOUD_GRAPH_VERSION || process.env.META_GRAPH_VERSION || 'v21.0').trim().replace(/^\/+/, '');
+  return {
+    enabled: settings.whatsapp_cloud_api_enabled === true || String(process.env.WHATSAPP_CLOUD_API_ENABLED || '').toLowerCase() === 'true',
+    fallbackEnabled: settings.whatsapp_cloud_fallback_enabled !== false,
+    dryRunDefault: settings.whatsapp_cloud_dry_run !== false,
+    graphVersion,
+    phoneNumberId,
+    businessAccountId: String(settings.whatsapp_cloud_business_account_id || process.env.WHATSAPP_CLOUD_BUSINESS_ACCOUNT_ID || '').trim(),
+    accessToken: token,
+    verifyToken: String(settings.whatsapp_cloud_verify_token || process.env.WHATSAPP_CLOUD_VERIFY_TOKEN || process.env.FB_VERIFY_TOKEN || '').trim(),
+    webhookSecret: String(settings.whatsapp_cloud_webhook_secret || process.env.WHATSAPP_CLOUD_WEBHOOK_SECRET || '').trim(),
+    defaultTemplate: String(settings.whatsapp_cloud_default_template || process.env.WHATSAPP_CLOUD_DEFAULT_TEMPLATE || 'hello_world').trim(),
+    defaultLanguage: String(settings.whatsapp_cloud_default_language || process.env.WHATSAPP_CLOUD_DEFAULT_LANGUAGE || 'en_US').trim()
+  };
+}
+
+function getWhatsAppCloudStatus() {
+  const cfg = getWhatsAppCloudConfig();
+  const missing = [];
+  if (!cfg.phoneNumberId) missing.push('WHATSAPP_CLOUD_PHONE_NUMBER_ID');
+  if (!cfg.accessToken) missing.push('WHATSAPP_CLOUD_ACCESS_TOKEN');
+  if (!cfg.verifyToken) missing.push('WHATSAPP_CLOUD_VERIFY_TOKEN');
+  return {
+    enabled: cfg.enabled,
+    ready: cfg.enabled && !missing.includes('WHATSAPP_CLOUD_PHONE_NUMBER_ID') && !missing.includes('WHATSAPP_CLOUD_ACCESS_TOKEN'),
+    webhookReady: !!cfg.verifyToken,
+    fallbackEnabled: cfg.fallbackEnabled,
+    dryRunDefault: cfg.dryRunDefault,
+    graphVersion: cfg.graphVersion,
+    phoneNumberId: cfg.phoneNumberId ? `${cfg.phoneNumberId.slice(0, 4)}...${cfg.phoneNumberId.slice(-4)}` : '',
+    businessAccountId: cfg.businessAccountId ? `${cfg.businessAccountId.slice(0, 4)}...${cfg.businessAccountId.slice(-4)}` : '',
+    tokenMasked: cfg.accessToken ? maskSecret(cfg.accessToken) : '',
+    defaultTemplate: cfg.defaultTemplate,
+    defaultLanguage: cfg.defaultLanguage,
+    missing,
+    webhookUrl: `${settings.social_public_base_url || settings.gmail_public_base_url || `http://localhost:${PORT}`}/api/whatsapp-cloud/webhook`
+  };
+}
+
+function normalizeWhatsAppCloudRecipient(value = '') {
+  const raw = String(value || '').trim().replace(/@c\.us$/i, '').replace(/^whatsapp:/i, '');
+  return raw.replace(/[^\d]/g, '');
+}
+
+let whatsappCloudApiLogCache = null;
+function logWhatsAppCloudApiEvent(row = {}) {
+  const event = {
+    id: row.id || uuid(),
+    type: row.type || 'whatsapp_cloud_api',
+    status: row.status || 'info',
+    createdAt: row.createdAt || new Date().toISOString(),
+    ...row
+  };
+  if (!Array.isArray(whatsappCloudApiLogCache)) whatsappCloudApiLogCache = loadJSON('whatsapp_cloud_api_log.json', []);
+  whatsappCloudApiLogCache.push(event);
+  trimArrayInPlace(whatsappCloudApiLogCache, Number(process.env.WHATSAPP_CLOUD_API_LOG_MAX_ROWS || 1000), 'tail');
+  saveJSON('whatsapp_cloud_api_log.json', whatsappCloudApiLogCache);
+  if (typeof logs !== 'undefined' && Array.isArray(logs)) {
+    logs.push({ id: event.id, type: event.type, status: event.status, time: event.createdAt, error: event.error || '', meta: event.meta || undefined });
+    saveJSON('logs.json', logs);
+  }
+  return event;
+}
+
+async function callWhatsAppCloudApi(edgePath, body, options = {}) {
+  const cfg = getWhatsAppCloudConfig();
+  if (!cfg.enabled) throw new Error('WhatsApp Cloud API is disabled in Settings');
+  if (!cfg.phoneNumberId) throw new Error('WhatsApp Cloud phone_number_id missing');
+  if (!cfg.accessToken) throw new Error('WhatsApp Cloud access token missing');
+  const url = `https://graph.facebook.com/${cfg.graphVersion}/${edgePath.replace(/^\/+/, '')}`;
+  const response = await fetchOutbound(url, {
+    method: options.method || 'POST',
+    headers: {
+      'Authorization': `Bearer ${cfg.accessToken}`,
+      'Content-Type': 'application/json'
+    },
+    body: body === undefined ? undefined : JSON.stringify(body)
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || data.error) {
+    throw new Error(data.error?.message || data.error?.error_user_msg || `WhatsApp Cloud API failed (${response.status})`);
+  }
+  return data;
+}
+
+async function sendWhatsAppCloudText(number, text, options = {}) {
+  const recipient = normalizeWhatsAppCloudRecipient(number);
+  const finalText = cleanOutgoingText(text || '').slice(0, 4096);
+  if (!recipient) throw new Error('recipient number is required');
+  if (!finalText) throw new Error('message text is required');
+  const cfg = getWhatsAppCloudConfig();
+  const dryRun = options.dryRun !== undefined ? options.dryRun === true : cfg.dryRunDefault;
+  const payload = {
+    messaging_product: 'whatsapp',
+    recipient_type: 'individual',
+    to: recipient,
+    type: 'text',
+    text: { preview_url: options.previewUrl === true, body: finalText }
+  };
+  if (dryRun) {
+    const event = logWhatsAppCloudApiEvent({ type: 'whatsapp_cloud_text_dry_run', status: 'preview', to: recipient, source: options.source || 'manual', meta: { payload } });
+    return { id: { _serialized: event.id }, dryRun: true, provider: 'whatsapp_cloud', to: recipient, payload };
+  }
+  const data = await callWhatsAppCloudApi(`${cfg.phoneNumberId}/messages`, payload);
+  const messageId = data.messages?.[0]?.id || data.message_id || '';
+  logWhatsAppCloudApiEvent({ type: 'whatsapp_cloud_text_sent', status: 'sent', to: recipient, source: options.source || 'manual', whatsappId: messageId });
+  try {
+    messageAnalytics.recordSentMessage({
+      to: recipient,
+      content: finalText,
+      whatsappId: messageId,
+      type: 'cloud_text',
+      accountId: 'whatsapp_cloud_api'
+    });
+  } catch {}
+  return { id: { _serialized: messageId }, provider: 'whatsapp_cloud', to: recipient, data };
+}
+
+async function sendWhatsAppCloudTemplate(number, templateName, languageCode, components = [], options = {}) {
+  const recipient = normalizeWhatsAppCloudRecipient(number);
+  if (!recipient) throw new Error('recipient number is required');
+  const cfg = getWhatsAppCloudConfig();
+  const name = String(templateName || cfg.defaultTemplate || 'hello_world').trim();
+  const language = String(languageCode || cfg.defaultLanguage || 'en_US').trim();
+  const dryRun = options.dryRun !== undefined ? options.dryRun === true : cfg.dryRunDefault;
+  const payload = {
+    messaging_product: 'whatsapp',
+    to: recipient,
+    type: 'template',
+    template: {
+      name,
+      language: { code: language },
+      ...(Array.isArray(components) && components.length ? { components } : {})
+    }
+  };
+  if (dryRun) {
+    const event = logWhatsAppCloudApiEvent({ type: 'whatsapp_cloud_template_dry_run', status: 'preview', to: recipient, source: options.source || 'manual', meta: { payload } });
+    return { id: { _serialized: event.id }, dryRun: true, provider: 'whatsapp_cloud', to: recipient, payload };
+  }
+  const data = await callWhatsAppCloudApi(`${cfg.phoneNumberId}/messages`, payload);
+  const messageId = data.messages?.[0]?.id || data.message_id || '';
+  logWhatsAppCloudApiEvent({ type: 'whatsapp_cloud_template_sent', status: 'sent', to: recipient, source: options.source || 'manual', whatsappId: messageId, meta: { template: name, language } });
+  try {
+    messageAnalytics.recordSentMessage({
+      to: recipient,
+      content: `[Template] ${name}`,
+      whatsappId: messageId,
+      type: 'cloud_template',
+      accountId: 'whatsapp_cloud_api'
+    });
+  } catch {}
+  return { id: { _serialized: messageId }, provider: 'whatsapp_cloud', to: recipient, data };
+}
+
+function extractWhatsAppCloudMessageText(message = {}) {
+  if (message.text?.body) return message.text.body;
+  if (message.button?.text) return message.button.text;
+  if (message.interactive?.button_reply?.title) return message.interactive.button_reply.title;
+  if (message.interactive?.list_reply?.title) return message.interactive.list_reply.title;
+  if (message.image?.caption) return message.image.caption;
+  if (message.document?.caption) return message.document.caption;
+  if (message.audio) return '[Audio message]';
+  if (message.image) return '[Image message]';
+  if (message.document) return '[Document message]';
+  return `[${message.type || 'message'}]`;
+}
+
+function recordWhatsAppCloudInboundMessage(message = {}, value = {}) {
+  const from = normalizeWhatsAppCloudRecipient(message.from || '');
+  const contact = (Array.isArray(value.contacts) ? value.contacts : []).find(item => normalizeWhatsAppCloudRecipient(item.wa_id || '') === from) || {};
+  const text = extractWhatsAppCloudMessageText(message);
+  const name = contact.profile?.name || `Cloud WA ${from.slice(-6)}`;
+  const row = {
+    id: message.id || uuid(),
+    source: 'whatsapp_cloud',
+    chatId: from,
+    recipientId: value.metadata?.phone_number_id || '',
+    number: from,
+    name,
+    body: text,
+    timestamp: new Date(Number(message.timestamp || Date.now() / 1000) * 1000).toISOString(),
+    read: false
+  };
+  if (typeof inbox !== 'undefined' && Array.isArray(inbox)) {
+    inbox.unshift(row);
+    if (inbox.length > 2000) inbox = inbox.slice(0, 2000);
+    try { saveInbox(); } catch {}
+  }
+  try { ensureGuestCustomer(from, name, 'whatsapp_cloud'); } catch {}
+  try {
+    messageAnalytics.recordInboundMessage({
+      from,
+      number: from,
+      recipientId: row.recipientId,
+      chatId: from,
+      content: text,
+      type: message.type || 'text',
+      source: 'whatsapp_cloud',
+      name
+    });
+  } catch {}
+  try { io.emit('incoming_message', row); } catch {}
+  try { triggerWebhooks('new_message', row); } catch {}
+  logWhatsAppCloudApiEvent({ id: row.id, type: 'whatsapp_cloud_inbound', status: 'received', from, meta: { messageType: message.type || 'text' } });
+  return row;
+}
+
+function handleWhatsAppCloudWebhookPayload(body = {}) {
+  const entries = Array.isArray(body.entry) ? body.entry : [];
+  const inbound = [];
+  const statuses = [];
+  for (const entry of entries) {
+    for (const change of (Array.isArray(entry.changes) ? entry.changes : [])) {
+      const value = change.value || {};
+      for (const message of (Array.isArray(value.messages) ? value.messages : [])) {
+        inbound.push(recordWhatsAppCloudInboundMessage(message, value));
+      }
+      for (const status of (Array.isArray(value.statuses) ? value.statuses : [])) {
+        statuses.push(status);
+        logWhatsAppCloudApiEvent({
+          id: status.id || uuid(),
+          type: 'whatsapp_cloud_status',
+          status: status.status || 'status',
+          to: normalizeWhatsAppCloudRecipient(status.recipient_id || ''),
+          meta: status
+        });
+      }
+    }
+  }
+  return { inbound, statuses };
+}
+
 function promiseTimeout(promise, ms, fallback) {
   return Promise.race([
     promise,
@@ -17907,6 +18200,7 @@ const WHATSAPP_ADMIN_COMMANDS = [
   { command: '!backup create', purpose: 'WhatsApp se fresh data backup create' },
   { command: '!backup list', purpose: 'Recent backup files list' },
   { command: '!watchdog', purpose: 'Auto health watchdog status/check/on/off' },
+  { command: '!cloudapi', purpose: 'Official WhatsApp Cloud API status + setup links' },
   { command: '!webfetch <url>', purpose: 'Website se title/text/links fetch' },
   { command: '!webpost <url> <message>', purpose: 'Website/API par JSON payload forward' },
   { command: '!webshare <url>', purpose: 'Website data customer groups ko WhatsApp par share' },
@@ -17972,9 +18266,130 @@ app.get('/api/health', (req, res) => {
         action: waDiagnostic.action,
         engine: waDiagnostic.engine,
         proxyEnabled: waDiagnostic.proxy.enabled
-      }
+      },
+      whatsappCloud: getWhatsAppCloudStatus()
     });
   });
+
+app.get('/api/whatsapp-cloud/status', (req, res) => {
+  try {
+    const sourceRows = Array.isArray(whatsappCloudApiLogCache) ? whatsappCloudApiLogCache : loadJSON('whatsapp_cloud_api_log.json', []);
+    const recent = sourceRows.slice(-25).reverse().map(row => ({
+      id: row.id,
+      type: row.type,
+      status: row.status,
+      to: row.to || '',
+      from: row.from || '',
+      createdAt: row.createdAt,
+      error: row.error || ''
+    }));
+    res.json({ success: true, status: getWhatsAppCloudStatus(), recent });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/whatsapp-cloud/settings', (req, res) => {
+  try {
+    const body = req.body || {};
+    settings.whatsapp_cloud_api_enabled = body.enabled === true || body.whatsapp_cloud_api_enabled === true;
+    settings.whatsapp_cloud_fallback_enabled = body.fallbackEnabled !== undefined ? body.fallbackEnabled !== false : body.whatsapp_cloud_fallback_enabled !== false;
+    settings.whatsapp_cloud_dry_run = body.dryRun !== undefined ? body.dryRun !== false : body.whatsapp_cloud_dry_run !== false;
+    settings.whatsapp_send_provider = ['unofficial', 'cloud', 'auto'].includes(String(body.sendProvider || body.whatsapp_send_provider || settings.whatsapp_send_provider || '').toLowerCase())
+      ? String(body.sendProvider || body.whatsapp_send_provider || settings.whatsapp_send_provider).toLowerCase()
+      : 'unofficial';
+    settings.whatsapp_cloud_graph_version = String(body.graphVersion || body.whatsapp_cloud_graph_version || settings.whatsapp_cloud_graph_version || 'v21.0').trim();
+    settings.whatsapp_cloud_phone_number_id = String(body.phoneNumberId || body.whatsapp_cloud_phone_number_id || '').trim();
+    settings.whatsapp_cloud_business_account_id = String(body.businessAccountId || body.whatsapp_cloud_business_account_id || '').trim();
+    const token = String(body.accessToken ?? body.whatsapp_cloud_access_token ?? '').trim();
+    if (token && token !== '********') settings.whatsapp_cloud_access_token = token.replace(/^Bearer\s+/i, '');
+    settings.whatsapp_cloud_verify_token = String(body.verifyToken || body.whatsapp_cloud_verify_token || settings.whatsapp_cloud_verify_token || '').trim();
+    settings.whatsapp_cloud_webhook_secret = String(body.webhookSecret || body.whatsapp_cloud_webhook_secret || settings.whatsapp_cloud_webhook_secret || '').trim();
+    settings.whatsapp_cloud_default_template = String(body.defaultTemplate || body.whatsapp_cloud_default_template || settings.whatsapp_cloud_default_template || 'hello_world').trim();
+    settings.whatsapp_cloud_default_language = String(body.defaultLanguage || body.whatsapp_cloud_default_language || settings.whatsapp_cloud_default_language || 'en_US').trim();
+    saveJSON('settings.json', settings);
+    res.json({ success: true, status: getWhatsAppCloudStatus() });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/whatsapp-cloud/send-text', async (req, res) => {
+  try {
+    const result = await sendWhatsAppCloudText(req.body?.number || req.body?.to, req.body?.text || req.body?.message, {
+      dryRun: req.body?.dryRun !== undefined ? req.body.dryRun === true : undefined,
+      previewUrl: req.body?.previewUrl === true,
+      source: req.body?.source || 'api'
+    });
+    res.json({ success: true, result });
+  } catch (error) {
+    logWhatsAppCloudApiEvent({ type: 'whatsapp_cloud_text_failed', status: 'failed', error: error.message, to: normalizeWhatsAppCloudRecipient(req.body?.number || req.body?.to || '') });
+    res.status(400).json({ success: false, error: error.message, status: getWhatsAppCloudStatus() });
+  }
+});
+
+app.post('/api/whatsapp-cloud/send-template', async (req, res) => {
+  try {
+    const result = await sendWhatsAppCloudTemplate(
+      req.body?.number || req.body?.to,
+      req.body?.template || req.body?.templateName,
+      req.body?.language || req.body?.languageCode,
+      Array.isArray(req.body?.components) ? req.body.components : [],
+      {
+        dryRun: req.body?.dryRun !== undefined ? req.body.dryRun === true : undefined,
+        source: req.body?.source || 'api'
+      }
+    );
+    res.json({ success: true, result });
+  } catch (error) {
+    logWhatsAppCloudApiEvent({ type: 'whatsapp_cloud_template_failed', status: 'failed', error: error.message, to: normalizeWhatsAppCloudRecipient(req.body?.number || req.body?.to || '') });
+    res.status(400).json({ success: false, error: error.message, status: getWhatsAppCloudStatus() });
+  }
+});
+
+app.post('/api/wa/send-official', async (req, res) => {
+  try {
+    const result = await sendWhatsAppCloudText(req.body?.number || req.body?.to, req.body?.text || req.body?.message, {
+      dryRun: req.body?.dryRun !== undefined ? req.body.dryRun === true : undefined,
+      previewUrl: req.body?.previewUrl === true,
+      source: req.body?.source || 'wa_send_official'
+    });
+    res.json({ success: true, result });
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message, status: getWhatsAppCloudStatus() });
+  }
+});
+
+app.get('/api/whatsapp-cloud/webhook', (req, res) => {
+  const mode = req.query['hub.mode'];
+  const token = req.query['hub.verify_token'];
+  const challenge = req.query['hub.challenge'];
+  const expected = getWhatsAppCloudConfig().verifyToken;
+  if (mode === 'subscribe' && expected && token === expected) {
+    logWhatsAppCloudApiEvent({ type: 'whatsapp_cloud_webhook_verify', status: 'verified' });
+    return res.status(200).send(challenge || '');
+  }
+  logWhatsAppCloudApiEvent({ type: 'whatsapp_cloud_webhook_verify', status: 'rejected', error: 'verify token mismatch' });
+  return res.sendStatus(403);
+});
+
+app.post('/api/whatsapp-cloud/webhook', (req, res) => {
+  try {
+    const result = handleWhatsAppCloudWebhookPayload(req.body || {});
+    res.json({ success: true, inbound: result.inbound.length, statuses: result.statuses.length });
+  } catch (error) {
+    logWhatsAppCloudApiEvent({ type: 'whatsapp_cloud_webhook_failed', status: 'failed', error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/whatsapp-cloud-api', (req, res) => {
+  try {
+    res.send(buildWhatsAppCloudApiPage(req));
+  } catch (error) {
+    res.status(500).send(`WhatsApp Cloud API page failed: ${htmlEscape(error.message)}`);
+  }
+});
 
 function buildTavilyClientFromSettings() {
   return createTavilyClient({
@@ -26604,6 +27019,21 @@ app.post('/api/settings', (req, res) => {
   settings.scholarship_auto_fetch_enabled = settings.scholarship_auto_fetch_enabled === true;
   settings.scholarship_auto_fetch_interval_minutes = Math.max(10, Number(settings.scholarship_auto_fetch_interval_minutes || 60));
   settings.scholarship_last_auto_fetch_at = String(settings.scholarship_last_auto_fetch_at || '').trim();
+  settings.whatsapp_send_provider = ['unofficial', 'cloud', 'auto'].includes(String(settings.whatsapp_send_provider || '').toLowerCase())
+    ? String(settings.whatsapp_send_provider || '').toLowerCase()
+    : 'unofficial';
+  settings.whatsapp_cloud_api_enabled = settings.whatsapp_cloud_api_enabled === true;
+  settings.whatsapp_cloud_fallback_enabled = settings.whatsapp_cloud_fallback_enabled !== false;
+  settings.whatsapp_cloud_dry_run = settings.whatsapp_cloud_dry_run !== false;
+  settings.whatsapp_cloud_graph_version = String(settings.whatsapp_cloud_graph_version || process.env.META_GRAPH_VERSION || 'v21.0').trim();
+  settings.whatsapp_cloud_phone_number_id = String(settings.whatsapp_cloud_phone_number_id || '').trim();
+  settings.whatsapp_cloud_business_account_id = String(settings.whatsapp_cloud_business_account_id || '').trim();
+  if (settings.whatsapp_cloud_access_token === '********') settings.whatsapp_cloud_access_token = loadJSON('settings.json', {})?.whatsapp_cloud_access_token || '';
+  settings.whatsapp_cloud_access_token = String(settings.whatsapp_cloud_access_token || '').trim();
+  settings.whatsapp_cloud_verify_token = String(settings.whatsapp_cloud_verify_token || '').trim();
+  settings.whatsapp_cloud_webhook_secret = String(settings.whatsapp_cloud_webhook_secret || '').trim();
+  settings.whatsapp_cloud_default_template = String(settings.whatsapp_cloud_default_template || 'hello_world').trim();
+  settings.whatsapp_cloud_default_language = String(settings.whatsapp_cloud_default_language || 'en_US').trim();
   safetySettings.requireOptIn = settings.explicit_opt_in_required === true;
   saveSafetySettings();
   sentimentAnalyzer.settings = settings;
@@ -29558,6 +29988,76 @@ function buildFilesLibraryPage(req) {
   </script></body></html>`;
 }
 
+function buildWhatsAppCloudApiPage(req) {
+  const status = getWhatsAppCloudStatus();
+  const cfg = getWhatsAppCloudConfig();
+  const recent = (Array.isArray(whatsappCloudApiLogCache) ? whatsappCloudApiLogCache : loadJSON('whatsapp_cloud_api_log.json', [])).slice(-30).reverse();
+  const rows = recent.length ? recent.map(row => `
+    <tr>
+      <td><b>${htmlEscape(row.type || '')}</b><br><small>${htmlEscape(row.createdAt || '')}</small></td>
+      <td><span class="pill ${row.status === 'sent' || row.status === 'received' || row.status === 'verified' ? 'ok' : row.status === 'failed' || row.status === 'rejected' ? 'bad' : 'warn'}">${htmlEscape(row.status || '')}</span></td>
+      <td>${htmlEscape(row.to || row.from || '-')}</td>
+      <td>${htmlEscape(row.error || row.whatsappId || '')}</td>
+    </tr>
+  `).join('') : '<tr><td colspan="4" class="muted">No Cloud API activity yet.</td></tr>';
+  const missing = status.missing.length ? status.missing.map(item => `<span class="pill bad">${htmlEscape(item)}</span>`).join(' ') : '<span class="pill ok">Required keys ready</span>';
+  return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>WhatsApp Cloud API - SuperSender Pro</title>
+  <style>
+    body{font-family:Inter,Arial,sans-serif;background:#071014;color:#eaf7f3;margin:0}.wrap{max-width:1180px;margin:0 auto;padding:28px}.top{display:flex;justify-content:space-between;gap:16px;align-items:center}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}.card{background:#122029;border:1px solid #263946;border-radius:16px;padding:18px;margin:14px 0;box-shadow:0 20px 60px rgba(0,0,0,.22)}label{display:block;margin-top:12px;color:#9fb3c8;font-size:12px;text-transform:uppercase;letter-spacing:.06em}input,select,textarea{width:100%;box-sizing:border-box;border:1px solid #2d4350;border-radius:12px;background:#071014;color:#eaf7f3;padding:11px;margin-top:6px}textarea{min-height:110px}button,.btn{background:#18c29c;color:#04120f;border:0;border-radius:12px;padding:11px 15px;font-weight:800;cursor:pointer;text-decoration:none;display:inline-block}.secondary{background:#243543;color:#eaf7f3}.danger{background:#ef4444;color:#fff}.pill{display:inline-block;border:1px solid #334155;border-radius:999px;padding:4px 9px;margin:2px;font-size:12px}.ok{color:#34d399;border-color:#166534}.warn{color:#fbbf24;border-color:#854d0e}.bad{color:#fb7185;border-color:#7f1d1d}.muted{color:#94a3b8}.metric{font-size:30px;font-weight:900}table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid #21313d;padding:10px;text-align:left}code{background:#071014;border:1px solid #263946;border-radius:8px;padding:6px;display:block;overflow:auto}.actions{display:flex;gap:10px;flex-wrap:wrap}.notice{border-left:4px solid #18c29c}
+  </style></head><body><div class="wrap">
+    <div class="top"><div><h1>WhatsApp Cloud API</h1><p class="muted">Official Meta WhatsApp lane alongside Baileys / whatsapp-web.js.</p></div><div class="actions"><a class="btn secondary" href="/">Dashboard</a><a class="btn secondary" href="/wa-qr">Unofficial QR</a><a class="btn secondary" href="/api/whatsapp-cloud/status">JSON</a></div></div>
+    <div class="grid">
+      <div class="card"><div class="muted">Cloud API</div><div class="metric">${status.ready ? 'READY' : 'SETUP'}</div><p>${status.enabled ? 'Enabled' : 'Disabled'} | Dry-run ${status.dryRunDefault ? 'ON' : 'OFF'}</p></div>
+      <div class="card"><div class="muted">Fallback</div><div class="metric">${status.fallbackEnabled ? 'ON' : 'OFF'}</div><p>Provider: ${htmlEscape(settings.whatsapp_send_provider || 'unofficial')}</p></div>
+      <div class="card"><div class="muted">Webhook</div><div class="metric">${status.webhookReady ? 'READY' : 'TOKEN'}</div><p>Meta verify token required.</p></div>
+      <div class="card"><div class="muted">Missing</div><p>${missing}</p></div>
+    </div>
+    <div class="card notice"><b>Meta Callback URL</b><code id="webhookUrl">${htmlEscape(status.webhookUrl)}</code><button class="secondary" onclick="copyText('webhookUrl')">Copy webhook URL</button><p class="muted">Meta Developer Console > WhatsApp > Configuration > Callback URL + Verify Token.</p></div>
+    <div class="grid">
+      <form class="card" onsubmit="saveSettings(event)">
+        <h2>Official API Settings</h2>
+        <label>Enabled</label><select id="enabled"><option value="true" ${status.enabled ? 'selected' : ''}>Enabled</option><option value="false" ${!status.enabled ? 'selected' : ''}>Disabled</option></select>
+        <label>Outbound provider</label><select id="sendProvider"><option value="unofficial" ${settings.whatsapp_send_provider === 'unofficial' ? 'selected' : ''}>Unofficial only</option><option value="auto" ${settings.whatsapp_send_provider === 'auto' ? 'selected' : ''}>Auto fallback</option><option value="cloud" ${settings.whatsapp_send_provider === 'cloud' ? 'selected' : ''}>Official Cloud only</option></select>
+        <label>Phone Number ID</label><input id="phoneNumberId" value="${htmlEscape(cfg.phoneNumberId)}" placeholder="Meta WhatsApp phone_number_id">
+        <label>Business Account ID</label><input id="businessAccountId" value="${htmlEscape(cfg.businessAccountId)}" placeholder="Optional WABA ID">
+        <label>Access Token</label><input id="accessToken" value="${cfg.accessToken ? '********' : ''}" placeholder="Permanent system-user token">
+        <label>Verify Token</label><input id="verifyToken" value="${htmlEscape(cfg.verifyToken)}" placeholder="Any strong string also set in Meta">
+        <label>Graph Version</label><input id="graphVersion" value="${htmlEscape(cfg.graphVersion)}">
+        <label>Default Template</label><input id="defaultTemplate" value="${htmlEscape(cfg.defaultTemplate)}">
+        <label>Default Language</label><input id="defaultLanguage" value="${htmlEscape(cfg.defaultLanguage)}">
+        <label><input id="fallbackEnabled" type="checkbox" ${status.fallbackEnabled ? 'checked' : ''} style="width:auto"> Enable fallback when QR bot is disconnected</label>
+        <label><input id="dryRun" type="checkbox" ${status.dryRunDefault ? 'checked' : ''} style="width:auto"> Keep sends in dry-run by default</label>
+        <button type="submit">Save Settings</button>
+      </form>
+      <div class="card">
+        <h2>Test Send</h2>
+        <label>Number</label><input id="testNumber" placeholder="923001234567">
+        <label>Message</label><textarea id="testMessage">SuperSender Pro official WhatsApp Cloud API test.</textarea>
+        <div class="actions"><button onclick="sendText(true)">Dry Run Text</button><button class="secondary" onclick="sendText(false)">Live Text</button></div>
+        <label>Template Name</label><input id="templateName" value="${htmlEscape(cfg.defaultTemplate)}">
+        <div class="actions"><button onclick="sendTemplate(true)">Dry Run Template</button><button class="secondary" onclick="sendTemplate(false)">Live Template</button></div>
+        <pre id="result" class="muted" style="white-space:pre-wrap"></pre>
+      </div>
+    </div>
+    <div class="card"><h2>Compliance Checklist</h2><ul>
+      <li>Use Cloud API for client SaaS, order updates, support, payment verification, templates, and opted-in broadcasts.</li>
+      <li>Use templates outside the 24-hour customer service window.</li>
+      <li>Keep Baileys / web session for internal/admin/local experiments only.</li>
+      <li>Never blast cold numbers. Keep opt-in, STOP handling, frequency limits, and message quality tracking ON.</li>
+    </ul></div>
+    <div class="card"><h2>Recent Activity</h2><table><thead><tr><th>Event</th><th>Status</th><th>Number</th><th>Detail</th></tr></thead><tbody>${rows}</tbody></table></div>
+  </div><script>
+    async function api(url, payload){ const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}); const d=await r.json().catch(()=>({})); if(!r.ok||d.success===false) throw new Error(d.error||'Request failed'); return d; }
+    function val(id){ return document.getElementById(id).value; }
+    function checked(id){ return document.getElementById(id).checked; }
+    async function copyText(id){ await navigator.clipboard.writeText(document.getElementById(id).innerText || document.getElementById(id).value); alert('Copied'); }
+    async function saveSettings(e){ e.preventDefault(); try { const d=await api('/api/whatsapp-cloud/settings',{enabled:val('enabled')==='true',sendProvider:val('sendProvider'),phoneNumberId:val('phoneNumberId'),businessAccountId:val('businessAccountId'),accessToken:val('accessToken'),verifyToken:val('verifyToken'),graphVersion:val('graphVersion'),defaultTemplate:val('defaultTemplate'),defaultLanguage:val('defaultLanguage'),fallbackEnabled:checked('fallbackEnabled'),dryRun:checked('dryRun')}); document.getElementById('result').textContent=JSON.stringify(d,null,2); setTimeout(()=>location.reload(),900); } catch(err){ document.getElementById('result').textContent=err.message; } }
+    async function sendText(dryRun){ try { const d=await api('/api/whatsapp-cloud/send-text',{number:val('testNumber'),text:val('testMessage'),dryRun}); document.getElementById('result').textContent=JSON.stringify(d,null,2); } catch(err){ document.getElementById('result').textContent=err.message; } }
+    async function sendTemplate(dryRun){ try { const d=await api('/api/whatsapp-cloud/send-template',{number:val('testNumber'),template:val('templateName'),language:val('defaultLanguage'),dryRun}); document.getElementById('result').textContent=JSON.stringify(d,null,2); } catch(err){ document.getElementById('result').textContent=err.message; } }
+  </script></body></html>`;
+}
+
 function buildSocialConnectPage(req, notice = '') {
   const urls = buildSocialOAuthUrls(req);
   const accounts = allSocialAccounts().map(publicSocialAccount);
@@ -29946,7 +30446,7 @@ function splitSocialCommandArgs(text = '') {
 }
 
 function isWhatsAppSocialCommand(text = '') {
-  return /^!(social|connect|post|draft|approvepost|sharepost|poststatus|comment|telegram|control|admin|menuadmin|server|status|health|watchdog|next50|antigravity|aihub|automationhub|agents|agentcontrol|agenttask|autobuild|claw|claws|zeroclaw|pcagents|importskills|skillpacks|packs|waauto|automation|autosettings|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelfix|channelwatch|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
+  return /^!(social|connect|post|draft|approvepost|sharepost|poststatus|comment|telegram|control|admin|menuadmin|server|status|health|watchdog|cloudapi|officialwa|next50|antigravity|aihub|automationhub|agents|agentcontrol|agenttask|autobuild|claw|claws|zeroclaw|pcagents|importskills|skillpacks|packs|waauto|automation|autosettings|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelfix|channelwatch|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
 }
 
 function adminNumberCandidates() {
@@ -30935,6 +31435,7 @@ Server:
 *!report* â€” daily sales summary
 *!watchdog* â€” auto health watchdog status
 *!watchdog check* â€” run health check now
+*!cloudapi* - official WhatsApp Cloud API status/setup
 *!backup* â€” latest backup zip path
 *!backup create* â€” fresh data backup
 *!backup list* â€” recent backups
@@ -31075,6 +31576,32 @@ function buildWhatsAppGroupsListReply(groups = []) {
   return `👥 *Connected WhatsApp Groups*\n\n${lines || 'No groups found. WhatsApp connected hai lekin group list empty hai.'}\n\nUse:\n*!grouppost 2 Your message*\n*!grouppost all Your message*`;
 }
 
+function buildWhatsAppCloudApiReply() {
+  const status = getWhatsAppCloudStatus();
+  const missing = status.missing.length ? status.missing.join(', ') : 'none';
+  return `☁️ *Official WhatsApp Cloud API*
+
+Status: *${status.ready ? 'READY' : 'SETUP NEEDED'}*
+Enabled: *${status.enabled ? 'YES' : 'NO'}*
+Fallback: *${status.fallbackEnabled ? 'ON' : 'OFF'}*
+Dry-run: *${status.dryRunDefault ? 'ON' : 'OFF'}*
+Provider: *${settings.whatsapp_send_provider || 'unofficial'}*
+Missing: *${missing}*
+
+Dashboard:
+http://localhost:3001/whatsapp-cloud-api
+
+Webhook URL for Meta:
+${status.webhookUrl}
+
+Best setup:
+1. Meta Business App mein WhatsApp product add karein
+2. Phone Number ID + permanent token paste karein
+3. Verify token same dashboard wala set karein
+4. Template messages approve karein
+5. Client SaaS ke liye Cloud API, local testing ke liye QR bot use karein`;
+}
+
 async function handleWhatsAppSocialAdminCommand(ctx = {}) {
   const text = String(ctx.body || '').trim();
   if (!isWhatsAppSocialCommand(text)) return false;
@@ -31097,6 +31624,11 @@ async function handleWhatsAppSocialAdminCommand(ctx = {}) {
 
     if (command === '!server' || command === '!status' || command === '!health') {
       await reply(buildServerStatusReply());
+      return true;
+    }
+
+    if (command === '!cloudapi' || command === '!officialwa') {
+      await reply(buildWhatsAppCloudApiReply());
       return true;
     }
 
