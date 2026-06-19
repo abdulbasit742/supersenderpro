@@ -11857,6 +11857,210 @@ Dashboard:
 http://localhost:3001/setup-validator`;
 }
 
+function normalizeLaunchBaseUrl(value = '') {
+  const text = String(value || '').trim();
+  if (!text) return '';
+  return text.replace(/\/+$/, '');
+}
+
+function isLocalLaunchBaseUrl(value = '') {
+  try {
+    const host = new URL(normalizeLaunchBaseUrl(value)).hostname.toLowerCase();
+    return ['localhost', '127.0.0.1', '::1'].includes(host);
+  } catch {
+    return false;
+  }
+}
+
+function getConfiguredPublicBaseUrl() {
+  const candidates = [
+    process.env.PUBLIC_LAUNCH_URL,
+    process.env.PUBLIC_BASE_URL,
+    settings.public_base_url,
+    settings.social_public_base_url,
+    settings.gmail_public_base_url
+  ].map(normalizeLaunchBaseUrl).filter(Boolean);
+  return candidates.find(value => !isLocalLaunchBaseUrl(value)) || '';
+}
+
+async function fetchJsonWithTimeout(url, timeoutMs = 2500) {
+  const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  const timer = controller ? setTimeout(() => controller.abort(), timeoutMs) : null;
+  try {
+    const response = await fetch(url, controller ? { signal: controller.signal } : {});
+    const text = await response.text();
+    let body = {};
+    try {
+      body = text ? JSON.parse(text) : {};
+    } catch (error) {
+      return { ok: false, status: response.status, error: `Invalid JSON: ${error.message}` };
+    }
+    return { ok: response.ok, status: response.status, body };
+  } catch (error) {
+    return { ok: false, status: 0, error: error.name === 'AbortError' ? 'Timeout' : error.message };
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
+function publicLaunchCheck(id, label, ok, detail = '', severity = 'critical', fix = '') {
+  return { id, label, ok: !!ok, detail, severity, fix };
+}
+
+function promiseWithTimeout(promise, timeoutMs = 1500, timeoutMessage = 'Timeout') {
+  let timer = null;
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => {
+      timer = setTimeout(() => reject(new Error(timeoutMessage)), timeoutMs);
+    })
+  ]).finally(() => {
+    if (timer) clearTimeout(timer);
+  });
+}
+
+async function buildPublicLaunchStatus() {
+  const publicBaseUrl = getConfiguredPublicBaseUrl();
+  const localBaseUrl = `http://127.0.0.1:${PORT}`;
+  const cloud = getWhatsAppCloudStatus();
+  const checks = [];
+  const add = (...args) => checks.push(publicLaunchCheck(...args));
+
+  add('server_runtime', 'Local Express runtime', true, `Running on port ${PORT}`, 'critical');
+
+  const activeWaSessions = typeof waClients !== 'undefined'
+    ? Array.from(waClients.values()).filter(client => client?.isReady).length
+    : 0;
+  const totalWaSessions = typeof waClients !== 'undefined' ? Math.max(1, waClients.size || 1) : 1;
+  add(
+    'whatsapp_qr',
+    'WhatsApp QR customer bot',
+    activeWaSessions > 0,
+    `${activeWaSessions}/${totalWaSessions} ready`,
+    'critical',
+    'Open /wa-qr and scan the customer bot QR.'
+  );
+
+  add(
+    'public_base_url',
+    'Public domain/tunnel URL',
+    !!publicBaseUrl,
+    publicBaseUrl || 'Not configured',
+    'recommended',
+    'Set PUBLIC_BASE_URL=https://app.pakentrepreneur.me after Cloudflare Tunnel route is active.'
+  );
+
+  if (publicBaseUrl) {
+    let publicDnsOk = false;
+    try {
+      const host = new URL(publicBaseUrl).hostname;
+      const resolved = await promiseWithTimeout(dns.promises.lookup(host), 1500, 'DNS lookup timeout');
+      publicDnsOk = !!resolved.address;
+      add('public_dns', 'Public domain DNS resolves', !!resolved.address, `${host} -> ${resolved.address}`, 'critical');
+    } catch (error) {
+      add('public_dns', 'Public domain DNS resolves', false, error.message, 'critical', 'Check Cloudflare DNS/tunnel route for the public hostname.');
+    }
+
+    if (publicDnsOk) {
+      const publicHealth = await fetchJsonWithTimeout(`${publicBaseUrl}/api/health`);
+      add(
+        'public_health',
+        'Public /api/health',
+        publicHealth.ok,
+        publicHealth.error || `HTTP ${publicHealth.status}`,
+        'critical',
+        'Start Cloudflare Tunnel and route the hostname to http://localhost:3001.'
+      );
+
+      const publicCompletion = await fetchJsonWithTimeout(`${publicBaseUrl}/api/project/completion-report`);
+      add(
+        'public_completion',
+        'Public completion report',
+        publicCompletion.ok && publicCompletion.body?.success === true,
+        publicCompletion.error || `HTTP ${publicCompletion.status}`,
+        'recommended',
+        'Ensure public tunnel can reach the same running backend.'
+      );
+    } else {
+      add('public_health', 'Public /api/health', false, 'Skipped because DNS did not resolve', 'critical', 'Fix Cloudflare DNS/tunnel route first.');
+      add('public_completion', 'Public completion report', false, 'Skipped because DNS did not resolve', 'recommended', 'Fix public DNS, then rerun launch check.');
+    }
+  }
+
+  const localHealth = await fetchJsonWithTimeout(`${localBaseUrl}/api/health`);
+  add(
+    'local_health',
+    'Local /api/health',
+    localHealth.ok,
+    localHealth.error || `HTTP ${localHealth.status}`,
+    'critical',
+    'Start the local backend on port 3001.'
+  );
+
+  add(
+    'whatsapp_cloud_deferred',
+    'Official WhatsApp Cloud API',
+    cloud.ready || !cloud.enabled,
+    cloud.ready ? 'Ready' : (cloud.enabled ? `Missing ${cloud.missing.join(', ')}` : 'Deferred until Meta payment/API setup'),
+    cloud.enabled ? 'recommended' : 'optional',
+    'Leave disabled for now; fill Cloud API credentials at final API launch stage.'
+  );
+
+  const setup = buildSystemSetupValidator();
+  add(
+    'setup_critical',
+    'Setup validator critical checks',
+    setup.summary.failedCritical === 0,
+    `${setup.summary.failedCritical} critical missing, ${setup.summary.failedRecommended} recommended missing`,
+    'critical',
+    'Open /setup-validator and resolve critical items.'
+  );
+
+  const failedCritical = checks.filter(row => !row.ok && row.severity === 'critical');
+  const failedRecommended = checks.filter(row => !row.ok && row.severity === 'recommended');
+  const passed = checks.filter(row => row.ok).length;
+  const score = Math.round((passed / Math.max(1, checks.length)) * 100);
+  const status = failedCritical.length
+    ? 'public_launch_blocked'
+    : failedRecommended.length
+      ? 'local_ready_public_warnings'
+      : 'public_launch_ready';
+  const report = {
+    success: true,
+    generatedAt: new Date().toISOString(),
+    status,
+    score,
+    localBaseUrl,
+    publicBaseUrl,
+    cloudApiDeferred: !cloud.enabled && !cloud.ready,
+    summary: {
+      total: checks.length,
+      passed,
+      failedCritical: failedCritical.length,
+      failedRecommended: failedRecommended.length
+    },
+    checks,
+    nextFixes: checks
+      .filter(row => !row.ok && row.severity !== 'optional')
+      .map(row => ({ id: row.id, label: row.label, severity: row.severity, fix: row.fix || row.detail }))
+      .slice(0, 12),
+    links: {
+      dashboard: '/launch-status',
+      api: '/api/launch/status',
+      health: '/api/health',
+      completion: '/project-completion',
+      setupValidator: '/setup-validator',
+      whatsappQr: '/wa-qr'
+    }
+  };
+  try {
+    fs.writeFileSync(path.join(dataDir, 'public-launch-status.json'), stringifyJsonPayload(report), 'utf8');
+  } catch (error) {
+    report.reportSaveError = error.message;
+  }
+  return report;
+}
+
 function safeCompletionProbe(label, fn, fallback = null) {
   try {
     return { ok: true, label, value: fn() };
@@ -11884,6 +12088,8 @@ function buildProjectCompletionReport() {
   const configuredChannels = typeof getConfiguredWhatsAppChannels === 'function' ? getConfiguredWhatsAppChannels() : [];
   const relayQueue = Array.isArray(channelRelayInbox) ? channelRelayInbox : [];
   const openRelayCount = relayQueue.filter(row => !['published', 'rejected', 'done'].includes(String(row.status || '').toLowerCase())).length;
+  const publicBaseUrl = getConfiguredPublicBaseUrl();
+  const cloudDeferred = !cloud.enabled && !cloud.ready;
 
   const modules = [
     {
@@ -11910,9 +12116,16 @@ function buildProjectCompletionReport() {
     {
       id: 'whatsapp_cloud',
       label: 'Official WhatsApp Cloud API',
-      score: cloud.ready ? 95 : (cloud.enabled ? 55 : 35),
-      status: cloud.ready ? 'ready' : (cloud.enabled ? 'missing_config' : 'optional_disabled'),
-      detail: cloud.ready ? 'Cloud API ready' : (cloud.missing?.length ? `Missing ${cloud.missing.join(', ')}` : 'Disabled')
+      score: cloud.ready ? 95 : (cloud.enabled ? 55 : 75),
+      status: cloud.ready ? 'ready' : (cloud.enabled ? 'missing_config' : 'deferred'),
+      detail: cloud.ready ? 'Cloud API ready' : (cloud.enabled ? `Missing ${cloud.missing?.join(', ') || 'credentials'}` : 'Deferred until Meta payment/API setup')
+    },
+    {
+      id: 'public_launch',
+      label: 'Public tunnel/domain launch',
+      score: publicBaseUrl ? 80 : 50,
+      status: publicBaseUrl ? 'configured_needs_live_test' : 'needs_public_url',
+      detail: publicBaseUrl || 'Set PUBLIC_BASE_URL when Cloudflare Tunnel route is live'
     },
     {
       id: 'channels',
@@ -11958,8 +12171,13 @@ function buildProjectCompletionReport() {
   if (setup.summary.failedRecommended > 0) {
     p1.push('Fill recommended setup values: groups, JWT secret, and live public URL.');
   }
-  if (!cloud.ready) {
+  if (cloud.enabled && !cloud.ready) {
     p1.push('Complete Official WhatsApp Cloud API credentials for production fallback.');
+  } else if (cloudDeferred) {
+    p2.push('Official WhatsApp Cloud API is intentionally deferred until Meta payment/API setup is ready.');
+  }
+  if (!publicBaseUrl) {
+    p1.push('Set PUBLIC_BASE_URL to the Cloudflare Tunnel domain before public launch.');
   }
   if (!configuredChannels.length) {
     p1.push('Add target WhatsApp channel IDs and source channels in Channel Center.');
@@ -20878,6 +21096,53 @@ app.get('/api/project/completion-report', (_req, res) => {
   } catch (error) {
     console.error('[CompletionReport] failed:', error);
     res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/launch/status', async (_req, res) => {
+  try {
+    res.json(await buildPublicLaunchStatus());
+  } catch (error) {
+    console.error('[PublicLaunchStatus] failed:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/launch-status', async (_req, res) => {
+  try {
+    const report = await buildPublicLaunchStatus();
+    const statusClass = report.status === 'public_launch_ready' ? 'ok' : (report.summary.failedCritical ? 'bad' : 'warn');
+    const rows = report.checks.map(row => `<tr>
+<td><span class="pill ${row.ok ? 'ok' : row.severity === 'critical' ? 'bad' : row.severity === 'recommended' ? 'warn' : 'muted'}">${row.ok ? 'OK' : htmlEscape(row.severity)}</span></td>
+<td>${htmlEscape(row.label)}</td>
+<td>${htmlEscape(row.detail || '')}</td>
+<td>${htmlEscape(row.ok ? '' : (row.fix || ''))}</td>
+</tr>`).join('');
+    res.type('html').send(`<!doctype html><html><head><meta charset="utf-8"><title>Public Launch Status</title>
+<style>
+body{font-family:Inter,Arial,sans-serif;background:#0f1720;color:#e8f3ff;margin:0;padding:28px;line-height:1.5}
+main{max-width:1180px;margin:auto}.hero,.card{background:#17232e;border:1px solid #284052;border-radius:14px;padding:20px;box-shadow:0 12px 32px rgba(0,0,0,.18)}
+.hero{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center}.big{font-size:64px;font-weight:950;color:#5eead4}
+.pill{display:inline-flex;padding:6px 10px;border-radius:999px;font-weight:850;font-size:12px;text-transform:uppercase}.ok{background:#064e3b;color:#86efac}.warn{background:#713f12;color:#fde68a}.bad{background:#7f1d1d;color:#fecaca}.muted{background:#1f2937;color:#cbd5e1}
+a{color:#5eead4}.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.btn{background:#10b981;color:#06120d;padding:10px 14px;border-radius:8px;text-decoration:none;font-weight:800;border:0;cursor:pointer}
+table{width:100%;border-collapse:collapse;margin-top:14px;background:#111c26;border-radius:12px;overflow:hidden}td,th{border-bottom:1px solid #284052;text-align:left;padding:12px;vertical-align:top}th{color:#96aabd}.small{color:#96aabd;font-size:13px}
+</style></head><body><main>
+<section class="hero"><div>
+<span class="pill ${statusClass}">${htmlEscape(report.status)}</span>
+<h1>Public Launch Status</h1>
+<p class="small">Cloud API is allowed to stay deferred. This page focuses on local runtime, QR bot, public tunnel/domain, and critical setup.</p>
+<div class="toolbar"><a class="btn" href="/api/launch/status">JSON API</a><a class="btn" href="/project-completion">Completion</a><a class="btn" href="/setup-validator">Setup Validator</a><a class="btn" href="/wa-qr">WhatsApp QR</a></div>
+</div><div class="big">${report.score}%</div></section>
+<section class="card" style="margin-top:14px">
+<p><b>Local:</b> ${htmlEscape(report.localBaseUrl)}</p>
+<p><b>Public:</b> ${htmlEscape(report.publicBaseUrl || 'Not configured')}</p>
+<p><b>Cloud API:</b> ${report.cloudApiDeferred ? 'Deferred until Meta payment/API setup' : 'Configured or enabled for validation'}</p>
+<table><thead><tr><th>Status</th><th>Check</th><th>Detail</th><th>Fix</th></tr></thead><tbody>${rows}</tbody></table>
+</section>
+</main></body></html>`);
+  } catch (error) {
+    console.error('[LaunchStatusPage] failed:', error);
+    res.status(500).send(`Launch status failed: ${htmlEscape(error.message)}`);
   }
 });
 

@@ -8,6 +8,8 @@ Use this checklist before announcing or selling the platform.
 - Confirm dashboard: `http://localhost:3001`
 - Confirm health: `http://localhost:3001/api/health`
 - Run launch gate: `node scripts/launch-readiness.js`
+- Run public/domain gate: `node scripts/public-launch-check.js`
+- Browser launch status: `http://localhost:3001/launch-status`
 
 ## 2. WhatsApp
 
@@ -19,6 +21,8 @@ Use this checklist before announcing or selling the platform.
 
 ## 3. Official WhatsApp Cloud API
 
+This stage is intentionally deferred until Meta payment/API access is ready. It is not a blocker for the Baileys/QR beta launch as long as `WHATSAPP_CLOUD_API_ENABLED=false`.
+
 Fill these only when Meta credentials are ready:
 
 - `WHATSAPP_CLOUD_API_ENABLED=true`
@@ -29,6 +33,15 @@ Fill these only when Meta credentials are ready:
 - `WHATSAPP_CLOUD_WEBHOOK_SECRET=`
 
 Keep `WHATSAPP_CLOUD_DRY_RUN=true` until one template send is verified.
+
+## 3A. Public Tunnel / Domain
+
+- Cloudflare Tunnel hostname should point to `http://localhost:3001`.
+- Preferred public URL: `https://app.pakentrepreneur.me`.
+- Set `PUBLIC_BASE_URL=https://app.pakentrepreneur.me` in `.env` after the route is live.
+- Verify local route: `http://localhost:3001/api/launch/status`.
+- Verify public route: `https://app.pakentrepreneur.me/api/launch/status`.
+- If public URL fails but local health works, the issue is tunnel/DNS/routing, not the app backend.
 
 ## 4. MCP / AI Connectors
 

@@ -9,6 +9,7 @@
     "smoke": "node scripts/smoke-test.js",
     "health": "node scripts/healthCheck.js",
     "launch:check": "node scripts/launch-readiness.js",
+    "launch:public": "node scripts/public-launch-check.js",
     "fix": "node scripts/fixAllBugs.js",
     "test:api": "node scripts/testAllAPIs.js",
     "mcp": "node mcp/supersender-mcp.js",
