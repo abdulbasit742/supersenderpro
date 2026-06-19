@@ -12,6 +12,7 @@ uploads/
 logs/
 backups/
 _backups/
+private-backup-encrypted/
 data/*.json
 data/*.csv
 data/*.md
@@ -23,6 +24,7 @@ data/*.md
 .wwebjs_cache/
 auth/
 tools/
+NemoClaw/
 node-local.exe
 cloudflare-token*.txt
 .cloudflare-tunnel-token

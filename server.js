@@ -5,7 +5,7 @@ const crypto = require('crypto');
 const { Server } = require('socket.io');
 const fs = require('fs');
 const path = require('path');
-const { execFileSync } = require('child_process');
+const { execFileSync, spawn } = require('child_process');
 const cors = require('cors');
 const cron = require('node-cron');
 const qrcode = require('qrcode');
@@ -46787,6 +46787,75 @@ if (videoAgent) {
   setTimeout(runVideoAgentTick, 12000);
 }
 
+let chatGptConnectorProcess = null;
+
+function isChatGptConnectorEnabled() {
+  return /^(1|true|yes)$/i.test(String(process.env.GPT_CONNECTOR_ENABLED || ''));
+}
+
+function chatGptConnectorPort() {
+  const port = Number(process.env.GPT_CONNECTOR_PORT || 3002);
+  return Number.isFinite(port) && port > 0 ? port : 3002;
+}
+
+function chatGptConnectorPublicUrl() {
+  return String(process.env.GPT_CONNECTOR_PUBLIC_URL || `http://localhost:${chatGptConnectorPort()}`).replace(/\/+$/, '');
+}
+
+function chatGptConnectorStatusPayload() {
+  const port = chatGptConnectorPort();
+  const publicUrl = chatGptConnectorPublicUrl();
+  return {
+    success: true,
+    enabled: isChatGptConnectorEnabled(),
+    running: !!chatGptConnectorProcess && !chatGptConnectorProcess.killed,
+    pid: chatGptConnectorProcess && !chatGptConnectorProcess.killed ? chatGptConnectorProcess.pid : null,
+    port,
+    publicUrl,
+    openapiUrl: `${publicUrl}/openapi.json`,
+    actionUrl: `${publicUrl}/api/gpt/action`,
+    authRequired: !!(process.env.GPT_CONNECTOR_API_KEY || process.env.GPT_CONNECTOR_BEARER_TOKEN),
+    directActionsEnabled: /^(1|true|yes)$/i.test(String(process.env.GPT_CONNECTOR_ALLOW_DIRECT_ACTIONS || '')),
+    backendBaseUrl: String(process.env.SUPERSENDER_API_BASE || `http://localhost:${PORT}`).replace(/\/+$/, '')
+  };
+}
+
+function startChatGptConnectorIfEnabled() {
+  if (!isChatGptConnectorEnabled()) return chatGptConnectorStatusPayload();
+  if (chatGptConnectorProcess && !chatGptConnectorProcess.killed) return chatGptConnectorStatusPayload();
+  const connectorEntry = path.join(__dirname, 'mcp', 'chatgpt', 'server.js');
+  if (!fs.existsSync(connectorEntry)) {
+    console.warn('[GPT Connector] mcp/chatgpt/server.js not found; connector was not started.');
+    return chatGptConnectorStatusPayload();
+  }
+  const env = {
+    ...process.env,
+    GPT_CONNECTOR_PORT: String(chatGptConnectorPort()),
+    SUPERSENDER_API_BASE: String(process.env.SUPERSENDER_API_BASE || `http://localhost:${PORT}`)
+  };
+  chatGptConnectorProcess = spawn(process.execPath, [connectorEntry], {
+    cwd: __dirname,
+    env,
+    stdio: ['ignore', 'pipe', 'pipe'],
+    windowsHide: true
+  });
+  chatGptConnectorProcess.stdout.on('data', chunk => {
+    String(chunk).split(/\r?\n/).filter(Boolean).forEach(line => console.log(`[GPT Connector] ${line}`));
+  });
+  chatGptConnectorProcess.stderr.on('data', chunk => {
+    String(chunk).split(/\r?\n/).filter(Boolean).forEach(line => console.warn(`[GPT Connector] ${line}`));
+  });
+  chatGptConnectorProcess.on('exit', (code, signal) => {
+    console.warn(`[GPT Connector] exited code=${code ?? ''} signal=${signal || ''}`);
+    chatGptConnectorProcess = null;
+  });
+  return chatGptConnectorStatusPayload();
+}
+
+app.get('/api/gpt-connector/status', (_req, res) => {
+  res.json(chatGptConnectorStatusPayload());
+});
+
 function shouldServeDashboardSpa(req) {
   const urlPath = String(req.path || '');
   if (req.method !== 'GET') return false;
@@ -46812,7 +46881,10 @@ app.get('*', (req, res, next) => {
   }
 });
 
-const httpServer = server.listen(PORT, () => console.log(`SuperSender Pro Server running on http://localhost:${PORT}`));
+const httpServer = server.listen(PORT, () => {
+  console.log(`SuperSender Pro Server running on http://localhost:${PORT}`);
+  startChatGptConnectorIfEnabled();
+});
 
 setTimeout(() => {
   const accountId = baileysChannelPublisherId();
@@ -46825,6 +46897,9 @@ setTimeout(() => {
 
 async function shutdown(signal) {
   console.log(`[${signal}] Shutting down SuperSender Pro...`);
+  if (chatGptConnectorProcess && !chatGptConnectorProcess.killed) {
+    try { chatGptConnectorProcess.kill('SIGTERM'); } catch {}
+  }
   for (const [tenantId, inst] of waClients.entries()) {
     await destroyWAInstance(inst, tenantId, 'shutdown');
     try { await preflightCleanupWA(tenantId); } catch {}

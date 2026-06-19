@@ -134,3 +134,32 @@ Draft examples:
 ## Notes
 
 Keep `http://localhost:3001` running before using the MCP tools that call the API. Local JSON search tools still work even when the web server is offline.
+
+## ChatGPT Custom GPT Connector
+
+Custom GPT Actions use the OpenAPI connector in `mcp/chatgpt/server.js`.
+
+Run it manually:
+
+```powershell
+cd .\mcp
+npm run start:chatgpt
+```
+
+Or let the main app start it:
+
+```text
+GPT_CONNECTOR_ENABLED=true
+GPT_CONNECTOR_PORT=3002
+GPT_CONNECTOR_PUBLIC_URL=https://app.pakentrepreneur.me
+GPT_CONNECTOR_API_KEY=change-this-strong-token
+```
+
+Status:
+
+```text
+http://localhost:3001/api/gpt-connector/status
+http://localhost:3002/openapi.json
+```
+
+Full instructions are in `mcp/chatgpt/README.md`.
