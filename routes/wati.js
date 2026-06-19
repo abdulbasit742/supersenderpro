@@ -487,5 +487,98 @@ module.exports = function(watiBroadcast, watiCopilot) {
     }
   });
 
+    
+  // ========================================================================
+  // FEATURE BATCH 3 ENDPOINTS (Translate, Occasion, Order Tracking, NPS, Referral, Auto-Tag)
+  // ========================================================================
+
+  // 31. Multilingual Detect & Reply Guidance
+  router.post('/wati/language/detect', (req, res) => {
+    try {
+      const { message } = req.body;
+      if (!message) return res.status(400).json({ success: false, error: 'message is required.' });
+      const result = competitorParity.detectLanguageAndGuide(message);
+      res.json({ success: true, result });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // 32. Birthday & Anniversary Auto-Greeter
+  router.post('/wati/occasions/schedule', (req, res) => {
+    try {
+      const { tenantId = 'default-tenant', phone, occasion, date, discountCode = '' } = req.body;
+      if (!phone || !occasion || !date) {
+        return res.status(400).json({ success: false, error: 'phone, occasion, and date are required.' });
+      }
+      const greeting = competitorParity.scheduleOccasionGreeting(tenantId, phone, occasion, date, discountCode);
+      res.json({ success: true, greeting });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // 33. Order Tracking & Delivery Status Update
+  router.post('/wati/orders/track', (req, res) => {
+    try {
+      const { tenantId = 'default-tenant', orderRef, status, note = '' } = req.body;
+      if (!orderRef || !status) {
+        return res.status(400).json({ success: false, error: 'orderRef and status are required.' });
+      }
+      const tracking = competitorParity.updateOrderTracking(tenantId, orderRef, status, note);
+      res.json({ success: true, tracking });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // 34. NPS Survey Response & Summary
+  router.post('/wati/nps/respond', (req, res) => {
+    try {
+      const { tenantId = 'default-tenant', phone, score, comment = '' } = req.body;
+      if (!phone || score === undefined) {
+        return res.status(400).json({ success: false, error: 'phone and score are required.' });
+      }
+      const result = competitorParity.recordNpsResponse(tenantId, phone, score, comment);
+      res.json({ success: true, result });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  router.get('/wati/nps/summary', (req, res) => {
+    try {
+      const tenantId = req.query.tenantId || 'default-tenant';
+      const summary = competitorParity.getNpsSummary(tenantId);
+      res.json({ success: true, summary });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // 35. Referral Program Link Generator
+  router.post('/wati/referral/generate', (req, res) => {
+    try {
+      const { tenantId = 'default-tenant', phone, rewardPoints = 100 } = req.body;
+      if (!phone) return res.status(400).json({ success: false, error: 'phone is required.' });
+      const referral = competitorParity.generateReferralLink(tenantId, phone, rewardPoints);
+      res.json({ success: true, referral });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // 36. Smart Contact Auto-Tagging
+  router.post('/wati/contacts/auto-tag', (req, res) => {
+    try {
+      const { tenantId = 'default-tenant', phone, signals = {} } = req.body;
+      if (!phone) return res.status(400).json({ success: false, error: 'phone is required.' });
+      const record = competitorParity.autoTagContact(tenantId, phone, signals);
+      res.json({ success: true, record });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
     return router;
 };
