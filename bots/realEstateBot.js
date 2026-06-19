@@ -393,7 +393,31 @@ async function handleRealEstateText({ userId, text, tenantId = 'default', name =
     return { replies: [getMainMenu(config)], tenantId: safeTenant };
   }
 
+  // Live Sentiment & Agent Escalation Integration
+  let sentimentTag = 'neutral';
+  try {
+    const SentimentAnalyzer = require('../ai/sentimentAnalyzer');
+    const analyzer = new SentimentAnalyzer(DATA_DIR, config);
+    const analysis = await analyzer.recordSentiment(userId, clean, 'inbound');
+    sentimentTag = analysis.sentiment;
+    if (analysis.sentiment === 'negative') {
+      console.log(`[Escalation] Negative sentiment detected for user: ${userId}. Routing to real agent.`);
+      const agentNum = config.agentNumber || config.ownerPhone || config.phone || 'N/A';
+      return {
+        replies: [
+          `⚠️ *Urgent Escalation* ⚠️\n\nAssalam o Alaikum! Hamein khushi nahi hui aap ki pareshani sun kar. Hum ne direct human agent ko notify kar diya hai.\n\n👤 Agent: ${config.agentName || 'Senior Support Agent'}\n📱 Rabta: ${agentNum}\n\nJald se jald direct contact kiya jayega.`,
+          getMainMenu(config)
+        ],
+        adminAlert: `🚨 *Negative Sentiment Real Estate Enquiry!*\n👤 User: ${name || 'Customer'} (${userId})\n💬 Msg: "${clean}"\n📌 Action: Escalated to human agent.`,
+        tenantId: safeTenant
+      };
+    }
+  } catch (err) {
+    console.error('[RealEstateBot] Failed to analyze sentiment:', err.message);
+  }
+
   if (session.state === 'idle') {
+
     if (naturalSearch(clean)) {
       const results = searchProperties(clean, safeTenant);
       if (!results.length) {
