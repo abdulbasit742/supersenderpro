@@ -11616,6 +11616,33 @@ function makeSetupPathCheck(input = {}) {
   };
 }
 
+// Group-category setup check: passes when EITHER an env var OR the settings idsKey/arrayKey is set.
+// Lets groups configured at runtime (via Settings/UI/!setgroups) satisfy the validator without a .env restart.
+function makeGroupSetupCheck(input = {}) {
+  const envKeys = Array.isArray(input.envKeys) ? input.envKeys : [];
+  const envHit = envKeys.map(k => String(process.env[k] || '').trim()).find(Boolean) || '';
+  const idsVal = String(settings?.[input.idsKey] || '').trim();
+  const arrVal = Array.isArray(settings?.[input.arrayKey]) ? settings[input.arrayKey].filter(Boolean) : [];
+  const ok = !!(envHit || idsVal || arrVal.length);
+  const source = envHit ? 'env' : ((idsVal || arrVal.length) ? 'settings' : '');
+  const count = envHit
+    ? envHit.split(/[\s,]+/).filter(Boolean).length
+    : (idsVal ? idsVal.split(/[\s,]+/).filter(Boolean).length : arrVal.length);
+  return {
+    id: input.id,
+    label: input.label,
+    category: input.category || 'groups',
+    severity: input.severity || 'recommended',
+    ok,
+    configuredBy: source,
+    key: source === 'env' ? (envKeys.find(k => String(process.env[k] || '').trim()) || envKeys[0]) : (input.idsKey || ''),
+    keys: [...envKeys, input.idsKey].filter(Boolean),
+    valueMasked: '',
+    message: ok ? `${count} group(s) configured via ${source}` : 'Missing',
+    fix: input.fix || 'Configure groups in /setup-validator Group Setup card or via !setgroups.'
+  };
+}
+
 function buildSystemSetupValidator() {
   const publicBaseUrl = String(settings.social_public_base_url || settings.gmail_public_base_url || process.env.PUBLIC_BASE_URL || '').trim();
   const cloud = getWhatsAppCloudStatus();
@@ -11630,8 +11657,9 @@ function buildSystemSetupValidator() {
     makeSetupPathCheck({ id: 'wwebjs_auth', label: 'WhatsApp Web auth folder', severity: 'recommended', path: path.join(__dirname, '.wwebjs_auth'), mustBeNonEmpty: true, fix: 'Open /wa-qr and scan QR from the WhatsApp account.' }),
     makeSetupPathCheck({ id: 'wa_auth', label: 'Baileys auth folder', severity: 'optional', path: path.join(__dirname, '.wa-auth'), mustBeNonEmpty: true, fix: 'Only needed if Baileys session mode is used.' }),
     makeSetupCheck({ id: 'admin_number', label: 'Admin WhatsApp number', category: 'whatsapp', severity: 'critical', keys: ['ADMIN_NUMBER', 'OWNER_WHATSAPP'], fix: 'Set ADMIN_NUMBER=923xxxxxxxxx in .env.' }),
-    makeSetupCheck({ id: 'selling_groups', label: 'Selling groups', category: 'dealer intelligence', severity: 'recommended', keys: ['SELLING_GROUPS'], fix: 'Add comma-separated WhatsApp selling group IDs.' }),
-    makeSetupCheck({ id: 'customer_groups', label: 'Customer groups', category: 'broadcast', severity: 'recommended', keys: ['CUSTOMER_GROUPS'], fix: 'Add comma-separated customer group IDs.' }),
+    makeGroupSetupCheck({ id: 'selling_groups', label: 'Selling groups', category: 'dealer intelligence', severity: 'recommended', envKeys: ['SELLING_GROUPS', 'AUTO_STOCK_SOURCING_GROUPS'], idsKey: 'selling_group_ids', arrayKey: 'selling_groups', fix: 'Add selling group IDs in the Group Setup card, via !setgroups selling, or env SELLING_GROUPS.' }),
+    makeGroupSetupCheck({ id: 'customer_groups', label: 'Customer groups', category: 'broadcast', severity: 'recommended', envKeys: ['CUSTOMER_GROUPS'], idsKey: 'customer_group_ids', arrayKey: 'customer_groups', fix: 'Add customer group IDs in the Group Setup card, via !setgroups customer, or env CUSTOMER_GROUPS.' }),
+    makeGroupSetupCheck({ id: 'scholarship_groups', label: 'Scholarship groups', category: 'scholarship', severity: 'optional', envKeys: ['SCHOLARSHIP_GROUPS'], idsKey: 'scholarship_source_group_ids', arrayKey: 'scholarship_source_groups', fix: 'Add scholarship source group IDs in the Group Setup card or via !setgroups scholarship.' }),
     makeSetupCheck({ id: 'public_base_url', label: 'Public base URL', category: 'deployment', severity: 'recommended', keys: ['PUBLIC_BASE_URL', 'SOCIAL_PUBLIC_BASE_URL', 'GMAIL_PUBLIC_BASE_URL'], okMessage: publicBaseUrl ? publicBaseUrl : 'Configured', fix: 'Set PUBLIC_BASE_URL or social_public_base_url to your Cloudflare tunnel/domain.' }),
     makeSetupCheck({ id: 'jwt_secret', label: 'JWT secret', category: 'security', severity: 'recommended', keys: ['JWT_SECRET'], fix: 'Set a long random JWT_SECRET in .env.' }),
     makeSetupCheck({ id: 'n8n_secret', label: 'n8n webhook secret', category: 'automation', severity: 'optional', keys: ['N8N_WEBHOOK_SECRET'], fix: 'Set N8N_WEBHOOK_SECRET if n8n workflows are active.' }),
@@ -11860,6 +11888,7 @@ function buildProjectCompletionReport() {
   const channelCenter = safeCompletionProbe('channelCenter', () => (
     typeof buildWhatsAppChannelCommandCenter === 'function' ? buildWhatsAppChannelCommandCenter() : {}
   ), {}).value || {};
+  const groupSetup = safeCompletionProbe('groupSetup', () => getGroupSetupSummary(), {}).value || {};
   const activeWaSessions = typeof waClients !== 'undefined'
     ? Array.from(waClients.values()).filter(client => client?.isReady).length
     : 0;
@@ -11925,6 +11954,13 @@ function buildProjectCompletionReport() {
       score: automation.enabled ? 80 : 60,
       status: automation.enabled ? 'enabled' : 'configured_off',
       detail: `${automation.label || automation.businessType || 'Automation'} profile`
+    },
+    {
+      id: 'group_setup',
+      label: 'WhatsApp group setup',
+      score: Number(groupSetup.score) || 60,
+      status: groupSetup.status || 'needs_setup',
+      detail: `${groupSetup.configuredCategories || 0}/4 categories, ${groupSetup.totalGroups || 0} groups assigned`
     }
   ];
 
@@ -11950,6 +11986,9 @@ function buildProjectCompletionReport() {
   }
   if (!socialCount) {
     p1.push('Connect Meta/LinkedIn/TikTok OAuth accounts in Social Hub.');
+  }
+  if (!groupSetup.configuredCategories) {
+    p1.push('Configure WhatsApp group categories (selling/customer/scholarship/channel) at /group-setup or via !setgroups.');
   }
   if (!String(process.env.REDIS_URL || '').trim()) {
     p2.push('Add Redis/BullMQ for durable automation jobs.');
@@ -18688,6 +18727,8 @@ const WHATSAPP_ADMIN_COMMANDS = [
   { command: '!scholarshipscan 50', purpose: 'Source groups/channels se scholarship posts collect' },
   { command: '!scholarshippost latest', purpose: 'Scholarship website + social + WhatsApp par publish' },
   { command: '!scholarshipgroups <ids>', purpose: 'Scholarship source groups/channels set' },
+  { command: '!groups', purpose: 'Detected WhatsApp groups (names + IDs + assigned category) list karein' },
+  { command: '!setgroups selling <ids>', purpose: 'Selling groups set (customer/scholarship/channel bhi)' },
   { command: '!finder <item>', purpose: 'AI product finder: tools, laptops, accessories, dry fruits, shirts' },
   { command: '!channel', purpose: 'WhatsApp Channel automation status' },
   { command: '!channelcatch', purpose: 'Connected WhatsApp se created/followed channels auto-detect' },
@@ -20955,8 +20996,73 @@ ul{margin:0;padding-left:20px}.muted{color:#96aabd}
 <p class="muted">WhatsApp admin commands: <code>!setupcheck</code> and <code>!setupfix</code></p>
 <pre id="autofixOut" style="white-space:pre-wrap;background:#081018;border:1px solid #243746;border-radius:10px;padding:12px;max-height:220px;overflow:auto">Safe Auto-Fix creates only non-secret folders/reports and never overwrites existing .env.</pre>
 </section></div>
+<section class="card" id="groupSetupCard" style="margin-top:14px">
+<h2>Group Setup</h2>
+<p class="muted">Assign detected WhatsApp groups to Selling / Customer / Scholarship. Saves to settings + live runtime config (no .env restart).</p>
+<div id="gsCurrent" class="muted">Loading current saved group IDs…</div>
+<div id="gsTableWrap" style="margin-top:10px"><p class="muted">Loading detected groups…</p></div>
+<div class="toolbar"><button class="btn" onclick="gsSave()">Save groups</button><button class="btn" onclick="gsLoad()">Reload detected groups</button></div>
+<pre id="gsLog" style="white-space:pre-wrap;background:#081018;border:1px solid #243746;border-radius:10px;padding:12px;max-height:160px;overflow:auto;margin-top:10px">Ready.</pre>
+</section>
 <div class="grid">${categoryHtml}</div>
 <script>
+var gsGroups=[];
+function gsEsc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function gsLog(m){document.getElementById('gsLog').textContent=m;}
+async function gsLoad(){
+  gsLog('Loading detected groups...');
+  try{
+    var r=await fetch('/api/wa/group-options',{cache:'no-store'});
+    var d=await r.json();
+    gsGroups=(d&&Array.isArray(d.groups))?d.groups:(Array.isArray(d)?d:[]);
+    gsLog('Loaded '+gsGroups.length+' detected group(s).');
+  }catch(e){gsGroups=[];gsLog('Group options failed: '+e.message);}
+  try{
+    var sr=await fetch('/api/settings/groups',{cache:'no-store'});
+    var sd=await sr.json();
+    var g=(sd&&sd.groups)||{};
+    document.getElementById('gsCurrent').innerHTML='<strong>Saved group IDs</strong><br>Selling: '+gsEsc((g.selling||[]).join(', ')||'-')+'<br>Customer: '+gsEsc((g.customer||[]).join(', ')||'-')+'<br>Scholarship: '+gsEsc((g.scholarship||[]).join(', ')||'-');
+  }catch(e){}
+  gsRender();
+}
+function gsRender(){
+  var wrap=document.getElementById('gsTableWrap');
+  if(!gsGroups.length){wrap.innerHTML='<p class="muted">No groups detected. Connect the WhatsApp QR session, then Reload.</p>';return;}
+  var html='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead><tr><th style="text-align:left">Group</th><th>Selling</th><th>Customer</th><th>Scholarship</th></tr></thead><tbody>';
+  for(var i=0;i<gsGroups.length;i++){
+    var x=gsGroups[i];var id=gsEsc(x.id);
+    var sug=x.typeSuggestion||'unknown';var cur=x.currentType||'';
+    var selChk=(cur==='SELLING_GROUPS'||(!cur&&sug==='selling'))?' checked':'';
+    var cusChk=(cur==='CUSTOMER_GROUPS'||(!cur&&sug==='customer'))?' checked':'';
+    var schChk=(cur==='SCHOLARSHIP_GROUPS'||(!cur&&sug==='scholarship'))?' checked':'';
+    html+='<tr data-id="'+id+'"><td style="text-align:left"><strong>'+gsEsc(x.name)+'</strong><br><span class="muted">'+id+' &middot; '+(x.memberCount||0)+' members &middot; suggest: '+gsEsc(sug)+'</span></td>'+
+      '<td style="text-align:center"><input type="checkbox" class="gs-sell"'+selChk+'></td>'+
+      '<td style="text-align:center"><input type="checkbox" class="gs-cust"'+cusChk+'></td>'+
+      '<td style="text-align:center"><input type="checkbox" class="gs-sch"'+schChk+'></td></tr>';
+  }
+  html+='</tbody></table></div>';
+  wrap.innerHTML=html;
+}
+async function gsSave(){
+  var rows=document.querySelectorAll('#gsTableWrap tr[data-id]');
+  var payload={sellingGroups:[],customerGroups:[],scholarshipGroups:[]};
+  rows.forEach(function(tr){
+    var id=tr.getAttribute('data-id');
+    if(tr.querySelector('.gs-sell').checked)payload.sellingGroups.push(id);
+    if(tr.querySelector('.gs-cust').checked)payload.customerGroups.push(id);
+    if(tr.querySelector('.gs-sch').checked)payload.scholarshipGroups.push(id);
+  });
+  gsLog('Saving group selections...');
+  try{
+    var r=await fetch('/api/settings/groups',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    var d=await r.json();
+    if(!d.success)throw new Error(d.error||'Save failed');
+    var s=d.summary||{};
+    gsLog('Saved. '+(s.configuredCategories||0)+'/4 categories, '+(s.totalGroups||0)+' groups assigned. Refreshing score...');
+    setTimeout(function(){location.reload();},1200);
+  }catch(e){gsLog('Save failed: '+e.message);}
+}
+gsLoad();
 async function runAutofix(){
   const out = document.getElementById('autofixOut');
   out.textContent = 'Running safe auto-fix...';
@@ -20974,6 +21080,123 @@ async function runAutofix(){
     console.error('[SetupValidatorPage] failed:', error);
     res.status(500).send(`Setup Validator failed: ${htmlEscape(error.message)}`);
   }
+});
+
+// Group Setup admin page: pick detected WhatsApp groups per category.
+app.get('/group-setup', (_req, res) => {
+  res.type('html').send(`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Group Setup</title>
+<style>
+body{font-family:Inter,Arial,sans-serif;background:#0f1720;color:#e8f3ff;margin:0;padding:28px;line-height:1.5}
+main{max-width:1100px;margin:auto}
+h1{margin:0 0 4px}.muted{color:#96aabd}
+.hero,.card{background:#17232e;border:1px solid #284052;border-radius:14px;padding:20px;margin-bottom:16px;box-shadow:0 12px 32px rgba(0,0,0,.18)}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.btn{background:#10b981;color:#06120d;padding:10px 16px;border:0;border-radius:8px;font-weight:800;cursor:pointer;text-decoration:none}
+.btn.secondary{background:#1f3242;color:#cfe6ff}
+.pill{display:inline-flex;padding:5px 10px;border-radius:999px;font-weight:800;font-size:12px;background:#0d1720;border:1px solid #284052}
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:10px}
+.summary div{background:#0d1720;border:1px solid #243746;border-radius:10px;padding:10px}
+.summary b{display:block;font-size:22px;color:#5eead4}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:10px;border-bottom:1px solid #243746;vertical-align:top}
+th{color:#9fb6c9;font-size:13px;text-transform:uppercase;letter-spacing:.04em}
+td code{color:#7fd1c0;font-size:12px;word-break:break-all}
+select{background:#0d1720;color:#e8f3ff;border:1px solid #2c4458;border-radius:8px;padding:8px;min-width:190px}
+.empty{color:#9fb6c9;padding:14px}
+#log{white-space:pre-wrap;background:#081018;border:1px solid #243746;border-radius:10px;padding:12px;margin-top:12px;max-height:200px;overflow:auto}
+input.search{background:#0d1720;color:#e8f3ff;border:1px solid #2c4458;border-radius:8px;padding:9px 12px;width:100%;max-width:340px}
+</style></head><body><main>
+<section class="hero">
+<span class="pill" id="conn">checking…</span>
+<h1>WhatsApp Group Setup</h1>
+<p class="muted">Assign each detected WhatsApp group to a category. Saving updates settings and live runtime config.</p>
+<div class="summary" id="summary"></div>
+<div class="toolbar">
+<button class="btn" onclick="save()">Save groups</button>
+<button class="btn secondary" onclick="load()">Reload detected groups</button>
+<a class="btn secondary" href="/project-completion">Completion report</a>
+<a class="btn secondary" href="/api/wa/group-options">group-options JSON</a>
+</div>
+</section>
+<section class="card">
+<input class="search" id="search" placeholder="Filter groups by name or ID…" oninput="render()">
+<div id="tableWrap"><p class="empty">Loading detected groups…</p></div>
+</section>
+<section class="card"><strong>Activity</strong><div id="log">Ready.</div></section>
+</main>
+<script>
+const CATEGORIES = [
+  { value: '', label: '— Ignore —' },
+  { value: 'SELLING_GROUPS', label: 'Selling' },
+  { value: 'CUSTOMER_GROUPS', label: 'Customer' },
+  { value: 'SCHOLARSHIP_GROUPS', label: 'Scholarship' },
+  { value: 'CHANNEL_SOURCE_GROUPS', label: 'Channel source' }
+];
+let groups = [];
+const choice = {};
+function log(m){ document.getElementById('log').textContent = m; }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+async function load(){
+  log('Loading detected groups…');
+  try{
+    const [optRes, status] = await Promise.all([
+      fetch('/api/wa/group-options', { cache:'no-store' }),
+      fetch('/api/wa/status', { cache:'no-store' }).then(r=>r.json()).catch(()=>({}))
+    ]);
+    document.getElementById('conn').textContent = (status && (status.ready || status.connected || status.isReady)) ? 'WhatsApp connected' : 'WhatsApp status unknown';
+    const optData = await optRes.json();
+    groups = Array.isArray(optData) ? optData : (optData && Array.isArray(optData.groups) ? optData.groups : []);
+    groups.forEach(g => { choice[g.id] = g.currentType || g.typeSuggestion || ''; });
+    log('Loaded ' + groups.length + ' detected group(s).');
+  }catch(e){ log('Failed to load groups: ' + e.message); groups = []; }
+  render();
+}
+function render(){
+  const q = (document.getElementById('search').value || '').toLowerCase();
+  const rows = groups.filter(g => !q || (g.name||'').toLowerCase().includes(q) || (g.id||'').toLowerCase().includes(q));
+  const wrap = document.getElementById('tableWrap');
+  if(!rows.length){ wrap.innerHTML = '<p class="empty">No groups detected. Make sure the WhatsApp QR session is connected, then Reload.</p>'; updateSummary(); return; }
+  let html = '<table><thead><tr><th>Group</th><th>ID</th><th>Members</th><th>Category</th></tr></thead><tbody>';
+  for(const g of rows){
+    const sel = CATEGORIES.map(c => '<option value="'+c.value+'"'+(choice[g.id]===c.value?' selected':'')+'>'+esc(c.label)+'</option>').join('');
+    html += '<tr><td><strong>'+esc(g.name)+'</strong><br><span class="muted">suggested: '+esc(g.typeSuggestion||'—')+'</span></td>'+
+            '<td><code>'+esc(g.id)+'</code></td>'+
+            '<td>'+(g.memberCount||0)+'</td>'+
+            '<td><select onchange="choice[\\''+esc(g.id).replace(/'/g,"")+'\\']=this.value;updateSummary()">'+sel+'</select></td></tr>';
+  }
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+  updateSummary();
+}
+function collect(){
+  const out = { selling:[], customer:[], scholarship:[], channelSource:[] };
+  const map = { SELLING_GROUPS:'selling', CUSTOMER_GROUPS:'customer', SCHOLARSHIP_GROUPS:'scholarship', CHANNEL_SOURCE_GROUPS:'channelSource' };
+  for(const g of groups){ const c = choice[g.id]; if(map[c]) out[map[c]].push(g.id); }
+  return out;
+}
+function updateSummary(){
+  const c = collect();
+  const cells = [
+    ['Selling', c.selling.length], ['Customer', c.customer.length],
+    ['Scholarship', c.scholarship.length], ['Channel source', c.channelSource.length]
+  ];
+  document.getElementById('summary').innerHTML = cells.map(x => '<div>'+x[0]+'<b>'+x[1]+'</b></div>').join('');
+}
+async function save(){
+  const payload = collect();
+  log('Saving group selections…');
+  try{
+    const res = await fetch('/api/settings/groups', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    const data = await res.json();
+    if(!data.success) throw new Error(data.error || 'Save failed');
+    const s = data.summary || {};
+    log('Saved. '+(s.configuredCategories||0)+'/4 categories configured, '+(s.totalGroups||0)+' groups assigned. Completion report and !complete now reflect this.');
+  }catch(e){ log('Save failed: ' + e.message); }
+}
+load();
+</script>
+</body></html>`);
 });
 
 app.get('/api/wa/automation-settings', (_req, res) => {
@@ -24066,6 +24289,19 @@ app.get('/api/wa/chats', async (req, res) => {
   }
 });
 
+// Detected WhatsApp groups (sourced from getChats, same as /api/wa/chats) formatted
+// for the Group Setup page as { id, name, typeSuggestion }.
+app.get('/api/wa/group-options', async (req, res) => {
+  try {
+    const accountId = String(req.query.accountId || 'default').trim() || 'default';
+    const options = await buildGroupOptions(accountId);
+    res.json({ success: true, groups: options });
+  } catch (e) {
+    console.warn('[WA] group-options failed:', e.message);
+    res.status(500).json({ success: false, error: e.message, groups: [] });
+  }
+});
+
 // Alias used by the dashboard for message counts (legacy UI expects an object keyed by number).
 app.get('/api/wa/conversations', (req, res) => {
   res.json(waConversations || {});
@@ -24153,6 +24389,162 @@ async function listWhatsAppGroups(accountId = 'default') {
     lastMessage: chat?.lastMessage?.body || '',
     timestamp: chat?.timestamp || null
   })).filter(group => group.id);
+}
+
+// ------------------------------------------------------------------
+// WHATSAPP GROUP SETUP
+// Categories: SELLING_GROUPS / CUSTOMER_GROUPS / SCHOLARSHIP_GROUPS / CHANNEL_SOURCE_GROUPS
+// ------------------------------------------------------------------
+// Each category persists in TWO settings keys: an array (arrayKey) and a comma string (idsKey).
+const GROUP_SETUP_CATEGORIES = [
+  { key: 'selling', label: 'SELLING_GROUPS', arrayKey: 'selling_groups', idsKey: 'selling_group_ids', env: ['SELLING_GROUPS', 'AUTO_STOCK_SOURCING_GROUPS'] },
+  { key: 'customer', label: 'CUSTOMER_GROUPS', arrayKey: 'customer_groups', idsKey: 'customer_group_ids', env: ['CUSTOMER_GROUPS'] },
+  { key: 'scholarship', label: 'SCHOLARSHIP_GROUPS', arrayKey: 'scholarship_source_groups', idsKey: 'scholarship_source_group_ids', env: ['SCHOLARSHIP_GROUPS'] },
+  { key: 'channelSource', label: 'CHANNEL_SOURCE_GROUPS', arrayKey: 'channel_source_groups', idsKey: 'channel_source_group_ids', env: ['CHANNEL_SOURCE_GROUPS'] }
+];
+
+function normalizeGroupIdList(input) {
+  let list = [];
+  if (Array.isArray(input)) list = input;
+  else if (input == null) list = [];
+  else list = String(input).split(/[\s,]+/);
+  const seen = new Set();
+  const out = [];
+  for (const raw of list) {
+    const id = String(raw || '').trim();
+    if (!id) continue;
+    const k = id.toLowerCase();
+    if (seen.has(k)) continue;
+    seen.add(k);
+    out.push(id);
+  }
+  return out;
+}
+
+function readGroupCategoryIds(category) {
+  const fromArray = normalizeGroupIdList(settings?.[category.arrayKey]);
+  if (fromArray.length) return fromArray;
+  const fromIds = normalizeGroupIdList(settings?.[category.idsKey]);
+  if (fromIds.length) return fromIds;
+  for (const envKey of category.env) {
+    const fromEnv = normalizeGroupIdList(process.env[envKey]);
+    if (fromEnv.length) return fromEnv;
+  }
+  return [];
+}
+
+function getGroupSetupConfig() {
+  const config = {};
+  for (const category of GROUP_SETUP_CATEGORIES) {
+    config[category.key] = readGroupCategoryIds(category);
+  }
+  return config;
+}
+
+// Infer a category from the group name (Part 2 keyword rules).
+// Order follows the spec: selling -> customer -> scholarship -> unknown.
+function suggestGroupType(name = '') {
+  const text = String(name || '').toLowerCase();
+  if (/\bai\b|seller|\brate\b|rates|tools|dealer/.test(text)) return 'selling';
+  if (/students|\bpes\b|general|freelanc/.test(text)) return 'customer';
+  if (/scholarship|students|admission/.test(text)) return 'scholarship';
+  return 'unknown';
+}
+
+function currentGroupCategoryFor(id, config = getGroupSetupConfig()) {
+  const norm = String(id || '').toLowerCase();
+  const map = { selling: 'SELLING_GROUPS', customer: 'CUSTOMER_GROUPS', scholarship: 'SCHOLARSHIP_GROUPS', channelSource: 'CHANNEL_SOURCE_GROUPS' };
+  for (const key of Object.keys(map)) {
+    if ((config[key] || []).some(gid => String(gid).toLowerCase() === norm)) return map[key];
+  }
+  return '';
+}
+
+async function buildGroupOptions(accountId = 'default') {
+  const groups = await listWhatsAppGroups(accountId);
+  const config = getGroupSetupConfig();
+  return groups.map(group => {
+    const assigned = currentGroupCategoryFor(group.id, config);
+    return {
+      id: group.id,
+      name: group.name || group.id,
+      memberCount: group.memberCount || 0,
+      currentType: assigned || '',
+      typeSuggestion: suggestGroupType(group.name)
+    };
+  });
+}
+
+function applyGroupSetupRuntimeConfig(config = getGroupSetupConfig()) {
+  // "runtime config" = live process.env overrides consumed across the app without a restart
+  const csv = arr => (arr || []).join(',');
+  process.env.SELLING_GROUPS = csv(config.selling);
+  process.env.AUTO_STOCK_SOURCING_GROUPS = csv(config.selling);
+  process.env.CUSTOMER_GROUPS = csv(config.customer);
+  process.env.SCHOLARSHIP_GROUPS = csv(config.scholarship);
+  process.env.CHANNEL_SOURCE_GROUPS = csv(config.channelSource);
+  return config;
+}
+
+function saveGroupSetup(payload = {}) {
+  const current = getGroupSetupConfig();
+  const resolve = (catKey, ...keys) => {
+    const hit = keys.find(k => payload[k] !== undefined);
+    return hit === undefined ? current[catKey] : normalizeGroupIdList(payload[hit]);
+  };
+  const next = {
+    selling: resolve('selling', 'selling', 'sellingGroups', 'selling_groups', 'selling_group_ids', 'SELLING_GROUPS'),
+    customer: resolve('customer', 'customer', 'customerGroups', 'customer_groups', 'customer_group_ids', 'CUSTOMER_GROUPS'),
+    scholarship: resolve('scholarship', 'scholarship', 'scholarshipGroups', 'scholarship_source_groups', 'scholarship_source_group_ids', 'scholarship_groups', 'SCHOLARSHIP_GROUPS'),
+    channelSource: resolve('channelSource', 'channelSource', 'channelSourceGroups', 'channel_source_groups', 'channel_source_group_ids', 'CHANNEL_SOURCE_GROUPS')
+  };
+  // Persist each category as BOTH an array (arrayKey) and a comma string (idsKey).
+  for (const category of GROUP_SETUP_CATEGORIES) {
+    const ids = next[category.key] || [];
+    settings[category.arrayKey] = ids.slice();
+    settings[category.idsKey] = ids.join(',');
+  }
+  // Update runtime config (live env) so consumers pick it up immediately (no .env restart).
+  applyGroupSetupRuntimeConfig(next);
+  // Persist via the existing settings save function.
+  saveJSON('settings.json', settings);
+  return next;
+}
+
+function setGroupCategory(categoryKey, ids) {
+  const config = getGroupSetupConfig();
+  if (!Object.prototype.hasOwnProperty.call(config, categoryKey)) {
+    throw new Error(`Unknown group category: ${categoryKey}`);
+  }
+  config[categoryKey] = normalizeGroupIdList(ids);
+  return saveGroupSetup(config);
+}
+
+// Compact view of the persisted group settings (returned by PUT /api/settings/groups).
+function getGroupSettingsSummary() {
+  return {
+    selling_groups: Array.isArray(settings.selling_groups) ? settings.selling_groups : normalizeGroupIdList(settings.selling_groups),
+    customer_groups: Array.isArray(settings.customer_groups) ? settings.customer_groups : normalizeGroupIdList(settings.customer_groups),
+    scholarship_source_groups: Array.isArray(settings.scholarship_source_groups) ? settings.scholarship_source_groups : normalizeGroupIdList(settings.scholarship_source_groups),
+    selling_group_ids: settings.selling_group_ids || '',
+    customer_group_ids: settings.customer_group_ids || '',
+    scholarship_source_group_ids: settings.scholarship_source_group_ids || ''
+  };
+}
+
+function getGroupSetupSummary() {
+  const config = getGroupSetupConfig();
+  const counts = {
+    selling: config.selling.length,
+    customer: config.customer.length,
+    scholarship: config.scholarship.length,
+    channelSource: config.channelSource.length
+  };
+  const configuredCategories = Object.values(counts).filter(n => n > 0).length;
+  const totalGroups = Object.values(counts).reduce((a, b) => a + b, 0);
+  const score = Math.min(100, 60 + (configuredCategories * 10));
+  const status = configuredCategories >= 4 ? 'configured' : (configuredCategories > 0 ? 'partial' : 'needs_setup');
+  return { counts, configuredCategories, totalGroups, score, status, config };
 }
 
 function bindGroupBroadcastClient(accountId = 'default') {
@@ -27655,6 +28047,28 @@ app.post('/api/settings', (req, res) => {
   res.json(settings);
 });
 
+// Group setup: read currently configured group categories + summary.
+app.get('/api/settings/groups', (req, res) => {
+  res.json({ success: true, groups: getGroupSetupConfig(), summary: getGroupSetupSummary() });
+});
+
+// Group setup: save selected WhatsApp group IDs per category into settings + runtime config.
+// Body accepts arrays or comma strings under: selling/customer/scholarship/channelSource
+// (also accepts *_groups and SELLING_GROUPS-style keys). Missing keys keep their current value.
+app.put('/api/settings/groups', (req, res) => {
+  try {
+    const saved = saveGroupSetup(req.body || {});
+    res.json({
+      success: true,
+      groups: saved,
+      settings: getGroupSettingsSummary(),
+      summary: getGroupSetupSummary()
+    });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
 function normalizeActionTrigger(input = {}) {
   const priorityMap = { low: 1, normal: 1, medium: 2, high: 3, urgent: 4, critical: 4 };
   const priorityValue = typeof input.priority === 'string'
@@ -31060,7 +31474,7 @@ function splitSocialCommandArgs(text = '') {
 }
 
 function isWhatsAppSocialCommand(text = '') {
-  return /^!(social|connect|post|draft|approvepost|sharepost|poststatus|comment|telegram|control|admin|menuadmin|server|status|health|complete|completion|setupcheck|setupvalidator|setupfix|doctor|watchdog|cloudapi|officialwa|next50|antigravity|aihub|automationhub|agents|agentcontrol|agenttask|autobuild|claw|claws|zeroclaw|pcagents|importskills|skillpacks|packs|waauto|automation|autosettings|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelfix|channelwatch|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
+  return /^!(social|connect|post|draft|approvepost|sharepost|poststatus|comment|telegram|control|admin|menuadmin|server|status|health|complete|completion|setupcheck|setupvalidator|setupfix|doctor|watchdog|cloudapi|officialwa|next50|antigravity|aihub|automationhub|agents|agentcontrol|agenttask|autobuild|claw|claws|zeroclaw|pcagents|importskills|skillpacks|packs|waauto|automation|autosettings|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelfix|channelwatch|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|setgroups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
 }
 
 function adminNumberCandidates() {
@@ -32925,7 +33339,38 @@ ${shouldWrite ? 'Done. Server replies/dashboard data should look cleaner now.' :
 
     if (command === '!groups') {
       const groups = await whatsAppAdminGroupRows('default');
-      await reply(buildWhatsAppGroupsListReply(groups));
+      const config = getGroupSetupConfig();
+      const lines = groups.slice(0, 30).map((group, index) => {
+        const assigned = currentGroupCategoryFor(group.id, config);
+        return `${index + 1}. *${group.name || 'Group'}*${assigned ? ` [${assigned}]` : ''}\n   ${group.id}\n   Members: ${group.memberCount || 0}`;
+      }).join('\n');
+      const summary = getGroupSetupSummary();
+      await reply(`👥 *Detected WhatsApp Groups*\n\n${lines || 'No groups found. WhatsApp connected hai lekin group list empty hai.'}\n\nConfigured: *${summary.configuredCategories}/4* categories (selling ${summary.counts.selling}, customer ${summary.counts.customer}, scholarship ${summary.counts.scholarship}, channel ${summary.counts.channelSource})\n\nAssign:\n*!setgroups selling <ids>*\n*!setgroups customer <ids>*\nUI: http://localhost:3001/group-setup`);
+      return true;
+    }
+
+    if (command === '!setgroups') {
+      const categoryMap = {
+        selling: 'selling', sell: 'selling',
+        customer: 'customer', cust: 'customer',
+        scholarship: 'scholarship', scholar: 'scholarship',
+        channel: 'channelSource', channelsource: 'channelSource', source: 'channelSource'
+      };
+      const sub = String(args[1] || '').toLowerCase();
+      const categoryKey = categoryMap[sub];
+      if (!categoryKey) {
+        await reply('Format:\n*!setgroups selling <ids>*\n*!setgroups customer <ids>*\n*!setgroups scholarship <ids>*\n*!setgroups channel <ids>*\n\nIDs comma/space separated, e.g. 120363xxx@g.us,120363yyy@g.us\nDetected groups: *!groups*');
+        return true;
+      }
+      const idsRaw = args.slice(2).join(' ').trim();
+      if (!idsRaw) {
+        const current = getGroupSetupConfig();
+        await reply(`Current *${sub}* groups:\n${(current[categoryKey] || []).join('\n') || 'None set.'}\n\nSet:\n*!setgroups ${sub} 120363xxx@g.us,120363yyy@g.us*`);
+        return true;
+      }
+      const saved = setGroupCategory(categoryKey, idsRaw);
+      const summary = getGroupSetupSummary();
+      await reply(`✅ *${sub.toUpperCase()} groups saved* (${saved[categoryKey].length})\n${saved[categoryKey].join('\n') || 'None'}\n\nGroup setup: *${summary.configuredCategories}/4* categories configured.\nCompletion score updated — check *!complete*.`);
       return true;
     }
 
