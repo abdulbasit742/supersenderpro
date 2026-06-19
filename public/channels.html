@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SuperSender Pro — Channel Sharing</title>
+  <style>
+    :root{--bg:#0f172a;--card:#1e293b;--line:#334155;--txt:#e2e8f0;--muted:#94a3b8;--accent:#38bdf8;--red:#ef4444;--green:#22c55e;}
+    *{box-sizing:border-box;}body{margin:0;font-family:system-ui,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--txt);}
+    header{padding:18px 24px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center;}
+    header h1{font-size:18px;margin:0;}.badge{font-size:12px;color:var(--muted);border:1px solid var(--line);padding:2px 8px;border-radius:999px;}
+    .wrap{max-width:1100px;margin:0 auto;padding:24px;display:grid;gap:20px;grid-template-columns:1fr;}
+    @media(min-width:860px){.wrap{grid-template-columns:1fr 1fr;}}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;}
+    .card.full{grid-column:1/-1;}
+    .card h2{font-size:14px;margin:0 0 12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);}
+    label{display:block;font-size:13px;margin:9px 0 4px;color:var(--muted);}
+    input,textarea,select{width:100%;background:#0b1220;border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:8px 10px;font-size:13px;}
+    textarea{min-height:60px;resize:vertical;}
+    button{background:var(--accent);color:#05202b;border:none;border-radius:8px;padding:8px 12px;font-weight:600;cursor:pointer;font-size:13px;}
+    button.ghost{background:transparent;color:var(--txt);border:1px solid var(--line);}button.danger{background:transparent;color:var(--red);border:1px solid var(--red);}
+    .row{display:flex;gap:8px;align-items:center;}.row>*{flex:1;}.chk{display:flex;gap:6px;align-items:center;font-size:13px;}.chk input{width:auto;}
+    table{width:100%;border-collapse:collapse;font-size:12px;}th,td{text-align:left;padding:6px;border-bottom:1px solid var(--line);}
+    .muted{color:var(--muted);font-size:12px;}.preview{background:#0b1220;border:1px dashed var(--line);border-radius:8px;padding:10px;white-space:pre-wrap;font-size:13px;min-height:36px;margin-top:8px;}
+    .pill{font-size:10px;padding:1px 7px;border-radius:999px;}.sent{background:rgba(34,197,94,.15);color:var(--green);}.drafted{background:rgba(56,189,248,.15);color:var(--accent);}.failed{background:rgba(239,68,68,.15);color:var(--red);}
+  </style>
+</head>
+<body>
+  <header><h1>🔁 Channel → Channel Sharing</h1><span class="badge">SuperSender Pro</span><span class="badge" id="state">…</span></header>
+  <div class="wrap">
+    <!-- Settings -->
+    <div class="card">
+      <h2>Settings</h2>
+      <div class="chk"><input type="checkbox" id="sEnabled" onchange="saveSettings()" /> Sharing enabled</div>
+      <div class="chk" style="margin-top:6px;"><input type="checkbox" id="sDraft" onchange="saveSettings()" /> Draft mode (manual approval)</div>
+      <label>Throttle preset</label>
+      <select id="sPreset" onchange="saveSettings()"><option value="safe">safe (slowest, anti-ban)</option><option value="fast">fast</option><option value="max">max (fastest)</option></select>
+      <div class="row" style="margin-top:8px;">
+        <div class="chk"><input type="checkbox" id="scrubPhones" onchange="saveSettings()" /> Scrub phones</div>
+        <div class="chk"><input type="checkbox" id="scrubLinks" onchange="saveSettings()" /> Scrub links</div>
+      </div>
+      <div class="chk" style="margin-top:8px;"><input type="checkbox" id="brandEnabled" onchange="saveSettings()" /> Branding footer</div>
+      <input id="brandFooter" placeholder="— via MyStore 🛍️" onchange="saveSettings()" style="margin-top:6px;" />
+      <label style="margin-top:10px;">Source blacklist <span class="muted">(comma separated channel IDs)</span></label>
+      <div class="row"><input id="blacklist" placeholder="noisy-channel-1, spam-2" /><button style="flex:0 0 auto;" onclick="saveBlacklist()">Save</button></div>
+    </div>
+
+    <!-- New route -->
+    <div class="card">
+      <h2>New Route (source → targets)</h2>
+      <label>Name</label><input id="rName" placeholder="MRF TECH → my channels" />
+      <label>Source channel IDs <span class="muted">(comma separated)</span></label><input id="rSources" placeholder="mrf-tech, cyber-wolf" />
+      <label>Targets <span class="muted">— one per line: platform,channelId</span></label>
+      <textarea id="rTargets" placeholder="whatsapp,aria-channel&#10;telegram,@mystore&#10;facebook,page-123"></textarea>
+      <div class="row" style="margin-top:6px;">
+        <div class="chk"><input type="checkbox" id="rPhones" checked /> Scrub phones</div>
+        <div class="chk"><input type="checkbox" id="rLinks" checked /> Scrub links</div>
+      </div>
+      <label>Branding footer (route override)</label><input id="rFooter" placeholder="optional" />
+      <div style="margin-top:10px;"><button onclick="addRoute()">Add route</button></div>
+    </div>
+
+    <!-- Preview tester -->
+    <div class="card">
+      <h2>Transform Preview</h2>
+      <textarea id="pvText" placeholder="Paste a sample source post with 0300-1234567 and https://link.com"></textarea>
+      <div style="margin-top:8px;"><button class="ghost" onclick="preview()">Preview cleaned output</button></div>
+      <div class="preview" id="pvOut">Cleaned content appears here…</div>
+    </div>
+
+    <!-- Drafts -->
+    <div class="card">
+      <h2>Draft Queue</h2>
+      <div id="drafts"><span class="muted">No drafts.</span></div>
+    </div>
+
+    <!-- Routes table -->
+    <div class="card full">
+      <h2>Routes</h2>
+      <div style="overflow-x:auto;"><table id="rtbl"><thead><tr><th>Name</th><th>Sources</th><th>Targets</th><th>Transforms</th><th></th></tr></thead><tbody></tbody></table></div>
+    </div>
+
+    <!-- Logs -->
+    <div class="card full">
+      <h2>Recent Activity</h2>
+      <div style="overflow-x:auto;"><table id="ltbl"><thead><tr><th>When</th><th>From</th><th>→ Platform / Target</th><th>Status</th><th>Preview</th></tr></thead><tbody></tbody></table></div>
+    </div>
+  </div>
+
+<script>
+async function api(p,o){const r=await fetch('/api'+p,Object.assign({headers:{'Content-Type':'application/json'}},o));return r.json();}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+async function loadSettings(){
+  const res=await api('/channels/settings'); const s=res.settings||{};
+  sEnabled.checked=!!s.enabled; sDraft.checked=!!s.draftMode; sPreset.value=s.preset||'safe';
+  scrubPhones.checked=!!(s.scrub&&s.scrub.phones); scrubLinks.checked=!!(s.scrub&&s.scrub.links);
+  brandEnabled.checked=!!(s.branding&&s.branding.enabled); brandFooter.value=(s.branding&&s.branding.footer)||'';
+  document.getElementById('state').textContent=(s.enabled?'● on':'○ off')+' · '+(s.preset||'safe');
+  const bl=await api('/channels/blacklist'); blacklist.value=(bl.blacklist||[]).join(', ');
+}
+async function saveSettings(){
+  await api('/channels/settings',{method:'PUT',body:JSON.stringify({enabled:sEnabled.checked,draftMode:sDraft.checked,preset:sPreset.value,
+    scrub:{phones:scrubPhones.checked,links:scrubLinks.checked},branding:{enabled:brandEnabled.checked,footer:brandFooter.value}})});
+  loadSettings();
+}
+async function saveBlacklist(){await api('/channels/blacklist',{method:'PUT',body:JSON.stringify({blacklist:blacklist.value.split(',').map(s=>s.trim()).filter(Boolean)})});loadSettings();}
+
+function parseTargets(text){return text.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>{const[platform,...rest]=l.split(',');return{platform:(platform||'').trim().toLowerCase(),channelId:rest.join(',').trim()};}).filter(t=>t.platform&&t.channelId);}
+async function addRoute(){
+  const res=await api('/channels/routes',{method:'POST',body:JSON.stringify({name:rName.value,
+    sources:rSources.value.split(',').map(s=>s.trim()).filter(Boolean),targets:parseTargets(rTargets.value),
+    transform:{scrubPhones:rPhones.checked,scrubLinks:rLinks.checked,branding:{enabled:!!rFooter.value,footer:rFooter.value}}})});
+  if(!res.ok)return alert(res.error);
+  rName.value='';rSources.value='';rTargets.value='';rFooter.value='';loadRoutes();
+}
+async function delRoute(id){if(!confirm('Delete route?'))return;await api('/channels/routes/'+id,{method:'DELETE'});loadRoutes();}
+async function loadRoutes(){
+  const res=await api('/channels/routes');
+  document.querySelector('#rtbl tbody').innerHTML=(res.routes||[]).map(r=>`<tr><td>${esc(r.name)}</td>
+    <td>${(r.sources||[]).map(esc).join(', ')}</td>
+    <td>${(r.targets||[]).map(t=>esc(t.platform+':'+t.channelId)).join('<br>')}</td>
+    <td class="muted">${r.transform.scrubPhones?'☎✂ ':''}${r.transform.scrubLinks?'🔗✂ ':''}${r.transform.branding&&r.transform.branding.enabled?'🏷️':''}</td>
+    <td><button class="danger" onclick="delRoute('${r.id}')">🗑</button></td></tr>`).join('')||'<tr><td colspan="5" class="muted">No routes.</td></tr>';
+}
+async function preview(){
+  const res=await api('/channels/preview',{method:'POST',body:JSON.stringify({text:pvText.value,transform:{scrubPhones:true,scrubLinks:true,branding:{enabled:brandEnabled.checked,footer:brandFooter.value}}})});
+  document.getElementById('pvOut').textContent=res.content||'';
+}
+async function loadDrafts(){
+  const res=await api('/channels/drafts'); const ds=(res.drafts||[]).filter(d=>d.status==='pending');
+  document.getElementById('drafts').innerHTML=ds.length?ds.map(d=>`<div style="border-bottom:1px solid var(--line);padding:6px 0;">
+    <div class="muted">${esc(d.platform)} → ${esc(d.channelId)}</div><div style="font-size:13px;margin:3px 0;">${esc((d.content||'').slice(0,140))}</div>
+    <button onclick="approve('${d.id}')">✓ Approve</button> <button class="danger" onclick="delDraft('${d.id}')">✕</button></div>`).join(''):'<span class="muted">No pending drafts.</span>';
+}
+async function approve(id){await api('/channels/drafts/'+id+'/approve',{method:'POST'});loadDrafts();loadLogs();}
+async function delDraft(id){await api('/channels/drafts/'+id,{method:'DELETE'});loadDrafts();}
+async function loadLogs(){
+  const res=await api('/channels/logs?limit=60');
+  document.querySelector('#ltbl tbody').innerHTML=(res.logs||[]).map(l=>`<tr><td class="muted">${new Date(l.at).toLocaleString()}</td><td>${esc(l.from)}</td>
+    <td>${esc(l.platform)} / ${esc(l.to)}</td><td><span class="pill ${l.status}">${l.status}</span></td><td class="muted">${esc((l.preview||'').slice(0,60))}</td></tr>`).join('')||'<tr><td colspan="5" class="muted">No activity yet.</td></tr>';
+}
+function refresh(){loadSettings();loadRoutes();loadDrafts();loadLogs();}
+refresh();setInterval(()=>{loadDrafts();loadLogs();},8000);
+</script>
+</body>
+</html>
