@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SuperSender Pro — Audience &amp; Templates</title>
+  <style>
+    :root { --bg:#0f172a; --card:#1e293b; --line:#334155; --txt:#e2e8f0; --muted:#94a3b8; --accent:#38bdf8; --red:#ef4444; }
+    *{box-sizing:border-box;} body{margin:0;font-family:system-ui,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--txt);}
+    header{padding:18px 24px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center;}
+    header h1{font-size:18px;margin:0;}
+    .badge{font-size:12px;color:var(--muted);border:1px solid var(--line);padding:2px 8px;border-radius:999px;}
+    .wrap{max-width:1100px;margin:0 auto;padding:24px;display:grid;gap:20px;grid-template-columns:1fr;}
+    @media(min-width:820px){.wrap{grid-template-columns:1fr 1fr;}}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;}
+    .card h2{font-size:14px;margin:0 0 12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);}
+    label{display:block;font-size:13px;margin:10px 0 4px;color:var(--muted);}
+    input,textarea,select{width:100%;background:#0b1220;border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:9px 10px;font-size:14px;}
+    textarea{min-height:70px;resize:vertical;}
+    button{background:var(--accent);color:#05202b;border:none;border-radius:8px;padding:9px 13px;font-weight:600;cursor:pointer;font-size:13px;}
+    button.ghost{background:transparent;color:var(--txt);border:1px solid var(--line);}
+    button.danger{background:transparent;color:var(--red);border:1px solid var(--red);}
+    table{width:100%;border-collapse:collapse;font-size:13px;}
+    th,td{text-align:left;padding:7px;border-bottom:1px solid var(--line);}
+    .tag{display:inline-block;font-size:11px;background:#0369a1;padding:1px 7px;border-radius:999px;margin:1px;}
+    .muted{color:var(--muted);font-size:12px;}
+    .preview{background:#0b1220;border:1px dashed var(--line);border-radius:8px;padding:10px;min-height:38px;font-size:13px;white-space:pre-wrap;}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>👥 Audience &amp; Templates</h1>
+    <span class="badge">SuperSender Pro</span>
+  </header>
+  <div class="wrap">
+    <!-- Contacts -->
+    <div class="card">
+      <h2>Add / Import Contacts</h2>
+      <label>Number</label><input id="cNum" placeholder="923001234567" />
+      <label>Name</label><input id="cName" placeholder="Ali" />
+      <label>Tags <span class="muted">(comma separated)</span></label><input id="cTags" placeholder="vip, lahore" />
+      <div style="margin-top:10px;display:flex;gap:8px;"><button onclick="addContact()">Add</button>
+        <button class="ghost" onclick="document.getElementById('csv').click()">Import CSV</button>
+        <a href="/api/contacts/export"><button class="ghost" type="button">Export</button></a></div>
+      <input type="file" id="csv" accept=".csv" style="display:none" onchange="importCsv(this)" />
+      <label style="margin-top:14px;">Segment by tags</label>
+      <div style="display:flex;gap:8px;"><input id="segTags" placeholder="vip,lahore" />
+        <select id="segMatch" style="width:120px;"><option value="any">any</option><option value="all">all</option></select>
+        <button onclick="loadContacts()">Filter</button></div>
+      <div style="overflow-x:auto;margin-top:12px;"><table id="ctbl"><thead><tr><th>Name</th><th>Number</th><th>Tags</th><th></th></tr></thead><tbody></tbody></table></div>
+    </div>
+
+    <!-- Templates -->
+    <div class="card">
+      <h2>Message Templates <span class="muted">— {{name}} vars &amp; {a|b} spintax</span></h2>
+      <label>Name</label><input id="tName" placeholder="June promo" />
+      <label>Body</label><textarea id="tBody" placeholder="Hi {{name}}, {great|amazing} news! 20% off."></textarea>
+      <div style="margin-top:10px;display:flex;gap:8px;"><button onclick="saveTemplate()">Save</button>
+        <button class="ghost" onclick="previewTemplate()">Preview</button>
+        <span class="muted" id="variants"></span></div>
+      <div class="preview" id="preview" style="margin-top:10px;">Preview appears here…</div>
+      <div style="overflow-x:auto;margin-top:14px;"><table id="ttbl"><thead><tr><th>Name</th><th>Vars</th><th>Variants</th><th></th></tr></thead><tbody></tbody></table></div>
+    </div>
+  </div>
+
+<script>
+async function api(p,o){const r=await fetch('/api'+p,Object.assign({headers:{'Content-Type':'application/json'}},o));return r.json();}
+
+// ---- contacts ----
+async function addContact(){
+  const tags=document.getElementById('cTags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  const res=await api('/contacts',{method:'POST',body:JSON.stringify({number:document.getElementById('cNum').value,name:document.getElementById('cName').value,tags})});
+  if(!res.ok)return alert(res.error);
+  document.getElementById('cNum').value='';document.getElementById('cName').value='';document.getElementById('cTags').value='';
+  loadContacts();
+}
+async function importCsv(input){
+  const file=input.files[0]; if(!file)return; const csv=await file.text();
+  const res=await api('/contacts/import',{method:'POST',body:JSON.stringify({csv})});
+  alert('Imported: '+(res.imported||0)); input.value=''; loadContacts();
+}
+async function delContact(id){ if(!confirm('Delete?'))return; await api('/contacts/'+id,{method:'DELETE'}); loadContacts(); }
+async function loadContacts(){
+  const tags=document.getElementById('segTags').value.trim();
+  const match=document.getElementById('segMatch').value;
+  const res=tags?await api('/contacts/segment?tags='+encodeURIComponent(tags)+'&match='+match):await api('/contacts');
+  const rows=res.contacts||[];
+  document.querySelector('#ctbl tbody').innerHTML=rows.map(c=>`<tr><td>${esc(c.name)}</td><td>${esc(c.number)}</td>
+    <td>${(c.tags||[]).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</td>
+    <td><button class="danger" onclick="delContact('${c.id}')">🗑</button></td></tr>`).join('')||'<tr><td colspan="4" class="muted">No contacts.</td></tr>';
+}
+
+// ---- templates ----
+async function saveTemplate(){
+  const res=await api('/templates',{method:'POST',body:JSON.stringify({name:document.getElementById('tName').value,body:document.getElementById('tBody').value})});
+  if(!res.ok)return alert(res.error);
+  document.getElementById('tName').value='';document.getElementById('tBody').value='';loadTemplates();
+}
+async function previewTemplate(){
+  const res=await api('/templates-preview',{method:'POST',body:JSON.stringify({body:document.getElementById('tBody').value,variables:{name:'Ali'}})});
+  document.getElementById('preview').textContent=res.rendered||'';
+  document.getElementById('variants').textContent=(res.variants? res.variants*1:1)+' variants · vars: '+(res.variables||[]).join(', ');
+}
+async function delTemplate(id){ if(!confirm('Delete?'))return; await api('/templates/'+id,{method:'DELETE'}); loadTemplates(); }
+async function loadTemplates(){
+  const res=await api('/templates'); const rows=res.templates||[];
+  document.querySelector('#ttbl tbody').innerHTML=rows.map(t=>`<tr><td>${esc(t.name)}</td><td>${(t.variables||[]).join(', ')||'—'}</td><td>${t.variants}</td>
+    <td><button class="danger" onclick="delTemplate('${t.id}')">🗑</button></td></tr>`).join('')||'<tr><td colspan="4" class="muted">No templates.</td></tr>';
+}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+loadContacts();loadTemplates();
+</script>
+</body>
+</html>

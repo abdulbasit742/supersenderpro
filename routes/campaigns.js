@@ -20,6 +20,13 @@ const express = require('express');
 const store = require('../lib/campaignStore');
 const { CampaignScheduler } = require('../lib/campaignScheduler');
 
+// Optional integrations: templates + contact segmentation.
+// Loaded defensively so campaigns still work if those modules are absent.
+let templates = null;
+let contacts = null;
+try { templates = require('../lib/templateStore'); } catch (_) {}
+try { contacts = require('../lib/contactStore'); } catch (_) {}
+
 function mountCampaigns(app, deps = {}) {
   const router = express.Router();
   const scheduler = new CampaignScheduler({
@@ -34,16 +41,31 @@ function mountCampaigns(app, deps = {}) {
     res.json({ ok: true, campaigns: store.listCampaigns() });
   });
 
-  // Create a campaign
+  // Create a campaign.
+  // Message can come from `message` or a saved `templateId`.
+  // Recipients can come from `recipients` or a contact `segment` ({tags,match}).
   router.post('/campaigns', (req, res) => {
-    const body = req.body || {};
+    const body = Object.assign({}, req.body || {});
+
+    // Resolve message from a template if requested.
+    if ((!body.message || !String(body.message).trim()) && body.templateId && templates) {
+      const t = templates.getTemplate(body.templateId);
+      if (t) body.message = t.body;
+    }
     if (!body.message || !String(body.message).trim()) {
-      return res.status(400).json({ ok: false, error: 'message is required' });
+      return res.status(400).json({ ok: false, error: 'message or valid templateId is required' });
     }
-    const recipients = store.normalizeRecipients(body.recipients);
+
+    // Resolve recipients from a contact segment if none supplied directly.
+    let recipients = store.normalizeRecipients(body.recipients);
+    if (recipients.length === 0 && body.segment && contacts) {
+      recipients = contacts.toRecipients(body.segment);
+      body.recipients = recipients;
+    }
     if (recipients.length === 0) {
-      return res.status(400).json({ ok: false, error: 'at least one recipient is required' });
+      return res.status(400).json({ ok: false, error: 'at least one recipient (or matching segment) is required' });
     }
+
     const campaign = store.createCampaign(body);
     res.status(201).json({ ok: true, campaign });
   });
