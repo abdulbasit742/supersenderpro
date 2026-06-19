@@ -257,5 +257,77 @@ module.exports = function(watiBroadcast, watiCopilot) {
     }
   });
 
+  // ========================================================================
+  // NEW ADVANCED COMPETITOR ENDPOINTS & PLUGGABLE ALGORITHMS
+  // ========================================================================
+
+  // 15. Shared Inbox Presence & Agent Collision Check
+  router.post('/wati/presence/register', (req, res) => {
+    try {
+      const { tenantId = 'default-tenant', chatId, agentId, action = 'viewing' } = req.body;
+      if (!chatId || !agentId) {
+        return res.status(400).json({ success: false, error: 'chatId and agentId are required.' });
+      }
+      const presenceReport = competitorParity.registerPresence(tenantId, chatId, agentId, action);
+      res.json({ success: true, ...presenceReport });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // 16. Click-to-WhatsApp Ads RoAS Campaign Analysis
+  router.get('/wati/ads/campaign/:adId/roas', (req, res) => {
+    try {
+      const tenantId = req.query.tenantId || 'default-tenant';
+      const adId = req.params.adId;
+      const analysis = competitorParity.getAdCampaignRoas(tenantId, adId);
+      res.json({ success: true, analysis });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // 17. Predictive Churn Risk Analytics Endpoint
+  router.post('/wati/algorithms/churn-predict', (req, res) => {
+    try {
+      const { phone, lastActiveDays, totalMessages, failedPayments } = req.body;
+      if (!phone) {
+        return res.status(400).json({ success: false, error: 'phone is required' });
+      }
+      const churnReport = competitorParity.predictChurnRisk(phone, { lastActiveDays, totalMessages, failedPayments });
+      res.json({ success: true, churnReport });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // 18. Dynamic Pricing Multi-Armed Bandit Optimizer
+  router.post('/wati/algorithms/pricing-optimize', (req, res) => {
+    try {
+      const { productId, basePrice, stock, demandVelocity } = req.body;
+      if (!productId || !basePrice || stock === undefined) {
+        return res.status(400).json({ success: false, error: 'productId, basePrice, and stock are required' });
+      }
+      const priceReport = competitorParity.computeDynamicPricing(productId, basePrice, stock, { demandVelocity });
+      res.json({ success: true, priceReport });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // 19. Advanced Pluggable Algorithm Pipeline Hub
+  router.post('/wati/algorithms/pipeline/run', (req, res) => {
+    try {
+      const { algorithmId, payload = {} } = req.body;
+      if (!algorithmId) {
+        return res.status(400).json({ success: false, error: 'algorithmId is required' });
+      }
+      const executionResult = competitorParity.runAlgorithmicPipeline(algorithmId, payload);
+      res.json({ success: true, executionResult });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
   return router;
 };
