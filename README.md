@@ -1299,3 +1299,39 @@ A new analytics-driven layer in `/lib/leadScoring.js`, `/lib/businessHours.js`, 
 - **POST** `/api/intelligence/business-hours/handle-inbound` — Send away message for an out-of-hours inbound.
 - **GET** `/api/intelligence/cx-score/:phone` — CX quality score for one conversation.
 - **GET** `/api/intelligence/cx-overview` — Store-wide CX overview + at-risk conversations.
+
+
+## Growth & Integrations Suite
+
+Two more competitor-grade modules in `/lib/loyaltyProgram.js`, `/lib/webhookDispatcher.js`, and `/routes/growth.js` add customer retention and external automation power found in Shopify/Smile.io and Zapier/Make/Respond.io.
+
+### Core Capabilities
+
+1. **Customer Loyalty & Rewards Wallet**
+   - Customers earn points on every verified order (default: 1 point per Rs 100 spent) and climb loyalty tiers: ⭐ Member → 🥈 Silver → 🥇 Gold → 💎 Platinum, each unlocking richer perks (discounts, early access, free months).
+   - Supports earning by amount-spent or explicit points, and redeeming points for rewards (discounts, gifts, free months).
+   - Every earn/redeem is logged to the CRM, mirrored onto the customer profile, and confirmed to the customer over WhatsApp. Includes a points leaderboard for gamification.
+
+2. **Outbound Event Webhook Dispatcher**
+   - Register external webhook URLs that fire automatically on CRM events: `new_lead`, `stage_change`, `payment_received`, `order_completed`, `bot_escalation`, `opt_out`, `opt_in`, `loyalty_earn`, `loyalty_redeem`, `campaign_completed`.
+   - Each delivery is signed with an **HMAC-SHA256** signature (`X-SuperSender-Signature` header) so receivers can verify authenticity, with an 8s timeout, success/failure counters, and full delivery logs.
+   - Connect SuperSender Pro to Zapier, Make, n8n, or any custom backend without polling.
+
+### Express REST API Endpoints (mounted under `/api`)
+
+**Loyalty**
+- **GET** `/api/loyalty/tiers` — Loyalty tier definitions and perks.
+- **GET** `/api/loyalty/:phone` — Wallet balance, lifetime points, and current tier.
+- **POST** `/api/loyalty/earn` — Award points (by `amountSpent` or explicit `points`).
+- **POST** `/api/loyalty/redeem` — Redeem points for a named reward.
+- **GET** `/api/loyalty/:phone/transactions` — Points transaction history.
+- **GET** `/api/loyalty-leaderboard` — Top customers by lifetime points.
+
+**Webhooks**
+- **GET** `/api/connect/webhook-events` — List of dispatchable event types.
+- **GET** `/api/connect/webhooks` — List registered webhooks.
+- **POST** `/api/connect/webhooks` — Register a webhook URL + event subscriptions (auto-generates a signing secret).
+- **PUT** `/api/connect/webhooks/:id/toggle` — Enable/disable a webhook.
+- **DELETE** `/api/connect/webhooks/:id` — Remove a webhook.
+- **POST** `/api/connect/webhooks/dispatch` — Manually dispatch a test event.
+- **GET** `/api/connect/webhook-logs` — Recent delivery logs (status, errors).
