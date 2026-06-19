@@ -580,5 +580,98 @@ module.exports = function(watiBroadcast, watiCopilot) {
     }
   });
 
+    
+  // ========================================================================
+  // FEATURE BATCH 4 ENDPOINTS (Recommend, Coupons, Booking, Win-back, QR, CSV Validate)
+  // ========================================================================
+
+  // 37. Smart Product Recommendation Engine
+  router.post('/wati/recommend/products', (req, res) => {
+    try {
+      const { purchasedProductId, allProducts = [], customerTier = 'Standard' } = req.body;
+      if (!purchasedProductId) return res.status(400).json({ success: false, error: 'purchasedProductId is required.' });
+      const result = competitorParity.recommendProducts(purchasedProductId, allProducts, customerTier);
+      res.json({ success: true, result });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // 38. Coupon Generator
+  router.post('/wati/coupons/create', (req, res) => {
+    try {
+      const { tenantId = 'default-tenant', discountPercent, maxUses = 100, expiryDays = 7 } = req.body;
+      if (discountPercent === undefined) return res.status(400).json({ success: false, error: 'discountPercent is required.' });
+      const coupon = competitorParity.createCoupon(tenantId, discountPercent, maxUses, expiryDays);
+      res.json({ success: true, coupon });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // 39. Coupon Validator
+  router.post('/wati/coupons/validate', (req, res) => {
+    try {
+      const { tenantId = 'default-tenant', code } = req.body;
+      if (!code) return res.status(400).json({ success: false, error: 'code is required.' });
+      const result = competitorParity.validateCoupon(tenantId, code);
+      res.json({ success: true, ...result });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // 40. Appointment / Booking Slot Scheduler
+  router.post('/wati/bookings/create', (req, res) => {
+    try {
+      const { tenantId = 'default-tenant', phone, date, slot, service = 'consultation' } = req.body;
+      if (!phone || !date || !slot) {
+        return res.status(400).json({ success: false, error: 'phone, date, and slot are required.' });
+      }
+      const result = competitorParity.bookSlot(tenantId, phone, date, slot, service);
+      res.json(result);
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // 41. Dormant Customer Win-back Re-engagement
+  router.post('/wati/reengage/winback', (req, res) => {
+    try {
+      const { tenantId = 'default-tenant', phone, lastActiveDays = 45 } = req.body;
+      if (!phone) return res.status(400).json({ success: false, error: 'phone is required.' });
+      const campaign = competitorParity.buildReengagementCampaign(tenantId, phone, lastActiveDays);
+      res.json({ success: true, campaign });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // 42. WhatsApp QR Click-to-Chat Campaign Generator
+  router.post('/wati/qr-campaign/create', (req, res) => {
+    try {
+      const { tenantId = 'default-tenant', campaignName, prefilledText } = req.body;
+      if (!campaignName) return res.status(400).json({ success: false, error: 'campaignName is required.' });
+      const campaign = competitorParity.generateQrCampaign(tenantId, campaignName, prefilledText);
+      res.json({ success: true, campaign });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // 43. Bulk CSV Contact Import Validator
+  router.post('/wati/contacts/validate-import', (req, res) => {
+    try {
+      const { contacts = [] } = req.body;
+      if (!Array.isArray(contacts) || !contacts.length) {
+        return res.status(400).json({ success: false, error: 'contacts array is required.' });
+      }
+      const result = competitorParity.validateContactImport(contacts);
+      res.json({ success: true, result });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
     return router;
 };
