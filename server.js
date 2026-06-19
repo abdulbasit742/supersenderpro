@@ -3012,6 +3012,13 @@ const realEstateBot = require('./bots/realEstateBot');
 const reRoutes = require('./saas/reSignup');
 app.use('/api', reRoutes);
 
+// Kommo CRM Advanced Integration (Digital Pipeline, Salesbot, and Lead Routing)
+const KommoCRM = require('./lib/kommoCRM');
+const kommoCRM = new KommoCRM(dataDir, sendDirect);
+const kommoRoutes = require('./routes/kommo')(kommoCRM);
+app.use('/api', kommoRoutes);
+
+
 let searchIndexRebuildTimer = null;
 function scheduleSearchIndexRebuild(reason = 'data-change', delayMs = Number(process.env.SEARCH_REBUILD_DEBOUNCE_MS || 30000)) {
   if (searchIndexRebuildTimer) clearTimeout(searchIndexRebuildTimer);
