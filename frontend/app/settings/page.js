@@ -25,14 +25,78 @@ export default function SettingsPage() {
   const [priceForm, setPriceForm] = useState({ tool: 'chatgpt', plan: 'plus', type: 'private', price: 999, limited: true });
   const [waNumber, setWaNumber] = useState('');
   const [saveStatus, setSaveStatus] = useState('');
+  const [setupCheck, setSetupCheck] = useState(null);
+  const [loadingSetup, setLoadingSetup] = useState(false);
+  const [importStatus, setImportStatus] = useState('');
 
   async function load() {
-    const [saved, groupRows] = await Promise.all([
+    const [saved, groupRows, setupRes] = await Promise.all([
       safeApi('/api/settings', demoSettings),
-      safeApi('/api/whatsapp/group-settings', [])
+      safeApi('/api/whatsapp/group-settings', []),
+      safeApi('/api/system/setup-validator', null)
     ]);
     setSettings(saved);
     setGroups(groupRows);
+    if (setupRes) setSetupCheck(setupRes);
+  }
+
+  async function refreshSetupCheck() {
+    setLoadingSetup(true);
+    try {
+      const res = await api('/api/system/setup-validator');
+      setSetupCheck(res);
+    } catch (error) {
+      console.error('Setup check failed:', error);
+    } finally {
+      setLoadingSetup(false);
+    }
+  }
+
+  async function exportChannelConfig() {
+    try {
+      const data = await api('/api/wa/channels/export-config');
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `whatsapp-channel-settings-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      alert('Export failed: ' + error.message);
+    }
+  }
+
+  async function importChannelConfig(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    setImportStatus('Importing...');
+    try {
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        try {
+          const config = JSON.parse(event.target.result);
+          const res = await api('/api/wa/channels/import-config', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(config)
+          });
+          if (res.success) {
+            setImportStatus(`Success! Imported targets: ${res.summary?.targets ?? 0}, sources: ${res.summary?.sources ?? 0}`);
+            await load();
+          } else {
+            setImportStatus(`Import failed: ${res.error}`);
+          }
+        } catch (err) {
+          setImportStatus('Invalid JSON file: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+    } catch (error) {
+      setImportStatus('File read failed: ' + error.message);
+    }
   }
 
   useEffect(() => { load(); }, []);
@@ -205,6 +269,79 @@ export default function SettingsPage() {
                 <div className="mt-3 text-sm">{agentResult.answer || 'No direct answer. Route to structured flow or admin handoff.'}</div>
               </div>
             ) : null}
+          </div>
+        </Panel>
+      </div>
+
+      <div className="mt-6 grid gap-4 xl:grid-cols-2">
+        {/* System Diagnostics Checklist Panel */}
+        <Panel title="System Readiness Diagnostics / سسٹم چیک لسٹ" action={
+          <button disabled={loadingSetup} onClick={refreshSetupCheck} className="btn text-xs">
+            {loadingSetup ? 'Checking...' : 'Refresh Checklist'}
+          </button>
+        }>
+          <div className="grid gap-3">
+            <div className="flex justify-between items-center text-sm font-semibold mb-2">
+              <span>Overall Readiness:</span>
+              <StatusBadge tone={setupCheck?.ready ? 'good' : 'warn'}>
+                {setupCheck?.score ?? 0}/{setupCheck?.total ?? 0} Ready
+              </StatusBadge>
+            </div>
+            
+            <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
+              {setupCheck?.checks ? (
+                setupCheck.checks.map((check, idx) => (
+                  <div key={idx} className="flex flex-col md:flex-row md:items-center justify-between border-b border-line pb-2 last:border-0">
+                    <div className="flex items-center gap-2">
+                      <span className={check.ok ? 'text-emerald-500' : 'text-yellow-500'}>
+                        {check.ok ? '✅' : '⚠️'}
+                      </span>
+                      <span className="font-semibold text-sm">{check.name}</span>
+                      <span className="text-xs text-slate-400">({check.note})</span>
+                    </div>
+                    {check.fix && !check.ok && (
+                      <span className="text-xs text-yellow-600 dark:text-yellow-400 font-mono italic md:text-right mt-1 md:mt-0">
+                        Fix: {check.fix}
+                      </span>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <div className="text-sm text-slate-400">Loading checklist data...</div>
+              )}
+            </div>
+          </div>
+        </Panel>
+
+        {/* Portability Panel */}
+        <Panel title="Channel Config Portability / سیٹنگز درآمد اور برآمد">
+          <div className="space-y-4">
+            <div className="text-xs text-slate-400">
+              WhatsApp channel target settings, source settings, presets, safety filters and rules block ko direct file main download ya upload karein.
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <div>
+                <span className="text-xs font-bold text-slate-400 uppercase block mb-1.5">Export Configuration</span>
+                <button type="button" className="btn btn-primary w-full text-xs" onClick={exportChannelConfig}>
+                  ⬇️ Export Channel Config (.json)
+                </button>
+              </div>
+
+              <div>
+                <span className="text-xs font-bold text-slate-400 uppercase block mb-1.5">Import Configuration</span>
+                <label className="btn text-xs w-full flex items-center justify-center cursor-pointer">
+                  Upload & Import Settings File
+                  <input type="file" accept=".json" className="hidden" onChange={importChannelConfig} />
+                </label>
+              </div>
+
+              {importStatus && (
+                <div className={`text-xs border p-3 rounded-lg font-mono ${importStatus.includes('Success') ? 'border-emerald-500/20 bg-emerald-500/5 text-emerald-600 dark:text-emerald-400' : 'border-line text-slate-400 bg-slate-950'}`}>
+                  {importStatus}
+                </div>
+              )}
+            </div>
           </div>
         </Panel>
       </div>

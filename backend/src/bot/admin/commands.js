@@ -13,23 +13,32 @@ const { deliverOrder } = require('../../services/deliveryService');
 const { manualVerifyTransaction } = require('../../payment/verifier');
 const { flagScammer } = require('../../security/fraudDetection');
 const { runZeroTouchJob, zeroTouchSummary, buildCustomerProfile } = require('../../zeroTouch');
+const Redis = require('ioredis');
+const redisClient = new Redis(env.redisUrl);
 
-const authSessions = new Map();
-const AUTH_TTL_MS = 12 * 60 * 60 * 1000;
+const AUTH_TTL_MS = 12 * 60 * 60 * 1000; // 12 hours in ms
+const AUTH_TTL_SEC = Math.floor(AUTH_TTL_MS / 1000);
+
+function authKey(phone) {
+  return `admin_auth:${normalizePhone(phone)}`;
+}
 
 function isAdmin(number = '') {
   return normalizePhone(number) === normalizePhone(env.adminNumber);
 }
 
-function isAuthenticated(sender = '') {
+async function isAuthenticated(sender = '') {
   if (!env.adminAuthPassword) return true;
-  return (authSessions.get(normalizePhone(sender)) || 0) > Date.now();
+  const key = authKey(sender);
+  const ttl = await redisClient.ttl(key);
+  return ttl > 0;
 }
 
-function authenticate(sender = '', password = '') {
+async function authenticate(sender = '', password = '') {
   if (!env.adminAuthPassword) return 'Admin auth password not configured; ADMIN_NUMBER commands are enabled.';
   if (String(password || '') !== String(env.adminAuthPassword)) return '❌ Auth failed. Password ghalat hai.';
-  authSessions.set(normalizePhone(sender), Date.now() + AUTH_TTL_MS);
+  const key = authKey(sender);
+  await redisClient.set(key, '1', 'EX', AUTH_TTL_SEC);
   return '✅ Admin authenticated for 12 hours.';
 }
 
@@ -165,7 +174,7 @@ async function handleAdminCommand(text = '', sender = '') {
   try {
     if (cmd === '!auth') return authenticate(sender, parts.slice(1).join(' '));
     if (cmd === '!help') return help();
-    if (!isAuthenticated(sender)) return '🔐 Admin auth required. Pehle `!auth password` bhejein.';
+    if (!(await isAuthenticated(sender))) return '🔐 Admin auth required. Pehle `!auth password` bhejein.';
 
     if (cmd === '!verify') {
       const result = await manualVerifyTransaction(parts[1], parts[2] || '');

@@ -2691,6 +2691,32 @@ function searchNav(q) {
   </div>
   <div class="grid g2" style="margin-top:12px">
     <div class="card">
+      <div class="card-title">Auto Health Watchdog</div>
+      <div class="automation-kicker">Automated diagnostics, auto-fix, and health alerts</div>
+      <div id="wa-channel-watchdog-box" style="font-size:12px;color:var(--muted);line-height:1.7;margin-top:8px">
+        Loading Watchdog state...
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+        <button class="btn btn-secondary btn-sm" onclick="runWatchdogCheck()">Run Diagnostic</button>
+        <button class="btn btn-secondary btn-sm" onclick="toggleWatchdog(true)">Enable</button>
+        <button class="btn btn-secondary btn-sm" onclick="toggleWatchdog(false)">Disable</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Channel Settings Exporter</div>
+      <div class="automation-kicker">Backup channel settings, sources, targets, rules, presets</div>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-direction:column">
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-secondary btn-sm" onclick="exportChannelConfig()">Export settings.json</button>
+          <button class="btn btn-primary btn-sm" onclick="document.getElementById('channel-import-file').click()">Import settings.json</button>
+        </div>
+        <input type="file" id="channel-import-file" style="display:none" onchange="importChannelConfig(event)" accept=".json" />
+        <div id="wa-channel-backup-status" style="font-size:11px;color:var(--muted);margin-top:4px">Ready to backup or restore</div>
+      </div>
+    </div>
+  </div>
+  <div class="grid g2" style="margin-top:12px">
+    <div class="card">
       <div class="card-title">Drafts & Scheduled Posts</div>
       <div id="wa-channel-posts" style="font-size:12px;color:var(--muted);line-height:1.6"></div>
     </div>
@@ -10042,6 +10068,7 @@ async function loadWAChannels() {
     renderChannelRelayInbox(data.relay || []);
     renderWAChannelHistory(data.history || []);
     await previewWAChannelPost(false);
+    await loadWatchdogStatus();
   } catch (e) {
     toast(e.message || 'Could not load WA channels', 'error');
   }
@@ -10339,6 +10366,122 @@ async function deleteWAChannelPost(id) {
   } catch (e) {
     toast(e.message || 'Delete failed', 'error');
   }
+}
+
+async function loadWatchdogStatus() {
+  try {
+    const data = await api('/api/wa/channels/watchdog');
+    const box = document.getElementById('wa-channel-watchdog-box');
+    if (box && data.status) {
+      const s = data.status;
+      const reasonsList = (s.lastReasons || []).map(r => `<li>${escHtml(r)}</li>`).join('');
+      const blockersList = (s.blockers || []).map(b => `<li style="color:var(--red)">${escHtml(b)}</li>`).join('');
+      box.innerHTML = `
+        <div><b>Watchdog:</b> <span class="tag tag-${s.enabled ? 'green' : 'orange'}">${s.enabled ? 'Enabled' : 'Disabled'}</span></div>
+        <div><b>Auto-Fix:</b> <span class="tag tag-${s.autoFix ? 'green' : 'gray'}">${s.autoFix ? 'ON' : 'OFF'}</span></div>
+        <div><b>Ready Score:</b> <span style="font-weight:bold;color:${s.readyScore >= 65 ? 'var(--green)' : 'var(--red)'}">${s.readyScore}/100</span> (Min: ${s.minReadyScore})</div>
+        <div><b>Status:</b> ${escHtml(s.status)}</div>
+        <div><b>Interval:</b> ${s.intervalMinutes} min</div>
+        ${s.lastRunAt ? `<div><b>Last Run:</b> ${escHtml(new Date(s.lastRunAt).toLocaleString())}</div>` : ''}
+        ${s.lastAutoFixAt ? `<div><b>Last Auto-Fix:</b> ${escHtml(new Date(s.lastAutoFixAt).toLocaleString())}</div>` : ''}
+        ${blockersList ? `<div style="margin-top:6px"><b>Blockers:</b><ul style="margin:4px 0;padding-left:16px">${blockersList}</ul></div>` : ''}
+        ${reasonsList ? `<div style="margin-top:6px"><b>Last Run Notes:</b><ul style="margin:4px 0;padding-left:16px">${reasonsList}</ul></div>` : ''}
+      `;
+    }
+  } catch (e) {
+    console.error('Error loading watchdog status:', e);
+  }
+}
+
+async function runWatchdogCheck() {
+  try {
+    toast('Running watchdog diagnostic sweep...', 'info');
+    const res = await api('/api/wa/channels/watchdog', {
+      method: 'POST',
+      body: JSON.stringify({ action: 'run' })
+    });
+    if (res.success) {
+      toast('Watchdog diagnostics completed!', 'success');
+    } else {
+      toast(res.error || 'Watchdog run completed with warnings', 'warning');
+    }
+    await loadWatchdogStatus();
+  } catch (e) {
+    toast('Watchdog failed: ' + e.message, 'error');
+  }
+}
+
+async function toggleWatchdog(enable) {
+  try {
+    const res = await api('/api/wa/channels/watchdog', {
+      method: 'POST',
+      body: JSON.stringify({
+        action: enable ? 'on' : 'off',
+        intervalMinutes: 10,
+        minReadyScore: 65,
+        autoFix: true
+      })
+    });
+    toast(res.message || `Watchdog ${enable ? 'enabled' : 'disabled'}`, 'success');
+    await loadWatchdogStatus();
+  } catch (e) {
+    toast('Failed to update watchdog state: ' + e.message, 'error');
+  }
+}
+
+async function exportChannelConfig() {
+  try {
+    const data = await api('/api/wa/channels/export-config');
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `whatsapp_channels_config_${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast('Settings exported successfully', 'success');
+  } catch (e) {
+    toast('Export failed: ' + e.message, 'error');
+  }
+}
+
+async function importChannelConfig(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const statusEl = document.getElementById('wa-channel-backup-status');
+  if (statusEl) statusEl.textContent = 'Importing...';
+  try {
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const payload = JSON.parse(e.target.result);
+        const res = await api('/api/wa/channels/import-config', {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+        if (res.success) {
+          toast('Configuration imported successfully!', 'success');
+          if (statusEl) {
+            statusEl.innerHTML = `<span style="color:var(--green)">Imported targets: ${res.summary?.targets || 0}, sources: ${res.summary?.sources || 0}</span>`;
+          }
+          await loadWAChannels();
+          await loadWatchdogStatus();
+        } else {
+          throw new Error(res.error || 'Failed to import configuration');
+        }
+      } catch (err) {
+        toast('Import failed: ' + err.message, 'error');
+        if (statusEl) statusEl.innerHTML = `<span style="color:var(--red)">Error: ${err.message}</span>`;
+      }
+    };
+    reader.readAsText(file);
+  } catch (err) {
+    toast('File reading failed: ' + err.message, 'error');
+    if (statusEl) statusEl.innerHTML = `<span style="color:var(--red)">Error: ${err.message}</span>`;
+  }
+  event.target.value = '';
 }
 
 async function loadLogs() {

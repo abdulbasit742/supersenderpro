@@ -3,6 +3,7 @@ const env = require('../config/env');
 const { normalizePhone } = require('../utils/phone');
 const { sendWhatsAppMessage } = require('../whatsapp/baileysClient');
 const { hashValue, maskReference } = require('../security/encryption');
+const { isProcessed, markProcessed } = require('../utils/transactionStore');
 const { detectPaymentFraud } = require('../security/fraudDetection');
 const { deliverOrder } = require('../services/deliveryService');
 const { auditLog } = require('../services/auditLog');
@@ -110,8 +111,8 @@ async function verifyPaymentNotification(input = {}) {
 
   const duplicate = await prisma.paymentNotification.findUnique({ where: { txnHash: parsed.txnHash } }).catch(() => null);
   const duplicateOrder = await prisma.businessOrder.findFirst({ where: { paymentTxnHash: parsed.txnHash } }).catch(() => null);
-  if (duplicate || duplicateOrder) {
-    await sendPaymentAlert(parsed, 'duplicate_rejected', `Already processed${duplicateOrder ? ` for ${duplicateOrder.orderId}` : ` as ${duplicate.status}`}.`);
+  if (duplicate || duplicateOrder || isProcessed(parsed.txnHash)) {
+    await sendPaymentAlert(parsed, 'duplicate_rejected', `Already processed${duplicateOrder ? ` for ${duplicateOrder.orderId}` : ` as ${duplicate?.status || 'unknown'}`}.`);
     return { success: false, status: 'duplicate_rejected', notification: duplicate, order: duplicateOrder, reason: 'Duplicate transaction ID' };
   }
 
@@ -161,6 +162,10 @@ async function verifyPaymentNotification(input = {}) {
     entityId: order.orderId,
     metadata: { notificationId: updated.id, fraud, delivery }
   });
+  // Mark transaction as processed to prevent replay
+  if (delivery.success) {
+    markProcessed(parsed.txnHash);
+  }
   return { success: delivery.success, status, notification: updated, matchedOrder: order, delivery, fraud };
 }
 

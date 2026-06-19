@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const http = require('http');
 const dns = require('dns');
 const crypto = require('crypto');
@@ -6286,7 +6286,7 @@ async function shareDataToWhatsAppChannels({ channelIds = [], message = '', kind
       } catch (error) {
         const combinedError = `${baileysError.message}; ${error.message}`;
         const needsPublisher = /Channel publisher not connected/i.test(baileysError.message || '');
-        const unsupported = needsPublisher || isWhatsAppChannelPublishUnsupported(error);
+        const unsupported = needsPublisher || isWhatsAppChannelPublishUnsupported(baileysError) || isWhatsAppChannelPublishUnsupported(error);
         failed.push({ channelId, error: combinedError, manualRequired: unsupported, needsPublisher });
         logs.push({ id: uuid(), type: 'whatsapp_channel_share', to: channelId, status: unsupported ? 'manual_required' : 'failed', error: combinedError, message: finalMessage, mediaUrl: mediaSource, time: new Date().toISOString() });
       }
