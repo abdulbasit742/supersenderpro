@@ -1223,3 +1223,44 @@ Our new Express router is mounted under `/api` in `server.js` and exposes the fo
 - **POST** `/api/kommo/leads/route` — Explicitly trigger the round-robin routing algorithm for a lead.
 - **GET** `/api/kommo/triggers` — Get Salesbot trigger setups.
 - **POST** `/api/kommo/triggers` — Configure or update Salesbot triggers for a specific stage.
+
+
+## Wati CRM Advanced Features Suite
+
+We have added a powerful compliance and conversational intelligence suite in `/lib/watiBroadcast.js`, `/lib/watiCopilot.js`, and `/routes/wati.js` modeled after the premium features of **Wati (Clare.ai)**. This brings advanced, policy-compliant outreach and high-performance agent handoffs to your WhatsApp ecosystem.
+
+### Core Capabilities
+
+1. **Compliance-First Opt-Out & Opt-In Automation**
+   - Automatically monitors all inbound customer messages for regulatory unsubscribe terms: `STOP`, `UNSUBSCRIBE`, `OPTOUT`, `BLOCK`, `EXIT`, `NIKLO`, or `UNSUB`.
+   - On match, it updates their profile with `promoOptIn: false`, applies the `opted_out` tag, logs the event, and blacklists them from all future marketing campaigns. It also sends a WhatsApp confirmation with instructions on how to opt back in.
+   - Conversely, handles automated re-subscription via `START` or `SUBSCRIBE`.
+
+2. **Advanced Promotional Broadcast Campaigns**
+   - Create, configure, and execute targeted broadcast campaigns mapped to custom customer segments.
+   - The campaign engine automatically filters the target list to strip out unsubscribed or blocked contacts, preventing policy violations and keeping your WhatsApp Quality Rating healthy.
+   - Supports inline template replacements (`{{name}}`, `{{tier}}`) and logs granular, real-time message telemetry (Sent, Delivered, Read, Failed, and Unsubscribed rates).
+
+3. **Wati AI Copilot: Thread Summarizer**
+   - Scans the user's recent chat logs and translates them into an instant, highly readable brief for sales agents.
+   - Summarizes user inquiry history, parses user intent (Sales, Tech Support, Billing, Handoff), detects customer sentiment (Neutral, Purchase Intent, Frustrated/Urgent), and suggests a recommended next action.
+
+4. **Smart Bot-to-Human Handoff (Agent Escalation)**
+   - When a user asks for human assistance or triggers an escalation, the bot is instantly muted for 24 hours (`botMuted: true`).
+   - Re-routes the chat directly using Kommo's round-robin queue to assign a dedicated, online representative.
+   - Logs the handoff event, and issues an automated reassurance notification over WhatsApp: *"The automated bot has been muted. Your chat is now escalated to our specialist, [Agent Name]..."*
+
+### Express REST API Endpoints
+
+The Wati router is mounted under `/api` in `server.js` and exposes the following endpoints:
+
+- **POST** `/api/wati/optout` — Manually add a phone number to the promotional blacklist.
+- **POST** `/api/wati/optin` — Manually re-subscribe a contact.
+- **GET** `/api/wati/campaigns` — Fetch all broadcast campaigns.
+- **POST** `/api/wati/campaigns` — Draft a new promotional broadcast campaign.
+- **GET** `/api/wati/campaigns/:id` — Retrieve detailed campaign stats, delivery metrics, and recipient states.
+- **POST** `/api/wati/campaigns/:id/send` — Execute the broadcast campaign (sends messages, filters opt-outs, and tracks progress).
+- **POST** `/api/wati/campaigns/:id/track-status` — Delivery/read receipts tracking webhook callback.
+- **GET** `/api/wati/leads/:phone/summary` — Run the AI Copilot Thread Summarizer for a customer.
+- **POST** `/api/wati/leads/:phone/escalate` — Mute the bot, auto-assign an agent, and send a WhatsApp handoff notification.
+- **POST** `/api/wati/leads/:phone/unmute` — Unmute the WhatsApp bot to re-enable automated replies.

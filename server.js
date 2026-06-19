@@ -3018,6 +3018,14 @@ const kommoCRM = new KommoCRM(dataDir, sendDirect);
 const kommoRoutes = require('./routes/kommo')(kommoCRM);
 app.use('/api', kommoRoutes);
 
+// Wati CRM Advanced Integration (Compliant Campaigns, Opt-out tracking, AI Copilot, Smart Handoff)
+const WatiBroadcast = require('./lib/watiBroadcast');
+const WatiCopilot = require('./lib/watiCopilot');
+const watiBroadcast = new WatiBroadcast(sendDirect);
+const watiCopilot = new WatiCopilot(kommoCRM, sendDirect);
+const watiRoutes = require('./routes/wati')(watiBroadcast, watiCopilot);
+app.use('/api', watiRoutes);
+
 
 let searchIndexRebuildTimer = null;
 function scheduleSearchIndexRebuild(reason = 'data-change', delayMs = Number(process.env.SEARCH_REBUILD_DEBOUNCE_MS || 30000)) {
