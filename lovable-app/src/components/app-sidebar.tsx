@@ -35,6 +35,7 @@ const nav = [
   { to: "/payments", label: "Payments", icon: CreditCard },
   { to: "/plans", label: "Plans", icon: Crown },
   { to: "/inbox", label: "AI Inbox Cockpit", icon: Inbox },
+  { to: "/wati", label: "Wati Business Suite", icon: Crown },
   { to: "/flows", label: "Flow Builder", icon: Workflow },
   { to: "/smart-broadcast", label: "Smart Broadcast", icon: Send },
   { to: "/campaigns", label: "Campaigns", icon: Megaphone },

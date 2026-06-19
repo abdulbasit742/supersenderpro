@@ -70,6 +70,7 @@ app.use('/api/dealer-intelligence', require('./routes/dealer-intelligence'));
 app.use('/api/n8n', require('./routes/n8n'));
 app.use('/api/payments', require('./routes/payments'));
 app.use('/api/zero-touch', require('./routes/zero-touch'));
+app.use('/api/wati', require('./routes/wati'));
 app.use('/webhook/n8n', require('./routes/n8n'));
 
 io.on('connection', (socket) => {

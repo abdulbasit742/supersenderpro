@@ -15,6 +15,7 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app.index'
 import { Route as AppZeroTouchRouteImport } from './routes/_app.zero-touch'
 import { Route as AppWhatsappRouteImport } from './routes/_app.whatsapp'
+import { Route as AppWatiRouteImport } from './routes/_app.wati'
 import { Route as AppTeamRouteImport } from './routes/_app.team'
 import { Route as AppStockRouteImport } from './routes/_app.stock'
 import { Route as AppSocialRouteImport } from './routes/_app.social'
@@ -76,6 +77,11 @@ const AppZeroTouchRoute = AppZeroTouchRouteImport.update({
 const AppWhatsappRoute = AppWhatsappRouteImport.update({
   id: '/whatsapp',
   path: '/whatsapp',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppWatiRoute = AppWatiRouteImport.update({
+  id: '/wati',
+  path: '/wati',
   getParentRoute: () => AppRoute,
 } as any)
 const AppTeamRoute = AppTeamRouteImport.update({
@@ -280,6 +286,7 @@ export interface FileRoutesByFullPath {
   '/social': typeof AppSocialRoute
   '/stock': typeof AppStockRoute
   '/team': typeof AppTeamRoute
+  '/wati': typeof AppWatiRoute
   '/whatsapp': typeof AppWhatsappRoute
   '/zero-touch': typeof AppZeroTouchRoute
   '/api/public/cron/dispatch': typeof ApiPublicCronDispatchRoute
@@ -319,6 +326,7 @@ export interface FileRoutesByTo {
   '/social': typeof AppSocialRoute
   '/stock': typeof AppStockRoute
   '/team': typeof AppTeamRoute
+  '/wati': typeof AppWatiRoute
   '/whatsapp': typeof AppWhatsappRoute
   '/zero-touch': typeof AppZeroTouchRoute
   '/': typeof AppIndexRoute
@@ -361,6 +369,7 @@ export interface FileRoutesById {
   '/_app/social': typeof AppSocialRoute
   '/_app/stock': typeof AppStockRoute
   '/_app/team': typeof AppTeamRoute
+  '/_app/wati': typeof AppWatiRoute
   '/_app/whatsapp': typeof AppWhatsappRoute
   '/_app/zero-touch': typeof AppZeroTouchRoute
   '/_app/': typeof AppIndexRoute
@@ -404,6 +413,7 @@ export interface FileRouteTypes {
     | '/social'
     | '/stock'
     | '/team'
+    | '/wati'
     | '/whatsapp'
     | '/zero-touch'
     | '/api/public/cron/dispatch'
@@ -443,6 +453,7 @@ export interface FileRouteTypes {
     | '/social'
     | '/stock'
     | '/team'
+    | '/wati'
     | '/whatsapp'
     | '/zero-touch'
     | '/'
@@ -484,6 +495,7 @@ export interface FileRouteTypes {
     | '/_app/social'
     | '/_app/stock'
     | '/_app/team'
+    | '/_app/wati'
     | '/_app/whatsapp'
     | '/_app/zero-touch'
     | '/_app/'
@@ -539,6 +551,13 @@ declare module '@tanstack/react-router' {
       path: '/whatsapp'
       fullPath: '/whatsapp'
       preLoaderRoute: typeof AppWhatsappRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/wati': {
+      id: '/_app/wati'
+      path: '/wati'
+      fullPath: '/wati'
+      preLoaderRoute: typeof AppWatiRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/team': {
@@ -808,6 +827,7 @@ interface AppRouteChildren {
   AppSocialRoute: typeof AppSocialRoute
   AppStockRoute: typeof AppStockRoute
   AppTeamRoute: typeof AppTeamRoute
+  AppWatiRoute: typeof AppWatiRoute
   AppWhatsappRoute: typeof AppWhatsappRoute
   AppZeroTouchRoute: typeof AppZeroTouchRoute
   AppIndexRoute: typeof AppIndexRoute
@@ -846,6 +866,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppSocialRoute: AppSocialRoute,
   AppStockRoute: AppStockRoute,
   AppTeamRoute: AppTeamRoute,
+  AppWatiRoute: AppWatiRoute,
   AppWhatsappRoute: AppWhatsappRoute,
   AppZeroTouchRoute: AppZeroTouchRoute,
   AppIndexRoute: AppIndexRoute,
@@ -862,3 +883,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

@@ -150,6 +150,17 @@ export const api = {
   getCodeIntelligenceStatus: () => get<any>("/api/code-intelligence/status"),
   runCodeScan: () => post<any>("/api/code-intelligence/scan"),
 
+  // Wati Business Suite
+  getWatiCosts: () => get<any>("/api/wati/costs"),
+  logWatiCost: (data: unknown) => post<any>("/api/wati/costs/log", data),
+  getWatiTemplates: () => get<any[]>("/api/wati/templates"),
+  createWatiTemplate: (data: unknown) => post<any>("/api/wati/templates", data),
+  getWatiAdLeads: () => get<any[]>("/api/wati/ad-leads"),
+  trackWatiAdLead: (data: unknown) => post<any>("/api/wati/ad-lead", data),
+  getWatiFlows: () => get<any[]>("/api/wati/flows"),
+  saveWatiFlow: (data: unknown) => post<any>("/api/wati/flows", data),
+  deleteWatiFlow: (id: string) => del<any>(`/api/wati/flows/${id}`),
+
   // Settings + audit
   saveSettings: (data: unknown) => post<any>("/api/settings", data),
   getLogs: () => get<any[]>("/api/logs"),
