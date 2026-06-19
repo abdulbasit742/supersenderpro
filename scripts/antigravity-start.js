@@ -1,8 +1,9 @@
-const { execSync, spawn } = require('child_process');
+const { execFileSync, execSync, spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.join(__dirname, '..');
+const NODE = process.execPath;
 
 // ANSI escape codes
 const RESET = '\x1b[0m';
@@ -20,7 +21,7 @@ console.log(`${BOLD}${CYAN}==================================================${R
 // 1. Run Syntax Check on server.js
 console.log(`${BOLD}${BLUE}[1/3] Running Syntax Check on server.js...${RESET}`);
 try {
-  execSync('node --check server.js', { cwd: ROOT, stdio: 'pipe' });
+  execFileSync(NODE, ['--check', 'server.js'], { cwd: ROOT, stdio: 'pipe' });
   console.log(`${GREEN}✔ Syntax check passed! No syntax errors found in server.js.${RESET}\n`);
 } catch (error) {
   console.error(`${RED}✘ Syntax check failed! server.js has compilation or syntax errors:${RESET}`);
@@ -31,7 +32,7 @@ try {
 // 2. Run Environment setup validator
 console.log(`${BOLD}${BLUE}[2/3] Running Environment Setup Validator...${RESET}`);
 try {
-  execSync('node scripts/env-validator.js', { cwd: ROOT, stdio: 'inherit' });
+  execFileSync(NODE, ['scripts/env-validator.js'], { cwd: ROOT, stdio: 'inherit' });
   console.log(`${GREEN}✔ Environment check completed successfully!${RESET}\n`);
 } catch (error) {
   console.error(`${RED}✘ Environment check failed with critical errors!${RESET}`);
@@ -48,7 +49,7 @@ const env = { ...process.env };
 const PORT = env.PORT || 3001;
 const QR_URL = `http://localhost:${PORT}/wa-qr`;
 
-const child = spawn('node', ['server.js'], { cwd: ROOT, env });
+const child = spawn(NODE, ['server.js'], { cwd: ROOT, env });
 
 let qrOpened = false;
 
