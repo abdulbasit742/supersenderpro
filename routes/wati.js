@@ -404,5 +404,88 @@ module.exports = function(watiBroadcast, watiCopilot) {
     }
   });
 
+    
+  // ========================================================================
+  // NEW ADVANCED FEATURE ENDPOINTS (Sentiment, Drip, Anti-Ban, CLV, FAQ, Loyalty)
+  // ========================================================================
+
+  // 25. AI Sentiment Analysis & Auto-Escalation
+  router.post('/wati/sentiment/analyze', (req, res) => {
+    try {
+      const { tenantId = 'default-tenant', phone, message } = req.body;
+      if (!phone || !message) {
+        return res.status(400).json({ success: false, error: 'phone and message are required.' });
+      }
+      const result = competitorParity.analyzeSentiment(tenantId, phone, message);
+      res.json({ success: true, result });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // 26. Smart Drip Campaign Sequencer
+  router.post('/wati/drip/create', (req, res) => {
+    try {
+      const { tenantId = 'default-tenant', name, steps } = req.body;
+      if (!name || !Array.isArray(steps) || !steps.length) {
+        return res.status(400).json({ success: false, error: 'name and a non-empty steps array are required.' });
+      }
+      const sequence = competitorParity.createDripSequence(tenantId, name, steps);
+      res.json({ success: true, sequence });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // 27. Anti-Ban Broadcast Throttle Guard
+  router.get('/wati/anti-ban/throttle', (req, res) => {
+    try {
+      const accountAgeDays = parseInt(req.query.accountAgeDays || '30', 10);
+      const dailySentSoFar = parseInt(req.query.dailySentSoFar || '0', 10);
+      const throttle = competitorParity.computeAntiBanThrottle(accountAgeDays, dailySentSoFar);
+      res.json({ success: true, throttle });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // 28. Customer Lifetime Value (CLV) Predictor
+  router.post('/wati/analytics/clv', (req, res) => {
+    try {
+      const clv = competitorParity.predictCustomerLifetimeValue(req.body || {});
+      res.json({ success: true, clv });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // 29. Smart FAQ Auto-Responder with Confidence Scoring
+  router.post('/wati/faq/answer', (req, res) => {
+    try {
+      const { question, faqs = [] } = req.body;
+      if (!question) {
+        return res.status(400).json({ success: false, error: 'question is required.' });
+      }
+      const answer = competitorParity.answerFromFAQ(question, faqs);
+      res.json({ success: true, answer });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // 30. Loyalty Points & Rewards Engine
+  router.post('/wati/loyalty/award', (req, res) => {
+    try {
+      const { tenantId = 'default-tenant', phone, points, reason = 'purchase' } = req.body;
+      if (!phone || points === undefined) {
+        return res.status(400).json({ success: false, error: 'phone and points are required.' });
+      }
+      const result = competitorParity.awardLoyaltyPoints(tenantId, phone, points, reason);
+      res.json({ success: true, result });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
     return router;
 };
