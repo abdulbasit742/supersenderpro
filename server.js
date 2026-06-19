@@ -1575,6 +1575,9 @@ let settings = loadJSON('settings.json', {
   student_sra_submit_value: 'Search',
   google_oauth_client_id: '',
   google_oauth_client_secret: '',
+  subscription_oauth_enabled: true,
+  subscription_oauth_public_base_url: '',
+  subscription_oauth_default_scopes: 'openid profile email',
   gmail_public_base_url: '',
   gmail_max_accounts: 75,
   gmail_payment_scanner_enabled: true,
@@ -2237,6 +2240,15 @@ let socialAccounts = loadJSON('social_accounts.json', []);
 const saveSocialAccounts = () => saveJSON('social_accounts.json', socialAccounts);
 let socialOauthStates = loadJSON('social_oauth_states.json', []);
 const saveSocialOauthStates = () => saveJSON('social_oauth_states.json', socialOauthStates);
+let subscriptionOauthAccounts = loadJSON('subscription_oauth_accounts.json', []);
+if (!Array.isArray(subscriptionOauthAccounts)) subscriptionOauthAccounts = [];
+const saveSubscriptionOauthAccounts = () => saveJSON('subscription_oauth_accounts.json', subscriptionOauthAccounts);
+let subscriptionOauthStates = loadJSON('subscription_oauth_states.json', []);
+if (!Array.isArray(subscriptionOauthStates)) subscriptionOauthStates = [];
+const saveSubscriptionOauthStates = () => saveJSON('subscription_oauth_states.json', subscriptionOauthStates);
+let subscriptionOauthProviders = loadJSON('subscription_oauth_providers.json', []);
+if (!Array.isArray(subscriptionOauthProviders)) subscriptionOauthProviders = [];
+const saveSubscriptionOauthProviders = () => saveJSON('subscription_oauth_providers.json', subscriptionOauthProviders);
 let gmailAccounts = loadJSON('gmail_accounts.json', []);
 if (!Array.isArray(gmailAccounts)) gmailAccounts = [];
 const saveGmailAccounts = () => saveJSON('gmail_accounts.json', gmailAccounts);
@@ -18126,6 +18138,10 @@ async function buildWAConversationResponse(number, body, name) {
     reply = buildAIPlanIssueReply(number, name, body);
   } else if (isAIOrderTrackingIntent(text) && getLatestAIPlanOrderForNumber(number)) {
     reply = buildAIPlanOrderTrackingReply(number, body);
+  } else if (isSubscriptionOAuthIntent(text)) {
+    conv.botState = 'main_menu';
+    conv.botData = {};
+    reply = buildSubscriptionOAuthCustomerReply(number);
   } else if (isAIToolsAvailabilityIntent(text) && (findAIPlanForOrder(text, '', conv) || /\b(chatgpt|claude|perplexity|gemini|canva|turnitin|cursor|midjourney|ai tools?|subscription)\b/i.test(lower))) {
     conv.botState = 'ai_tools_menu';
     conv.botData = {};
@@ -29292,6 +29308,475 @@ function htmlEscape(value = '') {
   }[char]));
 }
 
+function normalizeSubscriptionProviderSlug(value = '') {
+  return String(value || 'custom')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'custom';
+}
+
+function splitOAuthScopes(value = '') {
+  if (Array.isArray(value)) return value.map(item => String(item || '').trim()).filter(Boolean);
+  return String(value || '')
+    .split(/[,\s]+/g)
+    .map(item => item.trim())
+    .filter(Boolean);
+}
+
+function subscriptionOAuthBaseUrl(req = null) {
+  const configured = String(
+    settings.subscription_oauth_public_base_url ||
+    process.env.SUBSCRIPTION_OAUTH_PUBLIC_BASE_URL ||
+    settings.social_public_base_url ||
+    process.env.SOCIAL_PUBLIC_BASE_URL ||
+    process.env.PUBLIC_BASE_URL ||
+    ''
+  ).trim().replace(/\/+$/g, '');
+  if (configured) return configured;
+  return req ? currentBaseUrl(req) : `http://localhost:${PORT}`;
+}
+
+function subscriptionOAuthRedirectUri(req = null, slug = 'custom') {
+  return `${subscriptionOAuthBaseUrl(req)}/api/subscription-oauth/callback/${encodeURIComponent(normalizeSubscriptionProviderSlug(slug))}`;
+}
+
+function normalizeSubscriptionOAuthProvider(input = {}) {
+  const slug = normalizeSubscriptionProviderSlug(input.slug || input.id || input.name || 'custom');
+  const scopes = splitOAuthScopes(input.scopes || input.scope || settings.subscription_oauth_default_scopes || process.env.SUBSCRIPTION_OAUTH_SCOPES || 'openid profile email');
+  return {
+    slug,
+    label: String(input.label || input.name || slug).trim(),
+    description: String(input.description || input.notes || 'OAuth subscription account provider').trim(),
+    authUrl: String(input.authUrl || input.authorizationUrl || input.auth_url || '').trim(),
+    tokenUrl: String(input.tokenUrl || input.token_url || '').trim(),
+    userInfoUrl: String(input.userInfoUrl || input.userinfoUrl || input.user_info_url || '').trim(),
+    clientId: String(input.clientId || input.client_id || '').trim(),
+    clientSecret: String(input.clientSecret || input.client_secret || '').trim(),
+    scopes,
+    responseType: String(input.responseType || input.response_type || 'code').trim(),
+    tokenAuth: String(input.tokenAuth || input.token_auth || 'body').trim().toLowerCase(),
+    enabled: input.enabled !== false,
+    icon: String(input.icon || 'key').trim(),
+    docsUrl: String(input.docsUrl || input.docs_url || '').trim(),
+    source: String(input.source || 'custom').trim()
+  };
+}
+
+function builtInSubscriptionOAuthProviders() {
+  return [
+    normalizeSubscriptionOAuthProvider({
+      slug: 'google',
+      label: 'Google Account',
+      description: 'Connect a user Google account for subscription identity/profile access.',
+      authUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
+      tokenUrl: 'https://oauth2.googleapis.com/token',
+      userInfoUrl: 'https://openidconnect.googleapis.com/v1/userinfo',
+      clientId: settings.google_oauth_client_id || process.env.GOOGLE_OAUTH_CLIENT_ID || '',
+      clientSecret: settings.google_oauth_client_secret || process.env.GOOGLE_OAUTH_CLIENT_SECRET || '',
+      scopes: splitOAuthScopes(process.env.SUBSCRIPTION_GOOGLE_SCOPES || 'openid email profile'),
+      source: 'template'
+    }),
+    normalizeSubscriptionOAuthProvider({
+      slug: 'github',
+      label: 'GitHub Account',
+      description: 'Connect GitHub identity for developer subscription/customer verification.',
+      authUrl: 'https://github.com/login/oauth/authorize',
+      tokenUrl: 'https://github.com/login/oauth/access_token',
+      userInfoUrl: 'https://api.github.com/user',
+      clientId: process.env.GITHUB_OAUTH_CLIENT_ID || '',
+      clientSecret: process.env.GITHUB_OAUTH_CLIENT_SECRET || '',
+      scopes: splitOAuthScopes(process.env.GITHUB_OAUTH_SCOPES || 'read:user user:email'),
+      source: 'template'
+    }),
+    normalizeSubscriptionOAuthProvider({
+      slug: normalizeSubscriptionProviderSlug(process.env.SUBSCRIPTION_OAUTH_PROVIDER_SLUG || 'custom'),
+      label: process.env.SUBSCRIPTION_OAUTH_PROVIDER_LABEL || 'Custom Subscription Provider',
+      description: 'Generic OAuth 2.0 provider configured with SUBSCRIPTION_OAUTH_* environment variables.',
+      authUrl: process.env.SUBSCRIPTION_OAUTH_AUTH_URL || '',
+      tokenUrl: process.env.SUBSCRIPTION_OAUTH_TOKEN_URL || '',
+      userInfoUrl: process.env.SUBSCRIPTION_OAUTH_USERINFO_URL || '',
+      clientId: process.env.SUBSCRIPTION_OAUTH_CLIENT_ID || '',
+      clientSecret: process.env.SUBSCRIPTION_OAUTH_CLIENT_SECRET || '',
+      scopes: splitOAuthScopes(process.env.SUBSCRIPTION_OAUTH_SCOPES || settings.subscription_oauth_default_scopes || 'openid profile email'),
+      source: 'env'
+    })
+  ];
+}
+
+function providersFromJsonConfig() {
+  const rows = [];
+  const rawValues = [
+    settings.subscription_oauth_providers_json,
+    process.env.SUBSCRIPTION_OAUTH_PROVIDERS_JSON
+  ].filter(Boolean);
+  for (const raw of rawValues) {
+    try {
+      const parsed = JSON.parse(String(raw));
+      const list = Array.isArray(parsed) ? parsed : Array.isArray(parsed.providers) ? parsed.providers : Object.values(parsed || {});
+      for (const item of list) rows.push(normalizeSubscriptionOAuthProvider({ ...item, source: item.source || 'json' }));
+    } catch (error) {
+      console.error('Subscription OAuth provider JSON parse failed:', error.message);
+    }
+  }
+  return rows;
+}
+
+function allSubscriptionOAuthProviders() {
+  const merged = new Map();
+  const sources = [
+    ...builtInSubscriptionOAuthProviders(),
+    ...providersFromJsonConfig(),
+    ...(Array.isArray(subscriptionOauthProviders) ? subscriptionOauthProviders.map(row => normalizeSubscriptionOAuthProvider(row)) : [])
+  ];
+  for (const provider of sources) {
+    if (!provider.slug) continue;
+    const existing = merged.get(provider.slug) || {};
+    merged.set(provider.slug, { ...existing, ...provider });
+  }
+  return [...merged.values()].filter(provider => provider.enabled !== false);
+}
+
+function findSubscriptionOAuthProvider(slug = '') {
+  const normalized = normalizeSubscriptionProviderSlug(slug);
+  return allSubscriptionOAuthProviders().find(provider => provider.slug === normalized) || null;
+}
+
+function subscriptionProviderReady(provider = {}) {
+  return Boolean(provider.enabled !== false && provider.authUrl && provider.tokenUrl && provider.clientId && provider.clientSecret);
+}
+
+function publicSubscriptionOAuthProvider(provider = {}, req = null) {
+  const ready = subscriptionProviderReady(provider);
+  const { clientSecret, ...safe } = provider;
+  return {
+    ...safe,
+    clientSecret: undefined,
+    hasClientSecret: Boolean(clientSecret),
+    configured: ready,
+    scopes: splitOAuthScopes(provider.scopes),
+    redirectUri: subscriptionOAuthRedirectUri(req, provider.slug),
+    connectUrl: ready ? `${subscriptionOAuthBaseUrl(req)}/api/subscription-oauth/connect/${encodeURIComponent(provider.slug)}` : '',
+    setupMissing: [
+      !provider.authUrl ? 'authUrl' : '',
+      !provider.tokenUrl ? 'tokenUrl' : '',
+      !provider.clientId ? 'clientId' : '',
+      !clientSecret ? 'clientSecret' : ''
+    ].filter(Boolean)
+  };
+}
+
+function publicSubscriptionOAuthAccount(account = {}) {
+  const { accessToken, refreshToken, idToken, rawTokenData, rawUserInfo, clientSecret, ...safe } = account;
+  return {
+    ...safe,
+    accessTokenMasked: maskSecret(accessToken || ''),
+    refreshTokenMasked: maskSecret(refreshToken || ''),
+    idTokenMasked: maskSecret(idToken || ''),
+    hasAccessToken: Boolean(accessToken),
+    hasRefreshToken: Boolean(refreshToken),
+    hasIdToken: Boolean(idToken),
+    tokenPreview: maskSecret(accessToken || refreshToken || idToken || ''),
+    userInfoPreview: rawUserInfo ? {
+      id: rawUserInfo.sub || rawUserInfo.id || rawUserInfo.login || '',
+      email: rawUserInfo.email || '',
+      name: rawUserInfo.name || rawUserInfo.login || rawUserInfo.display_name || ''
+    } : null
+  };
+}
+
+function cleanupSubscriptionOauthStates() {
+  const now = Date.now();
+  subscriptionOauthStates = (subscriptionOauthStates || [])
+    .filter(row => Date.parse(row.expiresAt || 0) > now)
+    .slice(0, 200);
+  saveSubscriptionOauthStates();
+}
+
+function createSubscriptionOAuthState(input = {}) {
+  cleanupSubscriptionOauthStates();
+  const provider = normalizeSubscriptionProviderSlug(input.provider || 'custom');
+  const state = `${provider}-${cryptoRandomHex(16)}`;
+  const now = Date.now();
+  subscriptionOauthStates.unshift({
+    state,
+    provider,
+    userId: String(input.userId || '').trim(),
+    customerNumber: normalizeNumber(input.customerNumber || input.number || ''),
+    returnUrl: String(input.returnUrl || '').trim(),
+    createdAt: new Date(now).toISOString(),
+    expiresAt: new Date(now + 15 * 60 * 1000).toISOString()
+  });
+  saveSubscriptionOauthStates();
+  return state;
+}
+
+function consumeSubscriptionOAuthState(state = '', fallbackProvider = '') {
+  const value = String(state || '').trim();
+  const idx = (subscriptionOauthStates || []).findIndex(row => row.state === value);
+  if (idx < 0) throw new Error('OAuth state expired or invalid. Please start connection again.');
+  const row = subscriptionOauthStates[idx];
+  subscriptionOauthStates.splice(idx, 1);
+  saveSubscriptionOauthStates();
+  if (Date.parse(row.expiresAt || 0) < Date.now()) throw new Error('OAuth state expired. Please start connection again.');
+  return { ...row, provider: normalizeSubscriptionProviderSlug(row.provider || fallbackProvider) };
+}
+
+function buildSubscriptionOAuthUrl(req, slug = 'custom', options = {}) {
+  const provider = findSubscriptionOAuthProvider(slug);
+  if (!provider) throw new Error(`Subscription OAuth provider not found: ${slug}`);
+  if (!subscriptionProviderReady(provider)) throw new Error(`${provider.label} OAuth setup incomplete: ${publicSubscriptionOAuthProvider(provider, req).setupMissing.join(', ')}`);
+  const state = createSubscriptionOAuthState({
+    provider: provider.slug,
+    userId: options.userId || req.query.userId || req.query.user || '',
+    customerNumber: options.customerNumber || req.query.customerNumber || req.query.number || req.query.wa || '',
+    returnUrl: options.returnUrl || req.query.returnUrl || ''
+  });
+  const params = new URLSearchParams({
+    response_type: provider.responseType || 'code',
+    client_id: provider.clientId,
+    redirect_uri: subscriptionOAuthRedirectUri(req, provider.slug),
+    state
+  });
+  const scopes = splitOAuthScopes(provider.scopes);
+  if (scopes.length) params.set('scope', scopes.join(provider.slug === 'github' ? ' ' : ' '));
+  if (provider.slug === 'google') params.set('access_type', 'offline');
+  if (provider.slug === 'google') params.set('prompt', 'consent');
+  return `${provider.authUrl}${provider.authUrl.includes('?') ? '&' : '?'}${params.toString()}`;
+}
+
+async function exchangeSubscriptionOAuthCode(provider = {}, code = '', redirectUri = '') {
+  const body = new URLSearchParams({
+    grant_type: 'authorization_code',
+    code,
+    redirect_uri: redirectUri,
+    client_id: provider.clientId
+  });
+  const headers = { Accept: 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' };
+  if (String(provider.tokenAuth || 'body').toLowerCase() === 'basic') {
+    headers.Authorization = `Basic ${Buffer.from(`${provider.clientId}:${provider.clientSecret}`).toString('base64')}`;
+  } else {
+    body.set('client_secret', provider.clientSecret);
+  }
+  const response = await fetchOutbound(provider.tokenUrl, { method: 'POST', headers, body: body.toString() });
+  const text = await response.text();
+  let data = {};
+  try {
+    data = JSON.parse(text);
+  } catch {
+    data = Object.fromEntries(new URLSearchParams(text));
+  }
+  if (!response.ok || data.error) throw new Error(data.error_description || data.error || `Token exchange failed (${response.status})`);
+  if (!data.access_token && !data.id_token) throw new Error('OAuth provider did not return an access token.');
+  return data;
+}
+
+async function fetchSubscriptionUserInfo(provider = {}, accessToken = '') {
+  if (!provider.userInfoUrl || !accessToken) return {};
+  const response = await fetchOutbound(provider.userInfoUrl, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      Accept: 'application/json',
+      'User-Agent': 'SuperSenderPro-SubscriptionOAuth/1.0'
+    }
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || data.error) throw new Error(data.error_description || data.error?.message || data.message || `User info failed (${response.status})`);
+  return data;
+}
+
+function subscriptionSubjectFromUserInfo(userInfo = {}) {
+  return String(userInfo.sub || userInfo.id || userInfo.login || userInfo.email || userInfo.username || '').trim();
+}
+
+function upsertSubscriptionOAuthAccount({ provider = {}, tokenData = {}, userInfo = {}, stateRow = {} } = {}) {
+  const now = new Date().toISOString();
+  const subject = subscriptionSubjectFromUserInfo(userInfo) || `unknown-${uuid()}`;
+  const id = `${provider.slug}:${subject}`.replace(/\s+/g, '-');
+  const existingIndex = subscriptionOauthAccounts.findIndex(row => row.id === id || (row.provider === provider.slug && row.subject === subject));
+  const existing = existingIndex >= 0 ? subscriptionOauthAccounts[existingIndex] : {};
+  const expiresAt = tokenData.expires_in
+    ? new Date(Date.now() + Number(tokenData.expires_in) * 1000).toISOString()
+    : existing.expiresAt || '';
+  const account = {
+    ...existing,
+    id,
+    provider: provider.slug,
+    providerLabel: provider.label,
+    subject,
+    name: userInfo.name || userInfo.login || userInfo.display_name || userInfo.email || existing.name || provider.label,
+    email: userInfo.email || existing.email || '',
+    avatarUrl: userInfo.picture || userInfo.avatar_url || existing.avatarUrl || '',
+    customerNumber: stateRow.customerNumber || existing.customerNumber || '',
+    userId: stateRow.userId || existing.userId || '',
+    accessToken: tokenData.access_token || existing.accessToken || '',
+    refreshToken: tokenData.refresh_token || existing.refreshToken || '',
+    idToken: tokenData.id_token || existing.idToken || '',
+    scope: tokenData.scope || splitOAuthScopes(provider.scopes).join(' '),
+    tokenType: tokenData.token_type || existing.tokenType || 'Bearer',
+    expiresAt,
+    rawTokenData: tokenData,
+    rawUserInfo: userInfo,
+    status: 'connected',
+    source: 'oauth',
+    createdAt: existing.createdAt || now,
+    updatedAt: now,
+    lastConnectedAt: now
+  };
+  if (existingIndex >= 0) subscriptionOauthAccounts[existingIndex] = account;
+  else subscriptionOauthAccounts.unshift(account);
+  saveSubscriptionOauthAccounts();
+  return account;
+}
+
+async function refreshSubscriptionOAuthAccount(accountId = '') {
+  const idx = subscriptionOauthAccounts.findIndex(row => row.id === accountId || row.subject === accountId);
+  if (idx < 0) throw new Error('Subscription OAuth account not found.');
+  const account = subscriptionOauthAccounts[idx];
+  const provider = findSubscriptionOAuthProvider(account.provider);
+  if (!provider) throw new Error(`Provider no longer exists: ${account.provider}`);
+  if (!account.refreshToken) throw new Error('This account has no refresh token. Ask the user to connect again.');
+  const body = new URLSearchParams({
+    grant_type: 'refresh_token',
+    refresh_token: account.refreshToken,
+    client_id: provider.clientId
+  });
+  const headers = { Accept: 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' };
+  if (String(provider.tokenAuth || 'body').toLowerCase() === 'basic') {
+    headers.Authorization = `Basic ${Buffer.from(`${provider.clientId}:${provider.clientSecret}`).toString('base64')}`;
+  } else {
+    body.set('client_secret', provider.clientSecret);
+  }
+  const response = await fetchOutbound(provider.tokenUrl, { method: 'POST', headers, body: body.toString() });
+  const raw = await response.text();
+  let data = {};
+  try {
+    data = JSON.parse(raw);
+  } catch {
+    data = Object.fromEntries(new URLSearchParams(raw));
+  }
+  if (!response.ok || data.error) throw new Error(data.error_description || data.error || `Refresh failed (${response.status})`);
+  account.accessToken = data.access_token || account.accessToken;
+  account.refreshToken = data.refresh_token || account.refreshToken;
+  account.idToken = data.id_token || account.idToken || '';
+  account.scope = data.scope || account.scope || '';
+  account.expiresAt = data.expires_in ? new Date(Date.now() + Number(data.expires_in) * 1000).toISOString() : account.expiresAt || '';
+  account.rawTokenData = { ...(account.rawTokenData || {}), refreshed: data };
+  account.status = 'connected';
+  account.updatedAt = new Date().toISOString();
+  saveSubscriptionOauthAccounts();
+  return account;
+}
+
+function subscriptionOAuthResultHtml({ ok, title, message, accounts = [], error = '' }) {
+  const accountRows = accounts.length
+    ? `<ul>${accounts.map(row => `<li><b>${htmlEscape(row.providerLabel || row.provider)}</b>: ${htmlEscape(row.name || row.email || row.subject)}<small>${htmlEscape(row.email || row.customerNumber || row.subject || '')}</small></li>`).join('')}</ul>`
+    : '';
+  return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${htmlEscape(title)}</title><style>body{font-family:Inter,Arial,sans-serif;background:#071014;color:#eaf7f3;display:grid;place-items:center;min-height:100vh;margin:0}.card{max-width:820px;background:#122029;border:1px solid #263946;border-radius:18px;padding:28px;box-shadow:0 20px 80px rgba(0,0,0,.35)}.ok{color:#2dd4bf}.bad{color:#fb7185}a{color:#2dd4bf}li{margin:8px 0}small{color:#94a3b8;display:block;margin-top:2px}pre{white-space:pre-wrap;background:#071014;padding:12px;border-radius:12px;border:1px solid #263946}</style></head><body><div class="card"><h1 class="${ok ? 'ok' : 'bad'}">${htmlEscape(title)}</h1><p>${htmlEscape(message)}</p>${accountRows}${error ? `<pre>${htmlEscape(error)}</pre>` : ''}<p><a href="/subscription-oauth">Back to Subscription OAuth Vault</a></p></div></body></html>`;
+}
+
+function buildSubscriptionOAuthPage(req, notice = '') {
+  const providers = allSubscriptionOAuthProviders().map(provider => publicSubscriptionOAuthProvider(provider, req));
+  const accounts = subscriptionOauthAccounts.map(publicSubscriptionOAuthAccount);
+  const providerCards = providers.map(provider => `
+    <section class="card">
+      <div class="row"><div><h2>${htmlEscape(provider.label)}</h2><p>${htmlEscape(provider.description)}</p></div><span class="${provider.configured ? 'ok' : 'warn'}">${provider.configured ? 'Ready' : 'Setup needed'}</span></div>
+      <p><b>Slug:</b> ${htmlEscape(provider.slug)}<br><b>Scopes:</b> ${htmlEscape((provider.scopes || []).join(' ') || '-')}<br><b>Redirect:</b> <code>${htmlEscape(provider.redirectUri)}</code></p>
+      ${provider.setupMissing?.length ? `<p class="warn">Missing: ${htmlEscape(provider.setupMissing.join(', '))}</p>` : ''}
+      ${provider.configured ? `<a class="btn" href="${htmlEscape(provider.connectUrl)}">Connect ${htmlEscape(provider.label)}</a>` : '<span class="btn disabled">Add Client ID/Secret first</span>'}
+    </section>`).join('');
+  const accountRows = accounts.length ? accounts.map(account => `
+    <tr><td><b>${htmlEscape(account.providerLabel || account.provider)}</b><small>${htmlEscape(account.id)}</small></td><td>${htmlEscape(account.name || '-')}<small>${htmlEscape(account.email || account.customerNumber || '')}</small></td><td>${htmlEscape(account.status || 'connected')}</td><td>${htmlEscape(account.expiresAt || 'No expiry')}</td><td><button onclick="refreshAccount('${htmlEscape(account.id)}')">Refresh</button><button class="danger" onclick="deleteAccount('${htmlEscape(account.id)}')">Remove</button></td></tr>
+  `).join('') : '<tr><td colspan="5" class="muted">No subscription accounts connected yet.</td></tr>';
+  return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Subscription OAuth Vault</title>
+  <style>body{margin:0;background:#071014;color:#eaf7f3;font-family:Inter,Arial,sans-serif}.wrap{max-width:1180px;margin:0 auto;padding:26px}.top{display:flex;justify-content:space-between;gap:16px;align-items:center}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}.card{background:#122029;border:1px solid #263946;border-radius:16px;padding:18px;margin:14px 0}.row{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.btn,button{background:#14b88a;color:#06211a;border:0;border-radius:10px;padding:10px 14px;font-weight:800;text-decoration:none;display:inline-block;margin:4px;cursor:pointer}.secondary{background:#263946;color:#eaf7f3}.danger{background:#3b1d25;color:#fb7185}.disabled{background:#334155;color:#94a3b8;cursor:not-allowed}.ok{color:#2dd4bf}.warn{color:#fbbf24}.muted,small{color:#94a3b8}code,pre{background:#071014;border:1px solid #263946;border-radius:10px;padding:3px 6px;white-space:pre-wrap}input,textarea,select{width:100%;box-sizing:border-box;background:#071014;color:#eaf7f3;border:1px solid #365264;border-radius:10px;padding:10px;margin:6px 0 12px}table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid #263946;padding:10px;text-align:left}</style></head><body><div class="wrap">
+    <div class="top"><div><h1>Subscription OAuth Vault</h1><p class="muted">Users can connect subscription/identity accounts through official OAuth providers. Tokens stay server-side.</p></div><a class="btn secondary" href="/">Dashboard</a></div>
+    ${notice ? `<section class="card ok">${htmlEscape(notice)}</section>` : ''}
+    <div class="grid">${providerCards}</div>
+    <section class="card"><h2>Add / Update Custom Provider</h2><form id="providerForm">
+      <label>Slug</label><input name="slug" placeholder="my-provider" required>
+      <label>Label</label><input name="label" placeholder="My Subscription Provider" required>
+      <label>Authorization URL</label><input name="authUrl" placeholder="https://provider.com/oauth/authorize" required>
+      <label>Token URL</label><input name="tokenUrl" placeholder="https://provider.com/oauth/token" required>
+      <label>User Info URL</label><input name="userInfoUrl" placeholder="https://provider.com/oauth/userinfo">
+      <label>Client ID</label><input name="clientId" required>
+      <label>Client Secret</label><input name="clientSecret" type="password" required>
+      <label>Scopes</label><input name="scopes" placeholder="openid profile email">
+      <button type="submit">Save Provider</button><span id="saveResult" class="muted"></span>
+    </form></section>
+    <section class="card"><h2>Connected Accounts</h2><table><thead><tr><th>Provider</th><th>User</th><th>Status</th><th>Expiry</th><th>Action</th></tr></thead><tbody>${accountRows}</tbody></table></section>
+  </div><script>
+  async function api(path, options){ const res = await fetch(path, { headers:{'Content-Type':'application/json'}, ...options }); const data = await res.json().catch(()=>({})); if(!res.ok || data.success===false) throw new Error(data.error || 'Request failed'); return data; }
+  document.getElementById('providerForm').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const body = Object.fromEntries(new FormData(event.target).entries());
+    try { await api('/api/subscription-oauth/providers', { method:'POST', body: JSON.stringify(body) }); document.getElementById('saveResult').textContent='Saved. Refreshing...'; setTimeout(()=>location.reload(), 600); }
+    catch(error){ document.getElementById('saveResult').textContent=error.message; }
+  });
+  async function deleteAccount(id){ if(!confirm('Remove connected account?')) return; await api('/api/subscription-oauth/accounts/'+encodeURIComponent(id), { method:'DELETE' }); location.reload(); }
+  async function refreshAccount(id){ try { await api('/api/subscription-oauth/accounts/'+encodeURIComponent(id)+'/refresh', { method:'POST' }); location.reload(); } catch(error){ alert(error.message); } }
+  </script></body></html>`;
+}
+
+function buildSubscriptionConnectReply(providerSlug = '') {
+  const providers = allSubscriptionOAuthProviders();
+  const ready = providers.filter(subscriptionProviderReady);
+  const wanted = providerSlug ? findSubscriptionOAuthProvider(providerSlug) : ready[0];
+  const base = subscriptionOAuthBaseUrl(null);
+  const lines = providers.map(provider => `${provider.slug === wanted?.slug ? '>' : '-'} ${provider.label} (${provider.slug}) ${subscriptionProviderReady(provider) ? 'ready' : 'setup needed'}`).join('\n');
+  const connectLine = wanted && subscriptionProviderReady(wanted)
+    ? `\nConnect link:\n${base}/api/subscription-oauth/connect/${encodeURIComponent(wanted.slug)}`
+    : '\nNo provider is ready yet. Add OAuth Client ID/Secret on /subscription-oauth.';
+  return `🔐 *Subscription OAuth Vault*
+
+Connected accounts: ${subscriptionOauthAccounts.length}
+Providers:
+${lines || 'No providers configured.'}
+${connectLine}
+
+Dashboard:
+${base}/subscription-oauth`;
+}
+
+function formatSubscriptionOauthStatusReply() {
+  const providers = allSubscriptionOAuthProviders();
+  const ready = providers.filter(subscriptionProviderReady).length;
+  const recent = subscriptionOauthAccounts.slice(0, 6).map((account, index) => `${index + 1}. ${account.providerLabel || account.provider} - ${account.name || account.email || account.subject} (${account.status || 'connected'})`).join('\n');
+  return `🔐 *Subscription OAuth Status*
+
+Providers: ${ready}/${providers.length} ready
+Connected accounts: ${subscriptionOauthAccounts.length}
+Runtime store: data/subscription_oauth_accounts.json
+
+${recent || 'No connected subscription accounts yet.'}
+
+Commands:
+!connectsub google
+!connectsub github
+!suboauth`;
+}
+
+function isSubscriptionOAuthIntent(text = '') {
+  const lower = String(text || '').toLowerCase();
+  return /(connect|link|login|oauth|authorize).*(subscription|account|tool|google|github|chatgpt|claude|canva)|(?:apna|meri|my).*(account|subscription).*(connect|link|login)|subscription\s+account/i.test(lower);
+}
+
+function buildSubscriptionOAuthCustomerReply(number = '') {
+  const ready = allSubscriptionOAuthProviders().filter(subscriptionProviderReady);
+  const base = subscriptionOAuthBaseUrl(null);
+  const link = ready[0]
+    ? `${base}/api/subscription-oauth/connect/${encodeURIComponent(ready[0].slug)}?customerNumber=${encodeURIComponent(normalizeNumber(number || ''))}`
+    : `${base}/subscription-oauth`;
+  return `🔐 *Account Connect / OAuth*
+
+Aap apna subscription account official OAuth ke zariye connect kar sakte hain.
+
+Connect link:
+${link}
+
+Note: Token server-side safe rahega. Agar provider ready nahi hai to admin ko OAuth Client ID/Secret add karna hoga.`;
+}
+
 const GMAIL_OAUTH_SCOPES = [
   'openid',
   'email',
@@ -31341,7 +31826,7 @@ function splitSocialCommandArgs(text = '') {
 }
 
 function isWhatsAppSocialCommand(text = '') {
-  return /^!(social|connect|post|draft|approvepost|sharepost|poststatus|comment|telegram|control|admin|menuadmin|server|status|health|complete|completion|setupcheck|setupvalidator|setupfix|doctor|watchdog|cloudapi|officialwa|next50|antigravity|aihub|automationhub|agents|agentcontrol|agenttask|autobuild|claw|claws|zeroclaw|pcagents|importskills|skillpacks|packs|waauto|automation|autosettings|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelfix|channelwatch|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
+  return /^!(social|connect|suboauth|subscriptionoauth|subaccounts|connectsub|post|draft|approvepost|sharepost|poststatus|comment|telegram|control|admin|menuadmin|server|status|health|complete|completion|setupcheck|setupvalidator|setupfix|doctor|watchdog|cloudapi|officialwa|next50|antigravity|aihub|automationhub|agents|agentcontrol|agenttask|autobuild|claw|claws|zeroclaw|pcagents|importskills|skillpacks|packs|waauto|automation|autosettings|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelfix|channelwatch|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
 }
 
 function adminNumberCandidates() {
@@ -34103,6 +34588,16 @@ ${result.failures?.length ? '\n' + result.failures.map(f => `❌ ${f.channelId}:
       return true;
     }
 
+    if (command === '!suboauth' || command === '!subscriptionoauth' || command === '!subaccounts') {
+      await reply(formatSubscriptionOauthStatusReply());
+      return true;
+    }
+
+    if (command === '!connectsub') {
+      await reply(buildSubscriptionConnectReply(args[1] || ''));
+      return true;
+    }
+
     if (command === '!poststatus') {
       const rows = (socialCommandDrafts || []).slice(0, 8);
       const lines = rows.length ? rows.map(row => `${row.status === 'published' ? 'âœ…' : row.status === 'failed' ? 'âŒ' : 'ðŸ“'} *${row.code}* â€” ${row.status} â€” ${socialPlatformDisplay(row.platforms)} â€” ${row.topic || row.caption.slice(0, 50)}`).join('\n') : 'No WhatsApp social drafts yet.';
@@ -34602,6 +35097,135 @@ app.get('/api/social/status', (req, res) => {
     recentPosts: socialPosts.slice(0, 5),
     recentEvents: socialEvents.slice(0, 5)
   });
+});
+
+app.get('/subscription-oauth', (req, res) => {
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.send(buildSubscriptionOAuthPage(req, req.query.connected ? 'Subscription account connected successfully.' : ''));
+});
+
+app.get('/api/subscription-oauth/status', (req, res) => {
+  const providers = allSubscriptionOAuthProviders().map(provider => publicSubscriptionOAuthProvider(provider, req));
+  const accounts = subscriptionOauthAccounts.map(publicSubscriptionOAuthAccount);
+  res.json({
+    success: true,
+    enabled: settings.subscription_oauth_enabled !== false,
+    publicBaseUrl: subscriptionOAuthBaseUrl(req),
+    providersReady: providers.filter(provider => provider.configured).length,
+    providersTotal: providers.length,
+    connectedAccounts: accounts.length,
+    providers,
+    accounts
+  });
+});
+
+app.get('/api/subscription-oauth/providers', (req, res) => {
+  const providers = allSubscriptionOAuthProviders().map(provider => publicSubscriptionOAuthProvider(provider, req));
+  res.json({
+    success: true,
+    publicBaseUrl: subscriptionOAuthBaseUrl(req),
+    providers
+  });
+});
+
+app.post('/api/subscription-oauth/providers', (req, res) => {
+  try {
+    const body = req.body || {};
+    const slug = normalizeSubscriptionProviderSlug(body.slug || body.id || body.label);
+    if (!slug) return res.status(400).json({ success: false, error: 'Provider slug is required.' });
+    const existingIndex = subscriptionOauthProviders.findIndex(row => normalizeSubscriptionProviderSlug(row.slug || row.id) === slug);
+    const existing = existingIndex >= 0 ? subscriptionOauthProviders[existingIndex] : {};
+    const incomingSecret = String(body.clientSecret || body.client_secret || '').trim();
+    const provider = normalizeSubscriptionOAuthProvider({
+      ...existing,
+      ...body,
+      slug,
+      clientSecret: incomingSecret && incomingSecret !== '********' ? incomingSecret : existing.clientSecret,
+      source: 'saved'
+    });
+    if (!provider.authUrl || !provider.tokenUrl || !provider.clientId || !provider.clientSecret) {
+      return res.status(400).json({ success: false, error: 'authUrl, tokenUrl, clientId, and clientSecret are required.' });
+    }
+    if (existingIndex >= 0) subscriptionOauthProviders[existingIndex] = provider;
+    else subscriptionOauthProviders.unshift(provider);
+    saveSubscriptionOauthProviders();
+    res.json({ success: true, provider: publicSubscriptionOAuthProvider(provider, req), providers: allSubscriptionOAuthProviders().map(item => publicSubscriptionOAuthProvider(item, req)) });
+  } catch (error) {
+    console.error('Subscription OAuth provider save failed:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/subscription-oauth/connect/:provider', (req, res) => {
+  try {
+    if (settings.subscription_oauth_enabled === false) return res.status(403).send(subscriptionOAuthResultHtml({ ok: false, title: 'OAuth disabled', message: 'Subscription OAuth is disabled in settings.' }));
+    const url = buildSubscriptionOAuthUrl(req, req.params.provider);
+    res.redirect(url);
+  } catch (error) {
+    console.error('Subscription OAuth connect failed:', error);
+    res.status(400).send(subscriptionOAuthResultHtml({ ok: false, title: 'Connection setup needed', message: 'OAuth connect link could not be generated.', error: error.message }));
+  }
+});
+
+app.get('/api/subscription-oauth/callback/:provider', async (req, res) => {
+  try {
+    if (req.query.error) {
+      throw new Error(`${req.query.error}: ${req.query.error_description || req.query.error_message || 'OAuth provider denied the request.'}`);
+    }
+    const code = String(req.query.code || '').trim();
+    if (!code) throw new Error('OAuth callback did not include a code.');
+    const stateRow = consumeSubscriptionOAuthState(req.query.state || '', req.params.provider);
+    const provider = findSubscriptionOAuthProvider(stateRow.provider || req.params.provider);
+    if (!provider) throw new Error(`Provider not found: ${stateRow.provider || req.params.provider}`);
+    const redirectUri = subscriptionOAuthRedirectUri(req, provider.slug);
+    const tokenData = await exchangeSubscriptionOAuthCode(provider, code, redirectUri);
+    const userInfo = await fetchSubscriptionUserInfo(provider, tokenData.access_token).catch(error => {
+      console.error('Subscription OAuth userinfo failed:', error.message);
+      return {};
+    });
+    const account = upsertSubscriptionOAuthAccount({ provider, tokenData, userInfo, stateRow });
+    logs.push({ id: uuid(), type: 'subscription_oauth_connected', provider: provider.slug, accountId: account.id, customerNumber: account.customerNumber || '', time: new Date().toISOString() });
+    saveJSON('logs.json', logs);
+    res.send(subscriptionOAuthResultHtml({
+      ok: true,
+      title: 'Subscription Account Connected',
+      message: `${provider.label} account connected successfully. You can close this tab.`,
+      accounts: [publicSubscriptionOAuthAccount(account)]
+    }));
+  } catch (error) {
+    console.error('Subscription OAuth callback failed:', error);
+    res.status(400).send(subscriptionOAuthResultHtml({ ok: false, title: 'OAuth connection failed', message: 'Could not connect this subscription account.', error: error.message }));
+  }
+});
+
+app.get('/api/subscription-oauth/accounts', (req, res) => {
+  const provider = String(req.query.provider || '').trim() ? normalizeSubscriptionProviderSlug(req.query.provider || '') : '';
+  const customerNumber = normalizeNumber(req.query.customerNumber || req.query.number || '');
+  const userId = String(req.query.userId || req.query.user || '').trim();
+  let rows = subscriptionOauthAccounts;
+  if (provider) rows = rows.filter(row => row.provider === provider);
+  if (customerNumber) rows = rows.filter(row => normalizeNumber(row.customerNumber || '') === customerNumber);
+  if (userId) rows = rows.filter(row => String(row.userId || '') === userId);
+  res.json({ success: true, accounts: rows.map(publicSubscriptionOAuthAccount), connected: rows.length });
+});
+
+app.post('/api/subscription-oauth/accounts/:id/refresh', async (req, res) => {
+  try {
+    const account = await refreshSubscriptionOAuthAccount(req.params.id);
+    res.json({ success: true, account: publicSubscriptionOAuthAccount(account) });
+  } catch (error) {
+    console.error('Subscription OAuth refresh failed:', error);
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.delete('/api/subscription-oauth/accounts/:id', (req, res) => {
+  const id = String(req.params.id || '');
+  const before = subscriptionOauthAccounts.length;
+  subscriptionOauthAccounts = subscriptionOauthAccounts.filter(row => row.id !== id && row.subject !== id);
+  saveSubscriptionOauthAccounts();
+  res.json({ success: true, removed: before - subscriptionOauthAccounts.length, connected: subscriptionOauthAccounts.length });
 });
 
 app.get('/social-connect', (req, res) => {

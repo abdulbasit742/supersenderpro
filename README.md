@@ -1335,3 +1335,16 @@ Two more competitor-grade modules in `/lib/loyaltyProgram.js`, `/lib/webhookDisp
 - **DELETE** `/api/connect/webhooks/:id` — Remove a webhook.
 - **POST** `/api/connect/webhooks/dispatch` — Manually dispatch a test event.
 - **GET** `/api/connect/webhook-logs` — Recent delivery logs (status, errors).
+
+## Subscription OAuth Vault
+
+Customers can connect OAuth-capable subscription or identity accounts through `/subscription-oauth`. The server stores connected account tokens in ignored runtime JSON and only exposes masked token previews through the API.
+
+WhatsApp admin commands:
+
+- `!suboauth` — show provider/account status.
+- `!connectsub google` — generate a Google connect link.
+- `!connectsub github` — generate a GitHub connect link.
+- `!connectsub custom` — generate a custom provider connect link.
+
+Setup details are in [docs/subscription-oauth-vault.md](docs/subscription-oauth-vault.md).
