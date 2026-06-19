@@ -1264,3 +1264,38 @@ The Wati router is mounted under `/api` in `server.js` and exposes the following
 - **GET** `/api/wati/leads/:phone/summary` — Run the AI Copilot Thread Summarizer for a customer.
 - **POST** `/api/wati/leads/:phone/escalate` — Mute the bot, auto-assign an agent, and send a WhatsApp handoff notification.
 - **POST** `/api/wati/leads/:phone/unmute` — Unmute the WhatsApp bot to re-enable automated replies.
+
+
+## Sales Intelligence & Operations Suite
+
+A new analytics-driven layer in `/lib/leadScoring.js`, `/lib/businessHours.js`, `/lib/cxScore.js`, and `/routes/intelligence.js` brings the lead-prioritization, operations, and conversation-quality intelligence found in HubSpot, Kommo, Wati, and Respond.io.
+
+### Core Capabilities
+
+1. **Predictive Lead Scoring (Lead Prioritization)**
+   - Scores every contact 0–100 using an RFM model (Recency, Frequency, Monetary) blended with pipeline-stage intent and engagement signals.
+   - Buckets leads into 🔥 **Hot** (70+), 🌤 **Warm** (40–69), and ❄️ **Cold** (<40) so reps always work the highest-intent contacts first.
+   - Applies penalties for opted-out or blocked contacts, and can persist scores back to the lead profile for dashboard sorting.
+
+2. **Business Hours & Away-Message Auto-Responder**
+   - Configurable weekly working hours, timezone (default `Asia/Karachi`), and holiday calendar.
+   - Inbound messages arriving outside business hours receive a single, friendly away message stating expected response time — with a per-contact cooldown to prevent reply spam.
+   - Live open/closed status endpoint for dashboards and health checks.
+
+3. **AI Conversation Quality (CX) Score**
+   - Grades each conversation 0–100 (A–F) across three weighted signals: **Responsiveness** (reply gaps), **Sentiment** (tone), and **Resolution** (positive/closed outcome).
+   - Surfaces at-risk conversations (grade D/F) and a store-wide CX overview with grade distribution and average score.
+
+### Express REST API Endpoints (mounted under `/api`)
+
+- **GET** `/api/intelligence/lead-score/:phone` — Score a single lead with full breakdown.
+- **GET** `/api/intelligence/lead-scores` — Ranked list of all leads by score.
+- **GET** `/api/intelligence/hot-leads` — Only the hottest leads (configurable threshold).
+- **POST** `/api/intelligence/lead-score/sync` — Persist a lead's score to its profile.
+- **GET** `/api/intelligence/lead-score-distribution` — Hot/Warm/Cold distribution + average.
+- **GET** `/api/intelligence/business-hours` — Get business-hours config + live status.
+- **POST** `/api/intelligence/business-hours` — Update hours, timezone, holidays, away message.
+- **GET** `/api/intelligence/business-hours/status` — Live open/closed status.
+- **POST** `/api/intelligence/business-hours/handle-inbound` — Send away message for an out-of-hours inbound.
+- **GET** `/api/intelligence/cx-score/:phone` — CX quality score for one conversation.
+- **GET** `/api/intelligence/cx-overview` — Store-wide CX overview + at-risk conversations.
