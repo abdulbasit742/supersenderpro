@@ -33,6 +33,7 @@ Get the live machine-readable list from `GET /api/flow-studio/node-types`.
 | Method | Route | Purpose |
 |---|---|---|
 | GET | `/api/flow-studio/status` | Counts + integration readiness |
+| GET | `/api/flow-studio/doctor` | Launch-readiness score, invalid flows, missing integrations and next actions |
 | GET | `/api/flow-studio/node-types` | All node definitions |
 | GET | `/api/flow-studio/flows` | List flows |
 | GET | `/api/flow-studio/flows/:id` | Get one flow |
@@ -73,6 +74,15 @@ A sample flow is in [`docs/flow-studio-sample-flow.json`](./flow-studio-sample-f
 4. Select a node to edit its **label** and **config JSON** in the right Inspector.
 5. Click **Save**, then **Run Test (Dry run)** to simulate — nothing is sent.
 6. Click **Activate** to enable live execution; live runs require `status === "active"` **and** `{ "live": true }`.
+
+## Launch Doctor
+
+Use the dashboard **Launch Doctor** button or call `GET /api/flow-studio/doctor`.
+It checks active flows, invalid flow validation errors, missing integrations,
+recent failed runs, paused approval packets and practical next actions before
+launch. API responses are also normalized through the project text-repair path
+so common UTF-8 mojibake in labels, icons and logs is cleaned before the
+dashboard renders it.
 
 ## How to connect n8n / Sheets / social / ecommerce
 

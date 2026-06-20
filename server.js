@@ -48080,6 +48080,22 @@ function maskSecretsDeep(value) {
   return value;
 }
 
+function cleanFlowStudioPayload(value) {
+  if (value == null) return value;
+  if (typeof value === 'string') return cleanOutgoingText(value);
+  if (Array.isArray(value)) return value.map(cleanFlowStudioPayload);
+  if (typeof value === 'object') {
+    const out = {};
+    for (const [key, child] of Object.entries(value)) out[key] = cleanFlowStudioPayload(child);
+    return out;
+  }
+  return value;
+}
+
+function flowStudioJson(value) {
+  return cleanFlowStudioPayload(maskSecretsDeep(value));
+}
+
 async function executeFlowNode(node, context) {
   const { live, log } = context;
   const cfg = node.config || {};
@@ -48345,19 +48361,115 @@ function buildFlowStudioStatus() {
   };
 }
 
+function buildFlowStudioDoctor() {
+  const flows = loadFlowStudioFlows();
+  const runs = loadFlowStudioRuns();
+  const templates = loadFlowStudioTemplates();
+  const status = buildFlowStudioStatus();
+  const validationRows = flows.map(flow => ({ flow, validation: validateFlow(flow) }));
+  const invalidFlows = validationRows.filter(row => !row.validation.valid);
+  const recentRuns = runs.slice(-50);
+  const recentFailed = recentRuns.filter(run => run.status === 'failed');
+  const pausedApprovals = runs.filter(run => run.status === 'paused_approval').slice(-20);
+  const missingIntegrations = Object.entries(status.integrationsReady || {})
+    .filter(([, ready]) => !ready)
+    .map(([name]) => name);
+  const warnings = [];
+  const nextActions = [];
+
+  if (!flows.length) {
+    warnings.push('No flows created yet.');
+    nextActions.push('Install one template, run dry test, then activate only after review.');
+  }
+  if (!status.activeFlows) {
+    warnings.push('No active flows.');
+    nextActions.push('Activate one verified flow when you are ready for live automation.');
+  }
+  if (invalidFlows.length) {
+    warnings.push(`${invalidFlows.length} flow(s) have validation errors.`);
+    nextActions.push('Open invalid flows, add a trigger node and fix missing/unknown node IDs.');
+  }
+  if (missingIntegrations.length) {
+    warnings.push(`Missing integrations: ${missingIntegrations.join(', ')}.`);
+    nextActions.push('Complete credentials for missing integrations in Settings before live runs.');
+  }
+  if (recentRuns.length && recentFailed.length / recentRuns.length > 0.2) {
+    warnings.push('Recent flow failure rate is above 20%.');
+    nextActions.push('Use dry runs and inspect failed logs before activating more flows.');
+  }
+  if (pausedApprovals.length) {
+    warnings.push(`${pausedApprovals.length} approval packet(s) waiting.`);
+    nextActions.push('Review paused approval packets before enabling auto-posting.');
+  }
+
+  const readinessScore = Math.max(0, Math.min(100,
+    45
+    + Math.min(20, status.activeFlows * 10)
+    + Math.min(15, status.totalRuns ? 15 : 0)
+    + Math.round((Object.values(status.integrationsReady || {}).filter(Boolean).length / Math.max(1, Object.keys(status.integrationsReady || {}).length)) * 20)
+    - invalidFlows.length * 12
+    - recentFailed.length * 3
+  ));
+
+  const level = readinessScore >= 85 ? 'launch-ready' : readinessScore >= 65 ? 'almost-ready' : readinessScore >= 40 ? 'needs-setup' : 'not-ready';
+
+  return {
+    success: true,
+    generatedAt: new Date().toISOString(),
+    readinessScore,
+    level,
+    summary: {
+      flowCount: status.flowCount,
+      activeFlows: status.activeFlows,
+      totalRuns: status.totalRuns,
+      failedRuns: status.failedRuns,
+      templateCount: templates.length,
+      nodeTypes: status.nodeTypes,
+      queuePending: status.queuePending
+    },
+    integrationsReady: status.integrationsReady,
+    missingIntegrations,
+    invalidFlows: invalidFlows.map(row => ({
+      id: row.flow.id,
+      name: row.flow.name,
+      errors: row.validation.errors
+    })),
+    recentFailures: recentFailed.slice(-10).reverse().map(run => ({
+      id: run.id,
+      flowId: run.flowId,
+      flowName: run.flowName,
+      error: run.error || 'Unknown error',
+      finishedAt: run.finishedAt
+    })),
+    pausedApprovals: pausedApprovals.reverse().map(run => ({
+      runId: run.id,
+      flowId: run.flowId,
+      flowName: run.flowName,
+      approvalPacket: run.approvalPacket
+    })),
+    warnings,
+    nextActions: Array.from(new Set(nextActions))
+  };
+}
+
 // ---- Routes ------------------------------------------------------
 app.get('/api/flow-studio/status', (_req, res) => {
-  try { res.json(buildFlowStudioStatus()); }
+  try { res.json(flowStudioJson(buildFlowStudioStatus())); }
   catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
 app.get('/api/flow-studio/node-types', (_req, res) => {
-  try { res.json({ success: true, categories: getFlowStudioNodeTypes() }); }
+  try { res.json(flowStudioJson({ success: true, categories: getFlowStudioNodeTypes() })); }
+  catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.get('/api/flow-studio/doctor', (_req, res) => {
+  try { res.json(flowStudioJson(buildFlowStudioDoctor())); }
   catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
 app.get('/api/flow-studio/flows', (_req, res) => {
-  try { res.json({ success: true, flows: loadFlowStudioFlows() }); }
+  try { res.json(flowStudioJson({ success: true, flows: loadFlowStudioFlows() })); }
   catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
@@ -48365,7 +48477,7 @@ app.get('/api/flow-studio/flows/:id', (req, res) => {
   try {
     const flow = loadFlowStudioFlows().find(f => f.id === req.params.id);
     if (!flow) return res.status(404).json({ success: false, error: 'Flow not found' });
-    res.json({ success: true, flow });
+    res.json(flowStudioJson({ success: true, flow }));
   } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
@@ -48376,7 +48488,7 @@ app.post('/api/flow-studio/flows', (req, res) => {
     const flows = loadFlowStudioFlows();
     flows.push(flow);
     saveFlowStudioFlows(flows);
-    res.json({ success: true, flow, validation });
+    res.json(flowStudioJson({ success: true, flow, validation }));
   } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
@@ -48388,7 +48500,7 @@ app.put('/api/flow-studio/flows/:id', (req, res) => {
     const updated = normalizeFlowInput(req.body || {}, flows[idx]);
     flows[idx] = updated;
     saveFlowStudioFlows(flows);
-    res.json({ success: true, flow: updated, validation: validateFlow(updated) });
+    res.json(flowStudioJson({ success: true, flow: updated, validation: validateFlow(updated) }));
   } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
@@ -48412,7 +48524,7 @@ app.post('/api/flow-studio/flows/:id/activate', (req, res) => {
     flow.status = 'active';
     flow.updatedAt = new Date().toISOString();
     saveFlowStudioFlows(flows);
-    res.json({ success: true, flow });
+    res.json(flowStudioJson({ success: true, flow }));
   } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
@@ -48424,21 +48536,21 @@ app.post('/api/flow-studio/flows/:id/pause', (req, res) => {
     flow.status = 'paused';
     flow.updatedAt = new Date().toISOString();
     saveFlowStudioFlows(flows);
-    res.json({ success: true, flow });
+    res.json(flowStudioJson({ success: true, flow }));
   } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
 app.post('/api/flow-studio/flows/:id/run-test', async (req, res) => {
   try {
     const result = await runFlow(req.params.id, req.body?.input || {}, { live: false });
-    res.json(result);
+    res.json(flowStudioJson(result));
   } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
 app.post('/api/flow-studio/flows/:id/run', async (req, res) => {
   try {
     const result = await runFlow(req.params.id, req.body?.input || {}, { live: req.body?.live === true });
-    res.json(result);
+    res.json(flowStudioJson(result));
   } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
@@ -48447,12 +48559,12 @@ app.get('/api/flow-studio/runs', (req, res) => {
     const limit = Math.max(1, Math.min(500, Number(req.query.limit || 100)));
     let runs = loadFlowStudioRuns();
     if (req.query.flowId) runs = runs.filter(r => r.flowId === req.query.flowId);
-    res.json({ success: true, runs: runs.slice(-limit).reverse() });
+    res.json(flowStudioJson({ success: true, runs: runs.slice(-limit).reverse() }));
   } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
 app.get('/api/flow-studio/templates', (_req, res) => {
-  try { res.json({ success: true, templates: loadFlowStudioTemplates() }); }
+  try { res.json(flowStudioJson({ success: true, templates: loadFlowStudioTemplates() })); }
   catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
@@ -48460,7 +48572,7 @@ app.post('/api/flow-studio/templates/:id/install', (req, res) => {
   try {
     const flow = installFlowTemplate(req.params.id);
     if (!flow) return res.status(404).json({ success: false, error: 'Template not found' });
-    res.json({ success: true, flow });
+    res.json(flowStudioJson({ success: true, flow }));
   } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 

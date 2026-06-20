@@ -4444,6 +4444,7 @@ curl -X POST http://localhost:3001/mcp/send \
       <button class="btn btn-secondary" onclick="fsSaveFlow()">💾 Save</button>
       <button class="btn btn-secondary" onclick="fsRunTest()">🧪 Run Test (Dry run)</button>
       <button class="btn btn-secondary" onclick="fsToggleActivate()" id="fs-activate-btn">▶ Activate</button>
+      <button class="btn btn-secondary" onclick="fsRenderDoctor()">🩺 Launch Doctor</button>
       <button class="btn btn-secondary" onclick="fsViewLogs()">📜 View Logs</button>
       <button class="btn btn-secondary" onclick="fsExportJSON()">⬇ Export JSON</button>
       <button class="btn btn-secondary" onclick="document.getElementById('fs-import-file').click()">⬆ Import JSON</button>
@@ -4453,6 +4454,7 @@ curl -X POST http://localhost:3001/mcp/send \
 
   <!-- Dashboard stats -->
   <div class="grid" id="fs-stats" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:10px"></div>
+  <div class="card" id="fs-doctor" style="display:none;margin-bottom:10px"></div>
 
   <!-- Builder layout -->
   <div class="grid" style="display:grid;grid-template-columns:220px 1fr 280px;gap:10px;align-items:start">
@@ -17208,6 +17210,7 @@ async function loadFlowStudio() {
     fsRenderCanvas();
     fsRenderInspector();
     await fsRenderStats();
+    await fsRenderDoctor(false);
     await fsRenderTemplates();
     await fsViewLogs();
   } catch (e) { toast('Flow Studio load failed: ' + e.message, 'error'); }
@@ -17230,6 +17233,47 @@ async function fsRenderStats() {
       `<div class="card" style="padding:10px"><div style="font-size:11px;opacity:.7">${k}</div><div style="font-size:20px;font-weight:700">${v}</div></div>`).join('');
     document.getElementById('fs-ready-badge').innerText = readyCount > 0 ? 'Automation ready' : 'Setup needed';
   } catch (e) { /* silent */ }
+}
+
+async function fsRenderDoctor(showToast = true) {
+  const box = document.getElementById('fs-doctor');
+  if (!box) return;
+  try {
+    const d = await api('/api/flow-studio/doctor');
+    const score = Number(d.readinessScore || 0);
+    const color = score >= 85 ? '#16a34a' : score >= 65 ? '#d97706' : '#ef4444';
+    const missing = d.missingIntegrations || [];
+    const warnings = d.warnings || [];
+    const actions = d.nextActions || [];
+    const readyRows = Object.entries(d.integrationsReady || {})
+      .map(([name, ready]) => `<span class="tag ${ready ? 'tag-green' : 'tag-orange'}" style="margin:2px">${escHtml(name)}: ${ready ? 'ready' : 'missing'}</span>`)
+      .join('');
+    box.style.display = 'block';
+    box.innerHTML = `
+      <div class="flex-between" style="gap:10px;align-items:flex-start;flex-wrap:wrap">
+        <div>
+          <div class="card-title" style="margin:0">Launch Doctor</div>
+          <div style="font-size:12px;opacity:.7">Flow automation readiness, validation and integration health.</div>
+        </div>
+        <div style="font-size:26px;font-weight:800;color:${color}">${score}%</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin:10px 0">
+        <div><div style="font-size:11px;opacity:.65">Level</div><b>${escHtml(d.level || 'unknown')}</b></div>
+        <div><div style="font-size:11px;opacity:.65">Active flows</div><b>${escHtml(String(d.summary?.activeFlows || 0))}</b></div>
+        <div><div style="font-size:11px;opacity:.65">Templates</div><b>${escHtml(String(d.summary?.templateCount || 0))}</b></div>
+        <div><div style="font-size:11px;opacity:.65">Failed runs</div><b>${escHtml(String(d.summary?.failedRuns || 0))}</b></div>
+      </div>
+      <div style="margin:8px 0">${readyRows || '<span class="tag tag-orange">No integration status</span>'}</div>
+      ${missing.length ? `<div style="font-size:12px;color:#fbbf24;margin-top:6px">Missing: ${escHtml(missing.join(', '))}</div>` : ''}
+      ${warnings.length ? `<div style="margin-top:8px"><b>Warnings</b><ul style="margin:6px 0 0 18px">${warnings.map(w => `<li>${escHtml(w)}</li>`).join('')}</ul></div>` : ''}
+      ${actions.length ? `<div style="margin-top:8px"><b>Next actions</b><ul style="margin:6px 0 0 18px">${actions.map(a => `<li>${escHtml(a)}</li>`).join('')}</ul></div>` : '<div style="margin-top:8px;color:#16a34a">No critical action required.</div>'}
+    `;
+    if (showToast) toast('Launch Doctor refreshed', 'success');
+  } catch (e) {
+    box.style.display = 'block';
+    box.innerHTML = `<div class="card-title" style="margin:0">Launch Doctor</div><div style="color:#ef4444;margin-top:6px">Doctor failed: ${escHtml(e.message)}</div>`;
+    if (showToast) toast('Launch Doctor failed: ' + e.message, 'error');
+  }
 }
 
 function fsRenderLibrary() {
