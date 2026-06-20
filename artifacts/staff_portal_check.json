@@ -1,0 +1,229 @@
+{
+  "generatedAt": "2026-06-20T17:06:51.652Z",
+  "passed": 44,
+  "failed": 0,
+  "total": 44,
+  "strict": "false",
+  "checks": [
+    {
+      "name": "file lib/staffPortal/store.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/staffPortal/staffPortalModel.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/staffPortal/staffPortalService.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/staffPortal/statusSummaryPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/staffPortal/profileStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/staffPortal/attendanceStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/staffPortal/shiftStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/staffPortal/leaveStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/staffPortal/leaveRequestPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/staffPortal/payrollSummaryPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/staffPortal/payslipMetadataPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/staffPortal/commissionSummaryPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/staffPortal/expenseStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/staffPortal/expenseRequestPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/staffPortal/taskStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/staffPortal/sopStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/staffPortal/branchAssignmentPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/staffPortal/approvalStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/staffPortal/documentRequestPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/staffPortal/contractStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/staffPortal/hrSupportRequestPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/staffPortal/messageDrafts.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/staffPortal/auditPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/staffPortal/redactor.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file routes/staffPortalRoutes.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/staff-portal.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/js/staff-portal.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/css/staff-portal.css",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "server hook present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "route module loads",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "service functions exported",
+      "ok": true,
+      "detail": "all present"
+    },
+    {
+      "name": "redactor functions exist",
+      "ok": true,
+      "detail": "all present"
+    },
+    {
+      "name": "status dryRun true",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "status liveActionsEnabled false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "status staffPortalPublicLive false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "status externalCallsEnabled false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "mask phone",
+      "ok": true,
+      "detail": "+92******4567"
+    },
+    {
+      "name": "mask email",
+      "ok": true,
+      "detail": "st***@example.com"
+    },
+    {
+      "name": "mask cnic",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "mask bank ref",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "mask salary",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "mask payment ref",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "mask document ref",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no PII/secret leak",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}

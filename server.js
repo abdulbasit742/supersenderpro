@@ -3096,6 +3096,18 @@ try {
 }
 // END CUSTOMER PORTAL HOOK
 
+// BEGIN STAFF PORTAL HOOK
+// Staff Portal + Employee Self-Service HR Center (preview-only: no payroll/attendance/leave/expense mutation, no sends, PII masked).
+try {
+  const staffPortalRoutes = require('./routes/staffPortalRoutes');
+  app.use('/api/staff-portal', staffPortalRoutes);
+  app.get('/staff-portal.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'staff-portal.html')));
+  console.log('[StaffPortal] mounted at /api/staff-portal (preview-only, PII masked, no live actions)');
+} catch (e) {
+  console.error('[StaffPortal] failed to initialise (non-fatal):', e.message);
+}
+// END STAFF PORTAL HOOK
+
 
 let searchIndexRebuildTimer = null;
 function scheduleSearchIndexRebuild(reason = 'data-change', delayMs = Number(process.env.SEARCH_REBUILD_DEBOUNCE_MS || 30000)) {

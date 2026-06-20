@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Staff Portal — SuperSender Pro</title>
+<link rel="stylesheet" href="/css/staff-portal.css" />
+</head>
+<body>
+<header class="sp-hero">
+  <div class="sp-hero-inner">
+    <h1>Employee Self-Service Portal</h1>
+    <p class="sp-sub">Check your HR &amp; work status anytime. This is a <strong>safe preview</strong> — your private details (salary, CNIC, bank) are masked, nothing is submitted, and no message is sent.</p>
+    <div id="sp-safety-badges" class="sp-badges"></div>
+  </div>
+</header>
+
+<main class="sp-main">
+  <section class="sp-card sp-lookup">
+    <h2>Check your status</h2>
+    <form id="sp-lookup-form" class="sp-form">
+      <label class="sp-field">Lookup method
+        <select id="sp-mode">
+          <option value="demo_preview">Demo preview</option>
+          <option value="preview_token">Preview token</option>
+          <option value="masked_phone_lookup_preview">Masked phone</option>
+          <option value="employee_code_preview">Employee code</option>
+        </select>
+      </label>
+      <label class="sp-field">Reference / token <input id="sp-ref" placeholder="preview only" /></label>
+      <button type="submit" class="sp-btn">Check Status Preview</button>
+    </form>
+    <div id="sp-profile" class="sp-profile"></div>
+    <div id="sp-error" class="sp-error" hidden></div>
+  </section>
+
+  <section id="sp-kpis" class="sp-kpis"></section>
+
+  <div class="sp-grid">
+    <section class="sp-card"><h3>🕒 Attendance</h3><div id="sp-attendance" class="sp-list"></div></section>
+    <section class="sp-card"><h3>📆 Shifts</h3><div id="sp-shifts" class="sp-list"></div></section>
+    <section class="sp-card"><h3>🌴 Leave Balance</h3><div id="sp-leave" class="sp-list"></div></section>
+    <section class="sp-card"><h3>💵 Payroll &amp; Payslips</h3><div id="sp-payroll" class="sp-list"></div></section>
+    <section class="sp-card"><h3>📈 Commission</h3><div id="sp-commission" class="sp-list"></div></section>
+    <section class="sp-card"><h3>🧾 Expenses</h3><div id="sp-expenses" class="sp-list"></div></section>
+    <section class="sp-card"><h3>✅ Assigned Tasks</h3><div id="sp-tasks" class="sp-list"></div></section>
+    <section class="sp-card"><h3>📋 SOP Checklists</h3><div id="sp-sops" class="sp-list"></div></section>
+    <section class="sp-card"><h3>🏢 Branch Assignment</h3><div id="sp-branch" class="sp-list"></div></section>
+    <section class="sp-card"><h3>🗂️ Approvals</h3><div id="sp-approvals" class="sp-list"></div></section>
+    <section class="sp-card"><h3>📄 Contracts &amp; Documents</h3><div id="sp-documents" class="sp-list"></div></section>
+  </div>
+
+  <section class="sp-card">
+    <h2>Need something? Create a safe preview request</h2>
+    <p class="sp-muted">All actions below are previews/drafts only. <strong>Contact HR to complete any real action.</strong></p>
+    <div class="sp-actions">
+      <button class="sp-btn ghost" data-draft="leave">Draft Leave Request</button>
+      <button class="sp-btn ghost" data-draft="expense">Draft Expense Request</button>
+      <button class="sp-btn ghost" data-draft="hr">Draft HR Support Request</button>
+      <button class="sp-btn ghost" data-draft="message">Draft Message</button>
+      <button class="sp-btn ghost" data-draft="document">View Document Request Preview</button>
+    </div>
+    <div id="sp-draft-out" class="sp-draft-out"></div>
+  </section>
+
+  <footer class="sp-footer">
+    <p>🔒 No payroll change · No leave/expense submitted · No message sent · Salary, CNIC &amp; bank details masked · External calls disabled.</p>
+  </footer>
+</main>
+
+<script src="/js/staff-portal.js"></script>
+</body>
+</html>

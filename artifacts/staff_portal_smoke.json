@@ -1,0 +1,153 @@
+{
+  "generatedAt": "2026-06-20T17:06:51.990Z",
+  "passed": 29,
+  "failed": 0,
+  "total": 29,
+  "results": [
+    {
+      "name": "require service module",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require redactor",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require route module",
+      "pass": true,
+      "detail": "loaded"
+    },
+    {
+      "name": "getStaffPortalStatus works + safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "lookupStaffPreview works + masked",
+      "pass": true,
+      "detail": "preview_token"
+    },
+    {
+      "name": "getStaffSummaryPreview works (modules ok)",
+      "pass": true,
+      "detail": "leave 12"
+    },
+    {
+      "name": "leave request preview liveLeaveMutation false",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "expense request preview liveExpenseMutation false",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "payroll livePayrollMutation + livePaymentAction false",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "attendance no checkin/checkout/mutation",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "HR support preview liveTicketCreation false",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "document request preview liveDocumentDownload false",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "message draft preview liveSend false",
+      "pass": true,
+      "detail": "+92******4567"
+    },
+    {
+      "name": "getProfilePreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getShiftStatusPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getLeaveStatusPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getPayslipMetadataPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getCommissionSummaryPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getExpenseStatusPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getTaskStatusPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getSopStatusPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getBranchAssignmentPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getApprovalStatusPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getDocumentStatusPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getContractStatusPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "audit preview no live write",
+      "pass": true,
+      "detail": "7 entries"
+    },
+    {
+      "name": "redactor masking examples",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "no full PII in aggregate blob",
+      "pass": true,
+      "detail": "clean"
+    },
+    {
+      "name": "missing-module fallback does not crash",
+      "pass": true,
+      "detail": "ok"
+    }
+  ]
+}

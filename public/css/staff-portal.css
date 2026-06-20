@@ -1,0 +1,48 @@
+/* public/css/staff-portal.css — Clean, staff-friendly SaaS styling. Mobile responsive. */
+:root{
+  --bg:#f4f6fb; --card:#ffffff; --line:#e3e8f1; --text:#1b2433; --muted:#65728c;
+  --accent:#0d9488; --accent-d:#0b7d72; --ok:#16a34a; --warn:#d97706; --bad:#dc2626;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#0b1220; --card:#111c30; --line:#1d2940; --text:#e6edf7; --muted:#8da2c0; --accent:#14b8a6; --accent-d:#0d9488; }
+}
+*{ box-sizing:border-box; }
+body{ margin:0; background:var(--bg); color:var(--text); font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif; line-height:1.5; }
+.sp-hero{ background:linear-gradient(135deg,var(--accent),var(--accent-d)); color:#fff; padding:36px 20px; }
+.sp-hero-inner{ max-width:1080px; margin:0 auto; }
+.sp-hero h1{ margin:0 0 8px; font-size:26px; }
+.sp-sub{ margin:0 0 14px; opacity:.95; max-width:700px; font-size:14px; }
+.sp-badges{ display:flex; gap:8px; flex-wrap:wrap; }
+.sp-badge{ font-size:11px; padding:5px 10px; border-radius:999px; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.3); }
+.sp-main{ max-width:1080px; margin:0 auto; padding:20px; }
+.sp-card{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px; margin-bottom:16px; }
+.sp-card h2{ margin:0 0 12px; font-size:18px; } .sp-card h3{ margin:0 0 10px; font-size:15px; }
+.sp-muted{ color:var(--muted); font-size:13px; }
+.sp-form{ display:grid; grid-template-columns:1fr; gap:10px; }
+@media(min-width:640px){ .sp-form{ grid-template-columns:1fr 1fr auto; align-items:end; } }
+.sp-field{ display:flex; flex-direction:column; gap:5px; font-size:12px; color:var(--muted); }
+.sp-field input,.sp-field select{ background:var(--bg); border:1px solid var(--line); color:var(--text); padding:10px; border-radius:9px; font-family:inherit; font-size:14px; }
+.sp-btn{ background:var(--accent); color:#fff; border:none; padding:11px 16px; border-radius:9px; cursor:pointer; font-size:14px; font-weight:600; }
+.sp-btn:hover{ background:var(--accent-d); }
+.sp-btn.ghost{ background:transparent; color:var(--accent); border:1px solid var(--accent); font-weight:500; }
+.sp-profile{ margin-top:14px; font-size:14px; }
+.sp-profile .row{ display:flex; gap:8px; flex-wrap:wrap; color:var(--muted); } .sp-profile .row b{ color:var(--text); }
+.sp-error{ margin-top:12px; background:rgba(220,38,38,.08); border:1px solid var(--bad); color:var(--bad); padding:10px 12px; border-radius:9px; font-size:13px; }
+.sp-kpis{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:16px; }
+@media(min-width:640px){ .sp-kpis{ grid-template-columns:repeat(3,1fr); } }
+@media(min-width:980px){ .sp-kpis{ grid-template-columns:repeat(5,1fr); } }
+.sp-kpi{ background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; }
+.sp-kpi .k{ font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; }
+.sp-kpi .v{ font-size:24px; font-weight:700; margin-top:4px; }
+.sp-grid{ display:grid; grid-template-columns:1fr; gap:16px; }
+@media(min-width:760px){ .sp-grid{ grid-template-columns:1fr 1fr; } }
+.sp-list{ display:flex; flex-direction:column; gap:8px; }
+.sp-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px; border:1px solid var(--line); border-radius:10px; background:var(--bg); font-size:13px; }
+.sp-row .id{ font-family:ui-monospace,monospace; color:var(--muted); }
+.sp-empty{ color:var(--muted); font-size:13px; font-style:italic; padding:8px 0; }
+.badge{ font-size:11px; padding:3px 9px; border-radius:999px; border:1px solid var(--line); white-space:nowrap; }
+.badge.ok{ color:var(--ok); border-color:var(--ok); } .badge.warn{ color:var(--warn); border-color:var(--warn); } .badge.bad{ color:var(--bad); border-color:var(--bad); }
+.sp-actions{ display:flex; flex-wrap:wrap; gap:10px; margin:12px 0; }
+.sp-draft-out{ background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:14px; font-size:13px; white-space:pre-wrap; min-height:20px; display:none; }
+.sp-draft-out.show{ display:block; }
+.sp-footer{ text-align:center; color:var(--muted); font-size:12px; padding:16px 0; }

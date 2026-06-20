@@ -42,7 +42,9 @@
     "whatsapp-cloud-setup:check": "node scripts/whatsapp-cloud-setup-check.js",
     "whatsapp-cloud-setup:smoke": "node tests/smoke/whatsappCloudSetupSmoke.js",
     "customer-portal:check": "node scripts/customer-portal-check.js",
-    "customer-portal:smoke": "node tests/smoke/customerPortalSmoke.js"
+    "customer-portal:smoke": "node tests/smoke/customerPortalSmoke.js",
+    "staff-portal:check": "node scripts/staff-portal-check.js",
+    "staff-portal:smoke": "node tests/smoke/staffPortalSmoke.js"
   },
   "dependencies": {
     "@whiskeysockets/baileys": "^7.0.0-rc.9",
