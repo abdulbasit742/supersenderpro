@@ -1,0 +1,51 @@
+{
+  "generatedAt": "2026-06-20T06:20:00Z",
+  "repo": "abdulbasit742/supersenderpro",
+  "scannedAreas": [
+    "server.js",
+    "public/",
+    "routes/",
+    "lib/",
+    "docs/",
+    "scripts/",
+    ".env.example",
+    "package.json"
+  ],
+  "existingRelatedFeatures": {
+    "whatsapp_system": "exists (wa-sales-bot, whatsapp-ai-tools-bot, bots) \u2014 DO NOT rebuild",
+    "ai_providers": "exists (lib/aiAgent.js, lib/storeAIAgent.js, ai/) \u2014 reuse only",
+    "crm_customers_orders": "exists (lib/storeCRM.js, lib/txnStore.js, lib/kommoCRM.js) \u2014 adapter only",
+    "flow_studio": "exists (docs/superflow-studio.md, docs/flow-studio-sample-flow.json) \u2014 add nodes only",
+    "ecommerce_hub": "exists (lib/storeBuilder.js, lib/productBotEngine.js) \u2014 adapter only",
+    "admin_commands": "exists in server.js / bots \u2014 add hooks only",
+    "local_worker_bridge": "exists (scripts/live, mcp/) \u2014 adapter only, never touch auth"
+  },
+  "voiceAI": {
+    "providerRegistry": "missing -> created (lib/voiceAI/providerRegistry.js + providerConfig.js + providers/*)",
+    "ttsEngine": "missing -> created",
+    "sttEngine": "missing -> created",
+    "conversationManager": "missing -> created",
+    "voiceAgents": "missing -> created (agentRegistry/router/prompts)",
+    "templates": "missing -> created (urdu/roman_urdu/english)",
+    "consent_optin": "missing -> created (consentStore/consentGuard/optInGuard)",
+    "queue_approvals": "missing -> created (voiceQueue/approvalWorkflow/scheduler)",
+    "whatsapp_voice_adapter": "missing -> created (safe adapter, no session touch)",
+    "telegram_social_channel_adapters": "missing -> created (drafts only)",
+    "ecommerce_voice": "missing -> created (ecommerceVoice/productVoiceover/orderVoiceAssistant)",
+    "flow_studio_nodes": "missing -> created (lib/voiceAI/flowNodes.js)",
+    "dashboard_ui": "missing -> created (public/voice-ai.html + js/css)",
+    "api_routes": "missing -> created (routes/voiceAIRoutes.js)",
+    "admin_commands": "missing -> created (lib/voiceAI/adminCommands.js, hooks only)",
+    "audit_logs": "missing -> created (auditLog/historyStore)",
+    "reliability": "missing -> created (retry/doctor/cleanup)",
+    "doctor_healthcheck": "missing -> created (scripts/voice-ai-check.js + /api/voice-ai/doctor)",
+    "reports": "missing -> created (reportBuilder.js)",
+    "env_placeholders": "missing -> added to .env.example",
+    "smoke_tests": "missing -> created (tests/smoke/voiceAISmoke.js)"
+  },
+  "flags": {
+    "duplicate_risk": "none \u2014 no existing lib/voiceAI or voice-ai routes/pages found",
+    "privacy_risk": "controlled \u2014 consent-first, redaction, no raw audio storage by default",
+    "live_action_risk": "controlled \u2014 dry-run + approval-protected by default, no external calls"
+  }
+}

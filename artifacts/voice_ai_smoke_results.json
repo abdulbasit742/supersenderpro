@@ -1,0 +1,98 @@
+{
+  "generatedAt": "2026-06-20T06:33:22.534Z",
+  "passed": 18,
+  "failed": 0,
+  "total": 18,
+  "results": [
+    {
+      "name": "require route module",
+      "pass": true,
+      "detail": "loaded"
+    },
+    {
+      "name": "require barrel + core modules",
+      "pass": true,
+      "detail": "providers=10"
+    },
+    {
+      "name": "provider registry has mock_dry_run default",
+      "pass": true,
+      "detail": "mock_dry_run"
+    },
+    {
+      "name": "dry-run TTS preview",
+      "pass": true,
+      "detail": {}
+    },
+    {
+      "name": "tts dryRun true",
+      "pass": true,
+      "detail": "dry-run"
+    },
+    {
+      "name": "TTS preview redacts phone/email",
+      "pass": true,
+      "detail": "Assalam o Alaikum, call me at [REDACTED_PHONE_*567] or me***@[REDACTED_EMAIL]"
+    },
+    {
+      "name": "TTS preview has no audioUrl (dry-run)",
+      "pass": true,
+      "detail": "null"
+    },
+    {
+      "name": "dry-run STT preview",
+      "pass": true,
+      "detail": "dry-run"
+    },
+    {
+      "name": "STT returns intent + sentiment",
+      "pass": true,
+      "detail": "complaint/negative"
+    },
+    {
+      "name": "STT does not store transcript by default",
+      "pass": true,
+      "detail": "not stored"
+    },
+    {
+      "name": "create voice queue draft",
+      "pass": true,
+      "detail": "vq_1781937202531_iznzo6"
+    },
+    {
+      "name": "queue draft requires approval + dry-run",
+      "pass": true,
+      "detail": "approval_pending + dryRun"
+    },
+    {
+      "name": "voice cloning blocked without consent",
+      "pass": true,
+      "detail": "blocked"
+    },
+    {
+      "name": "external provider denied by default",
+      "pass": true,
+      "detail": "live_provider_disabled"
+    },
+    {
+      "name": "admin command !voicestatus works",
+      "pass": true,
+      "detail": "Voice AI status: Dry-run ON hai. 4 drafts pending hain. Live sending disabled hai."
+    },
+    {
+      "name": "template render works",
+      "pass": true,
+      "detail": "Assalam o Alaikum Ali! SuperSender mein khush aamdeed."
+    },
+    {
+      "name": "no PII leak in combined previews",
+      "pass": true,
+      "detail": "clean"
+    },
+    {
+      "name": "doctor runs",
+      "pass": true,
+      "detail": "checks=18 healthy=true"
+    }
+  ]
+}

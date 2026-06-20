@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Voice AI Command Center — SuperSender Pro</title>
+  <link rel="stylesheet" href="/css/voice-ai.css" />
+</head>
+<body>
+  <header class="va-header">
+    <div class="va-brand">
+      <span class="va-logo">🎙️</span>
+      <div>
+        <h1>Voice AI Command Center</h1>
+        <p class="va-sub">Client voice chat · AI voice agents · TTS / STT · ElevenLabs &amp; multi-provider</p>
+      </div>
+    </div>
+    <div id="va-status-pill" class="va-pill va-pill-safe">Loading…</div>
+  </header>
+
+  <main class="va-main">
+    <!-- 1. Overview cards -->
+    <section class="va-section">
+      <h2>Overview</h2>
+      <div class="va-cards" id="va-overview"></div>
+    </section>
+
+    <!-- 2. Provider status -->
+    <section class="va-section">
+      <h2>Providers</h2>
+      <div class="va-table-wrap"><table class="va-table" id="va-providers">
+        <thead><tr><th>Provider</th><th>Capabilities</th><th>Key</th><th>Status</th><th>Risk</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+    </section>
+
+    <div class="va-grid-2">
+      <!-- 4. TTS generator -->
+      <section class="va-section va-card">
+        <h2>TTS Generator <span class="va-badge va-badge-warn">Dry-run</span></h2>
+        <textarea id="tts-text" rows="3" placeholder="Type a message to convert to voice (dry-run preview)"></textarea>
+        <div class="va-row">
+          <select id="tts-language"><option value="roman_urdu">Roman Urdu</option><option value="urdu">Urdu</option><option value="english">English</option></select>
+          <select id="tts-tone"><option value="professional">Professional</option><option value="friendly">Friendly</option><option value="enthusiastic">Enthusiastic</option><option value="calm">Calm</option></select>
+          <select id="tts-provider"></select>
+        </div>
+        <button class="va-btn" onclick="VoiceAI.ttsPreview()">Generate Preview</button>
+        <pre class="va-out" id="tts-out"></pre>
+      </section>
+
+      <!-- 5. STT analyzer -->
+      <section class="va-section va-card">
+        <h2>Voice Note Analyzer <span class="va-badge va-badge-warn">Dry-run</span></h2>
+        <input id="stt-source" placeholder="Source type (whatsapp / upload / telegram)" value="whatsapp" />
+        <input id="stt-customer" placeholder="Customer ID (optional)" />
+        <input id="stt-mime" placeholder="Audio mime type (e.g. audio/ogg)" value="audio/ogg" />
+        <button class="va-btn" onclick="VoiceAI.sttPreview()">Analyze (dry-run)</button>
+        <pre class="va-out" id="stt-out"></pre>
+      </section>
+    </div>
+
+    <!-- 6. Voice queue -->
+    <section class="va-section">
+      <h2>Voice Queue / Approvals</h2>
+      <div class="va-table-wrap"><table class="va-table" id="va-queue">
+        <thead><tr><th>ID</th><th>Type</th><th>Channel</th><th>Preview</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+    </section>
+
+    <!-- 3. Voice conversations -->
+    <section class="va-section">
+      <h2>Voice Conversations</h2>
+      <div class="va-table-wrap"><table class="va-table" id="va-conversations">
+        <thead><tr><th>Customer</th><th>Channel</th><th>Transcript</th><th>Intent</th><th>Sentiment</th><th>Status</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+    </section>
+
+    <div class="va-grid-2">
+      <!-- 7. Templates -->
+      <section class="va-section va-card">
+        <h2>Voice Templates</h2>
+        <select id="tpl-language" onchange="VoiceAI.loadTemplates()">
+          <option value="">All languages</option><option value="roman_urdu">Roman Urdu</option><option value="urdu">Urdu</option><option value="english">English</option>
+        </select>
+        <div id="va-templates" class="va-templates"></div>
+      </section>
+
+      <!-- 8. Ecommerce voiceover -->
+      <section class="va-section va-card">
+        <h2>Ecommerce / Product Voiceover <span class="va-badge va-badge-warn">Dry-run</span></h2>
+        <input id="vo-product" placeholder="Product name" />
+        <input id="vo-price" placeholder="Price (optional)" />
+        <input id="vo-highlight" placeholder="Highlight (e.g. best seller)" />
+        <button class="va-btn" onclick="VoiceAI.productVoiceover()">Build Script</button>
+        <pre class="va-out" id="vo-out"></pre>
+      </section>
+    </div>
+
+    <!-- 10. Logs / doctor -->
+    <section class="va-section">
+      <h2>Doctor &amp; Audit Log</h2>
+      <button class="va-btn va-btn-ghost" onclick="VoiceAI.runDoctor()">Run Doctor</button>
+      <button class="va-btn va-btn-ghost" onclick="VoiceAI.loadAudit()">Refresh Audit</button>
+      <pre class="va-out" id="doctor-out"></pre>
+      <div id="va-audit" class="va-audit"></div>
+    </section>
+
+    <footer class="va-footer">
+      <strong>Safety:</strong> All voice generation, transcription and sending are <em>dry-run</em> and
+      <em>approval-protected</em> by default. Voice cloning is disabled and requires explicit consent.
+      No external provider is called unless you enable it in <code>.env</code>.
+    </footer>
+  </main>
+
+  <script src="/js/voice-ai.js"></script>
+</body>
+</html>

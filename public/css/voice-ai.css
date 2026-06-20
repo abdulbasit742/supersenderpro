@@ -1,0 +1,54 @@
+:root {
+  --bg: #0f1419; --panel: #1a212b; --panel2: #222b37; --border: #2d3744;
+  --text: #e6edf3; --muted: #8b97a6; --accent: #3b82f6; --safe: #22c55e;
+  --warn: #f59e0b; --danger: #ef4444; --radius: 10px;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.5; }
+.va-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  padding: 18px 24px; background: var(--panel); border-bottom: 1px solid var(--border); }
+.va-brand { display: flex; align-items: center; gap: 14px; }
+.va-logo { font-size: 32px; }
+.va-header h1 { margin: 0; font-size: 20px; }
+.va-sub { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+.va-pill { padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; }
+.va-pill-safe { background: rgba(34,197,94,.15); color: var(--safe); border: 1px solid rgba(34,197,94,.4); }
+.va-pill-live { background: rgba(239,68,68,.15); color: var(--danger); border: 1px solid rgba(239,68,68,.4); }
+.va-main { max-width: 1100px; margin: 0 auto; padding: 24px; }
+.va-section { margin-bottom: 28px; }
+.va-section h2 { font-size: 16px; margin: 0 0 12px; display: flex; align-items: center; gap: 10px; }
+.va-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.va-stat { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+.va-stat .n { font-size: 26px; font-weight: 700; }
+.va-stat .l { color: var(--muted); font-size: 12px; margin-top: 4px; text-transform: uppercase; letter-spacing: .04em; }
+.va-grid-2 { display: grid; grid-template-columns: 1fr; gap: 20px; }
+@media (min-width: 760px) { .va-grid-2 { grid-template-columns: 1fr 1fr; } }
+.va-card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; }
+.va-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); }
+.va-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.va-table th, .va-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.va-table th { background: var(--panel2); color: var(--muted); font-weight: 600; text-transform: uppercase; font-size: 11px; }
+.va-table tbody tr:hover { background: rgba(59,130,246,.06); }
+textarea, input, select { width: 100%; background: var(--panel2); border: 1px solid var(--border); color: var(--text);
+  border-radius: 8px; padding: 9px 11px; font-size: 13px; margin-bottom: 8px; font-family: inherit; }
+.va-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.va-btn { background: var(--accent); color: #fff; border: none; padding: 9px 16px; border-radius: 8px;
+  font-size: 13px; font-weight: 600; cursor: pointer; }
+.va-btn:hover { filter: brightness(1.1); }
+.va-btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text); margin-right: 8px; }
+.va-out { background: #0b0f14; border: 1px solid var(--border); border-radius: 8px; padding: 12px;
+  font-size: 12px; white-space: pre-wrap; word-break: break-word; max-height: 260px; overflow: auto; margin-top: 10px; }
+.va-badge { font-size: 10px; padding: 2px 8px; border-radius: 999px; font-weight: 700; text-transform: uppercase; }
+.va-badge-warn { background: rgba(245,158,11,.18); color: var(--warn); }
+.va-badge-ok { background: rgba(34,197,94,.18); color: var(--safe); }
+.va-badge-danger { background: rgba(239,68,68,.18); color: var(--danger); }
+.va-templates { display: flex; flex-direction: column; gap: 8px; max-height: 320px; overflow: auto; }
+.va-tpl { background: var(--panel2); border: 1px solid var(--border); border-radius: 8px; padding: 10px; font-size: 12px; }
+.va-tpl .cat { color: var(--accent); font-weight: 600; }
+.va-audit { margin-top: 10px; font-size: 12px; color: var(--muted); max-height: 220px; overflow: auto; }
+.va-audit div { padding: 4px 0; border-bottom: 1px solid var(--border); }
+.va-footer { margin-top: 30px; padding: 16px; background: var(--panel); border: 1px solid var(--border);
+  border-radius: var(--radius); font-size: 13px; color: var(--muted); }
+.va-act { cursor: pointer; color: var(--accent); margin-right: 8px; font-weight: 600; }
+.va-act.reject { color: var(--danger); }

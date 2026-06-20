@@ -3066,6 +3066,16 @@ const webhookDispatcher = new WebhookDispatcher();
 const growthRoutes = require('./routes/growth')(loyaltyProgram, webhookDispatcher);
 app.use('/api', growthRoutes);
 
+// BEGIN VOICE AI COMMAND CENTER HOOK
+// Dry-run + approval-protected voice AI (TTS/STT, voice agents, queue, providers).
+try {
+  const voiceAIRoutes = require('./routes/voiceAIRoutes');
+  app.use('/api', voiceAIRoutes);
+} catch (e) {
+  console.error('[voice-ai] route mount skipped:', e.message);
+}
+// END VOICE AI COMMAND CENTER HOOK
+
 // ── Channel Automation Command Center (sources/targets/queue/social bridge) ──
 let channelAutomationCenter = null;
 try {
