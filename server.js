@@ -3124,6 +3124,18 @@ try {
   console.error('[OwnerBriefing] failed to initialise (non-fatal):', e.message);
 }
 // END OWNER BRIEFING HOOK
+
+// BEGIN COMPLIANCE CENTER HOOK
+// Compliance & Consent Center (consent-first, cross-channel, no sending).
+try {
+  const complianceCenterRoutes = require('./routes/complianceCenterRoutes');
+  app.use('/api/compliance', complianceCenterRoutes);
+  app.get('/compliance-center', (req, res) => res.sendFile(path.join(__dirname, 'public', 'compliance-center.html')));
+  console.log('[ComplianceCenter] mounted at /api/compliance (consent-first default)');
+} catch (e) {
+  console.error('[ComplianceCenter] failed to initialise (non-fatal):', e.message);
+}
+// END COMPLIANCE CENTER HOOK
 // END MARKETPLACE INTELLIGENCE HOOK
 
 
