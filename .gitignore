@@ -38,3 +38,7 @@ dist/
 build/
 coverage/
 ssl/
+
+# Agent runtime local data
+data/agent-runtime/
+agent-runtime/__tests__/.tmp/

@@ -33,7 +33,10 @@
     "secret:scan": "node scripts/secret-scan.js",
     "docs:api": "node scripts/gen-api-docs.js",
     "install:hooks": "node scripts/install-hooks.js",
-    "doctor": "node scripts/doctor.js"
+    "doctor": "node scripts/doctor.js",
+    "agent:serve": "node agent-runtime/server.js",
+    "agent:demo": "node agent-runtime/demo.js",
+    "agent:test": "node --test agent-runtime/__tests__/"
   },
   "dependencies": {
     "@whiskeysockets/baileys": "^7.0.0-rc.9",
