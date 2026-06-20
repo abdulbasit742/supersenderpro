@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Start Setup — SuperSender Pro</title>
+<meta name="description" content="Self-serve onboarding: choose your business type & goal, get a recommended setup preview, and request a demo or trial. Nothing goes live automatically.">
+<link rel="stylesheet" href="/css/funnel.css">
+<link rel="stylesheet" href="/css/start.css">
+</head>
+<body>
+<div class="banner">Preview only · No live tenant is created · No messages are sent · Consent required</div>
+<nav class="nav"><div class="container">
+  <a class="brand" href="/landing.html"><span class="dot"></span> SuperSender Pro</a>
+  <div class="nav-links">
+    <a class="nav-link" href="/features.html">Features</a>
+    <a class="nav-link" href="/pricing.html">Pricing</a>
+    <a class="nav-link" href="/use-cases.html">Use Cases</a>
+    <a class="nav-link" href="/start.html">Start Setup</a>
+  </div>
+</div></nav>
+
+<header class="hero" style="padding-bottom:24px"><div class="container">
+  <span class="tag">Self-Serve Onboarding</span>
+  <h1>Build your setup preview in a minute.</h1>
+  <p class="sub">Tell us about your business. We'll recommend modules, playbooks and a plan — then you can request a demo or trial. Nothing is activated until you talk to us.</p>
+</div></header>
+
+<section style="padding-top:18px"><div class="container">
+  <div id="wizard">
+    <!-- Step 1 -->
+    <div class="wstep" data-step="1">
+      <h2>1. Choose your business type</h2>
+      <div class="choice-grid" id="typeGrid"></div>
+    </div>
+    <!-- Step 2 -->
+    <div class="wstep" data-step="2" hidden>
+      <h2>2. What's your primary goal?</h2>
+      <div class="choice-grid" id="goalGrid"></div>
+    </div>
+    <!-- Step 3 -->
+    <div class="wstep" data-step="3" hidden>
+      <h2>3. Which modules interest you?</h2>
+      <div class="choice-grid" id="moduleGrid"></div>
+    </div>
+    <!-- Step 4 -->
+    <div class="wstep" data-step="4" hidden>
+      <h2>4. Which plan are you interested in?</h2>
+      <div class="choice-grid" id="planGrid"></div>
+    </div>
+    <!-- Step 5 -->
+    <div class="wstep" data-step="5" hidden>
+      <h2>5. Your contact details</h2>
+      <form class="form" id="contactForm" onsubmit="return false">
+        <div class="row">
+          <label>Name<input name="name" autocomplete="name" required></label>
+          <label>Business name<input name="businessName"></label>
+        </div>
+        <div class="row">
+          <label>Email<input name="email" type="email" placeholder="you@business.com"></label>
+          <label>WhatsApp / Phone<input name="phone" placeholder="+92 300 1234567"></label>
+        </div>
+        <div class="row">
+          <label>Country<input name="country"></label>
+          <label>City<input name="city"></label>
+        </div>
+        <label>Message (optional)<textarea name="message" rows="3" placeholder="Tell us what you need…"></textarea></label>
+        <label class="consent"><input type="checkbox" id="consentContact"> I agree to be contacted by SuperSender Pro about my request.</label>
+        <label class="consent"><input type="checkbox" id="consentMarketing"> (Optional) I'd like to receive product updates &amp; offers.</label>
+      </form>
+    </div>
+    <!-- Step 6: preview + submit -->
+    <div class="wstep" data-step="6" hidden>
+      <h2>6. Your recommended setup preview</h2>
+      <div id="previewBox" class="card"><p class="lead">Generating preview…</p></div>
+      <div class="cta-row" style="margin-top:16px">
+        <button class="btn btn-primary" id="submitTrial">Submit Trial Request</button>
+        <button class="btn btn-ghost" id="submitDemo">Request Demo Instead</button>
+      </div>
+      <div id="result"></div>
+    </div>
+
+    <div class="cta-row" style="margin-top:22px">
+      <button class="btn btn-ghost" id="backBtn" hidden>Back</button>
+      <button class="btn btn-primary" id="nextBtn">Next</button>
+    </div>
+    <p class="lead" style="margin-top:14px;font-size:13px">Your details are masked on our side. We never auto-send messages or create a live account from this form.</p>
+  </div>
+</div></section>
+
+<footer class="footer"><div class="container">
+  <div><strong>SuperSender Pro</strong> — AI Business Command Center</div>
+  <div style="margin-top:8px"><a href="/landing.html">Home</a><a href="/features.html">Features</a><a href="/pricing.html">Pricing</a></div>
+</div></footer>
+
+<script src="/js/start.js"></script>
+</body>
+</html>

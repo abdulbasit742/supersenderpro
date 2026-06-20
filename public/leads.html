@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lead Command Center — SuperSender Pro (Admin)</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="stylesheet" href="/css/funnel.css">
+<link rel="stylesheet" href="/css/leads.css">
+</head>
+<body>
+<nav class="nav"><div class="container">
+  <a class="brand" href="/landing.html"><span class="dot"></span> SuperSender Pro</a>
+  <div class="nav-links">
+    <span class="nav-link">Lead Command Center</span>
+    <a class="nav-link" href="/landing.html">Public Site</a>
+  </div>
+</div></nav>
+
+<section style="padding-top:26px"><div class="container">
+  <h2>Lead Command Center <span class="pill">Admin</span></h2>
+  <p class="lead">Masked lead, demo &amp; trial data. Provide an admin secret to unlock masked contact previews; otherwise data is shown redacted. No raw PII is ever stored or exported, and no follow-ups are sent from here — drafts only.</p>
+
+  <div class="form" style="max-width:420px">
+    <label>Admin secret (x-admin-secret)<input id="adminSecret" type="password" placeholder="optional — leave blank for redacted view"></label>
+    <div class="cta-row"><button class="btn btn-primary" id="loadBtn">Load</button>
+      <button class="btn btn-ghost" id="exportBtn">Export Redacted (Markdown)</button></div>
+  </div>
+
+  <div class="kpi-grid" id="kpis" style="margin-top:24px"></div>
+
+  <h2 style="margin-top:30px">Leads</h2>
+  <div class="table-wrapper"><table id="leadsTable"><thead><tr>
+    <th>Name</th><th>Type</th><th>Plan</th><th>Source</th><th>Score</th><th>Grade</th><th>Status</th><th>Created</th>
+  </tr></thead><tbody><tr><td colspan="8" class="lead">No data loaded.</td></tr></tbody></table></div>
+
+  <div id="leadDetail" style="margin-top:24px"></div>
+
+  <h2 style="margin-top:30px">Demo Requests</h2>
+  <div class="table-wrapper"><table id="demoTable"><thead><tr>
+    <th>ID</th><th>Type</th><th>Status</th><th>Created</th>
+  </tr></thead><tbody><tr><td colspan="4" class="lead">No data loaded.</td></tr></tbody></table></div>
+
+  <h2 style="margin-top:30px">Trial Requests</h2>
+  <div class="table-wrapper"><table id="trialTable"><thead><tr>
+    <th>ID</th><th>Plan</th><th>Type</th><th>Status</th><th>Created</th>
+  </tr></thead><tbody><tr><td colspan="5" class="lead">No data loaded.</td></tr></tbody></table></div>
+
+  <div id="exportBox" style="margin-top:24px"></div>
+</div></section>
+
+<footer class="footer"><div class="container">
+  <div><strong>SuperSender Pro</strong> — Lead Command Center</div>
+  <div style="margin-top:8px">Drafts only · No live sends · No raw PII export.</div>
+</div></footer>
+
+<script src="/js/leads.js"></script>
+</body>
+</html>

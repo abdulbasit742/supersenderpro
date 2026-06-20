@@ -3153,6 +3153,24 @@ try {
 // END SAAS BILLING HOOK
 
 
+// BEGIN PUBLIC SAAS FUNNEL HOOK
+// Public launch funnel + self-serve onboarding + demo/lead command center.
+// Dry-run by default: no live sends, no payment capture, no live tenant writes.
+try {
+  const publicSaasFunnelRoutes = require('./routes/publicSaasFunnelRoutes');
+  app.use('/api/public-funnel', publicSaasFunnelRoutes);
+  app.get('/landing', (req, res) => res.sendFile(path.join(__dirname, 'public', 'landing.html')));
+  app.get('/pricing', (req, res) => res.sendFile(path.join(__dirname, 'public', 'pricing.html')));
+  app.get('/features', (req, res) => res.sendFile(path.join(__dirname, 'public', 'features.html')));
+  app.get('/use-cases', (req, res) => res.sendFile(path.join(__dirname, 'public', 'use-cases.html')));
+  app.get('/start', (req, res) => res.sendFile(path.join(__dirname, 'public', 'start.html')));
+  app.get('/leads', (req, res) => res.sendFile(path.join(__dirname, 'public', 'leads.html')));
+  console.log('[PublicSaasFunnel] mounted at /api/public-funnel (dry-run default)');
+} catch (e) {
+  console.error('[PublicSaasFunnel] failed to initialise (non-fatal):', e.message);
+}
+// END PUBLIC SAAS FUNNEL HOOK
+
 let searchIndexRebuildTimer = null;
 function scheduleSearchIndexRebuild(reason = 'data-change', delayMs = Number(process.env.SEARCH_REBUILD_DEBOUNCE_MS || 30000)) {
   if (searchIndexRebuildTimer) clearTimeout(searchIndexRebuildTimer);

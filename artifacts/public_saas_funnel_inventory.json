@@ -1,0 +1,35 @@
+{
+  "scannedAt": "2026-06-20",
+  "repo": "abdulbasit742/supersenderpro",
+  "branch": "main",
+  "scanScope": ["server.js", "public/", "routes/", "lib/", "docs/", "integrations/", ".env.example", "package.json"],
+  "existingModulesDetected": {
+    "saasBilling": { "status": "exists", "path": "lib/subscriptionPlans.js", "marks": ["exists", "safe_to_extend"], "action": "wrap_with_adapter_only" },
+    "businessSetupWizard": { "status": "exists", "path": "lib/unifiedSetup/", "marks": ["exists", "safe_to_extend"], "action": "wrap_with_adapter_only" },
+    "customer360CRM": { "status": "exists", "path": "lib/storeCRM.js, lib/kommoCRM.js", "marks": ["exists", "safe_to_extend"], "action": "wrap_with_adapter_only" },
+    "complianceCenter": { "status": "exists", "path": "lib/complianceCenter/", "marks": ["exists", "safe_to_extend"], "action": "use_consent_guard_via_adapter" },
+    "ownerCommandBriefing": { "status": "exists", "path": "lib/ownerBriefing/", "marks": ["exists", "safe_to_extend"], "action": "kpi_adapter_only" },
+    "growthCampaign": { "status": "exists", "path": "routes/growth.js", "marks": ["exists", "safe_to_extend"], "action": "audience_draft_adapter_only" },
+    "marketplaceIntelligence": { "status": "exists", "path": "lib/marketplaceIntelligence/", "marks": ["exists"], "action": "no_change" },
+    "channelAutomation": { "status": "exists", "path": "lib/channelAutomationCenter.js", "marks": ["exists"], "action": "no_change" },
+    "voiceAI": { "status": "exists", "path": "lib/voiceAI/", "marks": ["exists"], "action": "no_change" },
+    "legacyLeadScoring": { "status": "exists", "path": "lib/leadScoring.js", "marks": ["exists", "duplicate_risk"], "action": "kept_separate_funnel_scoring_namespaced" }
+  },
+  "publicFunnelFeatures": {
+    "landingPage": { "status": "missing", "marks": ["missing", "needs_ui"] },
+    "featurePages": { "status": "missing", "marks": ["missing", "needs_ui"] },
+    "pricingPage": { "status": "missing", "marks": ["missing", "needs_ui", "needs_wiring"] },
+    "useCasePages": { "status": "missing", "marks": ["missing", "needs_ui"] },
+    "leadCapture": { "status": "missing", "marks": ["missing", "needs_route", "lead_data_risk", "privacy_risk"] },
+    "demoRequest": { "status": "missing", "marks": ["missing", "needs_route", "live_action_risk"] },
+    "trialRequest": { "status": "missing", "marks": ["missing", "needs_route", "live_action_risk"] },
+    "selfServeOnboarding": { "status": "missing", "marks": ["missing", "needs_ui", "needs_route"] },
+    "tenantSetupPreview": { "status": "missing", "marks": ["missing", "live_action_risk"] },
+    "adminLeadCommandCenter": { "status": "missing", "marks": ["missing", "needs_ui", "needs_route", "privacy_risk"] },
+    "followUpDrafts": { "status": "missing", "marks": ["missing"] },
+    "publicDocs": { "status": "missing", "marks": ["missing", "needs_docs"] },
+    "apiRoutes": { "status": "missing", "marks": ["missing", "needs_route", "needs_wiring"] }
+  },
+  "decision": "clean_additive_build_no_duplicates",
+  "buildPolicy": "Add missing public funnel + onboarding + lead/demo command center only. Wrap existing modules with safe read/draft adapters. Dry-run, consent-required, no live sends, no payment, no live tenant write, no raw PII export/storage."
+}

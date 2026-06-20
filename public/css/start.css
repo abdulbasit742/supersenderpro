@@ -1,0 +1,4 @@
+/* public/css/start.css — onboarding wizard tweaks (extends funnel.css). */
+.wstep{margin-bottom:8px}
+#previewBox ul{margin:6px 0 0 18px;padding:0}
+#previewBox pre{white-space:pre-wrap}

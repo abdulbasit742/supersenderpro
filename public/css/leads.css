@@ -1,0 +1,3 @@
+/* public/css/leads.css — Lead Command Center tweaks (extends funnel.css). */
+.lead-row:hover td{background:var(--bg-soft)}
+#leadDetail pre{margin:6px 0 0}
