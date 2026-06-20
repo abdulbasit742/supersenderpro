@@ -64,6 +64,10 @@ node agent-runtime/server.js                                                    
 | GET  | `/api/agent-runtime/runs` | Run history (audit log) + stats |
 | GET  | `/api/agent-runtime/runs/:id` | A single recorded run |
 | GET  | `/api/agent-runtime/metrics` | JSON, or Prometheus text with `?format=prometheus` |
+| GET  | `/api/agent-runtime/templates` | List pre-approved action templates |
+| POST | `/api/agent-runtime/templates` | Create a new template (admin) |
+| POST | `/api/agent-runtime/templates/:id/execute` | Execute a template (skips approval queue) |
+| POST | `/api/agent-runtime/templates/:id/deactivate` | Deactivate a template |
 
 Set `AGENT_RUNTIME_API_KEY` to require `Authorization: Bearer <key>` on every route.
 
@@ -100,3 +104,19 @@ npm run agent:cli -- explain send_whatsapp_message '{"to":"1","message":"hi"}'
 npm run agent:cli -- metrics --prometheus
 # pick an agent:  AGENT=crewai npm run agent:cli -- run "..."
 ```
+
+### Action Templates
+Pre-approved routine actions that skip the approval queue but remain sandboxed:
+```bash
+# Create a template
+curl -X POST localhost:3005/api/agent-runtime/templates -H 'content-type: application/json' \
+  -d '{"name":"welcome-new-customer","description":"Send welcome to new lead","tool":"send_whatsapp_message","args":{"to":"923000000000","message":"Welcome!"}}'
+
+# List templates
+npm run agent:cli -- templates
+
+# Execute a template (no approval needed)
+npm run agent:cli -- template-execute <template-id>
+```
+
+Useful for: welcome messages, daily status broadcasts, routine follow-ups, etc.

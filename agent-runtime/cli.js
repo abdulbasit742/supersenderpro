@@ -13,6 +13,10 @@ async function main() {
     case 'agents':  return out(runtime.listAgents());
     case 'metrics':
       return rest[0] === '--prometheus' ? out(runtime.metrics.prometheus()) : out(runtime.metrics.json());
+    case 'templates':
+      return out({ stats: runtime.templates.stats(), templates: runtime.templates.list() });
+    case 'template-execute':
+      return out(await runtime.templates.execute(rest[0], { agent: process.env.AGENT, goal: rest.slice(1).join(' ') }));
     case 'queue':   return out({ stats: runtime.queue.stats(), tasks: runtime.queue.list({ limit: 50 }) });
     case 'runs':    return out({ stats: runtime.runs.stats(), runs: runtime.runs.list({ limit: 20 }) });
     case 'approve': return out(await runtime.approveAndRun(rest[0], 'cli'));
@@ -41,6 +45,8 @@ async function main() {
         '  approve <draftId>           Approve & execute a draft',
         '  reject <draftId> [reason]   Reject a draft',
         '  explain <tool> [argsJSON]   Explain a single action decision',
+        '  templates                   List pre-approved action templates',
+        '  template-execute <id> [g]   Execute a template (skips approval)',
         '  metrics [--prometheus]      Show metrics',
         '',
         'Env: AGENT=zeroclaw|groq|openai|crewai|langchain|webhook'

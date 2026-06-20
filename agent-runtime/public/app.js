@@ -92,4 +92,32 @@ async function loadRuns() {
 }
 $('#refreshR').onclick = () => loadRuns();
 
-loadStatus(); loadQueue(); loadRuns();
+async function loadTemplates() {
+  const t = await api('/api/agent-runtime/templates');
+  $('#templateStats').innerHTML = `<span>total: <b>${t.stats.total}</b></span>` +
+    `<span>active: <b>${t.stats.active}</b></span>` +
+    `<span>uses: <b>${t.stats.totalUses}</b></span>`;
+  if (!t.templates.length) { $('#templates').innerHTML = '<div class="empty">No templates yet.</div>'; return; }
+  $('#templates').innerHTML = t.templates.map(x => `
+    <div class="qitem">
+      <div class="head">
+        <div><b>${x.name}</b> <span class="muted">${x.description || ''}</span></div>
+        <button class="primary sm" data-tpl="${x.id}">Execute</button>
+      </div>
+      <div class="mono muted" style="margin-top:4px">${x.tool}(${JSON.stringify(x.args)})</div>
+      <div class="muted" style="margin-top:4px">uses: ${x.uses} · agents: ${(x.allowedAgents || []).join(',') || 'all'}</div>
+    </div>`).join('');
+}
+
+document.addEventListener('click', async (e) => {
+  const btn = e.target.closest('button[data-tpl]'); if (!btn) return;
+  btn.disabled = true;
+  const res = await api(`/api/agent-runtime/templates/${btn.dataset.tpl}/execute`, {
+    method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}'
+  });
+  alert(res.status === 'executed' ? 'Template executed!' : res.error || res.status);
+  loadTemplates(); loadRuns();
+});
+$('#refreshT').onclick = () => loadTemplates();
+
+loadStatus(); loadQueue(); loadRuns(); loadTemplates();
