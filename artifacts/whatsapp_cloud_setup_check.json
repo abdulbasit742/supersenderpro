@@ -1,0 +1,225 @@
+{
+  "generatedAt": "2026-06-20T13:43:26.923Z",
+  "passed": 43,
+  "failed": 0,
+  "total": 43,
+  "readinessScore": 7,
+  "strict": "false",
+  "checks": [
+    {
+      "name": "file lib/whatsappCloudSetup/store.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/whatsappCloudSetup/configModel.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/whatsappCloudSetup/setupChecklist.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/whatsappCloudSetup/redactor.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/whatsappCloudSetup/safety.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/whatsappCloudSetup/setupWizard.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/whatsappCloudSetup/setupValidator.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/whatsappCloudSetup/readinessScoring.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/whatsappCloudSetup/webhookVerifier.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/whatsappCloudSetup/sendPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/whatsappCloudSetup/index.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/whatsappCloudTemplates/templateStore.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/whatsappCloudTemplates/templateModel.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/whatsappCloudTemplates/templateValidator.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/whatsappCloudTemplates/templateCatalog.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/whatsappCloudTemplates/templatePreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/whatsappCloudTemplates/templateQuality.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/whatsappCloudTemplates/templateSyncPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/whatsappCloudTemplates/index.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file routes/whatsappCloudSetupRoutes.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/whatsapp-cloud-setup.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/js/whatsapp-cloud-setup.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/css/whatsapp-cloud-setup.css",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "server hook present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "env placeholders present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "gitignore protects data",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc WHATSAPP_CLOUD_SETUP.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc WHATSAPP_TEMPLATE_MANAGER.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc WHATSAPP_WEBHOOK_VERIFICATION.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc WHATSAPP_CLOUD_PRODUCTION_CHECKLIST.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc WHATSAPP_CLOUD_SETUP_GAP_REPORT.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "route module loads",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "safety dry-run by default",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "checklist has 14 items",
+      "ok": true,
+      "detail": "14 items"
+    },
+    {
+      "name": "create sample template",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "validate sample template",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "render preview (no missing vars)",
+      "ok": true,
+      "detail": "Hi A, order 1 is ok."
+    },
+    {
+      "name": "quality assessment",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "sync preview no live call",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "send preview dry-run + masked + no live send",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "webhook helper exposes env var name not value",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "readiness score computed",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no secret/PII leak",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}

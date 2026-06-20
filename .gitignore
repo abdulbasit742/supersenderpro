@@ -64,3 +64,11 @@ artifacts/*team-access-raw*
 team-exports/private/
 *.team.raw.json
 *.invite.raw.json
+
+# WhatsApp Cloud Setup + Template Manager protections
+data/whatsapp-cloud*.json
+data/whatsapp-templates*.json
+artifacts/*whatsapp-cloud-raw*
+.wa-auth/
+.baileys-auth/
+baileys_auth*/

@@ -3071,6 +3071,19 @@ try {
 }
 // END TEAM ACCESS HOOK
 
+// BEGIN WHATSAPP CLOUD SETUP HOOK
+// Official WhatsApp Cloud Setup + Template Manager coordination layer.
+// Dry-run, no live send, no live Meta API, no token exposure. Distinct from the live /api/whatsapp-cloud lane.
+try {
+  const whatsappCloudSetupRoutes = require('./routes/whatsappCloudSetupRoutes');
+  app.use('/api/whatsapp-cloud-setup', whatsappCloudSetupRoutes);
+  app.get('/whatsapp-cloud-setup.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'whatsapp-cloud-setup.html')));
+  console.log('[WhatsAppCloudSetup] mounted at /api/whatsapp-cloud-setup (dry-run, no live send, no token exposure)');
+} catch (e) {
+  console.error('[WhatsAppCloudSetup] failed to initialise (non-fatal):', e.message);
+}
+// END WHATSAPP CLOUD SETUP HOOK
+
 
 let searchIndexRebuildTimer = null;
 function scheduleSearchIndexRebuild(reason = 'data-change', delayMs = Number(process.env.SEARCH_REBUILD_DEBOUNCE_MS || 30000)) {

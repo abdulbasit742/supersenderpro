@@ -38,7 +38,9 @@
     "feature-flags:check": "node scripts/feature-flags-check.js",
     "feature-flags:smoke": "node tests/smoke/featureFlagsSmoke.js",
     "team-access:check": "node scripts/team-access-check.js",
-    "team-access:smoke": "node tests/smoke/teamAccessSmoke.js"
+    "team-access:smoke": "node tests/smoke/teamAccessSmoke.js",
+    "whatsapp-cloud-setup:check": "node scripts/whatsapp-cloud-setup-check.js",
+    "whatsapp-cloud-setup:smoke": "node tests/smoke/whatsappCloudSetupSmoke.js"
   },
   "dependencies": {
     "@whiskeysockets/baileys": "^7.0.0-rc.9",

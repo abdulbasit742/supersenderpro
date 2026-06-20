@@ -1,0 +1,78 @@
+{
+  "generatedAt": "2026-06-20T13:43:27.409Z",
+  "passed": 14,
+  "failed": 0,
+  "total": 14,
+  "results": [
+    {
+      "name": "require setup wizard",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require template manager",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require route module",
+      "pass": true,
+      "detail": "loaded"
+    },
+    {
+      "name": "checklist has 14 steps",
+      "pass": true,
+      "detail": "14 steps"
+    },
+    {
+      "name": "default sample templates seeded",
+      "pass": true,
+      "detail": "3 templates"
+    },
+    {
+      "name": "validate sample utility template",
+      "pass": true,
+      "detail": "valid"
+    },
+    {
+      "name": "render template preview",
+      "pass": true,
+      "detail": "Hi Ali, your order A-1029 is now shipped. Thank you for shopping with us!"
+    },
+    {
+      "name": "quality assessment returns rating",
+      "pass": true,
+      "detail": "GREEN"
+    },
+    {
+      "name": "send preview dryRun true",
+      "pass": true,
+      "detail": "dryRun=true"
+    },
+    {
+      "name": "send preview liveSend false",
+      "pass": true,
+      "detail": "liveSend=false"
+    },
+    {
+      "name": "recipient masked (no full number)",
+      "pass": true,
+      "detail": "+92••••••••67"
+    },
+    {
+      "name": "sync preview performs no live call",
+      "pass": true,
+      "detail": "no-live-call"
+    },
+    {
+      "name": "webhook helper hides token value",
+      "pass": true,
+      "detail": "hidden"
+    },
+    {
+      "name": "no token/phone/email leaks",
+      "pass": true,
+      "detail": "clean"
+    }
+  ]
+}

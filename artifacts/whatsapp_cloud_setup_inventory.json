@@ -1,0 +1,77 @@
+{
+  "generatedAt": "2026-06-20T13:30:00.000Z",
+  "feature": "Official WhatsApp Cloud Setup + Template Manager",
+  "scanScope": [
+    "server.js", "package.json", ".env.example", ".gitignore",
+    "routes/", "lib/", "public/", "docs/", "scripts/", "tests/"
+  ],
+  "existingWhatsAppSystems": [
+    {
+      "name": "WhatsApp Cloud API lane (send + webhook)",
+      "location": "server.js (/api/whatsapp-cloud/*)",
+      "routes": [
+        "GET /api/whatsapp-cloud/status",
+        "POST /api/whatsapp-cloud/settings",
+        "POST /api/whatsapp-cloud/send-text",
+        "POST /api/whatsapp-cloud/send-template",
+        "GET /api/whatsapp-cloud/webhook",
+        "POST /api/whatsapp-cloud/webhook"
+      ],
+      "status": "exists",
+      "decision": "do_not_rebuild",
+      "note": "Live send + webhook lane already implemented inline in server.js. Left untouched."
+    },
+    {
+      "name": "WATI broadcast lane",
+      "location": "routes/wati.js, lib/watiBroadcast.js, lib/watiCopilot.js",
+      "status": "exists",
+      "decision": "do_not_rebuild"
+    },
+    {
+      "name": "WhatsApp Cloud connector inspector",
+      "location": "lib/unifiedSetup/connectors/whatsappCloudConnector.js",
+      "status": "exists",
+      "decision": "do_not_rebuild",
+      "note": "Read-only presence inspector for the unified setup screen."
+    },
+    {
+      "name": "Baileys / whatsapp-web.js bots",
+      "location": "wa-sales-bot/, whatsapp-ai-tools-bot/, bots/",
+      "status": "exists",
+      "decision": "do_not_rebuild"
+    },
+    {
+      "name": "Template Marketplace (internal automation templates)",
+      "location": "routes/templateMarketplaceRoutes.js, lib/templateMarketplace/, public/template-marketplace.html",
+      "status": "exists",
+      "decision": "do_not_rebuild",
+      "note": "Distinct concept (internal automation blueprints), NOT Meta WhatsApp message templates."
+    }
+  ],
+  "duplicateRiskCheck": {
+    "lib/whatsappCloudSetup": "missing",
+    "lib/whatsappCloudTemplates": "missing",
+    "routes/whatsappCloudSetupRoutes.js": "missing",
+    "public/whatsapp-cloud-setup.html": "missing",
+    "/api/whatsapp-cloud-setup prefix": "free (distinct from existing /api/whatsapp-cloud)"
+  },
+  "gapTargets": [
+    { "item": "WhatsApp Cloud setup wizard", "status": "missing", "tags": ["needs_route", "needs_ui", "needs_docs", "needs_test", "safe_to_extend"] },
+    { "item": "WABA / phone number setup checklist", "status": "missing", "tags": ["needs_route", "needs_ui", "needs_docs"] },
+    { "item": "Webhook verification helper", "status": "partial", "tags": ["needs_route", "needs_docs"], "note": "Live webhook exists; verification GUIDE/helper missing." },
+    { "item": "Template manager", "status": "missing", "tags": ["needs_route", "needs_ui", "needs_docs", "needs_test"] },
+    { "item": "Template status dashboard", "status": "missing", "tags": ["needs_ui"] },
+    { "item": "Template sync preview", "status": "missing", "tags": ["needs_route"] },
+    { "item": "Template send preview", "status": "missing", "tags": ["needs_route", "needs_test"] },
+    { "item": "Quality / risk checklist", "status": "missing", "tags": ["needs_route"] },
+    { "item": "Docs / check / smoke tests", "status": "missing", "tags": ["needs_docs", "needs_test"] }
+  ],
+  "safetyPosture": {
+    "dryRunByDefault": true,
+    "liveSendDisabled": true,
+    "templateSyncLiveDisabled": true,
+    "tokensNeverStored": true,
+    "phonesAlwaysMasked": true,
+    "piiRedacted": true
+  }
+}
