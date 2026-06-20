@@ -4444,6 +4444,7 @@ curl -X POST http://localhost:3001/mcp/send \
       <button class="btn btn-secondary" onclick="fsSaveFlow()">💾 Save</button>
       <button class="btn btn-secondary" onclick="fsRunTest()">🧪 Run Test (Dry run)</button>
       <button class="btn btn-secondary" onclick="fsToggleActivate()" id="fs-activate-btn">▶ Activate</button>
+      <button class="btn btn-secondary" onclick="fsDuplicateFlow()">⧉ Duplicate</button>
       <button class="btn btn-secondary" onclick="fsRenderDoctor()">🩺 Launch Doctor</button>
       <button class="btn btn-secondary" onclick="fsViewLogs()">📜 View Logs</button>
       <button class="btn btn-secondary" onclick="fsExportJSON()">⬇ Export JSON</button>
@@ -4455,6 +4456,12 @@ curl -X POST http://localhost:3001/mcp/send \
   <!-- Dashboard stats -->
   <div class="grid" id="fs-stats" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:10px"></div>
   <div class="card" id="fs-doctor" style="display:none;margin-bottom:10px"></div>
+
+  <!-- Approval inbox -->
+  <div class="card" id="fs-approvals-card" style="margin-bottom:10px">
+    <div class="flex-between"><div class="card-title" style="margin:0">✅ Approval Inbox <span class="nav-badge" id="fs-approvals-count" style="display:none">0</span></div><button class="btn btn-secondary" onclick="fsRenderApprovals()">Refresh</button></div>
+    <div id="fs-approvals-list" style="font-size:12px"></div>
+  </div>
 
   <!-- Builder layout -->
   <div class="grid" style="display:grid;grid-template-columns:220px 1fr 280px;gap:10px;align-items:start">
@@ -4471,6 +4478,10 @@ curl -X POST http://localhost:3001/mcp/send \
         <span id="fs-flow-status" class="nav-badge" style="display:inline-block">draft</span>
       </div>
       <input id="fs-flow-desc" placeholder="Description (optional)" style="width:100%;margin:6px 0;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:inherit;padding:6px;border-radius:6px"/>
+      <div style="display:flex;gap:6px;margin:4px 0">
+        <button class="btn btn-secondary" id="fs-view-btn" onclick="fsToggleCanvasView()" style="font-size:11px;padding:3px 8px">🔲 Visual canvas</button>
+        <button class="btn btn-secondary" onclick="fsAutoLayout()" style="font-size:11px;padding:3px 8px">↳ Auto layout</button>
+      </div>
       <div id="fs-canvas" style="display:flex;flex-direction:column;gap:8px;margin-top:8px"></div>
       <div id="fs-canvas-empty" style="opacity:.6;font-size:13px;padding:20px;text-align:center">Click a node in the library to add it to the flow →</div>
     </div>
@@ -17451,6 +17462,171 @@ async function fsInstallTemplate(id) {
     toast('Template installed as editable flow', 'success');
   } catch (e) { toast('Install failed: ' + e.message, 'error'); }
 }
+</script>
+
+<script>
+/* ===== SuperFlow Studio frontend v2: approvals, duplicate, visual canvas ===== */
+(function () {
+  if (window.fsState) { fsState.visual = false; }
+
+  // ---- Approval inbox ----
+  window.fsRenderApprovals = async function () {
+    try {
+      const res = await api('/api/flow-studio/approvals');
+      const list = res.approvals || [];
+      const badge = document.getElementById('fs-approvals-count');
+      if (badge) { badge.style.display = list.length ? 'inline-block' : 'none'; badge.innerText = list.length; }
+      const box = document.getElementById('fs-approvals-list');
+      if (!box) return;
+      if (!list.length) { box.innerHTML = '<div style="opacity:.6;padding:6px 0">No pending approvals. Human-approval nodes pause runs and show here.</div>'; return; }
+      box.innerHTML = list.map(a => `
+        <div style="border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px;margin-bottom:6px">
+          <div class="flex-between"><b>${a.flowName || a.flowId}</b><span style="font-size:10px;opacity:.6">${new Date(a.createdAt).toLocaleString()}</span></div>
+          <div style="font-size:11px;opacity:.7">Pending node: ${a.pendingNode || '-'} · mode: ${a.mode || 'dry-run'}</div>
+          <div style="display:flex;gap:6px;margin-top:6px">
+            <button class="btn btn-primary" style="font-size:11px;padding:3px 8px" onclick="fsResolveApproval('${a.id}','approve')">Approve & resume</button>
+            <button class="btn btn-secondary" style="font-size:11px;padding:3px 8px" onclick="fsResolveApproval('${a.id}','reject')">Reject</button>
+          </div>
+        </div>`).join('');
+    } catch (e) { /* silent */ }
+  };
+
+  window.fsResolveApproval = async function (id, decision) {
+    try {
+      const res = await api('/api/flow-studio/approvals/' + encodeURIComponent(id) + '/resolve', { method: 'POST', body: JSON.stringify({ decision }) });
+      toast(decision === 'approve' ? 'Approved — flow resumed (dry run)' : 'Approval rejected', 'success');
+      if (res.resumeRun && typeof fsRenderRunLogs === 'function') fsRenderRunLogs(res.resumeRun);
+      fsRenderApprovals();
+      if (typeof fsRenderStats === 'function') fsRenderStats();
+    } catch (e) { toast('Resolve failed: ' + e.message, 'error'); }
+  };
+
+  // ---- Duplicate flow ----
+  window.fsDuplicateFlow = async function () {
+    if (!fsState.flow || !fsState.flow.id) { toast('Save the flow first, then duplicate', 'info'); return; }
+    try {
+      const res = await api('/api/flow-studio/flows/' + encodeURIComponent(fsState.flow.id) + '/duplicate', { method: 'POST', body: '{}' });
+      fsState.flow = res.flow; fsState.selected = null;
+      fsRenderCanvas(); if (typeof fsRenderInspector === 'function') fsRenderInspector();
+      toast('Flow duplicated as draft', 'success');
+    } catch (e) { toast('Duplicate failed: ' + e.message, 'error'); }
+  };
+
+  // ---- Canvas view toggle + auto layout ----
+  window.fsToggleCanvasView = function () {
+    fsState.visual = !fsState.visual;
+    const btn = document.getElementById('fs-view-btn');
+    if (btn) btn.innerText = fsState.visual ? '📋 List view' : '🔲 Visual canvas';
+    fsRenderCanvas();
+  };
+
+  window.fsAutoLayout = function () {
+    (fsState.flow.nodes || []).forEach((n, i) => { n.position = { x: 30 + (i % 4) * 200, y: 30 + Math.floor(i / 4) * 130 }; });
+    fsRenderCanvas();
+    toast('Auto layout applied', 'success');
+  };
+
+  // ---- Override fsRenderCanvas with list + visual modes ----
+  const catColor = c => ({ trigger: '#16a34a', ai: '#8b5cf6', action: '#2563eb', logic: '#d97706', data: '#0891b2' }[c] || '#64748b');
+
+  window.fsRenderCanvas = function () {
+    const f = fsState.flow;
+    const nameEl = document.getElementById('fs-flow-name'); if (nameEl) nameEl.value = f.name || '';
+    const descEl = document.getElementById('fs-flow-desc'); if (descEl) descEl.value = f.description || '';
+    const stEl = document.getElementById('fs-flow-status'); if (stEl) stEl.innerText = f.status || 'draft';
+    const aBtn = document.getElementById('fs-activate-btn'); if (aBtn) aBtn.innerText = f.status === 'active' ? '⏸ Pause' : '▶ Activate';
+    const canvas = document.getElementById('fs-canvas');
+    const empty = document.getElementById('fs-canvas-empty');
+    if (!canvas) return;
+    if (!f.nodes.length) { canvas.innerHTML = ''; canvas.style.position = ''; if (empty) empty.style.display = 'block'; return; }
+    if (empty) empty.style.display = 'none';
+
+    if (!fsState.visual) {
+      canvas.style.position = '';
+      canvas.style.height = '';
+      canvas.style.display = 'flex';
+      canvas.innerHTML = f.nodes.map((n, i) => {
+        const def = (fsState.typeIndex[n.type] || {});
+        const sel = fsState.selected === n.id;
+        const cat = (n.type || '').split('.')[0];
+        const color = catColor(cat);
+        return `<div onclick="fsSelectNode('${n.id}')" style="cursor:pointer;border:1px solid ${sel ? color : 'rgba(255,255,255,.1)'};border-left:4px solid ${color};border-radius:8px;padding:8px 10px;background:${sel ? 'rgba(255,255,255,.06)' : 'rgba(255,255,255,.02)'}">
+          <div class="flex-between"><div style="font-size:13px;font-weight:600">${def.icon || '•'} ${n.label}</div><div style="font-size:10px;opacity:.6">${cat}</div></div>
+          <div style="font-size:10px;opacity:.5;font-family:monospace">${n.type}</div>
+        </div>${i < f.nodes.length - 1 ? '<div style="text-align:center;opacity:.4">↓</div>' : ''}`;
+      }).join('');
+      return;
+    }
+
+    // Visual draggable canvas
+    f.nodes.forEach((n, i) => { if (!n.position || typeof n.position.x !== 'number') n.position = { x: 30 + (i % 4) * 200, y: 30 + Math.floor(i / 4) * 130 }; });
+    canvas.style.display = 'block';
+    canvas.style.position = 'relative';
+    canvas.style.height = '460px';
+    canvas.style.overflow = 'auto';
+    canvas.style.background = 'repeating-linear-gradient(0deg,transparent,transparent 23px,rgba(255,255,255,.03) 24px),repeating-linear-gradient(90deg,transparent,transparent 23px,rgba(255,255,255,.03) 24px)';
+    const W = 1200, H = 900;
+    const edges = (f.edges && f.edges.length) ? f.edges : [];
+    const byId = {}; f.nodes.forEach(n => byId[n.id] = n);
+    const lines = edges.map(e => {
+      const a = byId[e.from], b = byId[e.to]; if (!a || !b) return '';
+      const x1 = a.position.x + 80, y1 = a.position.y + 24, x2 = b.position.x + 80, y2 = b.position.y + 24;
+      return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="rgba(255,255,255,.25)" stroke-width="2" marker-end="url(#fsArrow)"/>`;
+    }).join('');
+    canvas.innerHTML = `<svg width="${W}" height="${H}" style="position:absolute;top:0;left:0;pointer-events:none">
+        <defs><marker id="fsArrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="rgba(255,255,255,.4)"/></marker></defs>${lines}
+      </svg>` +
+      f.nodes.map(n => {
+        const def = (fsState.typeIndex[n.type] || {});
+        const cat = (n.type || '').split('.')[0];
+        const color = catColor(cat);
+        const sel = fsState.selected === n.id;
+        return `<div class="fs-vnode" data-id="${n.id}" style="position:absolute;left:${n.position.x}px;top:${n.position.y}px;width:160px;cursor:move;border:1px solid ${sel ? color : 'rgba(255,255,255,.15)'};border-left:4px solid ${color};border-radius:8px;padding:6px 8px;background:#1a1f2b;box-shadow:0 2px 8px rgba(0,0,0,.3)">
+          <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${def.icon || '•'} ${n.label}</div>
+          <div style="font-size:9px;opacity:.5;font-family:monospace">${cat}</div>
+        </div>`;
+      }).join('');
+
+    // drag handlers
+    canvas.querySelectorAll('.fs-vnode').forEach(el => {
+      el.addEventListener('mousedown', startDrag);
+      el.addEventListener('click', ev => { if (!el._moved) fsSelectNode(el.dataset.id); });
+    });
+    function startDrag(ev) {
+      ev.preventDefault();
+      const el = ev.currentTarget; el._moved = false;
+      const node = byId[el.dataset.id];
+      const startX = ev.clientX, startY = ev.clientY, ox = node.position.x, oy = node.position.y;
+      function move(e) {
+        const dx = e.clientX - startX, dy = e.clientY - startY;
+        if (Math.abs(dx) > 3 || Math.abs(dy) > 3) el._moved = true;
+        node.position.x = Math.max(0, ox + dx); node.position.y = Math.max(0, oy + dy);
+        el.style.left = node.position.x + 'px'; el.style.top = node.position.y + 'px';
+        fsRedrawEdges();
+      }
+      function up() { document.removeEventListener('mousemove', move); document.removeEventListener('mouseup', up); }
+      document.addEventListener('mousemove', move); document.addEventListener('mouseup', up);
+    }
+    function fsRedrawEdges() {
+      const svg = canvas.querySelector('svg'); if (!svg) return;
+      svg.querySelectorAll('line').forEach(l => l.remove());
+      edges.forEach(e => {
+        const a = byId[e.from], b = byId[e.to]; if (!a || !b) return;
+        const ln = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        ln.setAttribute('x1', a.position.x + 80); ln.setAttribute('y1', a.position.y + 24);
+        ln.setAttribute('x2', b.position.x + 80); ln.setAttribute('y2', b.position.y + 24);
+        ln.setAttribute('stroke', 'rgba(255,255,255,.25)'); ln.setAttribute('stroke-width', '2'); ln.setAttribute('marker-end', 'url(#fsArrow)');
+        svg.appendChild(ln);
+      });
+    }
+  };
+
+  // ---- Wrap loadFlowStudio to also load approvals ----
+  if (typeof window.loadFlowStudio === 'function') {
+    const orig = window.loadFlowStudio;
+    window.loadFlowStudio = async function () { await orig.apply(this, arguments); try { await fsRenderApprovals(); } catch (e) {} };
+  }
+})();
 </script>
 
 </body>

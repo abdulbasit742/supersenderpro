@@ -47993,12 +47993,20 @@ function defaultFlowStudioTemplates() {
 }
 
 // ---- Storage helpers --------------------------------------------
+// Self-contained queue manager handle (resilient if the global import is absent).
+var flowStudioQueueManager = (function () { try { return require('./lib/queueManager'); } catch (_) { return null; } })();
 function loadFlowStudioFlows() {
   const data = loadJSON(FLOW_STUDIO_FLOWS_FILE, null);
   return Array.isArray(data) ? data : [];
 }
+// Synchronous write so reads immediately after a save are consistent
+// (the shared saveJSON is debounced/async, which races create->run flows).
+function saveFlowStudioFileSync(file, data) {
+  try { fs.writeFileSync(path.join(dataDir, file), JSON.stringify(data, null, 0), 'utf8'); }
+  catch (err) { console.error('FlowStudio save error:', file, err.message); }
+}
 function saveFlowStudioFlows(flows) {
-  saveJSON(FLOW_STUDIO_FLOWS_FILE, Array.isArray(flows) ? flows : []);
+  saveFlowStudioFileSync(FLOW_STUDIO_FLOWS_FILE, Array.isArray(flows) ? flows : []);
 }
 function loadFlowStudioRuns() {
   const data = loadJSON(FLOW_STUDIO_RUNS_FILE, null);
@@ -48006,13 +48014,13 @@ function loadFlowStudioRuns() {
 }
 function saveFlowStudioRuns(runs) {
   const trimmed = Array.isArray(runs) ? runs.slice(-FLOW_STUDIO_MAX_RUNS_KEPT) : [];
-  saveJSON(FLOW_STUDIO_RUNS_FILE, trimmed);
+  saveFlowStudioFileSync(FLOW_STUDIO_RUNS_FILE, trimmed);
 }
 function loadFlowStudioTemplates() {
   const stored = loadJSON(FLOW_STUDIO_TEMPLATES_FILE, null);
   if (Array.isArray(stored) && stored.length) return stored;
   const defaults = defaultFlowStudioTemplates();
-  saveJSON(FLOW_STUDIO_TEMPLATES_FILE, defaults);
+  saveFlowStudioFileSync(FLOW_STUDIO_TEMPLATES_FILE, defaults);
   return defaults;
 }
 
@@ -48116,9 +48124,9 @@ async function executeFlowNode(node, context) {
   // Logic
   if (type === 'logic.delay') {
     const minutes = Number(cfg.minutes || 0);
-    if (live && minutes > 0 && typeof queueManager?.addJob === 'function') {
+    if (live && minutes > 0 && typeof flowStudioQueueManager?.addJob === 'function') {
       try {
-        queueManager.addJob('flow_studio_delay', { flowId: context.flowId, nodeId: node.id, resumeAt: Date.now() + minutes * 60000 }, { source: 'flow-studio' });
+        flowStudioQueueManager.addJob('flow_studio_delay', { flowId: context.flowId, nodeId: node.id, resumeAt: Date.now() + minutes * 60000 }, { source: 'flow-studio' });
         return note(`Delay ${minutes}m scheduled via queue manager.`, { kind: 'logic' });
       } catch (e) { return note(`Delay simulated (queue unavailable): ${e.message}`, { kind: 'logic' }); }
     }
@@ -48179,8 +48187,8 @@ async function executeFlowNode(node, context) {
           return note('Sheet append skipped: connector unavailable.', { kind: 'action', sent: false });
         }
         case 'action.add_queue_job': {
-          if (typeof queueManager?.addJob === 'function') {
-            queueManager.addJob(cfg.jobType || 'flow_studio_action', { ...maskSecretsDeep(cfg), input: context.input }, { source: 'flow-studio' });
+          if (typeof flowStudioQueueManager?.addJob === 'function') {
+            flowStudioQueueManager.addJob(cfg.jobType || 'flow_studio_action', { ...maskSecretsDeep(cfg), input: context.input }, { source: 'flow-studio' });
             return note('Queue job added.', { kind: 'action', sent: true });
           }
           return note('Queue job skipped: queue unavailable.', { kind: 'action', sent: false });
@@ -48238,8 +48246,10 @@ async function runFlow(flowId, input = {}, options = {}) {
   let failed = false;
   let errorMessage = null;
 
-  // Start from trigger nodes
-  const startNodes = (flow.nodes || []).filter(n => (n.type || '').startsWith('trigger.'));
+  // Start from trigger nodes (or a specific resume node)
+  const startNodes = options.startNodeId
+    ? (flow.nodes || []).filter(n => n.id === options.startNodeId)
+    : (flow.nodes || []).filter(n => (n.type || '').startsWith('trigger.'));
   const queue = [...startNodes.map(n => n.id)];
   const visited = new Set();
   let executions = 0;
@@ -48255,9 +48265,28 @@ async function runFlow(flowId, input = {}, options = {}) {
     const node = findNodeById(flow, nodeId);
     if (!node) continue;
     executions++;
+    const maxRetries = Math.max(0, Number(node.config?.retries || 0));
+    const retryDelayMs = Math.max(0, Number(node.config?.retryDelayMs || 0));
+    let attempt = 0;
     try {
-      const result = await executeFlowNode(node, context);
-      logs.push({ ...result, at: new Date().toISOString(), status: 'ok' });
+      // If resuming past an approved approval node, do not pause again
+      const skipApprovalPause = options.resumeApproved && options.startNodeId === node.id
+        && (node.type === 'ai.human_approval' || node.type === 'logic.approval_gate');
+      let result;
+      while (true) {
+        try { result = await executeFlowNode(node, context); break; }
+        catch (err) {
+          if (attempt < maxRetries) {
+            attempt++;
+            logs.push({ nodeId: node.id, type: node.type, label: node.label, message: `Retry ${attempt}/${maxRetries} after error: ${err.message}`, kind: 'system', status: 'retry', at: new Date().toISOString() });
+            if (retryDelayMs) await new Promise(r => setTimeout(r, Math.min(5000, retryDelayMs)));
+            continue;
+          }
+          throw err;
+        }
+      }
+      if (skipApprovalPause && result.pause) result = { ...result, pause: false, message: (result.message || '') + ' (approved, resumed).' };
+      logs.push({ ...result, at: new Date().toISOString(), status: 'ok', attempts: attempt + 1 });
       if (result.pause) { paused = true; break; }
       for (const nxt of nextNodeIds(flow, node)) queue.push(nxt);
     } catch (e) {
@@ -48296,6 +48325,11 @@ async function runFlow(flowId, input = {}, options = {}) {
       pendingNode: logs.find(l => l.pause)?.nodeId || null,
       status: 'pending'
     };
+    try {
+      const approvals = loadFlowStudioApprovals();
+      approvals.push({ ...run.approvalPacket, runId: run.id, mode: run.mode, createdAt: run.approvalPacket.requestedAt });
+      saveFlowStudioApprovals(approvals);
+    } catch (_) {}
   }
 
   const runs = loadFlowStudioRuns();
@@ -48339,20 +48373,26 @@ function buildFlowStudioStatus() {
   const runs = loadFlowStudioRuns();
   const nodeTypeCount = getFlowStudioNodeTypes().reduce((sum, c) => sum + c.nodes.length, 0);
   let queuePending = 0;
-  try { queuePending = (typeof queueManager?.getQueueHealth === 'function' ? (queueManager.getQueueHealth().pending || 0) : 0); } catch {}
+  try { queuePending = (typeof flowStudioQueueManager?.getQueueHealth === 'function' ? (flowStudioQueueManager.getQueueHealth().pending || 0) : 0); } catch {}
   const integrationsReady = {
     whatsapp: typeof sendWhatsAppCloudText === 'function',
     n8n: !!(typeof n8nBridge === 'object' && n8nBridge && typeof n8nBridge.triggerWorkflow === 'function'),
     googleSheets: !!(typeof reportingConnectors === 'object' && reportingConnectors && typeof reportingConnectors.syncGoogleSheets === 'function'),
     social: typeof publishSocialPayloadToPlatform === 'function',
-    queue: typeof queueManager?.addJob === 'function',
+    queue: typeof flowStudioQueueManager?.addJob === 'function',
     adminAlerts: typeof createSystemAlert === 'function'
   };
+  let pendingApprovals = 0;
+  try { pendingApprovals = loadFlowStudioApprovals().filter(a => a.status === 'pending').length; } catch (_) {}
+  const scheduledFlows = flows.filter(f => f.status === 'active' && (f.triggerType === 'trigger.schedule'
+    || (f.nodes || []).some(n => n.type === 'trigger.schedule'))).length;
   return {
     success: true,
     flowCount: flows.length,
     activeFlows: flows.filter(f => f.status === 'active').length,
     pausedFlows: flows.filter(f => f.status === 'paused').length,
+    scheduledFlows,
+    pendingApprovals,
     totalRuns: runs.length,
     failedRuns: runs.filter(r => r.status === 'failed').length,
     queuePending,
@@ -48575,6 +48615,153 @@ app.post('/api/flow-studio/templates/:id/install', (req, res) => {
     res.json(flowStudioJson({ success: true, flow }));
   } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
+
+
+// ===================================================================
+// SuperFlow Studio v2 — Approvals, Scheduling, Duplicate, Run detail
+// ===================================================================
+
+const FLOW_STUDIO_APPROVALS_FILE = 'flow_studio_approvals.json';
+
+function loadFlowStudioApprovals() {
+  const data = loadJSON(FLOW_STUDIO_APPROVALS_FILE, null);
+  return Array.isArray(data) ? data : [];
+}
+function saveFlowStudioApprovals(rows) {
+  saveFlowStudioFileSync(FLOW_STUDIO_APPROVALS_FILE, Array.isArray(rows) ? rows.slice(-500) : []);
+}
+
+// ---- Approval inbox routes --------------------------------------
+app.get('/api/flow-studio/approvals', (req, res) => {
+  try {
+    let rows = loadFlowStudioApprovals();
+    if (req.query.status) rows = rows.filter(a => a.status === req.query.status);
+    else rows = rows.filter(a => a.status === 'pending');
+    res.json(flowStudioJson({ success: true, approvals: rows.slice().reverse() }));
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.post('/api/flow-studio/approvals/:id/resolve', async (req, res) => {
+  try {
+    const decision = String(req.body?.decision || '').toLowerCase();
+    if (!['approve', 'reject'].includes(decision)) {
+      return res.status(400).json({ success: false, error: "decision must be 'approve' or 'reject'" });
+    }
+    const approvals = loadFlowStudioApprovals();
+    const appr = approvals.find(a => a.id === req.params.id);
+    if (!appr) return res.status(404).json({ success: false, error: 'Approval not found' });
+    if (appr.status !== 'pending') return res.status(409).json({ success: false, error: `Already ${appr.status}` });
+
+    appr.status = decision === 'approve' ? 'approved' : 'rejected';
+    appr.resolvedAt = new Date().toISOString();
+    appr.note = String(req.body?.note || '');
+    saveFlowStudioApprovals(approvals);
+
+    let resumeRun = null;
+    if (decision === 'approve' && appr.pendingNode) {
+      // Resume the flow from the approved node (dry-run unless caller asks live)
+      try {
+        const result = await runFlow(appr.flowId, req.body?.input || {}, {
+          live: req.body?.live === true,
+          startNodeId: appr.pendingNode,
+          resumeApproved: true
+        });
+        resumeRun = result.run || null;
+      } catch (e) { resumeRun = { error: e.message }; }
+    }
+    res.json(flowStudioJson({ success: true, approval: appr, resumeRun }));
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+// ---- Duplicate flow ---------------------------------------------
+app.post('/api/flow-studio/flows/:id/duplicate', (req, res) => {
+  try {
+    const flows = loadFlowStudioFlows();
+    const src = flows.find(f => f.id === req.params.id);
+    if (!src) return res.status(404).json({ success: false, error: 'Flow not found' });
+    const now = new Date().toISOString();
+    const copy = {
+      ...JSON.parse(JSON.stringify(src)),
+      id: flowStudioId('flow'),
+      name: (req.body?.name || `${src.name} (copy)`),
+      status: 'draft',
+      createdAt: now, updatedAt: now, lastRunAt: null
+    };
+    flows.push(copy);
+    saveFlowStudioFlows(flows);
+    res.json(flowStudioJson({ success: true, flow: copy }));
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+// ---- Single run detail ------------------------------------------
+app.get('/api/flow-studio/runs/:id', (req, res) => {
+  try {
+    const run = loadFlowStudioRuns().find(r => r.id === req.params.id);
+    if (!run) return res.status(404).json({ success: false, error: 'Run not found' });
+    res.json(flowStudioJson({ success: true, run }));
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+// ---- Cron scheduler for active scheduled flows ------------------
+function flowStudioCronFieldMatch(field, value) {
+  field = String(field || '*').trim();
+  if (field === '*' || field === '?') return true;
+  for (const part of field.split(',')) {
+    const p = part.trim();
+    let step = 1, range = p;
+    if (p.includes('/')) { const [r, s] = p.split('/'); range = r || '*'; step = Number(s) || 1; }
+    let lo, hi;
+    if (range === '*') { lo = -Infinity; hi = Infinity; }
+    else if (range.includes('-')) { const [a, b] = range.split('-'); lo = Number(a); hi = Number(b); }
+    else { lo = hi = Number(range); }
+    if (range === '*') { if (value % step === 0) return true; }
+    else if (value >= lo && value <= hi && ((value - (isFinite(lo) ? lo : 0)) % step === 0)) return true;
+  }
+  return false;
+}
+function flowStudioCronMatches(expr, date) {
+  const parts = String(expr || '').trim().split(/\s+/);
+  if (parts.length < 5) return false;
+  const [min, hour, dom, mon, dow] = parts;
+  const d = date || new Date();
+  return flowStudioCronFieldMatch(min, d.getMinutes())
+    && flowStudioCronFieldMatch(hour, d.getHours())
+    && flowStudioCronFieldMatch(dom, d.getDate())
+    && flowStudioCronFieldMatch(mon, d.getMonth() + 1)
+    && flowStudioCronFieldMatch(dow, d.getDay());
+}
+
+let flowStudioSchedulerLastMinute = null;
+let flowStudioSchedulerStarted = false;
+function startFlowStudioScheduler() {
+  if (flowStudioSchedulerStarted) return;
+  flowStudioSchedulerStarted = true;
+  const tick = async () => {
+    try {
+      const now = new Date();
+      const minuteKey = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}-${now.getHours()}-${now.getMinutes()}`;
+      if (minuteKey === flowStudioSchedulerLastMinute) return;
+      flowStudioSchedulerLastMinute = minuteKey;
+      const flows = loadFlowStudioFlows().filter(f => f.status === 'active');
+      for (const flow of flows) {
+        const schedNode = (flow.nodes || []).find(n => n.type === 'trigger.schedule');
+        if (!schedNode) continue;
+        const cron = schedNode.config?.cron;
+        if (!cron || !flowStudioCronMatches(cron, now)) continue;
+        // Safe by default: scheduled runs are dry-run unless flow opts into live.
+        const live = flow.variables?.scheduleLive === true;
+        try {
+          await runFlow(flow.id, { source: 'scheduler', firedAt: now.toISOString() }, { live });
+          console.log(`[FlowStudio] scheduled ${live ? 'LIVE' : 'dry'} run: ${flow.name}`);
+        } catch (e) { console.warn('[FlowStudio] scheduled run failed:', flow.name, e.message); }
+      }
+    } catch (e) { /* never crash the loop */ }
+  };
+  const timer = setInterval(tick, 30000);
+  if (timer.unref) timer.unref();
+  console.log('[FlowStudio] cron scheduler started (dry-run by default; set variables.scheduleLive=true for live).');
+}
+try { startFlowStudioScheduler(); } catch (_) {}
 
 
 function shouldServeDashboardSpa(req) {

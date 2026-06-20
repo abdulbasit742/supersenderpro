@@ -114,3 +114,48 @@ If a helper isn't available the node logs a skip instead of failing the run.
 - Real-time run streaming via the existing Socket.IO channel.
 - Per-node retry/backoff config and scheduled (cron) trigger registration.
 - Approval inbox UI to resolve paused runs.
+
+---
+
+## v2 additions (shipped)
+
+These items from the roadmap are now implemented:
+
+### Drag-and-drop visual canvas
+The builder has two canvas modes — **List view** (sequential cards) and **Visual canvas**
+(draggable, absolutely-positioned node cards with SVG connector lines and arrowheads).
+Toggle with the **🔲 Visual canvas / 📋 List view** button; **↳ Auto layout** re-grids nodes.
+Node positions are saved on the flow (`node.position`).
+
+### Approval inbox
+Human-approval / approval-gate nodes pause a run and create an **approval packet**
+(persisted to `data/flow_studio_approvals.json`). The **✅ Approval Inbox** card lists
+pending packets; **Approve & resume** continues the flow from the approved node,
+**Reject** stops it.
+
+| Method | Route | Purpose |
+|---|---|---|
+| GET | `/api/flow-studio/approvals` | List approvals (`?status=pending\|approved\|rejected`) |
+| POST | `/api/flow-studio/approvals/:id/resolve` | Body `{ decision: "approve"\|"reject", note?, live? }` |
+
+### Per-node retry / backoff
+Any node can set `config.retries` and `config.retryDelayMs`. On failure the engine retries
+up to `retries` times (backoff capped at 5s) before routing to the `error_fallback` path.
+
+### Cron scheduler
+A lightweight scheduler ticks every 30s and runs **active** flows whose `trigger.schedule`
+node `config.cron` (standard 5-field cron: `min hour dom mon dow`, supports `*`, `*/n`,
+ranges and lists) matches the current minute. **Scheduled runs are dry-run by default**;
+set `flow.variables.scheduleLive = true` to allow live execution.
+
+### Other routes
+
+| Method | Route | Purpose |
+|---|---|---|
+| POST | `/api/flow-studio/flows/:id/duplicate` | Clone a flow as a new draft |
+| GET | `/api/flow-studio/runs/:id` | Single run detail with full logs |
+
+### Reliability
+Flow Studio JSON writes are now **synchronous**, removing the create→run race that the
+shared debounced writer could cause. `status` now also reports `scheduledFlows` and
+`pendingApprovals`.
