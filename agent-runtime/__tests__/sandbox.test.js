@@ -136,6 +136,8 @@ test('action templates can be created and listed', () => {
   assert.strictEqual(runtime.templates.stats().total, before + 1);
   const list = runtime.templates.list();
   assert.ok(list.some(x => x.id === t.id));
+  // cleanup
+  runtime.templates.deactivate(t.id);
 });
 
 test('template execute skips approval but still enforces policy', async () => {
