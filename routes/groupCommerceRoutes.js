@@ -16,6 +16,9 @@ const matchingEngine = require('../lib/groupCommerce/matchingEngine');
 const priceIntelligence = require('../lib/groupCommerce/priceIntelligence');
 const leaderboard = require('../lib/groupCommerce/leaderboard');
 const scheduler = require('../lib/groupCommerce/scheduler');
+const orderBook = require('../lib/groupCommerce/orderBook');
+const fraudScoring = require('../lib/groupCommerce/fraudScoring');
+const analytics = require('../lib/groupCommerce/analytics');
 
 // 1. GET /api/group-commerce/status - General system health and environment state
 router.get('/status', (req, res) => {
@@ -285,6 +288,76 @@ router.get('/groups/:id/leaderboard', (req, res) => {
 router.post('/groups/:id/schedule-broadcast', (req, res) => {
   try {
     const result = scheduler.planScheduledBroadcast(req.params.id, req.body || {});
+    res.json(result);
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+// 20. POST /api/group-commerce/groups/:id/orders - Create a new order draft
+router.post('/groups/:id/orders', (req, res) => {
+  try {
+    const result = orderBook.createOrder(req.params.id, req.body || {});
+    res.json(result);
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+// 21. GET /api/group-commerce/groups/:id/orders - List all orders for a group
+router.get('/groups/:id/orders', (req, res) => {
+  try {
+    const result = orderBook.listOrders(req.params.id);
+    res.json({ success: true, orders: result });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+// 22. PUT /api/group-commerce/groups/:id/orders/:orderId - Update order status
+router.put('/groups/:id/orders/:orderId', (req, res) => {
+  try {
+    const result = orderBook.updateStatus(req.params.id, req.params.orderId, req.body.status);
+    res.json(result);
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+// 23. GET /api/group-commerce/groups/:id/orders/summary - Order book summary stats
+router.get('/groups/:id/orders/summary', (req, res) => {
+  try {
+    const result = orderBook.summary(req.params.id);
+    res.json(result);
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+// 24. POST /api/group-commerce/groups/:id/score-fraud - Score a message for scam risk
+router.post('/groups/:id/score-fraud', (req, res) => {
+  try {
+    const result = fraudScoring.scoreMessage(req.body.messageText || '');
+    res.json(result);
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+// 25. GET /api/group-commerce/groups/:id/analytics - Group activity statistics
+router.get('/groups/:id/analytics', (req, res) => {
+  try {
+    const result = analytics.activityStats(req.params.id);
+    res.json(result);
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+// 26. GET /api/group-commerce/groups/:id/daily-digest - Generate daily market digest
+router.get('/groups/:id/daily-digest', (req, res) => {
+  try {
+    const result = analytics.dailyDigest(req.params.id);
     res.json(result);
   } catch (e) {
     res.status(500).json({ success: false, error: e.message });

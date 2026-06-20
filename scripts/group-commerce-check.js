@@ -110,6 +110,29 @@ try {
   if (!sched.success || !sched.schedule.cron) { throw new Error("Scheduler failed"); }
   console.log("\u2705 Scheduled broadcast planner works! Cron: " + sched.schedule.cron);
 
+  // 8. Test new advanced features (order book, fraud scoring, analytics)
+  console.log("\n8. Testing advanced features (order book, fraud scoring, analytics)...");
+  const orderBook = require('../lib/groupCommerce/orderBook');
+  const fraudScoring = require('../lib/groupCommerce/fraudScoring');
+  const analytics = require('../lib/groupCommerce/analytics');
+
+  const order = orderBook.createOrder("group-123", { sku: "SKU-IPH13", quantity: 2, buyer: "+923001234567" });
+  if (!order || !order.orderId) { throw new Error("Order book failed"); }
+  console.log("\u2705 Order book works! Order created: " + order.orderId);
+
+  const fraud = fraudScoring.scoreMessage("URGENT! Pay in advance. Double your money. Bit.ly link here.");
+  if (!fraud.success || fraud.riskScore < 30) { throw new Error("Fraud scoring failed"); }
+  console.log("\u2705 Fraud scoring works! Risk level: " + fraud.riskLevel + " (score: " + fraud.riskScore + ")");
+
+  const activity = analytics.activityStats("group-123");
+  if (!activity.success) { throw new Error("Analytics failed"); }
+  console.log("\u2705 Activity analytics works! Events tracked: " + activity.totalEvents);
+
+  const digest = analytics.dailyDigest("group-123");
+  if (!digest || !digest.digest) { throw new Error("Daily digest failed"); }
+  console.log("\u2705 Daily digest works! Low stock alerts: " + String(digest.lowStockCount));
+
+
   console.log("\n==================================================");
   console.log("🏆 Group Commerce OS Integrity Check: PASSED");
   console.log("==================================================");
