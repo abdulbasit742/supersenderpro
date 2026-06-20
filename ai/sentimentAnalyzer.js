@@ -35,12 +35,15 @@ class SentimentAnalyzer {
    * @returns {Promise<{sentiment: 'positive'|'negative'|'neutral', score: number}>}
    */
   async analyzeMessage(message) {
-    if (!this.hasAnyProvider()) {
-      return { sentiment: 'neutral', score: 0.5, reason: 'AI not configured' };
+    const local = this.analyzeMessageLocal(message);
+    const aiEnabled = String(process.env.SENTIMENT_AI_ENABLED || this.settings.sentiment_ai_enabled || '').toLowerCase() === 'true';
+    if (!aiEnabled || !this.hasAnyProvider()) {
+      return local;
     }
 
     try {
-      const result = (await this.callSentimentAI(message)).trim().toUpperCase();
+      const timeoutMs = Number(process.env.SENTIMENT_AI_TOTAL_TIMEOUT_MS || 1200);
+      const result = (await this.withTimeout(this.callSentimentAI(message), timeoutMs)).trim().toUpperCase();
       let sentiment = 'neutral';
       let score = 0.5;
 
@@ -52,11 +55,49 @@ class SentimentAnalyzer {
         score = 0.2;
       }
 
-      return { sentiment, score };
+      return { sentiment, score, mode: 'ai' };
     } catch (err) {
       console.error('Sentiment analysis error:', err.message);
-      return { sentiment: 'neutral', score: 0.5, error: err.message };
+      return { ...local, error: err.message, mode: 'local_fallback' };
     }
+  }
+
+  analyzeMessageLocal(message = '') {
+    const text = String(message || '').toLowerCase();
+    const positiveWords = [
+      'thanks', 'thank you', 'great', 'good', 'best', 'awesome', 'perfect', 'love', 'satisfied',
+      'shukriya', 'jazak', 'zabardast', 'acha', 'achha', 'behtareen', 'kamal', 'theek', 'ok', 'done'
+    ];
+    const negativeWords = [
+      'bad', 'worst', 'late', 'issue', 'problem', 'angry', 'refund', 'fake', 'scam', 'not working',
+      'masla', 'maslay', 'ghalat', 'bekar', 'fraud', 'nahi chal', 'nh chal', 'kaam nhi', 'kaam nahi',
+      'wait', 'slow', 'delay', 'late', 'خراب', 'مسئلہ', 'نہیں'
+    ];
+    let positive = 0;
+    let negative = 0;
+    for (const word of positiveWords) {
+      if (text.includes(word)) positive++;
+    }
+    for (const word of negativeWords) {
+      if (text.includes(word)) negative++;
+    }
+    if (/[!?]{2,}/.test(text)) negative += 1;
+    if (positive > negative) {
+      return { sentiment: 'positive', score: Math.min(0.9, 0.62 + positive * 0.07), mode: 'local' };
+    }
+    if (negative > positive) {
+      return { sentiment: 'negative', score: Math.max(0.1, 0.38 - negative * 0.06), mode: 'local' };
+    }
+    return { sentiment: 'neutral', score: 0.5, mode: 'local' };
+  }
+
+  withTimeout(promise, timeoutMs) {
+    let timer;
+    const timeout = new Promise((_, reject) => {
+      timer = setTimeout(() => reject(new Error(`sentiment AI timeout after ${timeoutMs}ms`)), timeoutMs);
+      if (timer.unref) timer.unref();
+    });
+    return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
   }
 
   normalizeProvider(value = '') {
