@@ -3060,6 +3060,20 @@ try {
 // END FEATURE FLAGS HOOK
 
 
+// BEGIN SECURITY GATEWAY HOOK
+// Security Gateway + Rate Limit + Abuse Protection Command Center (coordination layer).
+// Dry-run / report-only by default. No live blocking unless SECURITY_GATEWAY_ENFORCE=true. No external calls. Non-fatal if it fails.
+try {
+  const securityGatewayRoutes = require('./routes/securityGatewayRoutes');
+  app.use('/api/security-gateway', securityGatewayRoutes);
+  app.get('/security-gateway.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'security-gateway.html')));
+  app.get('/security-gateway', (req, res) => res.sendFile(path.join(__dirname, 'public', 'security-gateway.html')));
+  console.log('[SecurityGateway] mounted at /api/security-gateway (dry-run / report-only default)');
+} catch (e) {
+  console.error('[SecurityGateway] failed to initialise (non-fatal):', e.message);
+}
+// END SECURITY GATEWAY HOOK
+
 let searchIndexRebuildTimer = null;
 function scheduleSearchIndexRebuild(reason = 'data-change', delayMs = Number(process.env.SEARCH_REBUILD_DEBOUNCE_MS || 30000)) {
   if (searchIndexRebuildTimer) clearTimeout(searchIndexRebuildTimer);

@@ -1,0 +1,116 @@
+{
+  "generatedAt": "2026-06-20T12:22:58.636Z",
+  "passed": 21,
+  "failed": 0,
+  "total": 21,
+  "doctorScore": 100,
+  "doctorStatus": "production_launch_ready_with_caution",
+  "blockers": [],
+  "checks": [
+    {
+      "name": "route module present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "server hook present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dashboard page present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dashboard js present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dashboard css present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "env placeholders present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "gitignore protects security logs",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc SECURITY_GATEWAY_COMMAND_CENTER.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc RATE_LIMIT_POLICY.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc ABUSE_PROTECTION.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "sample policy created",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "rate limit sample check",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "rate limit key is hashed (no raw IP)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "sample abuse detection",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "sample public form validation",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "sample developer scope validation",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "sample webhook validation",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "tenant isolation sample check",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "live enforcement disabled by default",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no secret/raw-IP/PII leak in outputs",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doctor produces score",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}

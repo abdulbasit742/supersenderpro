@@ -56,3 +56,12 @@ data/feature-rollout*.json
 artifacts/*feature-flags-raw*
 feature-exports/private/
 *.feature.raw.json
+
+# Security Gateway — protect raw security/abuse logs (redacted-only, no raw IP/PII)
+data/security-gateway*.json
+data/security-events*.json
+artifacts/*security-raw*
+artifacts/*abuse-raw*
+security-exports/private/
+*.security.raw.json
+*.abuse.raw.json

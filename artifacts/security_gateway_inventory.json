@@ -1,0 +1,187 @@
+{
+  "generatedAt": "2026-06-20T12:21:54.501781+00:00",
+  "module": "Security Gateway + Rate Limit + Abuse Protection Command Center",
+  "scanScope": "scan-first; only add missing coordination layer; do not rebuild existing modules",
+  "existingModulesDetected": {
+    "adminAuthRbac": {
+      "status": "partially_exists",
+      "evidence": "express-session, bcryptjs present; public/re-login.html",
+      "action": "do_not_rebuild"
+    },
+    "complianceCenter": {
+      "status": "exists",
+      "evidence": "lib/complianceCenter, routes/complianceCenterRoutes.js",
+      "action": "do_not_rebuild; use as audit adapter"
+    },
+    "developerPortal": {
+      "status": "partially_exists",
+      "evidence": "lib/unifiedSetup, routes/unifiedSetupRoutes.js",
+      "action": "do_not_rebuild"
+    },
+    "webhookEventHub": {
+      "status": "partially_exists",
+      "evidence": "lib/webhookDispatcher.js",
+      "action": "do_not_rebuild"
+    },
+    "auditLedger": {
+      "status": "exists",
+      "evidence": "lib/complianceCenter/auditLog.js",
+      "action": "do_not_rebuild; safe adapter"
+    },
+    "approvalInbox": {
+      "status": "partially_exists",
+      "evidence": "compliance/marketplace approval flows",
+      "action": "do_not_rebuild; safe adapter"
+    },
+    "publicFunnel": {
+      "status": "exists",
+      "evidence": "routes/publicSaasFunnelRoutes.js, lib/publicSaasFunnel",
+      "action": "do_not_rebuild; safe adapter"
+    },
+    "supportHelpdesk": {
+      "status": "partially_exists",
+      "evidence": "public funnel lead/help forms",
+      "action": "do_not_rebuild"
+    },
+    "resellerPortal": {
+      "status": "exists",
+      "evidence": "lib/resellerNetwork.js, saasBilling reseller",
+      "action": "do_not_rebuild"
+    },
+    "tenantPortal": {
+      "status": "exists",
+      "evidence": "lib/saasBilling",
+      "action": "do_not_rebuild"
+    },
+    "saasBilling": {
+      "status": "exists",
+      "evidence": "lib/saasBilling, routes/saasBillingRoutes.js",
+      "action": "do_not_rebuild; safe adapter"
+    },
+    "deploymentCommand": {
+      "status": "exists",
+      "evidence": "deploy/, deploy.sh, docker-compose",
+      "action": "do_not_rebuild"
+    },
+    "incidentCommand": {
+      "status": "partially_exists",
+      "evidence": "launch checklist/health scripts",
+      "action": "do_not_rebuild; safe adapter"
+    },
+    "flowStudio": {
+      "status": "partially_exists",
+      "evidence": "docs/superflow-studio.md",
+      "action": "registry entries only"
+    },
+    "existingRateLimitMiddleware": {
+      "status": "missing",
+      "evidence": "no rate limit middleware found",
+      "action": "added (report-only)"
+    },
+    "existingSecurityGateway": {
+      "status": "missing",
+      "evidence": "no lib/securityGateway, no routes/securityGatewayRoutes.js",
+      "action": "added (coordination layer)"
+    }
+  },
+  "securityGatewayComponents": [
+    {
+      "name": "lib/securityGateway/securityPolicy.js",
+      "status": "missing->added",
+      "flags": [
+        "safe_to_extend",
+        "needs_test"
+      ]
+    },
+    {
+      "name": "lib/securityGateway/rateLimiter.js",
+      "status": "missing->added",
+      "flags": [
+        "safe_to_extend",
+        "api_abuse_risk",
+        "public_abuse_risk"
+      ]
+    },
+    {
+      "name": "lib/securityGateway/abuseDetector.js",
+      "status": "missing->added",
+      "flags": [
+        "public_abuse_risk",
+        "webhook_abuse_risk",
+        "api_abuse_risk"
+      ]
+    },
+    {
+      "name": "lib/securityGateway/scopeGuard.js",
+      "status": "missing->added",
+      "flags": [
+        "api_abuse_risk"
+      ]
+    },
+    {
+      "name": "lib/securityGateway/tenantIsolationGuard.js",
+      "status": "missing->added",
+      "flags": [
+        "tenant_isolation_risk"
+      ]
+    },
+    {
+      "name": "lib/securityGateway/securityEventWriter.js",
+      "status": "missing->added",
+      "flags": [
+        "privacy_risk",
+        "secret_risk",
+        "needs_adapter"
+      ]
+    },
+    {
+      "name": "lib/securityGateway/securityDoctor.js",
+      "status": "missing->added",
+      "flags": [
+        "needs_test"
+      ]
+    },
+    {
+      "name": "routes/securityGatewayRoutes.js",
+      "status": "missing->added",
+      "flags": [
+        "needs_route",
+        "route_mounted"
+      ]
+    },
+    {
+      "name": "public/security-gateway.html",
+      "status": "missing->added",
+      "flags": [
+        "needs_ui",
+        "dashboard_linked"
+      ]
+    },
+    {
+      "name": "docs/SECURITY_GATEWAY_COMMAND_CENTER.md",
+      "status": "missing->added",
+      "flags": [
+        "needs_docs"
+      ]
+    }
+  ],
+  "safetyPosture": {
+    "dryRunDefault": true,
+    "enforceDefault": false,
+    "rawIpStored": false,
+    "ipHashed": true,
+    "piiRedacted": true,
+    "secretsRedacted": true,
+    "rawExportAllowed": false,
+    "externalCalls": false,
+    "destructiveActions": false
+  },
+  "presentNow": {
+    "route": true,
+    "lib": true,
+    "dashboard": true,
+    "checkScript": true,
+    "smokeTest": true,
+    "docs": true
+  }
+}

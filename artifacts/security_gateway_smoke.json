@@ -1,0 +1,128 @@
+{
+  "generatedAt": "2026-06-20T12:22:58.998Z",
+  "passed": 24,
+  "failed": 0,
+  "total": 24,
+  "results": [
+    {
+      "name": "require barrel",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require security policy",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require rate limiter",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require abuse detector",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require input validator",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require scope guard",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require tenant isolation guard",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require security event writer",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require security doctor",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require route module",
+      "pass": true,
+      "detail": "loaded"
+    },
+    {
+      "name": "default posture is dry-run",
+      "pass": true,
+      "detail": "dryRun=true"
+    },
+    {
+      "name": "enforcement disabled by default",
+      "pass": true,
+      "detail": "enforce=false"
+    },
+    {
+      "name": "IP hashing never returns raw IP",
+      "pass": true,
+      "detail": "iph_e2c6852421292ca1"
+    },
+    {
+      "name": "user-agent hashing works",
+      "pass": true,
+      "detail": "hashed"
+    },
+    {
+      "name": "PII/token redaction works",
+      "pass": true,
+      "detail": "clean"
+    },
+    {
+      "name": "rate limit warning works",
+      "pass": true,
+      "detail": "retryAfter=60"
+    },
+    {
+      "name": "abuse score works",
+      "pass": true,
+      "detail": "100/critical"
+    },
+    {
+      "name": "secret-in-payload detected",
+      "pass": true,
+      "detail": "flagged"
+    },
+    {
+      "name": "public form guard requires consent",
+      "pass": true,
+      "detail": "consent enforced"
+    },
+    {
+      "name": "scope guard preview does not block by default",
+      "pass": true,
+      "detail": "preview"
+    },
+    {
+      "name": "tenant isolation guard warns on mismatch",
+      "pass": true,
+      "detail": "warn"
+    },
+    {
+      "name": "security event is redacted",
+      "pass": true,
+      "detail": "sev_mqmbw2oz_a3b347"
+    },
+    {
+      "name": "doctor produces score + status",
+      "pass": true,
+      "detail": "100/100 production_launch_ready_with_caution"
+    },
+    {
+      "name": "no raw IP/full phone/email/token leaks",
+      "pass": true,
+      "detail": "clean"
+    }
+  ]
+}

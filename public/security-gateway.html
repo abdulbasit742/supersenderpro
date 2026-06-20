@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Security Gateway — SuperSender Pro</title>
+  <link rel="stylesheet" href="/css/security-gateway.css" />
+</head>
+<body>
+  <header class="sg-header">
+    <div class="sg-title"><span class="sg-ico">🛡️</span> Security Gateway <small>+ Rate Limit + Abuse Protection</small></div>
+    <div id="sg-posture" class="sg-posture">Loading…</div>
+  </header>
+
+  <main class="sg-main">
+    <!-- 1. Overview -->
+    <section class="sg-card" id="overview">
+      <h2>Overview</h2>
+      <div class="sg-grid" id="sg-overview-grid"><div class="sg-muted">Loading overview…</div></div>
+    </section>
+
+    <!-- 2. Policy manager -->
+    <section class="sg-card" id="policies">
+      <h2>Policy Manager</h2>
+      <div class="sg-table-wrap"><table id="sg-policy-table"><thead><tr><th>Name</th><th>Scope</th><th>Target</th><th>Rate</th><th>Window</th><th>Mode</th><th>Severity</th></tr></thead><tbody><tr><td colspan="7" class="sg-muted">Loading…</td></tr></tbody></table></div>
+    </section>
+
+    <!-- 3. Rate limits -->
+    <section class="sg-card" id="rate-limits">
+      <h2>Rate Limits</h2>
+      <div class="sg-table-wrap"><table id="sg-rate-table"><thead><tr><th>Scope</th><th>Max Requests</th><th>Window (s)</th><th>Mode</th></tr></thead><tbody></tbody></table></div>
+      <div class="sg-tool">
+        <h3>Test rate limit (preview)</h3>
+        <label>Scope <select id="rl-scope"><option>public_form</option><option>public_api</option><option>developer_api</option><option>webhook</option><option>admin_api</option></select></label>
+        <button id="rl-test-btn">Run preview</button>
+        <pre id="rl-test-out" class="sg-out"></pre>
+      </div>
+    </section>
+
+    <!-- 4. Abuse signals -->
+    <section class="sg-card" id="abuse">
+      <h2>Abuse Signals</h2>
+      <button id="abuse-sample-btn">Run sample detection</button>
+      <pre id="abuse-out" class="sg-out"></pre>
+      <div class="sg-table-wrap"><table id="sg-abuse-table"><thead><tr><th>Time</th><th>Risk</th><th>Scope</th><th>Route</th><th>Safe Actor</th></tr></thead><tbody></tbody></table></div>
+    </section>
+
+    <!-- 5. Validation tools -->
+    <section class="sg-card" id="validation">
+      <h2>Validation Tools</h2>
+      <div class="sg-tool">
+        <h3>Public form validation</h3>
+        <button data-validate="public-form">Validate sample</button>
+        <h3>Developer API scope validation</h3>
+        <button data-validate="developer-api">Validate sample</button>
+        <h3>Webhook validation</h3>
+        <button data-validate="webhook">Validate sample</button>
+        <h3>Tenant access validation</h3>
+        <button data-validate="tenant-access">Validate sample</button>
+        <pre id="validate-out" class="sg-out"></pre>
+      </div>
+    </section>
+
+    <!-- 6. Security events -->
+    <section class="sg-card" id="events">
+      <h2>Security Events <small>(redacted)</small></h2>
+      <button id="events-export-btn">Export redacted report</button>
+      <div class="sg-table-wrap"><table id="sg-events-table"><thead><tr><th>Time</th><th>Type</th><th>Risk</th><th>Route</th><th>Summary</th></tr></thead><tbody></tbody></table></div>
+    </section>
+
+    <!-- 7. Safety panel -->
+    <section class="sg-card" id="safety">
+      <h2>Safety Panel</h2>
+      <ul id="sg-safety-list" class="sg-safety"><li class="sg-muted">Loading…</li></ul>
+    </section>
+  </main>
+  <script src="/js/security-gateway.js"></script>
+</body>
+</html>

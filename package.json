@@ -36,7 +36,9 @@
     "developer-portal:check": "node scripts/developer-portal-check.js",
     "developer-portal:smoke": "node tests/smoke/developerPortalSmoke.js",
     "feature-flags:check": "node scripts/feature-flags-check.js",
-    "feature-flags:smoke": "node tests/smoke/featureFlagsSmoke.js"
+    "feature-flags:smoke": "node tests/smoke/featureFlagsSmoke.js",
+    "security-gateway:check": "node scripts/security-gateway-check.js",
+    "security-gateway:smoke": "node tests/smoke/securityGatewaySmoke.js"
   },
   "dependencies": {
     "@whiskeysockets/baileys": "^7.0.0-rc.9",
