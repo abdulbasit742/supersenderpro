@@ -33,6 +33,7 @@ creds.json
 *token*
 *secret*
 *credential*
+!lib/unifiedSetup/credentialChecklist.js
 .next/
 dist/
 build/
