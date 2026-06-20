@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Group Commerce OS | SuperSender Pro Panel</title>
+  <link rel="stylesheet" href="/css/group-commerce.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- Header -->
+    <header>
+      <div class="logo-section">
+        <h1><i class="fa-solid fa-boxes-packing" style="margin-right: 10px;"></i>Group Commerce OS</h1>
+        <p>Coordination, Moderation, & Intelligence Wrapper for Group Marketplaces</p>
+      </div>
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <div class="status-pill">
+          <span id="system-status-dot" class="status-indicator status-online"></span>
+          <span id="system-status-text">Connected</span>
+        </div>
+        <div id="mode-badge" class="badge-dry-run">
+          🛡️ Dry-Run Active (Safety Mode)
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Grid Layout -->
+    <div class="grid-layout">
+
+      <!-- Left Sidebar: Group Registry -->
+      <aside>
+        <div class="card">
+          <h2><i class="fa-solid fa-address-book"></i>Group Registry</h2>
+          <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+            Select a group to load its settings, catalogue, and run admin triggers.
+          </p>
+          <div id="groups-list" class="group-list">
+            <!-- Loaded dynamically -->
+          </div>
+        </div>
+
+        <div class="card" id="add-group-form">
+          <h2><i class="fa-solid fa-circle-plus"></i>Register Group</h2>
+          <div class="form-group">
+            <label for="new-group-id">Group ID (WhatsApp/Platform)</label>
+            <input type="text" id="new-group-id" class="input-field" placeholder="e.g. 12036321@g.us">
+          </div>
+          <div class="form-group">
+            <label for="new-group-name">Group Name</label>
+            <input type="text" id="new-group-name" class="input-field" placeholder="e.g. Wholesale Accessories PK">
+          </div>
+          <div class="form-group">
+            <label for="new-group-platform">Platform Type</label>
+            <select id="new-group-platform" class="input-field" style="background-color: #121826;">
+              <option value="whatsapp">WhatsApp Group</option>
+              <option value="telegram">Telegram Channel</option>
+              <option value="facebook">Facebook Group</option>
+            </select>
+          </div>
+          <button id="btn-add-group" class="btn w-full" style="width: 100%; margin-top: 10px;">
+            <i class="fa-solid fa-floppy-disk"></i>Add Group to OS
+          </button>
+        </div>
+      </aside>
+
+      <!-- Right Column: Control Center & Working Console -->
+      <main>
+
+        <!-- Center Config Modes Toggles -->
+        <div class="card" style="padding: 20px;">
+          <h2 style="margin-bottom: 16px;"><i class="fa-solid fa-sliders"></i>Active Coordination Modes</h2>
+          <div style="display: grid; grid-template-cols: 1fr; gap: 12px; margin-bottom: 8px;">
+            <div style="display: grid; grid-template-cols: 1fr; gap: 12px;">
+              <!-- Responsive grid for switches -->
+              <div style="display: grid; grid-template-cols: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px;">
+
+                <div class="toggle-switch" style="margin-bottom: 0;">
+                  <div>
+                    <label>Commerce Mode</label>
+                    <p style="font-size: 11px; color: var(--text-secondary);">SKU Stock Prices Extraction</p>
+                  </div>
+                  <input type="checkbox" id="toggle-commerce" class="switch-input" checked>
+                </div>
+
+                <div class="toggle-switch" style="margin-bottom: 0;">
+                  <div>
+                    <label>AI Response Agents</label>
+                    <p style="font-size: 11px; color: var(--text-secondary);">Autonmous Suggestions</p>
+                  </div>
+                  <input type="checkbox" id="toggle-ai" class="switch-input" checked>
+                </div>
+
+                <div class="toggle-switch" style="margin-bottom: 0;">
+                  <div>
+                    <label>Moderation Shield</label>
+                    <p style="font-size: 11px; color: var(--text-secondary);">Anti-spam & Link Blocking</p>
+                  </div>
+                  <input type="checkbox" id="toggle-moderation" class="switch-input" checked>
+                </div>
+
+                <div class="toggle-switch" style="margin-bottom: 0;">
+                  <div>
+                    <label>Channel/Social Relay</label>
+                    <p style="font-size: 11px; color: var(--text-secondary);">Cross-Platform Forwarding</p>
+                  </div>
+                  <input type="checkbox" id="toggle-relay" class="switch-input">
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Working Console with Tabs -->
+        <div class="card">
+          <!-- Tab Navigation -->
+          <div class="tabs-container">
+            <button class="tab-btn active" data-tab="commands"><i class="fa-solid fa-terminal" style="margin-right: 6px;"></i>Command Tester</button>
+            <button class="tab-btn" data-tab="analyzer"><i class="fa-solid fa-magnifying-glass-chart" style="margin-right: 6px;"></i>Message Analyzer</button>
+            <button class="tab-btn" data-tab="catalog" id="tab-btn-catalog"><i class="fa-solid fa-store" style="margin-right: 6px;"></i>Market Catalog</button>
+            <button class="tab-btn" data-tab="agents"><i class="fa-solid fa-robot" style="margin-right: 6px;"></i>AI Agents</button>
+            <button class="tab-btn" data-tab="relays"><i class="fa-solid fa-circle-nodes" style="margin-right: 6px;"></i>Integrations / Relay</button>
+            <button class="tab-btn" data-tab="history"><i class="fa-solid fa-shield-halved" style="margin-right: 6px;"></i>Audit Logs</button>
+          </div>
+
+          <!-- Tab Content 1: Command Tester -->
+          <div class="tab-content active" id="commands-tab">
+            <h2 style="font-size: 16px; margin-bottom: 12px;"><i class="fa-solid fa-cube"></i>Run Admin/Group commands</h2>
+            <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+              Simulate administrator commands. Note: Hazardous actions (like kicks or link deletion) are dry-run by default.
+            </p>
+
+            <div class="log-terminal" id="terminalOutput">
+              <div class="log-entry"><span class="log-time">[10:00:00]</span><span class="log-tag">SYSTEM</span>Group Commerce OS Terminal initialized. Type /help to see all commands.</div>
+            </div>
+
+            <div style="margin-top: 16px; display: flex; gap: 10px;">
+              <input type="text" id="command-input" class="input-field" placeholder="Type group command (e.g. /status, /pause 5m, /catalog, /sellers, /rules)..." style="font-family: monospace;">
+              <button id="btn-run-command" class="btn"><i class="fa-solid fa-play"></i>Execute</button>
+            </div>
+
+            <div style="margin-top: 16px;">
+              <p style="font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 10px;">Quick command triggers:</p>
+              <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                <button class="btn btn-secondary quick-cmd-btn" data-cmd="/help">/help</button>
+                <button class="btn btn-secondary quick-cmd-btn" data-cmd="/status">/status</button>
+                <button class="btn btn-secondary quick-cmd-btn" data-cmd="/rules">/rules</button>
+                <button class="btn btn-secondary quick-cmd-btn" data-cmd="/pause 5m">/pause 5m</button>
+                <button class="btn btn-secondary quick-cmd-btn" data-cmd="/resume">/resume</button>
+                <button class="btn btn-secondary quick-cmd-btn" data-cmd="/catalog">/catalog</button>
+                <button class="btn btn-secondary quick-cmd-btn" data-cmd="/sellers">/sellers</button>
+                <button class="btn btn-secondary quick-cmd-btn" data-cmd="/approve @john">/approve seller</button>
+                <button class="btn btn-secondary quick-cmd-btn" data-cmd="/remove @spammer">/remove member</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab Content 2: Message Analyzer -->
+          <div class="tab-content" id="analyzer-tab">
+            <h2 style="font-size: 16px; margin-bottom: 12px;"><i class="fa-solid fa-brain"></i>Natural Language Parsing Intelligence</h2>
+            <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+              Test semantic extraction. Insert any text from WhatsApp to analyze seller/buyer roles, pricing, currency, stock availability, location flags, and SKU detection.
+            </p>
+            <div class="form-group">
+              <label for="analyzer-input">Group Chat Message Text</label>
+              <textarea id="analyzer-input" class="input-field" rows="4" placeholder="Paste message here... e.g. 'iPhone 13 128GB 3 pcs available 145k RS in Lahore'" style="resize: none; font-family: inherit;"></textarea>
+            </div>
+            <button id="btn-analyze" class="btn"><i class="fa-solid fa-calculator"></i>Run Semantic Extraction</button>
+
+            <div class="preview-box">
+              <p style="font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 8px;">Normalized Extraction Output (JSON):</p>
+              <pre id="analyzer-result" style="font-family: monospace; font-size: 13px; color: #a6e22e; overflow-x: auto;">{ "status": "waiting_for_input" }</pre>
+            </div>
+          </div>
+
+          <!-- Tab Content 3: Market Catalog -->
+          <div class="tab-content" id="catalog-tab">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <h2 style="font-size: 16px; margin: 0;"><i class="fa-solid fa-basket-shopping"></i>Virtual Group-Specific Catalogue</h2>
+              <div style="display: flex; gap: 8px;">
+                <button id="btn-import-ecom" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;"><i class="fa-solid fa-cloud-arrow-down"></i>Import from E-com</button>
+                <button id="btn-export-ecom" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;"><i class="fa-solid fa-cloud-arrow-up"></i>Export Draft Preview</button>
+              </div>
+            </div>
+            <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+              Track products, SKU prices, active reserves, and verified group merchants. This inventory syncs dynamically with external e-commerce engines.
+            </p>
+            <div class="catalog-table-wrapper">
+              <table class="catalog-table">
+                <thead>
+                  <tr>
+                    <th>Product Name</th>
+                    <th>SKU Code</th>
+                    <th>Latest Price</th>
+                    <th>Stock Reserve</th>
+                    <th>Verified Sellers</th>
+                  </tr>
+                </thead>
+                <tbody id="catalog-table-body">
+                  <!-- Loaded dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Tab Content 4: AI Agents -->
+          <div class="tab-content" id="agents-tab">
+            <h2 style="font-size: 16px; margin-bottom: 12px;"><i class="fa-solid fa-microchip"></i>AI Group Agent Assignment Playground</h2>
+            <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+              Assign specialized AI role models to this group. AI answers and catalog updates are formulated as dry-run drafts and will NOT auto-respond to members directly.
+            </p>
+            <div style="display: grid; grid-template-cols: 1fr; gap: 16px; margin-bottom: 16px;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label for="agent-selector">Select Active Persona</label>
+                <select id="agent-selector" class="input-field" style="background-color: #121826;">
+                  <!-- Loaded dynamically -->
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label for="agent-prompt">Chat Message Context to Evaluate</label>
+                <input type="text" id="agent-prompt" class="input-field" placeholder="Type message... e.g. 'need Netlfix 4 screens urgent'" value="need Canva Pro 1 year">
+              </div>
+            </div>
+            <button id="btn-run-agent" class="btn"><i class="fa-solid fa-wand-magic-sparkles"></i>Evaluate Message with AI</button>
+
+            <div class="preview-box" style="margin-top: 16px;">
+              <p style="font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 10px;">AI Agent Suggestions & Actions Console:</p>
+              <div class="log-terminal" id="agentConsole" style="height: 200px; color: #3b82f6;">
+                <div class="log-entry"><span class="log-time">[System]</span> Choose a persona and evaluate context. Suggestions draft only.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab Content 5: Relays -->
+          <div class="tab-content" id="relays-tab">
+            <h2 style="font-size: 16px; margin-bottom: 12px;"><i class="fa-solid fa-network-wired"></i>Cross-Platform Relay Planners</h2>
+            <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+              Relay verified group listings to social platforms, WhatsApp Channels, or compile e-commerce synchronization payloads. Default mode is review drafts.
+            </p>
+            <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px;">
+              <button id="btn-channel-preview" class="btn"><i class="fa-brands fa-whatsapp"></i>Group Catalog -> WA Channel</button>
+              <button id="btn-social-preview" class="btn"><i class="fa-brands fa-square-facebook"></i>Group Seller Offer -> Social Post</button>
+              <button id="btn-digest-preview" class="btn"><i class="fa-solid fa-newspaper"></i>Market Digest -> Channel Draft</button>
+            </div>
+            <div class="preview-box">
+              <p style="font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 10px;">Planned Cross-Platform Draft payloads (JSON):</p>
+              <pre id="relay-preview-area" style="font-family: monospace; font-size: 13px; color: #a6e22e; overflow-x: auto;">{ "status": "waiting_for_planner_generation" }</pre>
+            </div>
+          </div>
+
+          <!-- Tab Content 6: History/Audit Logs -->
+          <div class="tab-content" id="history-tab">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <h2 style="font-size: 16px; margin: 0;"><i class="fa-solid fa-lock"></i>Secure Audit History Trail</h2>
+              <button id="btn-refresh-history" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;"><i class="fa-solid fa-rotate"></i>Refresh</button>
+            </div>
+            <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+              Compliance and transparency log. Sensitive details (e.g. phone numbers, emails, payment confirmations) are automatically masked before saving to disk.
+            </p>
+            <div class="log-terminal" id="history-list" style="height: 350px;">
+              <!-- Loaded dynamically -->
+            </div>
+          </div>
+
+        </div>
+      </main>
+
+    </div>
+  </div>
+
+  <script src="/js/group-commerce.js"></script>
+</body>
+</html>

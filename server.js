@@ -3033,6 +3033,11 @@ const realEstateBot = require('./bots/realEstateBot');
 const reRoutes = require('./saas/reSignup');
 app.use('/api', reRoutes);
 
+// BEGIN GROUP COMMERCE OS HOOK
+const groupCommerceRoutes = require('./routes/groupCommerceRoutes');
+app.use('/api/group-commerce', groupCommerceRoutes);
+// END GROUP COMMERCE OS HOOK
+
 // Kommo CRM Advanced Integration (Digital Pipeline, Salesbot, and Lead Routing)
 const KommoCRM = require('./lib/kommoCRM');
 const kommoCRM = new KommoCRM(dataDir, sendDirect);

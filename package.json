@@ -36,7 +36,8 @@
     "doctor": "node scripts/doctor.js",
     "agent:serve": "node agent-runtime/server.js",
     "agent:demo": "node agent-runtime/demo.js",
-    "agent:test": "node --test agent-runtime/__tests__/"
+    "agent:test": "node --test agent-runtime/__tests__/",
+    "group-commerce:check": "node scripts/group-commerce-check.js"
   },
   "dependencies": {
     "@whiskeysockets/baileys": "^7.0.0-rc.9",

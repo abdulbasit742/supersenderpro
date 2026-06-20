@@ -1,0 +1,305 @@
+{
+  "WhatsApp group management": {
+    "description": "Handling WhatsApp groups, analytics, automatic replies, and broadcasting to groups.",
+    "status": "exists",
+    "matching_files": [
+      "automations/groupAnalytics.js",
+      "automations/groupAutoReply.js",
+      "automations/groupBroadcast.js",
+      "backend/src/whatsapp/groupManager.js"
+    ],
+    "duplicate_risk": "high (do not duplicate!)"
+  },
+  "WhatsApp/Baileys bot": {
+    "description": "Underlying Baileys WhatsApp client, sales bot, and AI tools bot integrations.",
+    "status": "exists",
+    "matching_files": [
+      "backend/src/whatsapp/baileysClient.js",
+      "wa-sales-bot/.env.example",
+      "wa-sales-bot/README.md",
+      "wa-sales-bot/apiServer.js",
+      "wa-sales-bot/bot/admin/commands.js",
+      "wa-sales-bot/bot/aiAgent/classifier.js",
+      "wa-sales-bot/bot/aiAgent/knowledgeBase.js",
+      "wa-sales-bot/bot/dealerIntelligence/dealerAccess.js",
+      "wa-sales-bot/bot/dealerIntelligence/dealerParser.js",
+      "wa-sales-bot/bot/dealerIntelligence/groupMonitor.js",
+      "wa-sales-bot/bot/dealerIntelligence/priceAnalytics.js",
+      "wa-sales-bot/bot/dealerIntelligence/stockManager.js",
+      "wa-sales-bot/bot/dealerIntelligence/trustManager.js",
+      "wa-sales-bot/bot/flows/availability.js",
+      "wa-sales-bot/bot/flows/delivery.js",
+      "wa-sales-bot/bot/flows/followup.js",
+      "wa-sales-bot/bot/flows/issue.js",
+      "wa-sales-bot/bot/flows/order.js",
+      "wa-sales-bot/bot/flows/rates.js",
+      "wa-sales-bot/bot/flows/support.js",
+      "wa-sales-bot/bot/flows/welcome.js",
+      "wa-sales-bot/bot/messageHandler.js",
+      "wa-sales-bot/bot/scheduler/cron.js",
+      "wa-sales-bot/bot/schedulers/dealerCron.js",
+      "wa-sales-bot/config/tools.js",
+      "wa-sales-bot/db/database.js",
+      "wa-sales-bot/db/queries.js",
+      "wa-sales-bot/index.js",
+      "wa-sales-bot/lib/n8nBridge.js",
+      "wa-sales-bot/package.json",
+      "wa-sales-bot/utils/formatter.js",
+      "wa-sales-bot/utils/invoiceGen.js",
+      "wa-sales-bot/utils/policyChecker.js",
+      "wa-sales-bot/utils/rateParser.js",
+      "wa-sales-bot/utils/warrantyChecker.js",
+      "whatsapp-ai-tools-bot/.env.example",
+      "whatsapp-ai-tools-bot/.gitignore",
+      "whatsapp-ai-tools-bot/README.md",
+      "whatsapp-ai-tools-bot/package.json",
+      "whatsapp-ai-tools-bot/src/config.js",
+      "whatsapp-ai-tools-bot/src/cronJobs.js",
+      "whatsapp-ai-tools-bot/src/db.js",
+      "whatsapp-ai-tools-bot/src/formatters.js",
+      "whatsapp-ai-tools-bot/src/handlers.js",
+      "whatsapp-ai-tools-bot/src/index.js",
+      "whatsapp-ai-tools-bot/src/parser.js",
+      "whatsapp-ai-tools-bot/src/parser.test.js",
+      "whatsapp-ai-tools-bot/src/sessionManager.js"
+    ],
+    "duplicate_risk": "high (do not duplicate!)"
+  },
+  "WhatsApp Cloud API": {
+    "description": "Integration with the official WhatsApp Cloud API.",
+    "status": "missing",
+    "matching_files": [],
+    "duplicate_risk": "low"
+  },
+  "WhatsApp channel automation": {
+    "description": "Automation and utilities for WhatsApp Channels.",
+    "status": "partially_exists",
+    "matching_files": [
+      "automations/channelForwarder.js",
+      "scripts/export-channels.js"
+    ],
+    "duplicate_risk": "high (do not duplicate!)"
+  },
+  "ecommerce hub": {
+    "description": "Integrations with e-commerce systems, store bots, and frontend commerce routes.",
+    "status": "partially_exists",
+    "matching_files": [
+      "bots/storeBot.js",
+      "docs/ecommerce-platform-completion.md",
+      "lovable-app/src/lib/marketplace.functions.ts",
+      "lovable-app/src/routes/_app.commerce.tsx",
+      "public/assets/brand-icons/woocommerce.svg",
+      "public/store.html"
+    ],
+    "duplicate_risk": "high (do not duplicate!)"
+  },
+  "product catalog": {
+    "description": "Configuration, routes, and UI pages for product catalogs.",
+    "status": "exists",
+    "matching_files": [
+      "backend/src/config/catalog.js",
+      "lovable-app/src/routes/_app.catalog.tsx"
+    ],
+    "duplicate_risk": "high (do not duplicate!)"
+  },
+  "orders": {
+    "description": "Order management, bots for orders, confirmations, and frontend routes.",
+    "status": "exists",
+    "matching_files": [
+      "automations/orderConfirmation.js",
+      "backend/src/bot/flows/order.js",
+      "frontend/app/orders/page.js",
+      "lovable-app/src/routes/_app.orders.tsx",
+      "wa-sales-bot/bot/flows/order.js"
+    ],
+    "duplicate_risk": "high (do not duplicate!)"
+  },
+  "payments": {
+    "description": "Payment gateway integrations (Easypaisa, Jazzcash) and verification systems.",
+    "status": "exists",
+    "matching_files": [
+      "backend/src/payment/easypaisa.js",
+      "backend/src/payment/jazzcash.js",
+      "backend/src/payment/verifier.js",
+      "backend/src/queues/paymentQueue.js",
+      "backend/src/routes/payments.js"
+    ],
+    "duplicate_risk": "high (do not duplicate!)"
+  },
+  "CRM/customers": {
+    "description": "Customer relationship management and Kommo CRM integrations.",
+    "status": "exists",
+    "matching_files": [
+      "backend/src/routes/customers.js",
+      "lib/kommoCRM.js",
+      "routes/kommo.js"
+    ],
+    "duplicate_risk": "high (do not duplicate!)"
+  },
+  "dealer intelligence": {
+    "description": "Dealer access control, parser, trust manager, and price analytics.",
+    "status": "exists",
+    "matching_files": [
+      "backend/src/dealerIntelligence/dealerAccess.js",
+      "backend/src/dealerIntelligence/dealerParser.js",
+      "backend/src/dealerIntelligence/groupMonitor.js",
+      "backend/src/dealerIntelligence/priceAnalytics.js",
+      "backend/src/dealerIntelligence/stockManager.js",
+      "backend/src/dealerIntelligence/trustManager.js",
+      "backend/src/services/priceAnalytics.js",
+      "wa-sales-bot/bot/dealerIntelligence/dealerAccess.js",
+      "wa-sales-bot/bot/dealerIntelligence/dealerParser.js",
+      "wa-sales-bot/bot/dealerIntelligence/groupMonitor.js",
+      "wa-sales-bot/bot/dealerIntelligence/priceAnalytics.js",
+      "wa-sales-bot/bot/dealerIntelligence/stockManager.js",
+      "wa-sales-bot/bot/dealerIntelligence/trustManager.js"
+    ],
+    "duplicate_risk": "high (do not duplicate!)"
+  },
+  "seller/rate/stock parsing": {
+    "description": "Parsing seller offers, stock, and price sheets.",
+    "status": "exists",
+    "matching_files": [
+      "backend/src/bot/flows/rates.js",
+      "backend/src/routes/rates.js",
+      "backend/src/services/stockService.js",
+      "backend/src/utils/rateParser.js",
+      "wa-sales-bot/bot/flows/rates.js",
+      "wa-sales-bot/utils/rateParser.js"
+    ],
+    "duplicate_risk": "high (do not duplicate!)"
+  },
+  "AI agents": {
+    "description": "AI agent services, brains, managers, classifications, and escalations.",
+    "status": "exists",
+    "matching_files": [
+      "ai/agents/selfHealingAgent.js",
+      "ai/aiBrain.js",
+      "ai/aiManager.js",
+      "backend/src/aiAgent/classifier.js",
+      "backend/src/aiAgent/escalation.js",
+      "backend/src/services/aiAgent.js",
+      "lib/aiAgent.js",
+      "wa-sales-bot/bot/aiAgent/classifier.js"
+    ],
+    "duplicate_risk": "high (do not duplicate!)"
+  },
+  "flow builder / automation builder": {
+    "description": "SuperFlow Studio flow builder, sample flows, and Zero-Touch automation engines.",
+    "status": "exists",
+    "matching_files": [
+      "backend/src/zeroTouch/engine.js",
+      "backend/src/zeroTouch/index.js",
+      "backend/src/zeroTouch/memory.js",
+      "backend/src/zeroTouch/pricing.js",
+      "backend/src/zeroTouch/queue.js",
+      "docs/flow-studio-sample-flow.json",
+      "docs/superflow-studio.md",
+      "mcp/tools/zeroTouchTool.js"
+    ],
+    "duplicate_risk": "high (do not duplicate!)"
+  },
+  "social hub": {
+    "description": "Social media auto-posting hubs, channels, and social pages.",
+    "status": "partially_exists",
+    "matching_files": [
+      "integrations/socialHub.js",
+      "lovable-app/src/routes/_app.channels.tsx",
+      "social-auto-posts/README.md",
+      "social-auto-posts/examples/daily-ai-tools-post.json",
+      "social-auto-posts/examples/text-post-template.txt",
+      "social-auto-posts/inbox/.gitkeep"
+    ],
+    "duplicate_risk": "high (do not duplicate!)"
+  },
+  "n8n bridge": {
+    "description": "Integration bridge and workflows for n8n automation.",
+    "status": "exists",
+    "matching_files": [
+      "backend/src/routes/n8n.js",
+      "backend/src/services/n8nClient.js",
+      "integrations/n8nBridge.js",
+      "n8n-workflows/README.md",
+      "n8n-workflows/customer-followup.json",
+      "n8n-workflows/daily-broadcast.json",
+      "n8n-workflows/dealer-rate-collection.json",
+      "n8n-workflows/payment-verification.json",
+      "wa-sales-bot/lib/n8nBridge.js"
+    ],
+    "duplicate_risk": "high (do not duplicate!)"
+  },
+  "Google Sheets reporting": {
+    "description": "Syncing and reporting connectors for Google Sheets.",
+    "status": "exists",
+    "matching_files": [
+      "backend/src/services/sheetsService.js",
+      "backend/src/utils/sheetsSync.js",
+      "lib/reportingConnectors.js"
+    ],
+    "duplicate_risk": "high (do not duplicate!)"
+  },
+  "admin auth/RBAC": {
+    "description": "Authentication middleware, routes, and role-based access control.",
+    "status": "exists",
+    "matching_files": [
+      "backend/src/middleware/auth.js",
+      "backend/src/routes/auth.js",
+      "lovable-app/src/routes/auth.tsx"
+    ],
+    "duplicate_risk": "high (do not duplicate!)"
+  },
+  "security scan": {
+    "description": "Encryption, fraud detection, health check scripts, and security folders.",
+    "status": "exists",
+    "matching_files": [
+      "backend/src/security/encryption.js",
+      "backend/src/security/fraudDetection.js",
+      "scripts/healthCheck.js"
+    ],
+    "duplicate_risk": "high (do not duplicate!)"
+  },
+  "launch center": {
+    "description": "Launch checklists, readiness verification scripts, and live scripts.",
+    "status": "partially_exists",
+    "matching_files": [
+      "docs/OFFICIAL_LAUNCH_CHECKLIST.md",
+      "scripts/go-live.ps1",
+      "scripts/launch-readiness.js"
+    ],
+    "duplicate_risk": "high (do not duplicate!)"
+  },
+  "local worker bridge": {
+    "description": "Local worker bridges, agent runtimes, and local startup tools.",
+    "status": "partially_exists",
+    "matching_files": [
+      "agent-runtime/README.md",
+      "agent-runtime/__tests__/sandbox.test.js",
+      "agent-runtime/agents.js",
+      "agent-runtime/approvalQueue.js",
+      "agent-runtime/contextSanitizer.js",
+      "agent-runtime/demo.js",
+      "agent-runtime/index.js",
+      "agent-runtime/policy.js",
+      "agent-runtime/public/app.js",
+      "agent-runtime/public/index.html",
+      "agent-runtime/public/styles.css",
+      "agent-runtime/sandbox.js",
+      "agent-runtime/server.js",
+      "agent-runtime/toolRegistry.js",
+      "docker-compose.agent-runtime.yml",
+      "scripts/claw-runtime/run-supervised-agent.ps1",
+      "scripts/claw-runtime/setup-claw-runtime.ps1",
+      "start-antigravity.js"
+    ],
+    "duplicate_risk": "high (do not duplicate!)"
+  },
+  "any existing group moderation/admin command logic": {
+    "description": "Existing command parsers for group bots or administrators.",
+    "status": "exists",
+    "matching_files": [
+      "backend/src/bot/admin/commands.js",
+      "wa-sales-bot/bot/admin/commands.js"
+    ],
+    "duplicate_risk": "high (do not duplicate!)"
+  }
+}
