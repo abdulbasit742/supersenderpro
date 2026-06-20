@@ -3138,6 +3138,20 @@ try {
 // END COMPLIANCE CENTER HOOK
 // END MARKETPLACE INTELLIGENCE HOOK
 
+// BEGIN SAAS BILLING HOOK
+// SaaS Billing + Tenant License + Usage Metering Command Center.
+// Warn-only / dry-run by default. No payment capture, no live suspension. Non-fatal if it fails.
+try {
+  const saasBillingRoutes = require('./routes/saasBillingRoutes');
+  app.use('/api/saas-billing', saasBillingRoutes);
+  app.get('/saas-billing.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'saas-billing.html')));
+  app.get('/saas-billing', (req, res) => res.sendFile(path.join(__dirname, 'public', 'saas-billing.html')));
+  console.log('[SaaSBilling] mounted at /api/saas-billing (warn-only / dry-run default)');
+} catch (e) {
+  console.error('[SaaSBilling] failed to initialise (non-fatal):', e.message);
+}
+// END SAAS BILLING HOOK
+
 
 let searchIndexRebuildTimer = null;
 function scheduleSearchIndexRebuild(reason = 'data-change', delayMs = Number(process.env.SEARCH_REBUILD_DEBOUNCE_MS || 30000)) {

@@ -1,0 +1,123 @@
+{
+  "generatedAt": "2026-06-20T08:58:22.472Z",
+  "passed": 22,
+  "failed": 0,
+  "total": 22,
+  "doctor": {
+    "score": 100,
+    "status": "healthy",
+    "blockers": []
+  },
+  "checks": [
+    {
+      "name": "route module present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "server hook present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dashboard page present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dashboard js present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dashboard css present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "env placeholders present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc SAAS_BILLING_COMMAND_CENTER.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc SAAS_PLANS_AND_LIMITS.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc SAAS_LICENSE_ENGINE.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc SAAS_USAGE_METERING.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc SAAS_RESELLER_PORTAL.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc SAAS_BILLING_SAFETY.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc SAAS_PAYMENT_ADAPTERS.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "plans seeded",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "license issued (trial)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "quota warn-only",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "feature gate warn-only by default",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "invoice draft built",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "mark-paid stays manual review",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doctor runs",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no secret leak in sample output",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no full license key returned",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}

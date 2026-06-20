@@ -1,0 +1,37 @@
+{
+  "generatedAt": "2026-06-20T08:55:00Z",
+  "repo": "abdulbasit742/supersenderpro",
+  "scanScope": ["server.js", "routes/", "lib/", "public/", "backend/", "saas/", "data/", "docs/", "package.json", ".env.example", ".gitignore"],
+  "summary": {
+    "decision": "Existing payment, subscription, reseller, and auth systems detected — NOT rebuilt. Added a new SaaS Billing + Tenant License + Usage Metering coordination layer that adapts/wires to them.",
+    "enforcement": "warn-only / dry-run by default"
+  },
+  "modules": [
+    { "name": "subscription plans", "path": "lib/subscriptionPlans.js", "status": "exists", "flags": ["safe_to_extend", "duplicate_risk"], "action": "adapted via lib/saasBilling/tenantPlans.js (legacy tier mapping); not rebuilt" },
+    { "name": "reseller network", "path": "lib/resellerNetwork.js", "status": "exists", "flags": ["safe_to_extend", "duplicate_risk"], "action": "surfaced read-only in resellerManager; new resellers stored separately" },
+    { "name": "payment verifier", "path": "backend/src/payment/verifier.js", "status": "exists", "flags": ["payment_risk", "safe_to_extend"], "action": "detected by existingPaymentAdapter; deferred to for review; never re-implemented or called" },
+    { "name": "payment gateways", "path": "backend/src/payment/{jazzcash,easypaisa,emailParser}.js", "status": "exists", "flags": ["payment_risk"], "action": "detected only; placeholder adapters added for stripe/paypal/jazzcash/easypaisa/bank" },
+    { "name": "payment routes", "path": "backend/src/routes/payments.js", "status": "exists", "flags": ["payment_risk"], "action": "untouched" },
+    { "name": "admin auth / RBAC", "path": "backend/src/middleware/auth.js", "status": "exists", "flags": ["safe_to_extend"], "action": "untouched; new write routes use admin-secret guard matching repo convention" },
+    { "name": "owner briefing / command", "path": "lib/ownerBriefing/", "status": "exists", "flags": ["safe_to_extend", "needs_wiring"], "action": "ownerCommandAdapter provides read-only billing summary" },
+    { "name": "unified / business setup", "path": "lib/unifiedSetup/", "status": "exists", "flags": ["safe_to_extend", "needs_wiring"], "action": "businessSetupAdapter provides plan-selection card + checklist" },
+    { "name": "invoice generator (wa-sales-bot)", "path": "wa-sales-bot/utils/invoiceGen.js", "status": "partially_exists", "flags": ["duplicate_risk"], "action": "left as-is; SaaS billing has its own draft invoiceBuilder for tenant subscriptions" },
+    { "name": "saas dir", "path": "saas/reSignup.js", "status": "partially_exists", "flags": [], "action": "unrelated (real-estate signup); not touched" },
+
+    { "name": "saas billing plan registry", "path": "lib/saasBilling/planRegistry.js", "status": "missing", "flags": ["needs_route", "needs_ui", "needs_docs", "needs_test"], "action": "created" },
+    { "name": "tenant license engine", "path": "lib/saasBilling/licenseEngine.js", "status": "missing", "flags": ["needs_route", "needs_ui", "needs_test"], "action": "created" },
+    { "name": "usage metering", "path": "lib/saasBilling/usageMeter.js", "status": "missing", "flags": ["needs_route", "needs_ui", "needs_test"], "action": "created" },
+    { "name": "feature gate", "path": "lib/saasBilling/featureGate.js", "status": "missing", "flags": ["live_action_risk"], "action": "created warn-only" },
+    { "name": "billing status + invoices", "path": "lib/saasBilling/{billingStatus,invoiceBuilder}.js", "status": "missing", "flags": ["payment_risk"], "action": "created draft-only" },
+    { "name": "payment adapter layer", "path": "lib/saasBilling/paymentAdapters/", "status": "missing", "flags": ["payment_risk"], "action": "created placeholders + existing-module detection" },
+    { "name": "reseller controls", "path": "lib/saasBilling/resellerManager.js", "status": "missing", "flags": ["privacy_risk"], "action": "created (masked PII, no payouts)" },
+    { "name": "plan change flow", "path": "lib/saasBilling/planChange.js", "status": "missing", "flags": ["live_action_risk"], "action": "created preview/approval-gated" },
+    { "name": "api routes", "path": "routes/saasBillingRoutes.js", "status": "missing", "flags": ["needs_wiring"], "action": "created + mounted in server.js" },
+    { "name": "dashboard ui", "path": "public/saas-billing.html", "status": "missing", "flags": ["needs_wiring"], "action": "created + nav link" },
+    { "name": "doctor + check + smoke", "path": "lib/saasBilling/doctor.js, scripts/saas-billing-check.js, tests/smoke/saasBillingSmoke.js", "status": "missing", "flags": ["needs_test"], "action": "created" },
+    { "name": "flow studio nodes", "path": "lib/saasBilling/flowNodes.js", "status": "missing", "flags": ["needs_wiring"], "action": "created registry entries (opt-in register())" },
+    { "name": "admin whatsapp commands", "path": "lib/saasBilling/adminCommands.js", "status": "missing", "flags": ["needs_wiring"], "action": "created handlers + documented integration point (no duplicate bot)" },
+    { "name": "env placeholders", "path": ".env.example", "status": "missing", "flags": [], "action": "appended SAAS_BILLING_* + provider placeholders" },
+    { "name": "docs", "path": "docs/SAAS_*.md", "status": "missing", "flags": [], "action": "created 7 docs + gap report" }
+  ]
+}

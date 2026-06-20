@@ -1,0 +1,47 @@
+/* public/css/saas-billing.css — SaaS Billing Command Center dashboard */
+:root{--bg:#0b1020;--panel:#121a30;--panel2:#0f1729;--line:#23304f;--txt:#e6ecf8;--mut:#93a4c7;--acc:#5b8cff;--ok:#34d399;--warn:#fbbf24;--bad:#f87171}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Segoe UI,system-ui,Arial,sans-serif;background:linear-gradient(180deg,#0b1020,#0a0f1d);color:var(--txt)}
+.sb-header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 24px;border-bottom:1px solid var(--line);background:rgba(18,26,48,.6);backdrop-filter:blur(6px);position:sticky;top:0;z-index:5;flex-wrap:wrap}
+.sb-brand{display:flex;align-items:center;gap:12px}
+.sb-logo{font-size:26px}
+.sb-header h1{font-size:18px;margin:0}
+.sb-sub{margin:2px 0 0;color:var(--mut);font-size:12px}
+.sb-pill{padding:8px 16px;border-radius:999px;font-weight:700;font-size:12px;background:rgba(52,211,153,.14);color:#86efac;border:1px solid rgba(52,211,153,.35)}
+.sb-pill.live{background:rgba(248,113,113,.15);color:#fca5a5;border-color:rgba(248,113,113,.4)}
+.sb-main{max-width:1200px;margin:0 auto;padding:22px}
+.sb-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.sb-tab{background:var(--panel2);border:1px solid var(--line);color:var(--mut);padding:9px 14px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:600}
+.sb-tab.active{background:var(--acc);color:#fff;border-color:var(--acc)}
+.sb-section{display:none;animation:fade .2s ease}
+.sb-section.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1}}
+.sb-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:18px}
+.sb-stat{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+.sb-stat .n{font-size:26px;font-weight:800}
+.sb-stat .l{color:var(--mut);font-size:12px;margin-top:4px}
+.sb-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px}
+.sb-card h2{font-size:15px;margin:0 0 14px}
+.sb-table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{color:var(--mut);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.4px}
+.chip{display:inline-block;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700}
+.chip.ok{background:rgba(52,211,153,.15);color:#86efac}
+.chip.warn{background:rgba(251,191,36,.15);color:#fcd34d}
+.chip.bad{background:rgba(248,113,113,.15);color:#fca5a5}
+.chip.mut{background:rgba(147,164,199,.12);color:var(--mut)}
+.bar{height:7px;border-radius:6px;background:#1c2742;overflow:hidden;min-width:80px}
+.bar>i{display:block;height:100%;background:var(--acc)}
+.bar.warn>i{background:var(--warn)}.bar.bad>i{background:var(--bad)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+.field{display:flex;flex-direction:column;gap:4px;min-width:150px}
+.field label{font-size:11px;color:var(--mut)}
+input,select{background:var(--panel2);border:1px solid var(--line);color:var(--txt);padding:9px 10px;border-radius:9px;font-size:13px;width:100%}
+.btn{background:var(--acc);border:none;color:#fff;padding:10px 16px;border-radius:9px;cursor:pointer;font-weight:700;font-size:13px}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--txt)}
+.muted{color:var(--mut);font-size:12px}
+pre{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px;overflow:auto;font-size:12px;max-height:340px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:13px}
+.kv b{color:var(--mut);font-weight:600}
+.banner{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);color:#fcd34d;padding:10px 14px;border-radius:10px;font-size:12px;margin-bottom:16px}

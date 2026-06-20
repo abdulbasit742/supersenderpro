@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SaaS Billing Command Center — SuperSender Pro</title>
+  <link rel="stylesheet" href="/css/saas-billing.css" />
+</head>
+<body>
+  <header class="sb-header">
+    <div class="sb-brand">
+      <span class="sb-logo">💳</span>
+      <div>
+        <h1>SaaS Billing Command Center</h1>
+        <p class="sb-sub">Plans · licenses · usage metering · invoices · resellers — warn-only by default</p>
+      </div>
+    </div>
+    <div id="sb-pill" class="sb-pill">Loading…</div>
+  </header>
+
+  <main class="sb-main">
+    <div id="sb-banner" class="banner" style="display:none"></div>
+    <div class="sb-tabs">
+      <button class="sb-tab active" data-tab="overview">📊 Overview</button>
+      <button class="sb-tab" data-tab="plans">🏷️ Plans</button>
+      <button class="sb-tab" data-tab="tenants">🏢 Tenants & Licenses</button>
+      <button class="sb-tab" data-tab="usage">📈 Usage</button>
+      <button class="sb-tab" data-tab="invoices">🧾 Invoices</button>
+      <button class="sb-tab" data-tab="gate">🚦 Feature Gate</button>
+      <button class="sb-tab" data-tab="resellers">🤝 Resellers</button>
+      <button class="sb-tab" data-tab="doctor">🩺 Doctor</button>
+    </div>
+
+    <!-- OVERVIEW -->
+    <section class="sb-section active" id="tab-overview">
+      <div class="sb-cards" id="ov-cards"></div>
+      <div class="sb-card"><h2>Tenants snapshot</h2><div class="sb-table-wrap"><table id="ov-tenants"><thead><tr><th>Tenant</th><th>Plan</th><th>License</th><th>Usage</th><th>Open invoices</th></tr></thead><tbody></tbody></table></div></div>
+    </section>
+
+    <!-- PLANS -->
+    <section class="sb-section" id="tab-plans">
+      <div class="sb-card"><h2>Plans &amp; tiers</h2><div class="sb-table-wrap"><table id="pl-table"><thead><tr><th>ID</th><th>Name</th><th>Tier</th><th>Price</th><th>Cycle</th><th>Trial</th><th>Features on</th><th>Active</th></tr></thead><tbody></tbody></table></div></div>
+      <div class="sb-card"><h2>Plan detail</h2><div class="row"><div class="field"><label>Plan</label><select id="pl-select"></select></div></div><pre id="pl-detail">Select a plan…</pre></div>
+    </section>
+
+    <!-- TENANTS -->
+    <section class="sb-section" id="tab-tenants">
+      <div class="sb-card"><h2>Tenants &amp; licenses</h2><div class="sb-table-wrap"><table id="tn-table"><thead><tr><th>Tenant</th><th>Plan</th><th>License</th><th>Entitled</th><th>Expiry</th><th>Renewal</th></tr></thead><tbody></tbody></table></div></div>
+      <div class="sb-card"><h2>Issue / update license <span class="muted">(admin)</span></h2>
+        <div class="row">
+          <div class="field"><label>Tenant ID</label><input id="tn-id" value="default" /></div>
+          <div class="field"><label>Plan</label><select id="tn-plan"></select></div>
+          <button class="btn" id="tn-issue">Issue license</button>
+        </div>
+        <pre id="tn-out" class="muted">No action yet.</pre>
+      </div>
+    </section>
+
+    <!-- USAGE -->
+    <section class="sb-section" id="tab-usage">
+      <div class="sb-card"><h2>Usage by tenant</h2>
+        <div class="row"><div class="field"><label>Period</label><select id="us-period"><option>monthly</option><option>daily</option><option>weekly</option><option>billing_cycle</option></select></div></div>
+        <div class="sb-table-wrap"><table id="us-table"><thead><tr><th>Tenant</th><th>Plan</th><th>Top metrics</th></tr></thead><tbody></tbody></table></div>
+      </div>
+      <div class="sb-card"><h2>Quota warnings</h2>
+        <div class="row"><div class="field"><label>Tenant ID</label><input id="us-tid" value="default" /></div><button class="btn ghost" id="us-check">Check quota</button></div>
+        <div class="sb-table-wrap"><table id="us-quota"><thead><tr><th>Limit</th><th>Used</th><th>Limit</th><th>%</th><th>Level</th></tr></thead><tbody></tbody></table></div>
+      </div>
+    </section>
+
+    <!-- INVOICES -->
+    <section class="sb-section" id="tab-invoices">
+      <div class="sb-card"><h2>Invoices</h2><div class="sb-table-wrap"><table id="in-table"><thead><tr><th>Number</th><th>Tenant</th><th>Amount</th><th>Status</th><th>Due</th><th>Action</th></tr></thead><tbody></tbody></table></div></div>
+      <div class="sb-card"><h2>Create draft invoice <span class="muted">(admin)</span></h2>
+        <div class="row">
+          <div class="field"><label>Tenant ID</label><input id="in-tid" value="default" /></div>
+          <div class="field"><label>Plan</label><select id="in-plan"></select></div>
+          <div class="field"><label>Due in days</label><input id="in-due" type="number" value="7" /></div>
+          <button class="btn" id="in-create">Create draft</button>
+        </div>
+        <pre id="in-out" class="muted">No action yet.</pre>
+      </div>
+    </section>
+
+    <!-- FEATURE GATE -->
+    <section class="sb-section" id="tab-gate">
+      <div class="sb-card"><h2>Feature gate tester</h2>
+        <div class="row">
+          <div class="field"><label>Tenant ID</label><input id="fg-tid" value="default" /></div>
+          <div class="field"><label>Feature</label><select id="fg-feature"></select></div>
+          <div class="field"><label>Action</label><input id="fg-action" value="use" /></div>
+          <div class="field"><label>Metric (optional)</label><input id="fg-metric" placeholder="e.g. channel_posts" /></div>
+          <button class="btn" id="fg-check">Check</button>
+          <button class="btn ghost" id="fg-preview">Preview enforcement</button>
+        </div>
+        <pre id="fg-out">Run a check…</pre>
+      </div>
+    </section>
+
+    <!-- RESELLERS -->
+    <section class="sb-section" id="tab-resellers">
+      <div class="sb-card"><h2>Resellers</h2><div class="sb-table-wrap"><table id="rs-table"><thead><tr><th>ID</th><th>Name</th><th>Status</th><th>Tenants</th><th>Rate</th><th>Commissions</th></tr></thead><tbody></tbody></table></div><p class="muted" id="rs-legacy"></p></div>
+      <div class="sb-card"><h2>Register reseller <span class="muted">(admin)</span></h2>
+        <div class="row">
+          <div class="field"><label>Name</label><input id="rs-name" /></div>
+          <div class="field"><label>Email</label><input id="rs-email" /></div>
+          <div class="field"><label>Commission rate</label><input id="rs-rate" type="number" step="0.01" value="0.15" /></div>
+          <button class="btn" id="rs-add">Register</button>
+        </div>
+        <pre id="rs-out" class="muted">No action yet.</pre>
+      </div>
+    </section>
+
+    <!-- DOCTOR -->
+    <section class="sb-section" id="tab-doctor">
+      <div class="sb-cards" id="dr-cards"></div>
+      <div class="sb-card"><h2>Checks</h2><div class="sb-table-wrap"><table id="dr-table"><thead><tr><th>Check</th><th>Level</th><th>Result</th><th>Detail</th></tr></thead><tbody></tbody></table></div></div>
+      <div class="sb-card"><h2>Payment adapters</h2><div class="sb-table-wrap"><table id="dr-pay"><thead><tr><th>Adapter</th><th>Status</th><th>Configured</th></tr></thead><tbody></tbody></table></div></div>
+      <div class="sb-card"><h2>Next steps</h2><ul id="dr-steps" class="muted"></ul></div>
+    </section>
+  </main>
+
+  <script src="/js/saas-billing.js"></script>
+</body>
+</html>

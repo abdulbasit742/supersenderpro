@@ -41,6 +41,8 @@
     "owner-briefing:smoke": "node tests/smoke/ownerBriefingSmoke.js",
     "voice-ai:smoke": "node tests/smoke/voiceAISmoke.js",
     "marketplace:intelligence:check": "node scripts/marketplace-intelligence-check.js",
+    "saas-billing:check": "node scripts/saas-billing-check.js",
+    "saas-billing:smoke": "node tests/smoke/saasBillingSmoke.js",
     "agent:serve": "node agent-runtime/server.js",
     "agent:demo": "node agent-runtime/demo.js",
     "agent:cli": "node agent-runtime/cli.js",
