@@ -45557,10 +45557,28 @@ app.post('/api/ai/suggest-reply', async (req, res) => {
     ? ' Customer may be sarcastic/frustrated. Acknowledge calmly first, do not argue, and offer a concrete next step.'
     : '';
   try {
-    const reply1 = await callAI(context + '\nWrite a friendly short reply.', 'You are a WhatsApp sales assistant for ' + (settings.business_name || 'Us') + '. Be concise and helpful. Max 2 sentences. ' + toneGuard + ' ' + replyStylePrompt);
-    const reply2 = await callAI(context + '\nWrite a persuasive reply that tries to close the sale.', 'You are a top sales closer for ' + (settings.business_name || 'Us') + '. Max 2 sentences, create mild urgency. ' + toneGuard + ' ' + replyStylePrompt);
-    const reply3 = await callAI(context + '\nWrite an empathetic reply that asks a qualifying question.', 'You are a helpful WhatsApp assistant for ' + (settings.business_name || 'Us') + '. Max 2 sentences. ' + toneGuard + ' ' + replyStylePrompt);
-    res.json({ suggestions: [reply1, reply2, reply3], intent, compliance, sarcasm, style: {
+    let aiMode = 'ai';
+    const fallbackSuggestions = sarcasm.sarcasm || sarcasm.sentimentRisk !== 'low'
+      ? [
+          'Samajh gaya, delay/issue ki wajah se frustration natural hai. Main abhi status check karke clear update deta hoon.',
+          'Aap tension na lein, pehle main exact problem verify karta hoon phir best solution ya replacement option share karta hoon.',
+          'Sorry for the inconvenience. Order/tool ka naam bhej dein, main priority par check karke next step confirm karta hoon.'
+        ]
+      : [
+          'Bilkul, main help kar deta hoon. Aap tool/plan ka naam bhej dein taake main availability aur best price confirm kar doon.',
+          'Yes available options check kar leta hoon. Aap private, warranty ya non-warranty mein se preference bata dein.',
+          'Great, aap apni requirement share kar dein. Main best plan, price aur delivery time quickly confirm kar doon.'
+        ];
+    const aiTimeoutMs = Number(process.env.AI_SUGGEST_TIMEOUT_MS || 3000);
+    const suggestions = await withTimeout(Promise.all([
+      callAI(context + '\nWrite a friendly short reply.', 'You are a WhatsApp sales assistant for ' + (settings.business_name || 'Us') + '. Be concise and helpful. Max 2 sentences. ' + toneGuard + ' ' + replyStylePrompt),
+      callAI(context + '\nWrite a persuasive reply that tries to close the sale.', 'You are a top sales closer for ' + (settings.business_name || 'Us') + '. Max 2 sentences, create mild urgency. ' + toneGuard + ' ' + replyStylePrompt),
+      callAI(context + '\nWrite an empathetic reply that asks a qualifying question.', 'You are a helpful WhatsApp assistant for ' + (settings.business_name || 'Us') + '. Max 2 sentences. ' + toneGuard + ' ' + replyStylePrompt)
+    ]), aiTimeoutMs, () => {
+      aiMode = 'local_fallback';
+      return fallbackSuggestions;
+    });
+    res.json({ suggestions, aiMode, intent, compliance, sarcasm, style: {
       language: settings.ai_reply_language || 'auto',
       dialect: settings.ai_reply_dialect || '',
       tone: settings.ai_reply_tone || 'friendly_sales'
