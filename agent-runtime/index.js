@@ -4,6 +4,8 @@ const { listTools } = require('./toolRegistry');
 const { listAgents, getAgent } = require('./agents');
 const sandbox = require('./sandbox');
 const queue = require('./approvalQueue');
+const audit = require('./auditLog');
+const metrics = require('./metrics');
 const { sanitize } = require('./contextSanitizer');
 
 function getStatus() {
@@ -16,6 +18,8 @@ function getStatus() {
       dryRunDefault: POLICY.dryRunDefault,
       liveActionsEnabled: POLICY.liveActionsEnabled,
       allowYolo: POLICY.allowYolo,
+      maxRiskyPerRun: POLICY.maxRiskyPerRun,
+      notifyEnabled: Boolean(POLICY.notifyUrl),
       allowedWorkspaces: POLICY.allowedWorkspaces,
       blockedActions: POLICY.blockedActions,
       approvalRequired: POLICY.approvalRequired
@@ -48,7 +52,19 @@ async function run(goal, { agent = 'zeroclaw', dryRun, approved = false } = {}) 
   const effectiveDryRun = dryRun !== undefined ? dryRun : POLICY.dryRunDefault;
   const steps = await a.plan(goal);
   const transcript = [];
+  let riskyCount = 0;
   for (const s of steps) {
+    const c = sandbox.classify(s.tool, s.args);
+    const isRisky = c.ok && (c.risk === 'high' || c.risk === 'medium');
+    // Safety quota: stop attempting risky actions past the per-run limit.
+    if (isRisky && !effectiveDryRun) {
+      riskyCount += 1;
+      if (riskyCount > POLICY.maxRiskyPerRun) {
+        transcript.push({ rationale: s.rationale, tool: s.tool, args: s.args,
+          status: 'quota_exceeded', reason: `risky-action quota (${POLICY.maxRiskyPerRun}/run) reached` });
+        continue;
+      }
+    }
     const r = await sandbox.execute(s.tool, s.args, { dryRun: effectiveDryRun, approved, agent, goal });
     transcript.push({ rationale: s.rationale, ...r });
   }
@@ -57,17 +73,31 @@ async function run(goal, { agent = 'zeroclaw', dryRun, approved = false } = {}) 
     dryRun: transcript.filter(t => t.status === 'dry_run').length,
     pendingApproval: transcript.filter(t => t.status === 'pending_approval').length,
     blocked: transcript.filter(t => t.status === 'blocked').length,
-    failed: transcript.filter(t => t.status === 'failed').length
+    failed: transcript.filter(t => t.status === 'failed').length,
+    quotaExceeded: transcript.filter(t => t.status === 'quota_exceeded').length
   };
-  return { success: true, agent, agentName: a.name, goal: sanitize(goal),
+  const result = { success: true, agent, agentName: a.name, goal: sanitize(goal),
     dryRun: effectiveDryRun, summary, transcript, ranAt: new Date().toISOString() };
+  try { result.auditId = audit.record(result).id; } catch { /* noop */ }
+  return result;
+}
+
+/** Explain (without executing) what the sandbox would do with a single action. */
+function explain(tool, args = {}, opts = {}) {
+  const c = sandbox.classify(tool, args);
+  const ev = sandbox.evaluate(tool, args, opts);
+  return { success: true, tool, args, classification: c.ok
+    ? { actionType: c.actionType, risk: c.risk, blocked: c.blocked, needsApproval: c.needsApproval, pathViolation: c.pathViolation }
+    : { error: c.reason }, decision: ev.decision, reason: ev.reason };
 }
 
 module.exports = {
-  getStatus, plan, run,
+  getStatus, plan, run, explain,
   listTools, listAgents,
   evaluate: sandbox.evaluate,
   approveAndRun: sandbox.executeApproved,
   queue: { list: queue.list, get: queue.get, approve: queue.approve, reject: queue.reject, stats: queue.stats },
+  runs: { list: audit.list, get: audit.get, stats: audit.stats },
+  metrics,
   POLICY
 };

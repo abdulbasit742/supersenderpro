@@ -46,7 +46,12 @@ const POLICY = {
   ]),
   apiBase: (process.env.SUPERSENDER_API_BASE || 'http://localhost:3001').replace(/\/+$/, ''),
   apiKey: process.env.SUPERSENDER_MCP_API_KEY || process.env.MCP_API_KEY || '',
-  runtimeApiKey: process.env.AGENT_RUNTIME_API_KEY || ''
+  runtimeApiKey: process.env.AGENT_RUNTIME_API_KEY || '',
+  // Notify endpoint pinged when an action needs approval.
+  notifyUrl: process.env.AGENT_RUNTIME_NOTIFY_URL || '',
+  notifyKey: process.env.AGENT_RUNTIME_NOTIFY_API_KEY || '',
+  // Safety quota: max risky (medium/high) actions a single run may attempt.
+  maxRiskyPerRun: Number(process.env.AGENT_RUNTIME_MAX_RISKY_PER_RUN || 5)
 };
 
 /** Is the resolved path inside an allowed workspace? */

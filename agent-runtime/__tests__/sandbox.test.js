@@ -8,6 +8,7 @@ process.env.AGENT_RUNTIME_DATA = TMP;
 process.env.AGENT_RUNTIME_DRY_RUN_DEFAULT = 'false';
 process.env.AGENT_RUNTIME_LIVE_ACTIONS = 'false';
 process.env.AGENT_RUNTIME_BLOCKED_ACTIONS = 'social_publish,delete_files';
+process.env.AGENT_RUNTIME_MAX_RISKY_PER_RUN = '1';
 
 const test = require('node:test');
 const assert = require('node:assert');
@@ -100,4 +101,30 @@ test('external/LLM plans cannot escape the tool set or policy', async () => {
     const ev = sandbox.evaluate(s.tool, s.args, { dryRun: false });
     assert.ok(['error', 'blocked', 'needs_approval'].includes(ev.decision), `${s.tool} -> ${ev.decision}`);
   }
+});
+
+test('explain() reports decision + classification without executing', () => {
+  const ex = runtime.explain('send_whatsapp_message', { to: '1', message: 'hi' }, { dryRun: false });
+  assert.strictEqual(ex.decision, 'needs_approval');
+  assert.strictEqual(ex.classification.risk, 'high');
+});
+
+test('a run is recorded to the audit log', async () => {
+  const before = runtime.runs.stats().totalRuns;
+  const res = await runtime.run('give me a sales overview', { agent: 'zeroclaw', dryRun: true });
+  assert.ok(res.auditId);
+  const after = runtime.runs.stats().totalRuns;
+  assert.strictEqual(after, before + 1);
+  assert.ok(runtime.runs.list({ limit: 5 }).some(r => r.id === res.auditId));
+});
+
+test('risky-action quota caps risky steps in a live run', async () => {
+  const res = await runtime.run('send whatsapp follow up and publish a social post', { agent: 'zeroclaw', dryRun: false });
+  assert.ok(res.summary.quotaExceeded >= 1, JSON.stringify(res.summary));
+});
+
+test('prometheus metrics expose runtime counters', () => {
+  const text = runtime.metrics.prometheus();
+  assert.match(text, /agent_runtime_queue_total/);
+  assert.match(text, /agent_runtime_runs_total/);
 });
