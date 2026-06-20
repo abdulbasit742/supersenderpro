@@ -1,0 +1,69 @@
+{
+  "generatedAt": "2026-06-20T11:52:46.647555+00:00",
+  "module": "template_marketplace",
+  "summary": "Scanned repo first. No unified Template Marketplace + Recipe Store + Blueprint Installer coordination layer existed; added additively.",
+  "existingTemplateSystemsDetected": [
+    {
+      "path": "lib/unifiedSetup/presets.js",
+      "kind": "business_setup_presets",
+      "decision": "left_untouched",
+      "status": "exists"
+    },
+    {
+      "path": "lib/unifiedSetup/taskTemplates.js",
+      "kind": "setup_task_templates",
+      "decision": "left_untouched",
+      "status": "exists"
+    },
+    {
+      "path": "ai/templateManager.js",
+      "kind": "ai_template_manager",
+      "decision": "left_untouched",
+      "status": "exists"
+    },
+    {
+      "path": "agent-runtime/actionTemplates.js",
+      "kind": "agent_action_templates",
+      "decision": "left_untouched",
+      "status": "exists"
+    },
+    {
+      "path": "lib/voiceAI/templates.js",
+      "kind": "voice_message_templates",
+      "decision": "left_untouched",
+      "status": "exists"
+    },
+    {
+      "path": "backend/src/whatsapp/messageTemplates.js",
+      "kind": "wa_message_templates",
+      "decision": "left_untouched",
+      "status": "exists"
+    }
+  ],
+  "duplicateRisk": "none \u2014 existing systems are module-specific (setup presets, voice/message templates, AI manager). No marketplace/recipe-store/installer coordination layer existed.",
+  "areas": {
+    "template_marketplace_model": "missing -> created (registry, catalog, validator, defaultTemplates)",
+    "default_template_packs": "missing -> 16 packs created",
+    "automation_recipe_store": "missing -> 10 recipes + builder + preview",
+    "blueprint_installer": "missing -> planner + installPreview + installer + history (preview-only)",
+    "module_adapters": "missing -> 13 adapters + resellerAssetAdapter (detect/preview only)",
+    "ai_draft_generator": "missing -> rule-based generator + prompts (no external AI by default)",
+    "import_export": "missing -> redacted export + dry-run import preview + pack validator",
+    "api_routes": "missing -> routes/templateMarketplaceRoutes.js (all dry-run safe)",
+    "admin_dashboard": "missing -> public/template-marketplace.*",
+    "public_gallery": "missing -> public/templates.* (public_safe/demo_only only)",
+    "server_hook": "needs_route -> marked TEMPLATE MARKETPLACE HOOK added",
+    "dashboard_link": "needs_ui -> marked nav links added",
+    "env_placeholders": "missing -> 12 TEMPLATE_MARKETPLACE_* keys added",
+    "docs": "missing -> 8 docs created",
+    "check_script": "missing -> scripts/template-marketplace-check.js",
+    "smoke_test": "missing -> tests/smoke/templateMarketplaceSmoke.js"
+  },
+  "protections": {
+    "liveInstall": "disabled by default (needs ALLOW_INSTALL+ALLOW_LIVE_ACTIONS)",
+    "recipes": "draft-only",
+    "externalAPIs": "disabled",
+    "aiDrafts": "rule-based fallback",
+    "privacy": "leak-scan on every response + redaction"
+  }
+}

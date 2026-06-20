@@ -3171,6 +3171,19 @@ try {
 }
 // END PUBLIC SAAS FUNNEL HOOK
 
+// BEGIN TEMPLATE MARKETPLACE HOOK
+// Template Marketplace + Automation Recipe Store + Blueprint Installer (dry-run, preview-only, approval-required).
+try {
+  const templateMarketplaceRoutes = require('./routes/templateMarketplaceRoutes');
+  app.use('/api/template-marketplace', templateMarketplaceRoutes);
+  app.get('/template-marketplace.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'template-marketplace.html')));
+  app.get('/templates.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'templates.html')));
+  console.log('[TemplateMarketplace] mounted at /api/template-marketplace (dry-run, no live install)');
+} catch (e) {
+  console.error('[TemplateMarketplace] failed to initialise (non-fatal):', e.message);
+}
+// END TEMPLATE MARKETPLACE HOOK
+
 let searchIndexRebuildTimer = null;
 function scheduleSearchIndexRebuild(reason = 'data-change', delayMs = Number(process.env.SEARCH_REBUILD_DEBOUNCE_MS || 30000)) {
   if (searchIndexRebuildTimer) clearTimeout(searchIndexRebuildTimer);

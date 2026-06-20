@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Template Marketplace — SuperSender Pro</title>
+  <link rel="stylesheet" href="/css/template-marketplace.css" />
+</head>
+<body>
+  <header class="tm-header">
+    <div class="tm-brand"><span class="tm-logo">🧩</span>
+      <div><h1>Template Marketplace</h1><p class="tm-sub">Industry blueprints · automation recipes · blueprint installer</p></div></div>
+    <div id="tm-pill" class="tm-pill">Loading…</div>
+  </header>
+  <main class="tm-main">
+    <section class="tm-section"><h2>Overview</h2><div class="tm-cards" id="tm-overview"></div></section>
+
+    <section class="tm-section">
+      <div class="tm-row"><h2>Template Catalog</h2>
+        <input id="tm-search" class="tm-input" placeholder="Search templates…" oninput="TM.filter()" /></div>
+      <div class="tm-filters" id="tm-filters"></div>
+      <div class="tm-cards" id="tm-catalog"></div>
+    </section>
+
+    <section class="tm-section" id="tm-detail-section" hidden>
+      <div class="tm-row"><h2 id="tm-detail-title">Template Detail</h2>
+        <button class="tm-btn tm-btn-ghost" onclick="TM.closeDetail()">Close</button></div>
+      <div id="tm-detail"></div>
+    </section>
+
+    <section class="tm-section"><h2>Automation Recipe Store</h2><div class="tm-cards" id="tm-recipes"></div></section>
+
+    <div class="tm-grid-2">
+      <section class="tm-section"><h2>Blueprint Installer <span class="tm-badge">approval required</span></h2>
+        <select id="tm-install-template" class="tm-input"></select>
+        <button class="tm-btn" onclick="TM.installPreview()">Generate Install Preview</button>
+        <pre class="tm-out" id="tm-install-out">Select a template and generate a dry-run install preview…</pre></section>
+      <section class="tm-section"><h2>Draft Generator <span class="tm-badge" id="tm-ai-badge">no external AI</span></h2>
+        <input id="tm-draft-industry" class="tm-input" placeholder="Industry (e.g. Bakery)" />
+        <button class="tm-btn" onclick="TM.draftTemplate()">Generate Template Draft</button>
+        <button class="tm-btn tm-btn-ghost" onclick="TM.draftRecipe()">Recipe Draft</button>
+        <pre class="tm-out" id="tm-draft-out"></pre></section>
+    </div>
+
+    <div class="tm-grid-2">
+      <section class="tm-section"><h2>Import / Export</h2>
+        <button class="tm-btn" onclick="TM.exportPack()">Export Redacted Pack</button>
+        <pre class="tm-out" id="tm-export-out"></pre></section>
+      <section class="tm-section"><h2>Safety Panel</h2><div class="tm-safety" id="tm-safety"></div></section>
+    </div>
+
+    <footer class="tm-footer"><strong>Preview-only & safe:</strong> Installs are dry-run and approval-required by default.
+      No live install, no external API calls, no live sending. Secrets redacted, PII masked.</footer>
+  </main>
+  <script src="/js/template-marketplace.js"></script>
+</body>
+</html>

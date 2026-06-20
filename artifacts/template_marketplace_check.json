@@ -1,0 +1,189 @@
+{
+  "generatedAt": "2026-06-20T11:53:10.287Z",
+  "passed": 36,
+  "failed": 0,
+  "total": 36,
+  "strict": "false",
+  "checks": [
+    {
+      "name": "file lib/templateMarketplace/index.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/templateMarketplace/store.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/templateMarketplace/templateRegistry.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/templateMarketplace/templateCatalog.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/templateMarketplace/defaultTemplates.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/templateMarketplace/recipeRegistry.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/templateMarketplace/blueprintInstaller.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/templateMarketplace/installPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/templateMarketplace/templateImportExport.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file routes/templateMarketplaceRoutes.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/template-marketplace.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/js/template-marketplace.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/css/template-marketplace.css",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/templates.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/js/templates.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/css/templates.css",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "server hook present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "env placeholders present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc TEMPLATE_MARKETPLACE_COMMAND_CENTER.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc INDUSTRY_BLUEPRINTS.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc AUTOMATION_RECIPE_STORE.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc BLUEPRINT_INSTALLER.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc TEMPLATE_IMPORT_EXPORT.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc TEMPLATE_MARKETPLACE_SAFETY.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc PUBLIC_TEMPLATE_GALLERY.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc RESELLER_TEMPLATE_PACKS.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "default templates load",
+      "ok": true,
+      "detail": "16 templates"
+    },
+    {
+      "name": "default recipes load",
+      "ok": true,
+      "detail": "10 recipes"
+    },
+    {
+      "name": "create sample template",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "create sample recipe",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "validate template",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "install preview dry-run + approval",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "live install disabled",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "export redacted (no leak)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "report generated",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no secret/PII leak in report",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}

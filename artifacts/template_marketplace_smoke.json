@@ -1,0 +1,78 @@
+{
+  "generatedAt": "2026-06-20T11:53:10.626Z",
+  "passed": 14,
+  "failed": 0,
+  "total": 14,
+  "results": [
+    {
+      "name": "require store/registry/catalog modules",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require recipe/installer/import-export modules",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require route module",
+      "pass": true,
+      "detail": "loaded"
+    },
+    {
+      "name": "barrel loads",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "load default templates",
+      "pass": true,
+      "detail": "17 templates"
+    },
+    {
+      "name": "validate AI Tools Reseller template",
+      "pass": true,
+      "detail": "valid"
+    },
+    {
+      "name": "validate Ecommerce Growth template",
+      "pass": true,
+      "detail": "valid"
+    },
+    {
+      "name": "generate install preview",
+      "pass": true,
+      "detail": "3 modules"
+    },
+    {
+      "name": "dryRun true",
+      "pass": true,
+      "detail": "dryRun=true"
+    },
+    {
+      "name": "approvalRequired true",
+      "pass": true,
+      "detail": "approval=true"
+    },
+    {
+      "name": "live install disabled",
+      "pass": true,
+      "detail": "blocked"
+    },
+    {
+      "name": "recipes draft-only (no live actions)",
+      "pass": true,
+      "detail": "draft-only"
+    },
+    {
+      "name": "export redacted (no leak)",
+      "pass": true,
+      "detail": "17 templates"
+    },
+    {
+      "name": "no phone/email/token leaks",
+      "pass": true,
+      "detail": "clean"
+    }
+  ]
+}

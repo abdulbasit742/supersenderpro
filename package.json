@@ -48,7 +48,9 @@
     "agent:cli": "node agent-runtime/cli.js",
     "agent:test": "node --test agent-runtime/__tests__/",
     "public-funnel:check": "node scripts/public-funnel-check.js",
-    "public-funnel:smoke": "node tests/smoke/publicFunnelSmoke.js"
+    "public-funnel:smoke": "node tests/smoke/publicFunnelSmoke.js",
+    "template-marketplace:check": "node scripts/template-marketplace-check.js",
+    "template-marketplace:smoke": "node tests/smoke/templateMarketplaceSmoke.js"
   },
   "dependencies": {
     "@whiskeysockets/baileys": "^7.0.0-rc.9",
