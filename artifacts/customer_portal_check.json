@@ -1,0 +1,179 @@
+{
+  "generatedAt": "2026-06-20T16:41:27.231Z",
+  "passed": 34,
+  "failed": 0,
+  "total": 34,
+  "strict": "false",
+  "checks": [
+    {
+      "name": "file lib/customerPortal/store.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/customerPortal/customerPortalModel.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/customerPortal/customerPortalService.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/customerPortal/statusSummaryPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/customerPortal/orderStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/customerPortal/invoiceStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/customerPortal/bookingStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/customerPortal/serviceStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/customerPortal/maintenanceStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/customerPortal/ticketStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/customerPortal/warrantyStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/customerPortal/loyaltyStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/customerPortal/contractStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/customerPortal/documentRequestPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/customerPortal/supportRequestPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/customerPortal/messageDrafts.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/customerPortal/auditPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/customerPortal/redactor.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file routes/customerPortalRoutes.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/customer-portal.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/js/customer-portal.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/css/customer-portal.css",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "server hook present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "route module loads",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "all service functions exported",
+      "ok": true,
+      "detail": "all present"
+    },
+    {
+      "name": "status dryRun true + liveActionsEnabled false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "status externalCallsEnabled false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "redactor masks phone",
+      "ok": true,
+      "detail": "+92******4567"
+    },
+    {
+      "name": "redactor masks email",
+      "ok": true,
+      "detail": "cu******@example.com"
+    },
+    {
+      "name": "redactor masks ref",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "invoice livePayment false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "message draft liveSend false + masked recipient",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "summary piiMasked true",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no PII/secret leak",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}

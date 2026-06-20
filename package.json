@@ -40,7 +40,9 @@
     "team-access:check": "node scripts/team-access-check.js",
     "team-access:smoke": "node tests/smoke/teamAccessSmoke.js",
     "whatsapp-cloud-setup:check": "node scripts/whatsapp-cloud-setup-check.js",
-    "whatsapp-cloud-setup:smoke": "node tests/smoke/whatsappCloudSetupSmoke.js"
+    "whatsapp-cloud-setup:smoke": "node tests/smoke/whatsappCloudSetupSmoke.js",
+    "customer-portal:check": "node scripts/customer-portal-check.js",
+    "customer-portal:smoke": "node tests/smoke/customerPortalSmoke.js"
   },
   "dependencies": {
     "@whiskeysockets/baileys": "^7.0.0-rc.9",

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Customer Portal — SuperSender Pro</title>
+<link rel="stylesheet" href="/css/customer-portal.css" />
+</head>
+<body>
+<header class="cp-hero">
+  <div class="cp-hero-inner">
+    <h1>Customer Self-Service Portal</h1>
+    <p class="cp-sub">Check your status anytime. This is a <strong>safe preview</strong> — your private details are masked, no payment is collected, and no message is sent.</p>
+    <div id="cp-safety-badges" class="cp-badges"></div>
+  </div>
+</header>
+
+<main class="cp-main">
+  <!-- Lookup panel -->
+  <section class="cp-card cp-lookup">
+    <h2>Check your status</h2>
+    <form id="cp-lookup-form" class="cp-form">
+      <label class="cp-field">Lookup method
+        <select id="cp-mode">
+          <option value="demo_preview">Demo preview</option>
+          <option value="preview_token">Preview token</option>
+          <option value="masked_phone_lookup_preview">Masked phone</option>
+          <option value="order_reference_preview">Order reference</option>
+          <option value="invoice_reference_preview">Invoice reference</option>
+          <option value="ticket_reference_preview">Ticket reference</option>
+        </select>
+      </label>
+      <label class="cp-field">Reference / token <input id="cp-ref" placeholder="preview only" /></label>
+      <button type="submit" class="cp-btn">Check Status Preview</button>
+    </form>
+    <div id="cp-profile" class="cp-profile"></div>
+    <div id="cp-error" class="cp-error" hidden></div>
+  </section>
+
+  <!-- KPI summary -->
+  <section id="cp-kpis" class="cp-kpis"></section>
+
+  <!-- Status sections -->
+  <div class="cp-grid">
+    <section class="cp-card"><h3>📦 Orders</h3><div id="cp-orders" class="cp-list"></div></section>
+    <section class="cp-card"><h3>🧾 Invoices &amp; Payments</h3><div id="cp-invoices" class="cp-list"></div></section>
+    <section class="cp-card"><h3>📅 Appointments &amp; Bookings</h3><div id="cp-bookings" class="cp-list"></div></section>
+    <section class="cp-card"><h3>🔧 Service Jobs</h3><div id="cp-service" class="cp-list"></div></section>
+    <section class="cp-card"><h3>🛠️ Maintenance / AMC</h3><div id="cp-maintenance" class="cp-list"></div></section>
+    <section class="cp-card"><h3>🎫 Helpdesk Tickets</h3><div id="cp-tickets" class="cp-list"></div></section>
+    <section class="cp-card"><h3>⚠️ Complaints &amp; Warranty</h3><div id="cp-warranty" class="cp-list"></div></section>
+    <section class="cp-card"><h3>⭐ Loyalty &amp; Rewards</h3><div id="cp-loyalty" class="cp-list"></div></section>
+    <section class="cp-card"><h3>📄 Contracts &amp; Documents</h3><div id="cp-documents" class="cp-list"></div></section>
+  </div>
+
+  <!-- Draft actions -->
+  <section class="cp-card">
+    <h2>Need help? Create a safe preview request</h2>
+    <p class="cp-muted">All actions below are previews/drafts only. <strong>Contact support to complete any real action.</strong></p>
+    <div class="cp-actions">
+      <button class="cp-btn ghost" data-draft="support">Draft Support Request</button>
+      <button class="cp-btn ghost" data-draft="reschedule">Draft Reschedule Request</button>
+      <button class="cp-btn ghost" data-draft="reminder">Draft Payment Reminder</button>
+      <button class="cp-btn ghost" data-draft="message">Draft Message</button>
+      <button class="cp-btn ghost" data-draft="document">View Document Request Preview</button>
+    </div>
+    <div id="cp-draft-out" class="cp-draft-out"></div>
+  </section>
+
+  <footer class="cp-footer">
+    <p>🔒 No payment will be collected · No message will be sent · Your private details are masked · External calls disabled.</p>
+  </footer>
+</main>
+
+<script src="/js/customer-portal.js"></script>
+</body>
+</html>

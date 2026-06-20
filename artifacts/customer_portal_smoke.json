@@ -1,0 +1,128 @@
+{
+  "generatedAt": "2026-06-20T16:41:27.578Z",
+  "passed": 24,
+  "failed": 0,
+  "total": 24,
+  "results": [
+    {
+      "name": "require service module",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require redactor",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require route module",
+      "pass": true,
+      "detail": "loaded"
+    },
+    {
+      "name": "portal status is safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "lookup preview safe + masked",
+      "pass": true,
+      "detail": "preview_token"
+    },
+    {
+      "name": "summary works even though no real modules",
+      "pass": true,
+      "detail": "1 unpaid"
+    },
+    {
+      "name": "getOrderStatusPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getInvoiceStatusPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getBookingStatusPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getServiceStatusPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getMaintenanceStatusPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getTicketStatusPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getWarrantyStatusPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getLoyaltyStatusPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getContractStatusPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getDocumentStatusPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "support request preview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "document request preview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "reschedule preview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "payment reminder preview safe (no live payment)",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "message draft preview safe (no live send)",
+      "pass": true,
+      "detail": "+92******4567"
+    },
+    {
+      "name": "audit preview is local + no live write",
+      "pass": true,
+      "detail": "7 entries"
+    },
+    {
+      "name": "redactor masking examples",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "no full PII in aggregate response blob",
+      "pass": true,
+      "detail": "clean"
+    }
+  ]
+}

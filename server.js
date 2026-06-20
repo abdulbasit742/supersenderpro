@@ -3084,6 +3084,18 @@ try {
 }
 // END WHATSAPP CLOUD SETUP HOOK
 
+// BEGIN CUSTOMER PORTAL HOOK
+// Customer Portal + Self-Service Status Center (preview-only: no live payment/send/mutation, PII masked, no external calls).
+try {
+  const customerPortalRoutes = require('./routes/customerPortalRoutes');
+  app.use('/api/customer-portal', customerPortalRoutes);
+  app.get('/customer-portal.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'customer-portal.html')));
+  console.log('[CustomerPortal] mounted at /api/customer-portal (preview-only, PII masked, no live actions)');
+} catch (e) {
+  console.error('[CustomerPortal] failed to initialise (non-fatal):', e.message);
+}
+// END CUSTOMER PORTAL HOOK
+
 
 let searchIndexRebuildTimer = null;
 function scheduleSearchIndexRebuild(reason = 'data-change', delayMs = Number(process.env.SEARCH_REBUILD_DEBOUNCE_MS || 30000)) {
