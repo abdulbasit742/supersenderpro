@@ -1,6 +1,6 @@
 # Owner Briefing Smoke Test
 
-Generated: 2026-06-20T08:34:09.043Z
+Generated: 2026-06-20T08:34:41.160Z
 
 **11/11 passed** — all passed ✅
 

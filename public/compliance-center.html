@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Compliance & Consent Center — SuperSender Pro</title>
+  <link rel="stylesheet" href="/css/compliance-center.css" />
+</head>
+<body>
+  <header class="cc-header">
+    <div class="cc-brand"><span class="cc-logo">🛡️</span>
+      <div><h1>Compliance &amp; Consent Center</h1><p class="cc-sub">Cross-channel consent · opt-outs · policy checks</p></div></div>
+    <div id="cc-pill" class="cc-pill">Loading…</div>
+  </header>
+  <main class="cc-main">
+    <section class="cc-section"><h2>Overview</h2><div class="cc-cards" id="cc-overview"></div></section>
+    <section class="cc-section"><h2>Active Rules</h2><div id="cc-rules" class="cc-rules"></div></section>
+    <div class="cc-grid-2">
+      <section class="cc-section cc-card">
+        <h2>Policy Checker <span class="cc-badge">no sending</span></h2>
+        <input id="pc-subject" placeholder="Subject id / phone" />
+        <select id="pc-channel"><option value="whatsapp">WhatsApp</option><option value="voice">Voice</option><option value="marketing">Marketing</option><option value="email">Email</option><option value="sms">SMS</option></select>
+        <button class="cc-btn" onclick="Compliance.check()">Check if allowed</button>
+        <pre class="cc-out" id="pc-out"></pre>
+      </section>
+      <section class="cc-section cc-card">
+        <h2>Manage Consent</h2>
+        <input id="mc-subject" placeholder="Subject id / phone" />
+        <label class="cc-chk"><input type="checkbox" id="mc-whatsapp" /> WhatsApp</label>
+        <label class="cc-chk"><input type="checkbox" id="mc-marketing" /> Marketing</label>
+        <label class="cc-chk"><input type="checkbox" id="mc-email" /> Email</label>
+        <button class="cc-btn" onclick="Compliance.setConsent()">Save Consent</button>
+        <button class="cc-btn cc-btn-danger" onclick="Compliance.optOut()">Opt Out (all)</button>
+        <pre class="cc-out" id="mc-out"></pre>
+      </section>
+    </div>
+    <section class="cc-section"><h2>Consent Registry <span class="cc-badge cc-badge-safe">masked</span></h2>
+      <div class="cc-table-wrap"><table class="cc-table" id="cc-registry">
+        <thead><tr><th>Subject</th><th>WhatsApp</th><th>Voice</th><th>Marketing</th><th>Opted out</th></tr></thead><tbody></tbody></table></div>
+    </section>
+    <section class="cc-section"><h2>Audit Log</h2><div id="cc-audit" class="cc-audit"></div></section>
+    <footer class="cc-footer"><strong>Consent-first &amp; safe:</strong> This center coordinates consent across
+      channels and decides whether outreach is allowed. It never sends messages and never exposes raw contact details.</footer>
+  </main>
+  <script src="/js/compliance-center.js"></script>
+</body>
+</html>
