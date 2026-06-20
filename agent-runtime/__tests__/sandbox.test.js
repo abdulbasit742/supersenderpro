@@ -143,8 +143,10 @@ test('action templates can be created and listed', () => {
 test('template execute skips approval but still enforces policy', async () => {
   const t = runtime.templates.create({ name: 'test-safe-read', tool: 'list_customers', args: { limit: 5 }, createdBy: 'test' });
   const res = await runtime.templates.execute(t.id, { agent: 'zeroclaw', goal: 'test' });
-  assert.strictEqual(res.status, 'executed');
+  assert.strictEqual(res.status, 'executed', JSON.stringify(res));
   assert.strictEqual(res.templateId, t.id);
+  // cleanup
+  runtime.templates.deactivate(t.id);
 });
 
 test('deactivated template cannot execute', async () => {
