@@ -349,8 +349,32 @@ export default function SettingsPage() {
               </label>
             )}
 
+            <hr className="border-line my-1" />
+
+            <label className="grid gap-1">
+              <span className="text-slate-500 dark:text-slate-400 font-semibold">Firecrawl API Key (Web Scraping)</span>
+              <input 
+                type="password"
+                className="input font-mono" 
+                placeholder="fc-..." 
+                value={settings.firecrawl_api_key || ''} 
+                onChange={(e) => setSettings({ ...settings, firecrawl_api_key: e.target.value })} 
+              />
+            </label>
+
+            <label className="grid gap-1">
+              <span className="text-slate-500 dark:text-slate-400 font-semibold">Browserless Token (Screenshots)</span>
+              <input 
+                type="password"
+                className="input font-mono" 
+                placeholder="Browserless token" 
+                value={settings.browserless_api_key || ''} 
+                onChange={(e) => setSettings({ ...settings, browserless_api_key: e.target.value })} 
+              />
+            </label>
+
             <button type="button" className="btn btn-primary mt-2" onClick={save}>
-              💾 Save AI Configuration
+              💾 Save AI & Scraper Configuration
             </button>
           </div>
         </Panel>

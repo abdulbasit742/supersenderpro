@@ -28,7 +28,9 @@ const allowedKeys = new Set([
   'DEEPSEEK_API_KEY',
   'GROQ_API_KEY',
   'OPENROUTER_API_KEY',
-  'OLLAMA_HOST'
+  'OLLAMA_HOST',
+  'FIRECRAWL_API_KEY',
+  'BROWSERLESS_API_KEY'
 ]);
 
 function validateSettings(body = {}) {

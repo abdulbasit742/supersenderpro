@@ -27961,6 +27961,65 @@ app.post('/api/settings', (req, res) => {
   res.json(settings);
 });
 
+app.post('/api/settings/ai-test', async (req, res) => {
+  try {
+    const { prompt } = req.body || {};
+    if (!prompt) return res.status(400).json({ error: 'prompt is required' });
+    const { processPrompt } = require('./ai/aiBrain');
+    const response = await processPrompt(prompt);
+    res.json({ success: true, response });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/scraper/history', (req, res) => {
+  const history = loadJSON('scraped_pages.json', []);
+  res.json(history);
+});
+
+app.post('/api/scraper/scrape', async (req, res) => {
+  try {
+    const { url } = req.body || {};
+    if (!url) return res.status(400).json({ error: 'url is required' });
+
+    const scraper = require('./lib/webScraper');
+    
+    // Read keys from settings or process.env
+    const firecrawlKey = settings.firecrawl_api_key || process.env.FIRECRAWL_API_KEY || '';
+    const browserlessKey = settings.browserless_api_key || process.env.BROWSERLESS_API_KEY || '';
+
+    const result = await scraper.scrapeWebsite(url, firecrawlKey);
+    const screenshot = await scraper.captureScreenshot(url, browserlessKey);
+
+    const historyItem = {
+      id: uuid(),
+      url,
+      title: result.title,
+      description: result.description,
+      content: result.content,
+      provider: result.provider,
+      screenshot: screenshot,
+      timestamp: new Date().toISOString()
+    };
+
+    const history = loadJSON('scraped_pages.json', []);
+    history.unshift(historyItem);
+    // Keep last 50 items
+    if (history.length > 50) history.pop();
+    saveJSON('scraped_pages.json', history);
+
+    res.json({ success: true, data: historyItem });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/scraper/clear', (req, res) => {
+  saveJSON('scraped_pages.json', []);
+  res.json({ success: true });
+});
+
 function normalizeActionTrigger(input = {}) {
   const priorityMap = { low: 1, normal: 1, medium: 2, high: 3, urgent: 4, critical: 4 };
   const priorityValue = typeof input.priority === 'string'

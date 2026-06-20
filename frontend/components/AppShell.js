@@ -19,6 +19,7 @@ const nav = [
   ['Social', '/social'],
   ['Analytics', '/analytics'],
   ['Zero-Touch', '/zero-touch'],
+  ['Web Scraper', '/scraper'],
   ['Settings', '/settings']
 ];
 
