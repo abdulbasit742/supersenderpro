@@ -159,3 +159,41 @@ set `flow.variables.scheduleLive = true` to allow live execution.
 Flow Studio JSON writes are now **synchronous**, removing the create→run race that the
 shared debounced writer could cause. `status` now also reports `scheduledFlows` and
 `pendingApprovals`.
+
+---
+
+## v3 additions (shipped)
+
+### Open & manage saved flows
+The **📂 My Flows** card lists every saved flow (status-colored) — click to open one into the
+builder, or delete it. The toolbar **📂 Open** button jumps to the list. Closes the gap where
+saved flows could previously only be reached via template install or JSON import.
+
+### Branching engine (if/else + switch)
+The execution engine is now **branch-aware** (`flowStudioNextNodes`):
+- **`logic.if_else`** evaluates `config.condition` and follows edges labeled `true`/`false`
+  (or, without labels, the first vs. second `next`).
+- **`logic.switch_intent`** routes on `config.var` (default `intent`) by matching each edge's
+  `condition` value, falling back to a `default` edge.
+- Conditions use a **safe, no-`eval`** evaluator supporting `var`, `==`, `!=`, `>`, `<`, `>=`,
+  `<=`, and `includes`, with variables resolved from the run input then flow variables.
+
+### Connection / branch editor
+The Inspector now has a **Connections (next steps)** editor: check the nodes a step should flow
+into and set a per-edge **condition** (e.g. `true`/`false` for if/else, an intent value for
+switch). If/else and switch nodes also expose their condition / switch-variable fields.
+
+### Variables & schedule editor
+A collapsible **⚙ Variables & schedule** panel edits `flow.variables` (JSON) and, for scheduled
+flows, toggles **Allow LIVE scheduled runs** (`variables.scheduleLive`).
+
+### Live run streaming
+Runs stream to the dashboard log panel in real time over Socket.IO
+(`flow-studio:run-start`, `flow-studio:node`, `flow-studio:run-end`).
+
+### Per-flow analytics
+`GET /api/flow-studio/flows/:id/analytics` returns success rate, total/completed/failed/paused
+counts, average duration and the last 10 runs. Shown in the **📊 Flow Analytics** card.
+
+### Node library search
+A search box filters the node library by label/type.

@@ -48285,6 +48285,68 @@ function findFallbackNode(flow) {
   return (flow.nodes || []).find(n => n.type === 'logic.error_fallback');
 }
 
+// Safe (no eval) condition evaluator for branching.
+// Supports: "" (true), "var", "var == value", "var != value",
+// "var > n", "var < n", "var includes text". Vars resolved from input then vars.
+function flowStudioResolveVar(name, context) {
+  if (name == null) return undefined;
+  const key = String(name).trim().replace(/^['"]|['"]$/g, '');
+  if (context?.input && key in context.input) return context.input[key];
+  if (context?.vars && key in context.vars) return context.vars[key];
+  return undefined;
+}
+function evalFlowCondition(expr, context) {
+  const raw = String(expr || '').trim();
+  if (!raw) return true;
+  const m = raw.match(/^(.+?)\s*(==|!=|>=|<=|>|<|includes)\s*(.+)$/i);
+  if (!m) { const v = flowStudioResolveVar(raw, context); return !!v && v !== 'false' && v !== '0'; }
+  let [, lhs, op, rhs] = m;
+  let lv = flowStudioResolveVar(lhs, context);
+  if (lv === undefined) lv = lhs.trim().replace(/^['"]|['"]$/g, '');
+  let rv = rhs.trim().replace(/^['"]|['"]$/g, '');
+  const ln = Number(lv), rn = Number(rv);
+  switch (op.toLowerCase()) {
+    case '==': return String(lv).toLowerCase() === String(rv).toLowerCase();
+    case '!=': return String(lv).toLowerCase() !== String(rv).toLowerCase();
+    case '>': return ln > rn;
+    case '<': return ln < rn;
+    case '>=': return ln >= rn;
+    case '<=': return ln <= rn;
+    case 'includes': return String(lv).toLowerCase().includes(String(rv).toLowerCase());
+    default: return false;
+  }
+}
+
+// Branch-aware successor selection.
+function flowStudioNextNodes(flow, node, context) {
+  const type = node.type || '';
+  const outEdges = (flow.edges || []).filter(e => e.from === node.id);
+  const plain = () => (Array.isArray(node.next) && node.next.length) ? node.next : outEdges.map(e => e.to);
+
+  if (type === 'logic.if_else') {
+    const pass = evalFlowCondition(node.config?.condition, context);
+    const labeled = outEdges.filter(e => e.condition);
+    if (labeled.length) {
+      const wanted = pass ? ['true', 'yes', '1'] : ['false', 'no', '0', 'else'];
+      const hit = labeled.filter(e => wanted.includes(String(e.condition).toLowerCase()));
+      if (hit.length) return hit.map(e => e.to);
+    }
+    // Fallback: first next = true branch, second = false branch
+    const nx = plain();
+    return pass ? nx.slice(0, 1) : nx.slice(1, 2).length ? nx.slice(1, 2) : [];
+  }
+
+  if (type === 'logic.switch_intent') {
+    const val = String(flowStudioResolveVar(node.config?.var || 'intent', context) || '').toLowerCase();
+    const matched = outEdges.filter(e => String(e.condition || '').toLowerCase() === val);
+    if (matched.length) return matched.map(e => e.to);
+    const def = outEdges.filter(e => ['default', 'else', ''].includes(String(e.condition || '').toLowerCase()));
+    return def.length ? def.map(e => e.to) : plain();
+  }
+
+  return plain();
+}
+
 async function runFlow(flowId, input = {}, options = {}) {
   const flows = loadFlowStudioFlows();
   const flow = flows.find(f => f.id === flowId);
@@ -48300,6 +48362,8 @@ async function runFlow(flowId, input = {}, options = {}) {
   const startedAt = new Date().toISOString();
   const logs = [];
   const context = { flowId, input, live, vars: { ...(flow.variables || {}) }, log: (l) => logs.push(l) };
+  const runStreamId = flowStudioId('run');
+  try { io.emit('flow-studio:run-start', { runId: runStreamId, flowId, flowName: flow.name, mode: live ? 'live' : 'dry-run', startedAt }); } catch (_) {}
 
   let paused = false;
   let failed = false;
@@ -48345,13 +48409,17 @@ async function runFlow(flowId, input = {}, options = {}) {
         }
       }
       if (skipApprovalPause && result.pause) result = { ...result, pause: false, message: (result.message || '') + ' (approved, resumed).' };
-      logs.push({ ...result, at: new Date().toISOString(), status: 'ok', attempts: attempt + 1 });
+      const okLog = { ...result, at: new Date().toISOString(), status: 'ok', attempts: attempt + 1 };
+      logs.push(okLog);
+      try { io.emit('flow-studio:node', { runId: runStreamId, flowId, flowName: flow.name, log: maskSecretsDeep(okLog) }); } catch (_) {}
       if (result.pause) { paused = true; break; }
-      for (const nxt of nextNodeIds(flow, node)) queue.push(nxt);
+      for (const nxt of flowStudioNextNodes(flow, node, context)) queue.push(nxt);
     } catch (e) {
       failed = true;
       errorMessage = e.message;
-      logs.push({ nodeId: node.id, type: node.type, label: node.label, message: e.message, kind: 'error', status: 'error', at: new Date().toISOString() });
+      const errLog = { nodeId: node.id, type: node.type, label: node.label, message: e.message, kind: 'error', status: 'error', at: new Date().toISOString() };
+      logs.push(errLog);
+      try { io.emit('flow-studio:node', { runId: runStreamId, flowId, flowName: flow.name, log: maskSecretsDeep(errLog) }); } catch (_) {}
       const fallback = findFallbackNode(flow);
       if (fallback && !visited.has(fallback.id)) {
         logs.push({ message: `Running fallback path from ${fallback.id}.`, kind: 'system' });
@@ -48364,7 +48432,7 @@ async function runFlow(flowId, input = {}, options = {}) {
   }
 
   const run = {
-    id: flowStudioId('run'),
+    id: runStreamId,
     flowId,
     flowName: flow.name,
     mode: live ? 'live' : 'dry-run',
@@ -48394,6 +48462,7 @@ async function runFlow(flowId, input = {}, options = {}) {
   const runs = loadFlowStudioRuns();
   runs.push(run);
   saveFlowStudioRuns(runs);
+  try { io.emit('flow-studio:run-end', { runId: run.id, flowId, flowName: flow.name, status: run.status, nodeCount: run.nodeCount, mode: run.mode }); } catch (_) {}
 
   // Update flow lastRunAt
   flow.lastRunAt = run.finishedAt;
@@ -48821,6 +48890,38 @@ function startFlowStudioScheduler() {
   console.log('[FlowStudio] cron scheduler started (dry-run by default; set variables.scheduleLive=true for live).');
 }
 try { startFlowStudioScheduler(); } catch (_) {}
+
+
+// ===================================================================
+// SuperFlow Studio v3 — Per-flow analytics
+// ===================================================================
+app.get('/api/flow-studio/flows/:id/analytics', (req, res) => {
+  try {
+    const flow = loadFlowStudioFlows().find(f => f.id === req.params.id);
+    if (!flow) return res.status(404).json({ success: false, error: 'Flow not found' });
+    const runs = loadFlowStudioRuns().filter(r => r.flowId === req.params.id);
+    const completed = runs.filter(r => r.status === 'completed').length;
+    const failed = runs.filter(r => r.status === 'failed').length;
+    const paused = runs.filter(r => r.status === 'paused_approval').length;
+    const durations = runs
+      .map(r => (r.finishedAt && r.startedAt) ? (Date.parse(r.finishedAt) - Date.parse(r.startedAt)) : null)
+      .filter(d => typeof d === 'number' && d >= 0);
+    const avgMs = durations.length ? Math.round(durations.reduce((a, b) => a + b, 0) / durations.length) : 0;
+    const total = runs.length;
+    res.json(flowStudioJson({
+      success: true,
+      flowId: flow.id,
+      flowName: flow.name,
+      status: flow.status,
+      totalRuns: total,
+      completed, failed, paused,
+      successRate: total ? Math.round((completed / total) * 100) : 0,
+      avgDurationMs: avgMs,
+      lastRunAt: flow.lastRunAt || null,
+      recent: runs.slice(-10).reverse().map(r => ({ id: r.id, status: r.status, mode: r.mode, finishedAt: r.finishedAt, nodeCount: r.nodeCount }))
+    }));
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
 
 
 function shouldServeDashboardSpa(req) {

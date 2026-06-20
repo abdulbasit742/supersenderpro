@@ -4444,7 +4444,9 @@ curl -X POST http://localhost:3001/mcp/send \
       <button class="btn btn-secondary" onclick="fsSaveFlow()">💾 Save</button>
       <button class="btn btn-secondary" onclick="fsRunTest()">🧪 Run Test (Dry run)</button>
       <button class="btn btn-secondary" onclick="fsToggleActivate()" id="fs-activate-btn">▶ Activate</button>
+      <button class="btn btn-secondary" onclick="fsOpenFlowPicker()">📂 Open</button>
       <button class="btn btn-secondary" onclick="fsDuplicateFlow()">⧉ Duplicate</button>
+      <button class="btn btn-secondary" onclick="fsShowAnalytics()">📊 Analytics</button>
       <button class="btn btn-secondary" onclick="fsRenderDoctor()">🩺 Launch Doctor</button>
       <button class="btn btn-secondary" onclick="fsViewLogs()">📜 View Logs</button>
       <button class="btn btn-secondary" onclick="fsExportJSON()">⬇ Export JSON</button>
@@ -4463,11 +4465,24 @@ curl -X POST http://localhost:3001/mcp/send \
     <div id="fs-approvals-list" style="font-size:12px"></div>
   </div>
 
+  <!-- My flows + analytics -->
+  <div class="grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+    <div class="card">
+      <div class="flex-between"><div class="card-title" style="margin:0">📂 My Flows</div><button class="btn btn-secondary" onclick="fsRenderFlowsList()">Refresh</button></div>
+      <div id="fs-flows-list" class="scroll-y" style="max-height:160px;font-size:12px"></div>
+    </div>
+    <div class="card" id="fs-analytics-card">
+      <div class="card-title" style="margin:0">📊 Flow Analytics</div>
+      <div id="fs-analytics" style="font-size:12px;opacity:.7">Save/open a flow and click Analytics.</div>
+    </div>
+  </div>
+
   <!-- Builder layout -->
   <div class="grid" style="display:grid;grid-template-columns:220px 1fr 280px;gap:10px;align-items:start">
     <!-- Left: node library -->
     <div class="card" style="max-height:520px;overflow:auto">
       <div class="card-title" style="margin-top:0">Node Library</div>
+      <input id="fs-node-search" placeholder="Search nodes..." oninput="fsFilterLibrary(this.value)" style="width:100%;margin-bottom:6px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:inherit;padding:5px;border-radius:6px;font-size:12px"/>
       <div id="fs-node-library"></div>
     </div>
 
@@ -4482,6 +4497,7 @@ curl -X POST http://localhost:3001/mcp/send \
         <button class="btn btn-secondary" id="fs-view-btn" onclick="fsToggleCanvasView()" style="font-size:11px;padding:3px 8px">🔲 Visual canvas</button>
         <button class="btn btn-secondary" onclick="fsAutoLayout()" style="font-size:11px;padding:3px 8px">↳ Auto layout</button>
       </div>
+      <div id="fs-vars" style="margin:4px 0"></div>
       <div id="fs-canvas" style="display:flex;flex-direction:column;gap:8px;margin-top:8px"></div>
       <div id="fs-canvas-empty" style="opacity:.6;font-size:13px;padding:20px;text-align:center">Click a node in the library to add it to the flow →</div>
     </div>
@@ -17625,6 +17641,175 @@ async function fsInstallTemplate(id) {
   if (typeof window.loadFlowStudio === 'function') {
     const orig = window.loadFlowStudio;
     window.loadFlowStudio = async function () { await orig.apply(this, arguments); try { await fsRenderApprovals(); } catch (e) {} };
+  }
+})();
+</script>
+
+<script>
+/* ===== SuperFlow Studio frontend v3 ===== */
+(function () {
+  // ---- Node library search (override render with filter) ----
+  window.fsFilterLibrary = function (term) { fsState.libFilter = (term || '').toLowerCase(); fsRenderLibrary(); };
+  window.fsRenderLibrary = function () {
+    const box = document.getElementById('fs-node-library'); if (!box) return;
+    const f = fsState.libFilter || '';
+    box.innerHTML = (fsState.categories || []).map(cat => {
+      const nodes = cat.nodes.filter(n => !f || (n.label + ' ' + n.type).toLowerCase().includes(f));
+      if (!nodes.length) return '';
+      return `<div style="margin-bottom:8px">
+        <div style="font-size:11px;text-transform:uppercase;opacity:.6;margin-bottom:4px">${cat.label}</div>
+        ${nodes.map(n => `<div onclick="fsAddNode('${n.type}')" style="cursor:pointer;padding:5px 7px;border-radius:6px;margin-bottom:3px;background:rgba(255,255,255,.04);font-size:12px">${n.icon || '•'} ${n.label}</div>`).join('')}
+      </div>`;
+    }).join('') || '<div style="opacity:.5;font-size:12px">No matching nodes.</div>';
+  };
+
+  // ---- My Flows list + open existing ----
+  window.fsRenderFlowsList = async function () {
+    try {
+      const res = await api('/api/flow-studio/flows');
+      const flows = res.flows || [];
+      const box = document.getElementById('fs-flows-list'); if (!box) return;
+      if (!flows.length) { box.innerHTML = '<div style="opacity:.6;padding:4px 0">No saved flows yet. Install a template or create one.</div>'; return; }
+      box.innerHTML = flows.slice().reverse().map(fl => {
+        const c = fl.status === 'active' ? '#16a34a' : fl.status === 'paused' ? '#d97706' : '#64748b';
+        const cur = fsState.flow && fsState.flow.id === fl.id;
+        return `<div class="flex-between" style="padding:4px 6px;border-radius:6px;${cur ? 'background:rgba(255,255,255,.06)' : ''}">
+          <div style="cursor:pointer;flex:1" onclick="fsOpenFlow('${fl.id}')"><span style="color:${c}">●</span> ${fl.name} <span style="opacity:.5;font-size:10px">(${(fl.nodes || []).length})</span></div>
+          <button class="btn btn-secondary" style="font-size:10px;padding:2px 6px" onclick="fsDeleteFlow('${fl.id}')">🗑</button>
+        </div>`;
+      }).join('');
+    } catch (e) { /* silent */ }
+  };
+  window.fsOpenFlowPicker = function () { fsRenderFlowsList(); toast('Pick a flow from "My Flows" below', 'info'); };
+  window.fsOpenFlow = async function (id) {
+    try {
+      const res = await api('/api/flow-studio/flows/' + encodeURIComponent(id));
+      fsState.flow = res.flow; fsState.selected = null;
+      fsRenderCanvas(); fsRenderInspector(); fsRenderVars(); fsRenderFlowsList();
+      toast('Opened: ' + (res.flow.name || id), 'success');
+    } catch (e) { toast('Open failed: ' + e.message, 'error'); }
+  };
+  window.fsDeleteFlow = async function (id) {
+    if (!confirm('Delete this flow?')) return;
+    try {
+      await api('/api/flow-studio/flows/' + encodeURIComponent(id), { method: 'DELETE' });
+      if (fsState.flow && fsState.flow.id === id) fsNewFlow();
+      fsRenderFlowsList(); if (typeof fsRenderStats === 'function') fsRenderStats();
+      toast('Flow deleted', 'success');
+    } catch (e) { toast('Delete failed: ' + e.message, 'error'); }
+  };
+
+  // ---- Variables + schedule editor ----
+  window.fsRenderVars = function () {
+    const box = document.getElementById('fs-vars'); if (!box) return;
+    const v = (fsState.flow && fsState.flow.variables) || {};
+    const isSched = (fsState.flow.nodes || []).some(n => n.type === 'trigger.schedule');
+    box.innerHTML = `<details style="font-size:12px"><summary style="cursor:pointer;opacity:.8">⚙ Variables & schedule</summary>
+      <textarea id="fs-vars-json" rows="3" onchange="fsSaveVars(this.value)" style="width:100%;font-family:monospace;font-size:11px;margin-top:4px">${JSON.stringify(v, null, 2)}</textarea>
+      ${isSched ? `<label style="display:flex;align-items:center;gap:6px;margin-top:4px"><input type="checkbox" id="fs-sched-live" ${v.scheduleLive ? 'checked' : ''} onchange="fsToggleScheduleLive(this.checked)"/> Allow LIVE scheduled runs (default dry run)</label>` : ''}
+    </details>`;
+  };
+  window.fsSaveVars = function (text) { try { fsState.flow.variables = JSON.parse(text || '{}'); toast('Variables updated', 'success'); fsRenderVars(); } catch (e) { toast('Invalid JSON', 'error'); } };
+  window.fsToggleScheduleLive = function (on) { fsState.flow.variables = fsState.flow.variables || {}; fsState.flow.variables.scheduleLive = !!on; toast(on ? 'Live scheduled runs enabled' : 'Scheduled runs are dry-run', 'info'); fsRenderVars(); };
+
+  // ---- Connection / branch editor (extend inspector) ----
+  window.fsRenderInspector = function () {
+    const box = document.getElementById('fs-inspector'); if (!box) return;
+    const node = (fsState.flow.nodes || []).find(n => n.id === fsState.selected);
+    if (!node) { box.innerHTML = '<div style="opacity:.6;font-size:13px">Select a node to edit its config & connections.</div>'; return; }
+    const isBroadcast = /send_whatsapp|send_channel_post|post_facebook|post_instagram|post_linkedin/.test(node.type);
+    const others = (fsState.flow.nodes || []).filter(n => n.id !== node.id);
+    const nexts = Array.isArray(node.next) ? node.next : [];
+    const branchHelp = node.type === 'logic.if_else'
+      ? `<div class="form-group"><label>Condition (e.g. reply == YES)</label><input value="${(node.config?.condition || '').replace(/"/g, '&quot;')}" onchange="fsSetNodeConfigKey('condition', this.value)"/></div><div style="font-size:10px;opacity:.6;margin-bottom:6px">Tip: label one edge condition "true" and another "false".</div>`
+      : node.type === 'logic.switch_intent'
+      ? `<div class="form-group"><label>Switch variable (default: intent)</label><input value="${(node.config?.var || 'intent').replace(/"/g, '&quot;')}" onchange="fsSetNodeConfigKey('var', this.value)"/></div><div style="font-size:10px;opacity:.6;margin-bottom:6px">Tip: set each edge condition to an intent value, or "default".</div>` : '';
+    box.innerHTML = `
+      <div class="form-group"><label>Label</label><input value="${(node.label || '').replace(/"/g, '&quot;')}" onchange="fsUpdateNode('label', this.value)"/></div>
+      <div style="font-size:10px;opacity:.5;font-family:monospace;margin-bottom:6px">${node.type}</div>
+      ${branchHelp}
+      <div class="form-group"><label>Config (JSON)</label><textarea rows="5" onchange="fsUpdateConfig(this.value)" style="width:100%;font-family:monospace;font-size:11px">${JSON.stringify(node.config || {}, null, 2)}</textarea></div>
+      <div class="form-group"><label>Connections (next steps)</label>
+        ${others.length ? others.map(o => {
+          const on = nexts.includes(o.id);
+          const edge = (fsState.flow.edges || []).find(e => e.from === node.id && e.to === o.id);
+          return `<div style="display:flex;align-items:center;gap:4px;margin-bottom:3px;font-size:11px">
+            <input type="checkbox" ${on ? 'checked' : ''} onchange="fsSetConnection('${node.id}','${o.id}',this.checked)"/>
+            <span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${o.label}</span>
+            ${on ? `<input placeholder="cond" value="${(edge?.condition || '').replace(/"/g, '&quot;')}" onchange="fsSetEdgeCondition('${node.id}','${o.id}',this.value)" style="width:70px;font-size:10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:inherit;border-radius:4px;padding:2px"/>` : ''}
+          </div>`;
+        }).join('') : '<div style="opacity:.5;font-size:11px">Add more nodes to connect.</div>'}
+      </div>
+      ${isBroadcast ? `<div style="font-size:11px;opacity:.7;border:1px dashed rgba(255,255,255,.15);padding:6px;border-radius:6px;margin-bottom:8px">⚠️ Safety: broadcast needs <b>optInSegment</b>, <b>maxFrequencyPerDay</b>, <b>requireApproval:true</b>. Social posting supports <b>draft:true</b>.</div>` : ''}
+      <button class="btn btn-secondary" onclick="fsDeleteNode('${node.id}')" style="width:100%">🗑 Delete node</button>`;
+  };
+  window.fsSetNodeConfigKey = function (key, val) { const n = fsState.flow.nodes.find(x => x.id === fsState.selected); if (!n) return; n.config = n.config || {}; n.config[key] = val; toast('Saved', 'success'); };
+  window.fsSetConnection = function (from, to, on) {
+    const n = fsState.flow.nodes.find(x => x.id === from); if (!n) return;
+    n.next = Array.isArray(n.next) ? n.next : [];
+    fsState.flow.edges = fsState.flow.edges || [];
+    if (on) {
+      if (!n.next.includes(to)) n.next.push(to);
+      if (!fsState.flow.edges.some(e => e.from === from && e.to === to)) fsState.flow.edges.push({ id: 'e' + Date.now() + Math.random().toString(36).slice(2, 5), from, to, condition: '' });
+    } else {
+      n.next = n.next.filter(x => x !== to);
+      fsState.flow.edges = fsState.flow.edges.filter(e => !(e.from === from && e.to === to));
+    }
+    fsRenderInspector(); fsRenderCanvas();
+  };
+  window.fsSetEdgeCondition = function (from, to, cond) {
+    const e = (fsState.flow.edges || []).find(x => x.from === from && x.to === to);
+    if (e) { e.condition = cond; toast('Edge condition set', 'success'); }
+  };
+
+  // ---- Analytics ----
+  window.fsShowAnalytics = async function () {
+    if (!fsState.flow || !fsState.flow.id) { toast('Save or open a flow first', 'info'); return; }
+    try {
+      const d = await api('/api/flow-studio/flows/' + encodeURIComponent(fsState.flow.id) + '/analytics');
+      const box = document.getElementById('fs-analytics'); if (!box) return;
+      box.style.opacity = '1';
+      box.innerHTML = `
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0">
+          <div><div style="font-size:18px;font-weight:700">${d.successRate}%</div><div style="font-size:10px;opacity:.6">Success rate</div></div>
+          <div><div style="font-size:18px;font-weight:700">${d.totalRuns}</div><div style="font-size:10px;opacity:.6">Total runs</div></div>
+          <div><div style="font-size:18px;font-weight:700">${Math.round((d.avgDurationMs || 0))}ms</div><div style="font-size:10px;opacity:.6">Avg duration</div></div>
+        </div>
+        <div style="font-size:11px;opacity:.7">✅ ${d.completed} · ❌ ${d.failed} · ⏸ ${d.paused}</div>
+        <div style="margin-top:6px">${(d.recent || []).map(r => {
+          const c = r.status === 'failed' ? '#ef4444' : r.status === 'paused_approval' ? '#d97706' : '#16a34a';
+          return `<div style="font-size:11px;padding:2px 0"><span style="color:${c}">●</span> [${r.mode}] ${r.status} · ${r.nodeCount} nodes · ${r.finishedAt ? new Date(r.finishedAt).toLocaleTimeString() : ''}</div>`;
+        }).join('') || '<span style="opacity:.5">No runs yet</span>'}</div>`;
+    } catch (e) { toast('Analytics failed: ' + e.message, 'error'); }
+  };
+
+  // ---- Live run streaming via Socket.IO ----
+  function fsStreamLog(entry) {
+    if (typeof currentSection !== 'undefined' && currentSection !== 'flow-studio') return;
+    const panel = document.getElementById('fs-log-panel'); if (!panel) return;
+    const div = document.createElement('div');
+    if (entry.system) { div.style.color = '#38bdf8'; div.textContent = entry.system; }
+    else {
+      const c = entry.status === 'error' ? '#ef4444' : entry.kind === 'approval' ? '#d97706' : entry.kind === 'action' ? '#2563eb' : 'inherit';
+      div.style.color = c; div.textContent = `• ${entry.label || entry.kind || ''}: ${entry.message || ''}`;
+    }
+    panel.appendChild(div); panel.scrollTop = panel.scrollHeight;
+  }
+  try {
+    if (typeof socket !== 'undefined' && socket && socket.on) {
+      socket.on('flow-studio:run-start', d => fsStreamLog({ system: `▶ Live run started [${d.mode}] — ${d.flowName}` }));
+      socket.on('flow-studio:node', d => fsStreamLog(d.log || {}));
+      socket.on('flow-studio:run-end', d => fsStreamLog({ system: `■ Run ${d.status} · ${d.nodeCount} nodes` }));
+    }
+  } catch (e) { /* socket not ready */ }
+
+  // ---- Hook loadFlowStudio to also load flows list, vars ----
+  if (typeof window.loadFlowStudio === 'function') {
+    const orig = window.loadFlowStudio;
+    window.loadFlowStudio = async function () {
+      await orig.apply(this, arguments);
+      try { await fsRenderFlowsList(); fsRenderVars(); } catch (e) {}
+    };
   }
 })();
 </script>
