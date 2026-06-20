@@ -1,6 +1,7 @@
 'use strict';
 // Standalone Agent Sandbox Runtime service (own port; talks to SuperSender API).
 //   node agent-runtime/server.js
+const path = require('path');
 const express = require('express');
 const buildRouter = require('../routes/agentRuntime');
 const runtime = require('./index');
@@ -21,6 +22,10 @@ app.use((req, res, next) => {
 });
 
 app.get('/health', (req, res) => res.json({ ok: true, service: 'agent-runtime', port: PORT }));
+
+// Web dashboard (queue approve/reject UI) served from ./public
+app.use(express.static(path.join(__dirname, 'public')));
+
 app.use(buildRouter(express));
 
 app.listen(PORT, () => {

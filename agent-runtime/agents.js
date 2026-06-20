@@ -53,10 +53,41 @@ async function llmPlanner(goal, { provider = 'groq' } = {}) {
   }
 }
 
+// Webhook adapter — lets ANY external agent framework (CrewAI, LangChain, AutoGen,
+// a custom Python crew, etc.) act as a planner. We POST the goal + the confined tool
+// list to the framework's endpoint and expect {"steps":[{tool,args,rationale}]} back.
+// Whatever it returns is still forced through the sandbox, so it can never exceed policy.
+async function webhookPlanner(goal, { url, apiKey } = {}) {
+  if (!url) return rulePlanner(goal);
+  const { listTools } = require('./toolRegistry');
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', ...(apiKey ? { authorization: `Bearer ${apiKey}` } : {}) },
+      body: JSON.stringify({ goal, tools: listTools() })
+    });
+    const data = await res.json();
+    const steps = Array.isArray(data?.steps) ? data.steps
+      : Array.isArray(data) ? data : [];
+    // keep only well-formed steps
+    const clean = steps.filter(s => s && typeof s.tool === 'string')
+      .map(s => ({ tool: s.tool, args: s.args || {}, rationale: s.rationale || 'external agent step' }));
+    return clean.length ? clean : rulePlanner(goal);
+  } catch {
+    return rulePlanner(goal); // framework down -> safe fallback, never crash
+  }
+}
+
 const AGENTS = {
-  zeroclaw: { name: 'ZeroClaw (rule-based)', kind: 'deterministic', plan: async (g) => rulePlanner(g) },
-  groq:     { name: 'Groq LLM',  kind: 'llm', plan: async (g) => llmPlanner(g, { provider: 'groq' }) },
-  openai:   { name: 'OpenAI LLM',kind: 'llm', plan: async (g) => llmPlanner(g, { provider: 'openai' }) }
+  zeroclaw:  { name: 'ZeroClaw (rule-based)', kind: 'deterministic', plan: async (g) => rulePlanner(g) },
+  groq:      { name: 'Groq LLM',   kind: 'llm', plan: async (g) => llmPlanner(g, { provider: 'groq' }) },
+  openai:    { name: 'OpenAI LLM', kind: 'llm', plan: async (g) => llmPlanner(g, { provider: 'openai' }) },
+  crewai:    { name: 'CrewAI (webhook)',    kind: 'webhook',
+    plan: async (g) => webhookPlanner(g, { url: process.env.CREWAI_AGENT_URL, apiKey: process.env.CREWAI_AGENT_API_KEY }) },
+  langchain: { name: 'LangChain (webhook)', kind: 'webhook',
+    plan: async (g) => webhookPlanner(g, { url: process.env.LANGCHAIN_AGENT_URL, apiKey: process.env.LANGCHAIN_AGENT_API_KEY }) },
+  webhook:   { name: 'Generic Webhook agent', kind: 'webhook',
+    plan: async (g) => webhookPlanner(g, { url: process.env.AGENT_WEBHOOK_URL, apiKey: process.env.AGENT_WEBHOOK_API_KEY }) }
 };
 
 function listAgents() {
@@ -64,4 +95,4 @@ function listAgents() {
 }
 function getAgent(id) { return AGENTS[id] || AGENTS.zeroclaw; }
 
-module.exports = { AGENTS, listAgents, getAgent, rulePlanner, llmPlanner };
+module.exports = { AGENTS, listAgents, getAgent, rulePlanner, llmPlanner, webhookPlanner };
