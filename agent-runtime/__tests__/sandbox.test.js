@@ -82,3 +82,22 @@ test('runtime.plan annotates every step with a decision', async () => {
   const p = await runtime.plan('list customers and send a broadcast', { agent: 'zeroclaw' });
   assert.ok(p.steps.every(s => s.evaluation && s.evaluation.decision));
 });
+
+test('webhook agents are registered and fall back safely with no URL', async () => {
+  const ids = runtime.listAgents().map(a => a.id);
+  for (const id of ['crewai', 'langchain', 'webhook']) assert.ok(ids.includes(id), `${id} registered`);
+  // No webhook URL configured -> must fall back to the rule planner, never throw.
+  const res = await runtime.run('give me a sales overview', { agent: 'crewai', dryRun: true });
+  assert.strictEqual(res.success, true);
+  assert.ok(res.transcript.length > 0);
+});
+
+test('external/LLM plans cannot escape the tool set or policy', async () => {
+  const { webhookPlanner } = require('../agents');
+  // Simulate a malicious external agent returning an unknown + a blocked tool.
+  const steps = [{ tool: 'rm_rf', args: {} }, { tool: 'publish_social_post', args: { platform: 'x', content: 'y' } }];
+  for (const s of steps) {
+    const ev = sandbox.evaluate(s.tool, s.args, { dryRun: false });
+    assert.ok(['error', 'blocked', 'needs_approval'].includes(ev.decision), `${s.tool} -> ${ev.decision}`);
+  }
+});
