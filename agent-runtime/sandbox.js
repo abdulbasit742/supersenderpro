@@ -63,6 +63,8 @@ async function execute(toolName, args = {}, opts = {}) {
   if (ev.decision === 'needs_approval') {
     const draft = queue.enqueue({ agent: opts.agent, goal: opts.goal, status: 'pending_approval',
       action: { tool: toolName, actionType: ev.actionType, args, risk: ev.risk }, reason: ev.reason, dryRun: false });
+    // Fire-and-forget notification (never blocks the run).
+    try { require('./notify').notifyApprovalNeeded(draft); } catch { /* noop */ }
     return { ...base, status: 'pending_approval', draftId: draft.id };
   }
   // allow -> actually run

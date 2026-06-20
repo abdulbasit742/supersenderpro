@@ -26,6 +26,7 @@ async function run(dryRunOverride) {
     `<div class="step">${badge(t.status)} <b>${t.tool}</b> <span class="muted">${t.rationale || ''}</span></div>`).join('');
   $('#transcript').innerHTML = rows || '<div class="empty">no steps</div>';
   loadQueue();
+  loadRuns();
 }
 
 async function plan() {
@@ -71,4 +72,24 @@ document.addEventListener('click', async (e) => {
 $('#runBtn').onclick = () => run();
 $('#planBtn').onclick = () => plan();
 $('#refreshQ').onclick = () => loadQueue();
-loadStatus(); loadQueue();
+
+async function loadRuns() {
+  const r = await api('/api/agent-runtime/runs?limit=15');
+  $('#runStats').innerHTML = `<span>runs: <b>${r.stats.totalRuns}</b></span>` +
+    `<span>dry: <b>${r.stats.dryRuns}</b></span>` +
+    `<span>live: <b>${r.stats.liveRuns}</b></span>` +
+    `<span>steps: <b>${r.stats.steps}</b></span>`;
+  if (!r.runs.length) { $('#runs').innerHTML = '<div class="empty">No runs yet.</div>'; return; }
+  $('#runs').innerHTML = r.runs.map(x => `
+    <div class="qitem">
+      <div class="head">
+        <div><b>${x.agent}</b> <span class="muted">${new Date(x.at).toLocaleString()}</span></div>
+        <div class="muted">${x.dryRun ? 'dry-run' : 'LIVE'}</div>
+      </div>
+      <div class="muted" style="margin-top:4px">${(x.goal || '').slice(0, 90)}</div>
+      <div class="mono muted" style="margin-top:4px">${(x.steps || []).map(s => s.tool + ':' + s.status).join('  ·  ')}</div>
+    </div>`).join('');
+}
+$('#refreshR').onclick = () => loadRuns();
+
+loadStatus(); loadQueue(); loadRuns();
