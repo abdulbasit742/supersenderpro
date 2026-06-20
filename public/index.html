@@ -1846,6 +1846,7 @@ function searchNav(q) {
     <div class="nav-section">Messaging</div>
     <div class="nav-item" onclick="showSection('cockpit')"><span class="ico">🚀</span>AI Inbox Cockpit<span class="nav-badge" id="cockpit-badge" style="display:none">0</span></div>
     <div class="nav-item advanced-nav" onclick="showSection('flows')"><span class="ico">🔀</span>Flow Builder</div>
+    <div class="nav-item advanced-nav" onclick="showSection('flow-studio')"><span class="ico">🧩</span>Flow Studio</div>
     <div class="nav-item advanced-nav" onclick="showSection('smart-broadcast')"><span class="ico">🎯</span>Smart Broadcast</div>
     <div class="nav-item" onclick="showSection('campaigns')"><span class="ico">🚀</span>Campaigns</div>
     <div class="nav-item" onclick="showSection('broadcast')"><span class="ico">📢</span>Broadcast</div>
@@ -4431,6 +4432,65 @@ curl -X POST http://localhost:3001/mcp/send \
 <div class="card"><div id="alerts-list" class="scroll-y"></div></div>
 </div>
 
+<!-- FLOW STUDIO -->
+<div class="section" id="s-flow-studio">
+  <div class="flex-between" style="margin-bottom:10px;flex-wrap:wrap;gap:8px">
+    <div>
+      <div class="card-title" style="margin:0">🧩 SuperFlow Studio — AI Automation Builder</div>
+      <div style="font-size:12px;opacity:.7">No-code AI workflow canvas · <span id="fs-ready-badge">Automation ready</span></div>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="fsNewFlow()">＋ New Flow</button>
+      <button class="btn btn-secondary" onclick="fsSaveFlow()">💾 Save</button>
+      <button class="btn btn-secondary" onclick="fsRunTest()">🧪 Run Test (Dry run)</button>
+      <button class="btn btn-secondary" onclick="fsToggleActivate()" id="fs-activate-btn">▶ Activate</button>
+      <button class="btn btn-secondary" onclick="fsViewLogs()">📜 View Logs</button>
+      <button class="btn btn-secondary" onclick="fsExportJSON()">⬇ Export JSON</button>
+      <button class="btn btn-secondary" onclick="document.getElementById('fs-import-file').click()">⬆ Import JSON</button>
+      <input type="file" id="fs-import-file" accept="application/json" style="display:none" onchange="fsImportJSON(event)"/>
+    </div>
+  </div>
+
+  <!-- Dashboard stats -->
+  <div class="grid" id="fs-stats" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:10px"></div>
+
+  <!-- Builder layout -->
+  <div class="grid" style="display:grid;grid-template-columns:220px 1fr 280px;gap:10px;align-items:start">
+    <!-- Left: node library -->
+    <div class="card" style="max-height:520px;overflow:auto">
+      <div class="card-title" style="margin-top:0">Node Library</div>
+      <div id="fs-node-library"></div>
+    </div>
+
+    <!-- Center: canvas / node list -->
+    <div class="card" style="min-height:520px">
+      <div class="flex-between">
+        <div class="card-title" style="margin:0"><input id="fs-flow-name" placeholder="Flow name" style="background:transparent;border:none;color:inherit;font-weight:700;font-size:15px;width:60%"/></div>
+        <span id="fs-flow-status" class="nav-badge" style="display:inline-block">draft</span>
+      </div>
+      <input id="fs-flow-desc" placeholder="Description (optional)" style="width:100%;margin:6px 0;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:inherit;padding:6px;border-radius:6px"/>
+      <div id="fs-canvas" style="display:flex;flex-direction:column;gap:8px;margin-top:8px"></div>
+      <div id="fs-canvas-empty" style="opacity:.6;font-size:13px;padding:20px;text-align:center">Click a node in the library to add it to the flow →</div>
+    </div>
+
+    <!-- Right: inspector -->
+    <div class="card" style="max-height:520px;overflow:auto">
+      <div class="card-title" style="margin-top:0">Inspector</div>
+      <div id="fs-inspector"><div style="opacity:.6;font-size:13px">Select a node to edit its config.</div></div>
+    </div>
+  </div>
+
+  <!-- Bottom: execution / log panel -->
+  <div class="card" style="margin-top:10px">
+    <div class="flex-between"><div class="card-title" style="margin:0">Execution / Logs</div><button class="btn btn-secondary" onclick="fsViewLogs()">Refresh</button></div>
+    <div id="fs-log-panel" class="scroll-y" style="max-height:220px;font-family:monospace;font-size:12px"></div>
+  </div>
+
+  <!-- Template gallery -->
+  <div class="flex-between" style="margin:14px 0 6px"><div class="card-title" style="margin:0">Template Gallery</div></div>
+  <div class="grid" id="fs-templates" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px"></div>
+</div>
+
 <!-- SETTINGS -->
 <div class="section" id="s-settings">
 <div class="grid g2">
@@ -5241,6 +5301,7 @@ function showSection(id, triggerEl) {
     plans: 'Plans',
     cockpit: 'Unified Inbox',
     flows: 'Automation Flows',
+    'flow-studio': 'Flow Studio',
     'smart-broadcast': 'Smart Campaigns',
     campaigns: 'Campaigns',
     broadcast: 'Broadcast',
@@ -5287,6 +5348,7 @@ function showSection(id, triggerEl) {
   else if (id === 'business-tools') loadBusinessTools();
   else if (id === 'social') loadSocialHub();
   else if (id === 'wa-channels') loadWAChannels();
+  else if (id === 'flow-studio') { if (typeof loadFlowStudio === 'function') loadFlowStudio(); }
   // other loaders are attached later via overrides/hooks
 }
 
@@ -17127,6 +17189,226 @@ if (typeof socket !== 'undefined') {
 }
 
 </script>
+<script>
+/* ===== SuperFlow Studio frontend ===== */
+window.fsState = { flow: null, categories: [], typeIndex: {}, selected: null };
+
+function fsNewFlowObject() {
+  return { id: null, name: 'Untitled flow', description: '', status: 'draft', triggerType: '', nodes: [], edges: [], variables: {} };
+}
+
+async function loadFlowStudio() {
+  try {
+    if (!fsState.flow) fsState.flow = fsNewFlowObject();
+    const nt = await api('/api/flow-studio/node-types');
+    fsState.categories = nt.categories || [];
+    fsState.typeIndex = {};
+    fsState.categories.forEach(c => c.nodes.forEach(n => { fsState.typeIndex[n.type] = Object.assign({ category: c.category }, n); }));
+    fsRenderLibrary();
+    fsRenderCanvas();
+    fsRenderInspector();
+    await fsRenderStats();
+    await fsRenderTemplates();
+    await fsViewLogs();
+  } catch (e) { toast('Flow Studio load failed: ' + e.message, 'error'); }
+}
+
+async function fsRenderStats() {
+  try {
+    const s = await api('/api/flow-studio/status');
+    const ir = s.integrationsReady || {};
+    const readyCount = Object.values(ir).filter(Boolean).length;
+    const items = [
+      ['Active flows', s.activeFlows || 0],
+      ['Paused', s.pausedFlows || 0],
+      ['Total flows', s.flowCount || 0],
+      ['Failed runs', s.failedRuns || 0],
+      ['Queue pending', s.queuePending || 0],
+      ['Integrations', readyCount + '/' + Object.keys(ir).length]
+    ];
+    document.getElementById('fs-stats').innerHTML = items.map(([k, v]) =>
+      `<div class="card" style="padding:10px"><div style="font-size:11px;opacity:.7">${k}</div><div style="font-size:20px;font-weight:700">${v}</div></div>`).join('');
+    document.getElementById('fs-ready-badge').innerText = readyCount > 0 ? 'Automation ready' : 'Setup needed';
+  } catch (e) { /* silent */ }
+}
+
+function fsRenderLibrary() {
+  const box = document.getElementById('fs-node-library');
+  box.innerHTML = fsState.categories.map(cat => `
+    <div style="margin-bottom:8px">
+      <div style="font-size:11px;text-transform:uppercase;opacity:.6;margin-bottom:4px">${cat.label}</div>
+      ${cat.nodes.map(n => `<div class="fs-lib-node" onclick="fsAddNode('${n.type}')" style="cursor:pointer;padding:5px 7px;border-radius:6px;margin-bottom:3px;background:rgba(255,255,255,.04);font-size:12px">${n.icon || '•'} ${n.label}</div>`).join('')}
+    </div>`).join('');
+}
+
+function fsAddNode(type) {
+  const def = fsState.typeIndex[type];
+  if (!def) return;
+  const id = 'n' + (fsState.flow.nodes.length + 1) + '_' + Math.random().toString(36).slice(2, 6);
+  const node = { id, type, label: def.label, position: { x: 80 + fsState.flow.nodes.length * 40, y: 120 }, config: {}, next: [] };
+  const nodes = fsState.flow.nodes;
+  if (nodes.length) { const prev = nodes[nodes.length - 1]; prev.next = [id]; fsState.flow.edges.push({ id: 'e' + Date.now(), from: prev.id, to: id, condition: '' }); }
+  nodes.push(node);
+  if (type.startsWith('trigger.') && !fsState.flow.triggerType) fsState.flow.triggerType = type;
+  fsState.selected = id;
+  fsRenderCanvas(); fsRenderInspector();
+}
+
+function fsRenderCanvas() {
+  const f = fsState.flow;
+  document.getElementById('fs-flow-name').value = f.name || '';
+  document.getElementById('fs-flow-desc').value = f.description || '';
+  document.getElementById('fs-flow-status').innerText = f.status || 'draft';
+  const btn = document.getElementById('fs-activate-btn');
+  btn.innerText = f.status === 'active' ? '⏸ Pause' : '▶ Activate';
+  const canvas = document.getElementById('fs-canvas');
+  const empty = document.getElementById('fs-canvas-empty');
+  if (!f.nodes.length) { canvas.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  canvas.innerHTML = f.nodes.map((n, i) => {
+    const def = fsState.typeIndex[n.type] || {};
+    const sel = fsState.selected === n.id;
+    const cat = (n.type || '').split('.')[0];
+    const color = { trigger: '#16a34a', ai: '#8b5cf6', action: '#2563eb', logic: '#d97706', data: '#0891b2' }[cat] || '#64748b';
+    return `<div onclick="fsSelectNode('${n.id}')" style="cursor:pointer;border:1px solid ${sel ? color : 'rgba(255,255,255,.1)'};border-left:4px solid ${color};border-radius:8px;padding:8px 10px;background:${sel ? 'rgba(255,255,255,.06)' : 'rgba(255,255,255,.02)'}">
+      <div class="flex-between"><div style="font-size:13px;font-weight:600">${def.icon || '•'} ${n.label}</div><div style="font-size:10px;opacity:.6">${cat}</div></div>
+      <div style="font-size:10px;opacity:.5;font-family:monospace">${n.type}</div>
+    </div>${i < f.nodes.length - 1 ? '<div style="text-align:center;opacity:.4">↓</div>' : ''}`;
+  }).join('');
+}
+
+function fsSelectNode(id) { fsState.selected = id; fsRenderCanvas(); fsRenderInspector(); }
+
+function fsRenderInspector() {
+  const box = document.getElementById('fs-inspector');
+  const node = fsState.flow.nodes.find(n => n.id === fsState.selected);
+  if (!node) { box.innerHTML = '<div style="opacity:.6;font-size:13px">Select a node to edit its config.</div>'; return; }
+  const isAction = (node.type || '').startsWith('action.');
+  const isBroadcast = /send_whatsapp|send_channel_post|post_facebook|post_instagram|post_linkedin/.test(node.type);
+  box.innerHTML = `
+    <div class="form-group"><label>Label</label><input value="${(node.label || '').replace(/"/g, '&quot;')}" onchange="fsUpdateNode('label', this.value)"/></div>
+    <div class="form-group"><label>Config (JSON)</label><textarea rows="6" onchange="fsUpdateConfig(this.value)" style="width:100%;font-family:monospace;font-size:11px">${JSON.stringify(node.config || {}, null, 2)}</textarea></div>
+    ${isBroadcast ? `<div style="font-size:11px;opacity:.7;border:1px dashed rgba(255,255,255,.15);padding:6px;border-radius:6px;margin-bottom:8px">⚠️ Safety: promotional broadcast needs <b>optInSegment</b>, <b>maxFrequencyPerDay</b>, and <b>requireApproval:true</b>. Social posting supports <b>draft:true</b>.</div>` : ''}
+    <button class="btn btn-secondary" onclick="fsDeleteNode('${node.id}')" style="width:100%">🗑 Delete node</button>`;
+}
+
+function fsUpdateNode(key, val) { const n = fsState.flow.nodes.find(x => x.id === fsState.selected); if (n) { n[key] = val; fsRenderCanvas(); } }
+function fsUpdateConfig(text) { const n = fsState.flow.nodes.find(x => x.id === fsState.selected); if (!n) return; try { n.config = JSON.parse(text || '{}'); toast('Config updated', 'success'); } catch (e) { toast('Invalid JSON', 'error'); } }
+function fsDeleteNode(id) {
+  fsState.flow.nodes = fsState.flow.nodes.filter(n => n.id !== id);
+  fsState.flow.edges = fsState.flow.edges.filter(e => e.from !== id && e.to !== id);
+  fsState.flow.nodes.forEach(n => { n.next = (n.next || []).filter(x => x !== id); });
+  fsState.selected = null; fsRenderCanvas(); fsRenderInspector();
+}
+
+function fsNewFlow() { fsState.flow = fsNewFlowObject(); fsState.selected = null; fsRenderCanvas(); fsRenderInspector(); toast('New flow created', 'success'); }
+
+function fsSyncFromForm() {
+  fsState.flow.name = document.getElementById('fs-flow-name').value || 'Untitled flow';
+  fsState.flow.description = document.getElementById('fs-flow-desc').value || '';
+}
+
+async function fsSaveFlow() {
+  fsSyncFromForm();
+  try {
+    const f = fsState.flow;
+    let res;
+    if (f.id) res = await api('/api/flow-studio/flows/' + encodeURIComponent(f.id), { method: 'PUT', body: JSON.stringify(f) });
+    else res = await api('/api/flow-studio/flows', { method: 'POST', body: JSON.stringify(f) });
+    fsState.flow = res.flow;
+    fsRenderCanvas();
+    if (res.validation && !res.validation.valid) toast('Saved with warnings: ' + res.validation.errors.join('; '), 'info');
+    else toast('Flow saved', 'success');
+    fsRenderStats();
+  } catch (e) { toast('Save failed: ' + e.message, 'error'); }
+}
+
+async function fsRunTest() {
+  if (!fsState.flow.id) { await fsSaveFlow(); }
+  if (!fsState.flow.id) return;
+  try {
+    const res = await api('/api/flow-studio/flows/' + encodeURIComponent(fsState.flow.id) + '/run-test', { method: 'POST', body: JSON.stringify({ input: {} }) });
+    fsRenderRunLogs(res.run);
+    toast('Dry run complete: ' + (res.run ? res.run.status : 'done'), res.success ? 'success' : 'error');
+  } catch (e) { toast('Run test failed: ' + e.message, 'error'); }
+}
+
+async function fsToggleActivate() {
+  if (!fsState.flow.id) { await fsSaveFlow(); if (!fsState.flow.id) return; }
+  const activate = fsState.flow.status !== 'active';
+  try {
+    const res = await api('/api/flow-studio/flows/' + encodeURIComponent(fsState.flow.id) + '/' + (activate ? 'activate' : 'pause'), { method: 'POST', body: '{}' });
+    fsState.flow = res.flow; fsRenderCanvas(); fsRenderStats();
+    toast(activate ? 'Flow activated (Live run enabled)' : 'Flow paused', 'success');
+  } catch (e) { toast((activate ? 'Activate' : 'Pause') + ' failed: ' + e.message, 'error'); }
+}
+
+function fsRenderRunLogs(run) {
+  const panel = document.getElementById('fs-log-panel');
+  if (!run) { panel.innerHTML = '<div style="opacity:.6">No run data.</div>'; return; }
+  const head = `<div style="margin-bottom:6px"><b>[${run.mode}]</b> ${run.flowName} — <span style="color:${run.status === 'failed' ? '#ef4444' : run.status === 'paused_approval' ? '#d97706' : '#16a34a'}">${run.status}</span> · ${run.nodeCount} nodes</div>`;
+  panel.innerHTML = head + (run.logs || []).map(l => {
+    const c = l.status === 'error' ? '#ef4444' : l.kind === 'approval' ? '#d97706' : l.kind === 'action' ? '#2563eb' : 'inherit';
+    return `<div style="color:${c};padding:2px 0">• ${l.label || l.kind || ''}: ${l.message || ''}</div>`;
+  }).join('');
+}
+
+async function fsViewLogs() {
+  try {
+    const flowId = fsState.flow && fsState.flow.id ? '?flowId=' + encodeURIComponent(fsState.flow.id) + '&limit=20' : '?limit=20';
+    const res = await api('/api/flow-studio/runs' + flowId);
+    const runs = res.runs || [];
+    const panel = document.getElementById('fs-log-panel');
+    if (!runs.length) { panel.innerHTML = '<div style="opacity:.6">No runs yet. Use Run Test to dry-run a flow.</div>'; return; }
+    panel.innerHTML = runs.map(r => {
+      const c = r.status === 'failed' ? '#ef4444' : r.status === 'paused_approval' ? '#d97706' : '#16a34a';
+      return `<div style="padding:3px 0;border-bottom:1px solid rgba(255,255,255,.06)"><b>[${r.mode}]</b> ${r.flowName} — <span style="color:${c}">${r.status}</span> · ${new Date(r.finishedAt).toLocaleString()} · ${r.nodeCount} nodes</div>`;
+    }).join('');
+  } catch (e) { toast('Logs load failed: ' + e.message, 'error'); }
+}
+
+function fsExportJSON() {
+  fsSyncFromForm();
+  const blob = new Blob([JSON.stringify(fsState.flow, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = (fsState.flow.name || 'flow').replace(/[^a-z0-9]+/gi, '-').toLowerCase() + '.json';
+  a.click(); URL.revokeObjectURL(a.href);
+  toast('Exported JSON', 'success');
+}
+
+function fsImportJSON(ev) {
+  const file = ev.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try { const obj = JSON.parse(reader.result); obj.id = null; obj.status = 'draft'; fsState.flow = Object.assign(fsNewFlowObject(), obj); fsState.selected = null; fsRenderCanvas(); fsRenderInspector(); toast('Imported flow (save to persist)', 'success'); }
+    catch (e) { toast('Import failed: invalid JSON', 'error'); }
+  };
+  reader.readAsText(file); ev.target.value = '';
+}
+
+async function fsRenderTemplates() {
+  try {
+    const res = await api('/api/flow-studio/templates');
+    document.getElementById('fs-templates').innerHTML = (res.templates || []).map(t => `
+      <div class="card" style="padding:10px">
+        <div style="font-weight:600;font-size:13px">${t.name}</div>
+        <div style="font-size:11px;opacity:.7;margin:4px 0;min-height:30px">${t.description || ''}</div>
+        <div style="font-size:10px;opacity:.5;margin-bottom:6px">${(t.nodes || []).length} nodes</div>
+        <button class="btn btn-secondary" style="width:100%" onclick="fsInstallTemplate('${t.id}')">Install</button>
+      </div>`).join('');
+  } catch (e) { /* silent */ }
+}
+
+async function fsInstallTemplate(id) {
+  try {
+    const res = await api('/api/flow-studio/templates/' + encodeURIComponent(id) + '/install', { method: 'POST', body: '{}' });
+    fsState.flow = res.flow; fsState.selected = null;
+    fsRenderCanvas(); fsRenderInspector(); fsRenderStats();
+    toast('Template installed as editable flow', 'success');
+  } catch (e) { toast('Install failed: ' + e.message, 'error'); }
+}
+</script>
+
 </body>
 </html>
 

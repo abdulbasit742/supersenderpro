@@ -27877,11 +27877,6 @@ app.put('/api/handoffs/:id', (req, res) => {
 });
 
 app.get('/api/settings', (req, res) => res.json(settings));
-app.put('/api/settings', (req, res) => {
-  settings = { ...settings, ...req.body };
-  saveJSON('settings.json', settings);
-  res.json(settings);
-});
 app.post('/api/settings', (req, res) => {
   settings = { ...settings, ...req.body };
   const DEFAULT_GMAIL_PAYMENT_SCAN_QUERY = 'newer_than:7d (jazzcash OR easypaisa OR payment OR transaction OR bank OR transfer OR received)';
@@ -27965,19 +27960,6 @@ app.post('/api/settings', (req, res) => {
   saveJSON('settings.json', settings);
   res.json(settings);
 });
-
-app.post('/api/settings/ai-test', async (req, res) => {
-  try {
-    const { prompt } = req.body || {};
-    if (!prompt) return res.status(400).json({ error: 'prompt is required' });
-    const { processPrompt } = require('./ai/aiBrain');
-    const response = await processPrompt(prompt);
-    res.json({ success: true, response });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
 
 function normalizeActionTrigger(input = {}) {
   const priorityMap = { low: 1, normal: 1, medium: 2, high: 3, urgent: 4, critical: 4 };
@@ -47802,6 +47784,686 @@ function startChatGptConnectorIfEnabled() {
 app.get('/api/gpt-connector/status', (_req, res) => {
   res.json(chatGptConnectorStatusPayload());
 });
+
+// ===================================================================
+// SuperFlow Studio — AI Automation Builder
+// Original SuperSender-style no-code automation engine.
+// Storage: data/flow_studio_flows.json, data/flow_studio_runs.json,
+//          data/flow_studio_templates.json (runtime, gitignored)
+// ===================================================================
+
+const FLOW_STUDIO_FLOWS_FILE = 'flow_studio_flows.json';
+const FLOW_STUDIO_RUNS_FILE = 'flow_studio_runs.json';
+const FLOW_STUDIO_TEMPLATES_FILE = 'flow_studio_templates.json';
+const FLOW_STUDIO_MAX_NODE_EXECUTIONS = Number(process.env.FLOW_STUDIO_MAX_NODES || 200);
+const FLOW_STUDIO_MAX_RUNS_KEPT = Number(process.env.FLOW_STUDIO_MAX_RUNS || 300);
+
+function flowStudioId(prefix = 'fs') {
+  return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+}
+
+// ---- Node type catalogue (categories A-E) ------------------------
+function getFlowStudioNodeTypes() {
+  return [
+    {
+      category: 'triggers', label: 'Triggers', nodes: [
+        { type: 'trigger.whatsapp_message', label: 'WhatsApp message received', icon: '💬' },
+        { type: 'trigger.whatsapp_channel_post', label: 'WhatsApp channel post detected', icon: '📣' },
+        { type: 'trigger.new_order', label: 'New ecommerce order', icon: '🛒' },
+        { type: 'trigger.new_customer', label: 'New customer added', icon: '🧑' },
+        { type: 'trigger.payment_received', label: 'Payment received', icon: '💳' },
+        { type: 'trigger.stock_low', label: 'Stock low', icon: '📉' },
+        { type: 'trigger.sheet_row', label: 'New Google Sheet row', icon: '📊' },
+        { type: 'trigger.n8n_webhook', label: 'n8n webhook received', icon: '🔗' },
+        { type: 'trigger.schedule', label: 'Schedule / cron', icon: '⏰' },
+        { type: 'trigger.manual', label: 'Manual button trigger', icon: '🖱️' },
+        { type: 'trigger.website_change', label: 'Website change detected', icon: '🌐' },
+        { type: 'trigger.social_message', label: 'Social comment/DM received', icon: '📨' }
+      ]
+    },
+    {
+      category: 'ai', label: 'AI Nodes', nodes: [
+        { type: 'ai.classify_intent', label: 'Classify intent', icon: '🧠' },
+        { type: 'ai.generate_reply', label: 'Generate reply', icon: '✍️' },
+        { type: 'ai.summarize', label: 'Summarize conversation', icon: '📝' },
+        { type: 'ai.extract_data', label: 'Extract data from text', icon: '🔍' },
+        { type: 'ai.translate', label: 'Translate Urdu/English', icon: '🌍' },
+        { type: 'ai.generate_caption', label: 'Generate caption', icon: '🏷️' },
+        { type: 'ai.score_lead', label: 'Score lead', icon: '🎯' },
+        { type: 'ai.detect_fraud', label: 'Detect scam/fraud', icon: '🛡️' },
+        { type: 'ai.recommend_product', label: 'Recommend product', icon: '🛍️' },
+        { type: 'ai.generate_offer', label: 'Generate offer', icon: '🎁' },
+        { type: 'ai.human_approval', label: 'Human approval required', icon: '✅' },
+        { type: 'ai.agent_router', label: 'Agent router', icon: '🔀' }
+      ]
+    },
+    {
+      category: 'actions', label: 'Actions', nodes: [
+        { type: 'action.send_whatsapp', label: 'Send WhatsApp message', icon: '💬' },
+        { type: 'action.send_whatsapp_media', label: 'Send WhatsApp media', icon: '🖼️' },
+        { type: 'action.send_channel_post', label: 'Send channel post', icon: '📣' },
+        { type: 'action.admin_alert', label: 'Send admin alert', icon: '🚨' },
+        { type: 'action.upsert_customer', label: 'Add/update customer', icon: '🧑' },
+        { type: 'action.create_order', label: 'Create order', icon: '🧾' },
+        { type: 'action.update_order_status', label: 'Update order status', icon: '🔄' },
+        { type: 'action.add_product', label: 'Add product', icon: '➕' },
+        { type: 'action.sync_product', label: 'Sync ecommerce product', icon: '🔁' },
+        { type: 'action.post_facebook', label: 'Post to Facebook', icon: '📘' },
+        { type: 'action.post_instagram', label: 'Post to Instagram', icon: '📸' },
+        { type: 'action.post_linkedin', label: 'Post to LinkedIn', icon: '💼' },
+        { type: 'action.trigger_n8n', label: 'Trigger n8n webhook', icon: '🔗' },
+        { type: 'action.append_sheet', label: 'Append Google Sheet row', icon: '📊' },
+        { type: 'action.create_task', label: 'Create task', icon: '🗂️' },
+        { type: 'action.send_email', label: 'Send email', icon: '📧' },
+        { type: 'action.add_queue_job', label: 'Add queue job', icon: '📥' }
+      ]
+    },
+    {
+      category: 'logic', label: 'Logic', nodes: [
+        { type: 'logic.if_else', label: 'If/else', icon: '⚖️' },
+        { type: 'logic.switch_intent', label: 'Switch by intent', icon: '🔢' },
+        { type: 'logic.delay', label: 'Delay', icon: '⏳' },
+        { type: 'logic.wait_reply', label: 'Wait for reply', icon: '⌛' },
+        { type: 'logic.loop_contacts', label: 'Loop over contacts', icon: '🔁' },
+        { type: 'logic.split_segment', label: 'Split by customer segment', icon: '🪓' },
+        { type: 'logic.rate_limit', label: 'Rate limit', icon: '🚦' },
+        { type: 'logic.stop_opted_out', label: 'Stop if opted out', icon: '🛑' },
+        { type: 'logic.approval_gate', label: 'Human approval gate', icon: '✅' },
+        { type: 'logic.error_fallback', label: 'Error fallback', icon: '🪂' }
+      ]
+    },
+    {
+      category: 'data', label: 'Data', nodes: [
+        { type: 'data.read_customer', label: 'Read customer profile', icon: '🧑' },
+        { type: 'data.read_stock', label: 'Read stock', icon: '📦' },
+        { type: 'data.read_dealer_rate', label: 'Read latest dealer rate', icon: '💱' },
+        { type: 'data.read_order', label: 'Read ecommerce order', icon: '🧾' },
+        { type: 'data.read_catalog', label: 'Read product catalog', icon: '📚' },
+        { type: 'data.read_messages', label: 'Read previous messages', icon: '🗨️' },
+        { type: 'data.read_sheet', label: 'Read Google Sheet', icon: '📊' },
+        { type: 'data.read_api', label: 'Read website/API', icon: '🌐' },
+        { type: 'data.save_variable', label: 'Save variable', icon: '💾' },
+        { type: 'data.transform_json', label: 'Transform JSON', icon: '🧰' }
+      ]
+    }
+  ];
+}
+
+function flowStudioNodeTypeIndex() {
+  const idx = {};
+  for (const cat of getFlowStudioNodeTypes()) {
+    for (const n of cat.nodes) idx[n.type] = { ...n, category: cat.category };
+  }
+  return idx;
+}
+
+// ---- Prebuilt templates (defaults, seeded into store) ------------
+function defaultFlowStudioTemplates() {
+  const T = (id, name, description, triggerType, steps) => ({
+    id, name, description, triggerType,
+    nodes: steps.map((s, i) => ({
+      id: `n${i + 1}`, type: s[0], label: s[1],
+      position: { x: 80 + i * 220, y: 120 }, config: s[2] || {},
+      next: i < steps.length - 1 ? [`n${i + 2}`] : []
+    })),
+    edges: steps.slice(0, -1).map((s, i) => ({ id: `e${i + 1}`, from: `n${i + 1}`, to: `n${i + 2}`, condition: '' }))
+  });
+  return [
+    T('whatsapp-lead-qualifier', 'New WhatsApp Lead Qualifier', 'Qualify inbound WhatsApp leads with AI and alert admin.', 'trigger.whatsapp_message', [
+      ['trigger.whatsapp_message', 'WhatsApp message received'],
+      ['ai.classify_intent', 'Classify intent'],
+      ['ai.generate_reply', 'Ask budget / use case', { question: 'Budget aur use case batayein?' }],
+      ['ai.score_lead', 'Score lead'],
+      ['action.admin_alert', 'Admin alert', { template: 'New qualified lead' }]
+    ]),
+    T('ecommerce-order-autopilot', 'Ecommerce Order Autopilot', 'Confirm new orders, alert admin, log to Sheet and n8n.', 'trigger.new_order', [
+      ['trigger.new_order', 'New ecommerce order'],
+      ['action.send_whatsapp', 'WhatsApp confirmation', { template: 'Order confirmed ✅' }],
+      ['action.admin_alert', 'Admin alert'],
+      ['action.append_sheet', 'Append Google Sheet row', { sheet: 'orders' }],
+      ['action.trigger_n8n', 'Trigger n8n webhook', { workflow: 'order_created' }]
+    ]),
+    T('abandoned-cart-recovery', 'Abandoned Cart Recovery', 'Recover abandoned carts with timed reminders.', 'trigger.n8n_webhook', [
+      ['trigger.n8n_webhook', 'Cart webhook received'],
+      ['logic.delay', 'Wait 2h', { minutes: 120 }],
+      ['action.send_whatsapp', 'Send reminder', { template: 'Aap ki cart wait kar rahi hai 🛒' }],
+      ['logic.delay', 'Wait 24h', { minutes: 1440 }],
+      ['action.send_whatsapp', 'Send final offer', { template: 'Last chance discount 🎁' }]
+    ]),
+    T('dealer-rate-collector', 'Dealer Rate Collector', 'Parse dealer rates from group messages with trust checks.', 'trigger.whatsapp_message', [
+      ['trigger.whatsapp_message', 'Group message received'],
+      ['ai.extract_data', 'Parse rate'],
+      ['ai.detect_fraud', 'Trust check'],
+      ['data.save_variable', 'Save rate', { key: 'dealer_rate' }],
+      ['action.admin_alert', 'Admin report']
+    ]),
+    T('stock-low-restock', 'Stock Low Restock Flow', 'React to low stock by alerting and requesting restock.', 'trigger.stock_low', [
+      ['trigger.stock_low', 'Stock low'],
+      ['data.read_dealer_rate', 'Find best dealer'],
+      ['action.admin_alert', 'Admin alert'],
+      ['action.send_whatsapp', 'WhatsApp restock request', { template: 'Restock chahiye' }]
+    ]),
+    T('channel-to-social', 'Channel to Social Republisher', 'Republish WhatsApp channel posts to social platforms.', 'trigger.whatsapp_channel_post', [
+      ['trigger.whatsapp_channel_post', 'Channel post detected'],
+      ['ai.generate_caption', 'Caption rewrite'],
+      ['data.transform_json', 'Watermark / brand'],
+      ['action.post_facebook', 'Post to FB/IG/LinkedIn', { draft: true }],
+      ['data.save_variable', 'Log result', { key: 'social_post_result' }]
+    ]),
+    T('daily-rate-broadcast', 'Daily AI Tools Rate Broadcast', 'Broadcast best rates to opted-in customer groups daily.', 'trigger.schedule', [
+      ['trigger.schedule', 'Schedule 10 AM', { cron: '0 10 * * *' }],
+      ['data.read_dealer_rate', 'Get best rates'],
+      ['ai.generate_reply', 'Generate message'],
+      ['action.send_whatsapp', 'Send customer groups', { optInSegment: 'rate-subscribers', requireApproval: true, maxFrequencyPerDay: 1 }]
+    ]),
+    T('payment-verification-followup', 'Payment Verification Follow-up', 'Follow up on pending payments with timed guidance.', 'trigger.payment_received', [
+      ['trigger.payment_received', 'Payment pending'],
+      ['logic.delay', 'Wait 2h', { minutes: 120 }],
+      ['action.send_whatsapp', 'Send guide'],
+      ['logic.delay', 'Wait 24h', { minutes: 1440 }],
+      ['action.update_order_status', 'Release slot', { status: 'released' }]
+    ]),
+    T('customer-renewal-engine', 'Customer Renewal Engine', 'Drive renewals with offers and order creation on YES.', 'trigger.schedule', [
+      ['trigger.schedule', 'Account expiring'],
+      ['ai.generate_offer', 'Generate renewal offer'],
+      ['action.send_whatsapp', 'Send WhatsApp'],
+      ['logic.if_else', 'If reply = YES', { condition: 'reply == YES' }],
+      ['action.create_order', 'Create order']
+    ]),
+    T('scholarship-content-pipeline', 'Scholarship Content Pipeline', 'Turn scholarship posts into website + social content.', 'trigger.website_change', [
+      ['trigger.website_change', 'Fetch scholarship post'],
+      ['ai.summarize', 'Summarize'],
+      ['action.create_task', 'Create website post'],
+      ['action.send_channel_post', 'Share to WhatsApp/social', { draft: true }]
+    ]),
+    T('support-issue-resolver', 'Support Issue Resolver', 'Resolve support issues with warranty + AI troubleshooting.', 'trigger.whatsapp_message', [
+      ['trigger.whatsapp_message', 'Customer issue'],
+      ['data.read_customer', 'Warranty check'],
+      ['ai.generate_reply', 'AI troubleshooting'],
+      ['logic.if_else', 'Escalate if needed', { condition: 'unresolved' }],
+      ['action.admin_alert', 'Escalate to admin']
+    ]),
+    T('product-recommendation-bot', 'AI Product Recommendation Bot', 'Recommend products and create checkout links.', 'trigger.whatsapp_message', [
+      ['trigger.whatsapp_message', 'Customer need'],
+      ['ai.generate_reply', 'Ask questions'],
+      ['ai.recommend_product', 'Recommend product/plan'],
+      ['action.create_order', 'Create checkout link', { mode: 'checkout-link' }]
+    ])
+  ];
+}
+
+// ---- Storage helpers --------------------------------------------
+function loadFlowStudioFlows() {
+  const data = loadJSON(FLOW_STUDIO_FLOWS_FILE, null);
+  return Array.isArray(data) ? data : [];
+}
+function saveFlowStudioFlows(flows) {
+  saveJSON(FLOW_STUDIO_FLOWS_FILE, Array.isArray(flows) ? flows : []);
+}
+function loadFlowStudioRuns() {
+  const data = loadJSON(FLOW_STUDIO_RUNS_FILE, null);
+  return Array.isArray(data) ? data : [];
+}
+function saveFlowStudioRuns(runs) {
+  const trimmed = Array.isArray(runs) ? runs.slice(-FLOW_STUDIO_MAX_RUNS_KEPT) : [];
+  saveJSON(FLOW_STUDIO_RUNS_FILE, trimmed);
+}
+function loadFlowStudioTemplates() {
+  const stored = loadJSON(FLOW_STUDIO_TEMPLATES_FILE, null);
+  if (Array.isArray(stored) && stored.length) return stored;
+  const defaults = defaultFlowStudioTemplates();
+  saveJSON(FLOW_STUDIO_TEMPLATES_FILE, defaults);
+  return defaults;
+}
+
+// ---- Validation --------------------------------------------------
+function validateFlow(flow) {
+  const errors = [];
+  if (!flow || typeof flow !== 'object') return { valid: false, errors: ['Flow object required.'] };
+  if (!flow.name || !String(flow.name).trim()) errors.push('Flow name is required.');
+  if (!Array.isArray(flow.nodes)) errors.push('nodes must be an array.');
+  const typeIndex = flowStudioNodeTypeIndex();
+  const ids = new Set();
+  (flow.nodes || []).forEach((node, i) => {
+    if (!node.id) errors.push(`Node #${i + 1} missing id.`);
+    else if (ids.has(node.id)) errors.push(`Duplicate node id: ${node.id}`);
+    else ids.add(node.id);
+    if (!node.type || !typeIndex[node.type]) errors.push(`Unknown node type: ${node.type || '(empty)'}`);
+  });
+  (flow.edges || []).forEach((edge) => {
+    if (edge.from && !ids.has(edge.from)) errors.push(`Edge references missing node: ${edge.from}`);
+    if (edge.to && !ids.has(edge.to)) errors.push(`Edge references missing node: ${edge.to}`);
+  });
+  const triggers = (flow.nodes || []).filter(n => (n.type || '').startsWith('trigger.'));
+  if (triggers.length === 0) errors.push('Flow must contain at least one trigger node.');
+  return { valid: errors.length === 0, errors };
+}
+
+function normalizeFlowInput(body = {}, existing = null) {
+  const now = new Date().toISOString();
+  const base = existing || {
+    id: flowStudioId('flow'), createdAt: now, status: 'draft'
+  };
+  const nodes = Array.isArray(body.nodes) ? body.nodes : (existing?.nodes || []);
+  const trigger = nodes.find(n => (n.type || '').startsWith('trigger.'));
+  return {
+    ...base,
+    name: body.name != null ? String(body.name) : (existing?.name || 'Untitled flow'),
+    description: body.description != null ? String(body.description) : (existing?.description || ''),
+    status: body.status || base.status || 'draft',
+    triggerType: body.triggerType || trigger?.type || existing?.triggerType || '',
+    nodes,
+    edges: Array.isArray(body.edges) ? body.edges : (existing?.edges || []),
+    variables: body.variables && typeof body.variables === 'object' ? body.variables : (existing?.variables || {}),
+    createdAt: base.createdAt || now,
+    updatedAt: now,
+    lastRunAt: existing?.lastRunAt || null
+  };
+}
+
+// ---- Execution engine -------------------------------------------
+function maskSecretsDeep(value) {
+  if (value == null) return value;
+  if (typeof value === 'string') {
+    if (/(token|secret|password|api[_-]?key|bearer)/i.test(value) && value.length > 8) return '***masked***';
+    return value;
+  }
+  if (Array.isArray(value)) return value.map(maskSecretsDeep);
+  if (typeof value === 'object') {
+    const out = {};
+    for (const [k, v] of Object.entries(value)) {
+      if (/(token|secret|password|api[_-]?key|credential|bearer)/i.test(k)) out[k] = '***masked***';
+      else out[k] = maskSecretsDeep(v);
+    }
+    return out;
+  }
+  return value;
+}
+
+async function executeFlowNode(node, context) {
+  const { live, log } = context;
+  const cfg = node.config || {};
+  const type = node.type || '';
+  const safeCfg = maskSecretsDeep(cfg);
+  const note = (msg, extra = {}) => ({ nodeId: node.id, type, label: node.label, message: msg, config: safeCfg, live, ...extra });
+
+  // Triggers simply seed context (already triggered)
+  if (type.startsWith('trigger.')) {
+    return note(`Trigger ready: ${node.label}`, { kind: 'trigger' });
+  }
+
+  // Human approval gate -> pause
+  if (type === 'ai.human_approval' || type === 'logic.approval_gate') {
+    return note('Human approval required — execution paused (approval packet created).', { kind: 'approval', pause: true });
+  }
+
+  // Logic
+  if (type === 'logic.delay') {
+    const minutes = Number(cfg.minutes || 0);
+    if (live && minutes > 0 && typeof queueManager?.addJob === 'function') {
+      try {
+        queueManager.addJob('flow_studio_delay', { flowId: context.flowId, nodeId: node.id, resumeAt: Date.now() + minutes * 60000 }, { source: 'flow-studio' });
+        return note(`Delay ${minutes}m scheduled via queue manager.`, { kind: 'logic' });
+      } catch (e) { return note(`Delay simulated (queue unavailable): ${e.message}`, { kind: 'logic' }); }
+    }
+    return note(`Delay ${minutes}m (simulated in ${live ? 'live' : 'dry'} run).`, { kind: 'logic' });
+  }
+  if (type === 'logic.stop_opted_out') {
+    return note('Opt-out check passed (simulated).', { kind: 'logic' });
+  }
+  if (type.startsWith('logic.')) {
+    return note(`Logic evaluated: ${node.label}`, { kind: 'logic' });
+  }
+
+  // Data nodes — read-only, safe to "simulate" descriptions
+  if (type.startsWith('data.')) {
+    return note(`Data step: ${node.label} (read-only).`, { kind: 'data' });
+  }
+
+  // AI nodes — describe; no external spend in dry run
+  if (type.startsWith('ai.')) {
+    return note(`AI step: ${node.label}${live ? '' : ' (dry run, no model call)'}.`, { kind: 'ai' });
+  }
+
+  // Actions
+  if (type.startsWith('action.')) {
+    if (!live) return note(`Action staged (dry run, not sent): ${node.label}`, { kind: 'action', sent: false });
+    // LIVE: attempt to wire to existing helpers, fully guarded
+    try {
+      switch (type) {
+        case 'action.send_whatsapp':
+        case 'action.send_whatsapp_media': {
+          const number = cfg.number || context.input?.number || context.input?.from;
+          const text = cfg.message || cfg.template || '';
+          if (number && typeof sendWhatsAppCloudText === 'function') {
+            await sendWhatsAppCloudText(String(number), String(text), {});
+            return note('WhatsApp message sent (cloud API).', { kind: 'action', sent: true });
+          }
+          return note('WhatsApp send skipped: no recipient/helper available.', { kind: 'action', sent: false });
+        }
+        case 'action.admin_alert': {
+          if (typeof createSystemAlert === 'function') {
+            createSystemAlert({ type: 'flow-studio', title: node.label || 'Flow alert', message: cfg.message || cfg.template || 'Flow Studio admin alert', severity: cfg.severity || 'info' });
+            return note('Admin alert created.', { kind: 'action', sent: true });
+          }
+          return note('Admin alert skipped: helper unavailable.', { kind: 'action', sent: false });
+        }
+        case 'action.trigger_n8n': {
+          if (n8nBridge && typeof n8nBridge.triggerWorkflow === 'function') {
+            await n8nBridge.triggerWorkflow(cfg.workflow || 'flow_studio', { ...maskSecretsDeep(cfg), input: context.input });
+            return note('n8n webhook triggered.', { kind: 'action', sent: true });
+          }
+          return note('n8n trigger skipped: bridge unavailable.', { kind: 'action', sent: false });
+        }
+        case 'action.append_sheet': {
+          if (reportingConnectors && typeof reportingConnectors.syncGoogleSheets === 'function') {
+            await reportingConnectors.syncGoogleSheets({ source: 'flow-studio', sheet: cfg.sheet || 'flow', row: context.input || {} });
+            return note('Google Sheet row appended.', { kind: 'action', sent: true });
+          }
+          return note('Sheet append skipped: connector unavailable.', { kind: 'action', sent: false });
+        }
+        case 'action.add_queue_job': {
+          if (typeof queueManager?.addJob === 'function') {
+            queueManager.addJob(cfg.jobType || 'flow_studio_action', { ...maskSecretsDeep(cfg), input: context.input }, { source: 'flow-studio' });
+            return note('Queue job added.', { kind: 'action', sent: true });
+          }
+          return note('Queue job skipped: queue unavailable.', { kind: 'action', sent: false });
+        }
+        case 'action.post_facebook':
+        case 'action.post_instagram':
+        case 'action.post_linkedin': {
+          const platform = type.split('.')[1].replace('post_', '');
+          if (cfg.draft) return note(`Social post saved as DRAFT for ${platform}.`, { kind: 'action', sent: false, draft: true });
+          if (typeof publishSocialPayloadToPlatform === 'function') {
+            await publishSocialPayloadToPlatform(platform, { message: cfg.message || cfg.caption || '', mediaUrl: cfg.mediaUrl });
+            return note(`Posted to ${platform}.`, { kind: 'action', sent: true });
+          }
+          return note(`Social post skipped for ${platform}: helper unavailable.`, { kind: 'action', sent: false });
+        }
+        default:
+          return note(`Action executed (no live wiring): ${node.label}`, { kind: 'action', sent: false });
+      }
+    } catch (e) {
+      throw new Error(`Action ${type} failed: ${e.message}`);
+    }
+  }
+
+  return note(`Unhandled node: ${node.label}`, { kind: 'unknown' });
+}
+
+function findNodeById(flow, id) {
+  return (flow.nodes || []).find(n => n.id === id);
+}
+function nextNodeIds(flow, node) {
+  if (Array.isArray(node.next) && node.next.length) return node.next;
+  return (flow.edges || []).filter(e => e.from === node.id).map(e => e.to);
+}
+function findFallbackNode(flow) {
+  return (flow.nodes || []).find(n => n.type === 'logic.error_fallback');
+}
+
+async function runFlow(flowId, input = {}, options = {}) {
+  const flows = loadFlowStudioFlows();
+  const flow = flows.find(f => f.id === flowId);
+  if (!flow) throw new Error('Flow not found.');
+
+  const validation = validateFlow(flow);
+  if (!validation.valid) {
+    return { success: false, dryRun: true, error: 'Flow invalid', validation };
+  }
+
+  // Live only when explicitly requested AND flow active
+  const live = options.live === true && flow.status === 'active';
+  const startedAt = new Date().toISOString();
+  const logs = [];
+  const context = { flowId, input, live, vars: { ...(flow.variables || {}) }, log: (l) => logs.push(l) };
+
+  let paused = false;
+  let failed = false;
+  let errorMessage = null;
+
+  // Start from trigger nodes
+  const startNodes = (flow.nodes || []).filter(n => (n.type || '').startsWith('trigger.'));
+  const queue = [...startNodes.map(n => n.id)];
+  const visited = new Set();
+  let executions = 0;
+
+  while (queue.length) {
+    if (executions >= FLOW_STUDIO_MAX_NODE_EXECUTIONS) {
+      logs.push({ message: `Max node execution limit (${FLOW_STUDIO_MAX_NODE_EXECUTIONS}) reached — stopping to prevent infinite loop.`, kind: 'system' });
+      break;
+    }
+    const nodeId = queue.shift();
+    if (visited.has(nodeId)) continue;
+    visited.add(nodeId);
+    const node = findNodeById(flow, nodeId);
+    if (!node) continue;
+    executions++;
+    try {
+      const result = await executeFlowNode(node, context);
+      logs.push({ ...result, at: new Date().toISOString(), status: 'ok' });
+      if (result.pause) { paused = true; break; }
+      for (const nxt of nextNodeIds(flow, node)) queue.push(nxt);
+    } catch (e) {
+      failed = true;
+      errorMessage = e.message;
+      logs.push({ nodeId: node.id, type: node.type, label: node.label, message: e.message, kind: 'error', status: 'error', at: new Date().toISOString() });
+      const fallback = findFallbackNode(flow);
+      if (fallback && !visited.has(fallback.id)) {
+        logs.push({ message: `Running fallback path from ${fallback.id}.`, kind: 'system' });
+        queue.push(fallback.id);
+        failed = false; // fallback handles the error
+      } else {
+        break;
+      }
+    }
+  }
+
+  const run = {
+    id: flowStudioId('run'),
+    flowId,
+    flowName: flow.name,
+    mode: live ? 'live' : 'dry-run',
+    status: paused ? 'paused_approval' : failed ? 'failed' : 'completed',
+    startedAt,
+    finishedAt: new Date().toISOString(),
+    nodeCount: executions,
+    error: errorMessage,
+    input: maskSecretsDeep(input),
+    logs
+  };
+  if (paused) {
+    run.approvalPacket = {
+      id: flowStudioId('appr'),
+      flowId, flowName: flow.name,
+      requestedAt: new Date().toISOString(),
+      pendingNode: logs.find(l => l.pause)?.nodeId || null,
+      status: 'pending'
+    };
+  }
+
+  const runs = loadFlowStudioRuns();
+  runs.push(run);
+  saveFlowStudioRuns(runs);
+
+  // Update flow lastRunAt
+  flow.lastRunAt = run.finishedAt;
+  saveFlowStudioFlows(flows.map(f => f.id === flow.id ? flow : f));
+
+  return { success: !failed, dryRun: !live, run };
+}
+
+function installFlowTemplate(templateId) {
+  const templates = loadFlowStudioTemplates();
+  const tpl = templates.find(t => t.id === templateId);
+  if (!tpl) return null;
+  const now = new Date().toISOString();
+  const flow = {
+    id: flowStudioId('flow'),
+    name: tpl.name,
+    description: tpl.description || '',
+    status: 'draft',
+    triggerType: tpl.triggerType || (tpl.nodes?.[0]?.type) || '',
+    nodes: JSON.parse(JSON.stringify(tpl.nodes || [])),
+    edges: JSON.parse(JSON.stringify(tpl.edges || [])),
+    variables: {},
+    templateId: tpl.id,
+    createdAt: now,
+    updatedAt: now,
+    lastRunAt: null
+  };
+  const flows = loadFlowStudioFlows();
+  flows.push(flow);
+  saveFlowStudioFlows(flows);
+  return flow;
+}
+
+function buildFlowStudioStatus() {
+  const flows = loadFlowStudioFlows();
+  const runs = loadFlowStudioRuns();
+  const nodeTypeCount = getFlowStudioNodeTypes().reduce((sum, c) => sum + c.nodes.length, 0);
+  let queuePending = 0;
+  try { queuePending = (typeof queueManager?.getQueueHealth === 'function' ? (queueManager.getQueueHealth().pending || 0) : 0); } catch {}
+  const integrationsReady = {
+    whatsapp: typeof sendWhatsAppCloudText === 'function',
+    n8n: !!(typeof n8nBridge === 'object' && n8nBridge && typeof n8nBridge.triggerWorkflow === 'function'),
+    googleSheets: !!(typeof reportingConnectors === 'object' && reportingConnectors && typeof reportingConnectors.syncGoogleSheets === 'function'),
+    social: typeof publishSocialPayloadToPlatform === 'function',
+    queue: typeof queueManager?.addJob === 'function',
+    adminAlerts: typeof createSystemAlert === 'function'
+  };
+  return {
+    success: true,
+    flowCount: flows.length,
+    activeFlows: flows.filter(f => f.status === 'active').length,
+    pausedFlows: flows.filter(f => f.status === 'paused').length,
+    totalRuns: runs.length,
+    failedRuns: runs.filter(r => r.status === 'failed').length,
+    queuePending,
+    nodeTypes: nodeTypeCount,
+    integrationsReady
+  };
+}
+
+// ---- Routes ------------------------------------------------------
+app.get('/api/flow-studio/status', (_req, res) => {
+  try { res.json(buildFlowStudioStatus()); }
+  catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.get('/api/flow-studio/node-types', (_req, res) => {
+  try { res.json({ success: true, categories: getFlowStudioNodeTypes() }); }
+  catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.get('/api/flow-studio/flows', (_req, res) => {
+  try { res.json({ success: true, flows: loadFlowStudioFlows() }); }
+  catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.get('/api/flow-studio/flows/:id', (req, res) => {
+  try {
+    const flow = loadFlowStudioFlows().find(f => f.id === req.params.id);
+    if (!flow) return res.status(404).json({ success: false, error: 'Flow not found' });
+    res.json({ success: true, flow });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.post('/api/flow-studio/flows', (req, res) => {
+  try {
+    const flow = normalizeFlowInput(req.body || {}, null);
+    const validation = validateFlow(flow);
+    const flows = loadFlowStudioFlows();
+    flows.push(flow);
+    saveFlowStudioFlows(flows);
+    res.json({ success: true, flow, validation });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.put('/api/flow-studio/flows/:id', (req, res) => {
+  try {
+    const flows = loadFlowStudioFlows();
+    const idx = flows.findIndex(f => f.id === req.params.id);
+    if (idx === -1) return res.status(404).json({ success: false, error: 'Flow not found' });
+    const updated = normalizeFlowInput(req.body || {}, flows[idx]);
+    flows[idx] = updated;
+    saveFlowStudioFlows(flows);
+    res.json({ success: true, flow: updated, validation: validateFlow(updated) });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.delete('/api/flow-studio/flows/:id', (req, res) => {
+  try {
+    const flows = loadFlowStudioFlows();
+    const next = flows.filter(f => f.id !== req.params.id);
+    if (next.length === flows.length) return res.status(404).json({ success: false, error: 'Flow not found' });
+    saveFlowStudioFlows(next);
+    res.json({ success: true });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.post('/api/flow-studio/flows/:id/activate', (req, res) => {
+  try {
+    const flows = loadFlowStudioFlows();
+    const flow = flows.find(f => f.id === req.params.id);
+    if (!flow) return res.status(404).json({ success: false, error: 'Flow not found' });
+    const validation = validateFlow(flow);
+    if (!validation.valid) return res.status(400).json({ success: false, error: 'Cannot activate invalid flow', validation });
+    flow.status = 'active';
+    flow.updatedAt = new Date().toISOString();
+    saveFlowStudioFlows(flows);
+    res.json({ success: true, flow });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.post('/api/flow-studio/flows/:id/pause', (req, res) => {
+  try {
+    const flows = loadFlowStudioFlows();
+    const flow = flows.find(f => f.id === req.params.id);
+    if (!flow) return res.status(404).json({ success: false, error: 'Flow not found' });
+    flow.status = 'paused';
+    flow.updatedAt = new Date().toISOString();
+    saveFlowStudioFlows(flows);
+    res.json({ success: true, flow });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.post('/api/flow-studio/flows/:id/run-test', async (req, res) => {
+  try {
+    const result = await runFlow(req.params.id, req.body?.input || {}, { live: false });
+    res.json(result);
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.post('/api/flow-studio/flows/:id/run', async (req, res) => {
+  try {
+    const result = await runFlow(req.params.id, req.body?.input || {}, { live: req.body?.live === true });
+    res.json(result);
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.get('/api/flow-studio/runs', (req, res) => {
+  try {
+    const limit = Math.max(1, Math.min(500, Number(req.query.limit || 100)));
+    let runs = loadFlowStudioRuns();
+    if (req.query.flowId) runs = runs.filter(r => r.flowId === req.query.flowId);
+    res.json({ success: true, runs: runs.slice(-limit).reverse() });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.get('/api/flow-studio/templates', (_req, res) => {
+  try { res.json({ success: true, templates: loadFlowStudioTemplates() }); }
+  catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.post('/api/flow-studio/templates/:id/install', (req, res) => {
+  try {
+    const flow = installFlowTemplate(req.params.id);
+    if (!flow) return res.status(404).json({ success: false, error: 'Template not found' });
+    res.json({ success: true, flow });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
 
 function shouldServeDashboardSpa(req) {
   const urlPath = String(req.path || '');

@@ -1,0 +1,24 @@
+{
+  "id": "flow_sample_lead_qualifier",
+  "name": "Sample — WhatsApp Lead Qualifier",
+  "description": "Dry-run safe sample flow: classify an inbound WhatsApp lead, ask qualifying questions, score it, and alert an admin.",
+  "status": "draft",
+  "triggerType": "trigger.whatsapp_message",
+  "nodes": [
+    { "id": "n1", "type": "trigger.whatsapp_message", "label": "WhatsApp message received", "position": { "x": 80, "y": 120 }, "config": {}, "next": ["n2"] },
+    { "id": "n2", "type": "ai.classify_intent", "label": "Classify intent", "position": { "x": 300, "y": 120 }, "config": { "labels": ["sales", "support", "spam"] }, "next": ["n3"] },
+    { "id": "n3", "type": "ai.generate_reply", "label": "Ask budget / use case", "position": { "x": 520, "y": 120 }, "config": { "question": "Budget aur use case batayein?" }, "next": ["n4"] },
+    { "id": "n4", "type": "ai.score_lead", "label": "Score lead", "position": { "x": 740, "y": 120 }, "config": {}, "next": ["n5"] },
+    { "id": "n5", "type": "action.admin_alert", "label": "Admin alert", "position": { "x": 960, "y": 120 }, "config": { "template": "New qualified lead", "severity": "info" }, "next": [] }
+  ],
+  "edges": [
+    { "id": "e1", "from": "n1", "to": "n2", "condition": "" },
+    { "id": "e2", "from": "n2", "to": "n3", "condition": "" },
+    { "id": "e3", "from": "n3", "to": "n4", "condition": "" },
+    { "id": "e4", "from": "n4", "to": "n5", "condition": "" }
+  ],
+  "variables": {},
+  "createdAt": "2026-01-01T00:00:00.000Z",
+  "updatedAt": "2026-01-01T00:00:00.000Z",
+  "lastRunAt": null
+}
