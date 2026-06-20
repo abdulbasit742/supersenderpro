@@ -58,4 +58,44 @@ router.post('/ingest', adminGuard, (req, res) => {
   } catch (e) { fail(res, e); }
 });
 
+// ── Analytics features (read-only) ──────────────────────────────────────────
+router.get('/summary', (req, res) => { try { ok(res, { summary: mi.summary() }); } catch (e) { fail(res, e); } });
+router.get('/trending', (req, res) => { try { ok(res, { trending: mi.trending(req.query.hours) }); } catch (e) { fail(res, e); } });
+router.get('/heatmap', (req, res) => { try { ok(res, { heatmap: mi.heatmap() }); } catch (e) { fail(res, e); } });
+router.get('/categories', (req, res) => { try { ok(res, { categories: mi.categoryBreakdown() }); } catch (e) { fail(res, e); } });
+router.get('/price-history', (req, res) => { try { ok(res, { sku: req.query.sku, history: mi.priceHistory(req.query.sku) }); } catch (e) { fail(res, e); } });
+router.get('/forecast', (req, res) => { try { ok(res, { forecast: mi.forecast(req.query.sku) }); } catch (e) { fail(res, e); } });
+router.get('/competitor-index', (req, res) => { try { ok(res, { index: mi.competitorIndex() }); } catch (e) { fail(res, e); } });
+router.get('/best-time-to-buy', (req, res) => { try { ok(res, { result: mi.bestTimeToBuy(req.query.sku) }); } catch (e) { fail(res, e); } });
+router.get('/negotiation', (req, res) => { try { ok(res, { negotiation: mi.negotiation(req.query.sku) }); } catch (e) { fail(res, e); } });
+router.get('/bundles', (req, res) => { try { ok(res, { bundles: mi.bundles() }); } catch (e) { fail(res, e); } });
+router.get('/stockout-risk', (req, res) => { try { ok(res, { risk: mi.stockoutRisk() }); } catch (e) { fail(res, e); } });
+router.get('/duplicates', (req, res) => { try { ok(res, { duplicates: mi.duplicates() }); } catch (e) { fail(res, e); } });
+router.get('/supply-gap', (req, res) => { try { ok(res, { gap: mi.supplyGap() }); } catch (e) { fail(res, e); } });
+router.get('/anomalies', (req, res) => { try { ok(res, { anomalies: mi.anomalies() }); } catch (e) { fail(res, e); } });
+router.get('/drop-leaders', (req, res) => { try { ok(res, { dropLeaders: mi.dropLeaders() }); } catch (e) { fail(res, e); } });
+
+// ── Watchlist & price alerts ────────────────────────────────────────────────
+router.get('/watchlist', (req, res) => { try { ok(res, { watchlist: mi.lists.listWatch() }); } catch (e) { fail(res, e); } });
+router.post('/watchlist', adminGuard, (req, res) => { try { ok(res, { item: mi.lists.addWatch(req.body || {}) }); } catch (e) { fail(res, e); } });
+router.delete('/watchlist/:id', adminGuard, (req, res) => { try { ok(res, mi.lists.removeWatch(req.params.id)); } catch (e) { fail(res, e); } });
+router.get('/alerts', (req, res) => { try { ok(res, { alerts: mi.lists.listAlerts() }); } catch (e) { fail(res, e); } });
+router.post('/alerts/check', adminGuard, (req, res) => { try { ok(res, mi.lists.checkAlerts()); } catch (e) { fail(res, e); } });
+
+// ── Saved searches ──────────────────────────────────────────────────────────
+router.get('/saved-searches', (req, res) => { try { ok(res, { savedSearches: mi.lists.listSearches() }); } catch (e) { fail(res, e); } });
+router.post('/saved-searches', adminGuard, (req, res) => { try { ok(res, { item: mi.lists.saveSearch(req.body || {}) }); } catch (e) { fail(res, e); } });
+router.delete('/saved-searches/:id', adminGuard, (req, res) => { try { ok(res, mi.lists.removeSearch(req.params.id)); } catch (e) { fail(res, e); } });
+
+// ── Seller whitelist / blacklist (advisory) ─────────────────────────────────
+router.get('/seller-lists', (req, res) => { try { ok(res, mi.lists.lists()); } catch (e) { fail(res, e); } });
+router.post('/seller-lists/:list', adminGuard, (req, res) => { try { ok(res, mi.lists.tagSeller(req.params.list, (req.body || {}).sellerId, (req.body || {}).note)); } catch (e) { fail(res, e); } });
+router.delete('/seller-lists/:list/:sellerId', adminGuard, (req, res) => { try { ok(res, mi.lists.untagSeller(req.params.list, req.params.sellerId)); } catch (e) { fail(res, e); } });
+
+// ── Webhooks (dry-run dispatch) ─────────────────────────────────────────────
+router.get('/webhooks', (req, res) => { try { ok(res, { webhooks: mi.lists.listWebhooks() }); } catch (e) { fail(res, e); } });
+router.post('/webhooks', adminGuard, (req, res) => { try { ok(res, { item: mi.lists.addWebhook(req.body || {}) }); } catch (e) { fail(res, e); } });
+router.delete('/webhooks/:id', adminGuard, (req, res) => { try { ok(res, mi.lists.removeWebhook(req.params.id)); } catch (e) { fail(res, e); } });
+router.post('/webhooks/test', adminGuard, async (req, res) => { try { ok(res, await mi.lists.dispatch((req.body || {}).event || 'test', (req.body || {}).payload || {})); } catch (e) { fail(res, e); } });
+
 module.exports = router;
