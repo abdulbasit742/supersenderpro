@@ -673,5 +673,82 @@ module.exports = function(watiBroadcast, watiCopilot) {
     }
   });
 
+    
+  // ========================================================================
+  // FEATURE BATCH 5 ENDPOINTS (A/B Test, Send-Time, Merge, Compliance, Stock, Health)
+  // ========================================================================
+
+  // 44. Create A/B Test
+  router.post('/wati/abtest/create', (req, res) => {
+    try {
+      const { tenantId = 'default-tenant', name, variants } = req.body;
+      if (!name || !Array.isArray(variants) || variants.length < 2) {
+        return res.status(400).json({ success: false, error: 'name and at least 2 variants are required.' });
+      }
+      const test = competitorParity.createAbTest(tenantId, name, variants);
+      res.json({ success: true, test });
+    } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+  });
+
+  // 45. Record A/B Result
+  router.post('/wati/abtest/result', (req, res) => {
+    try {
+      const { tenantId = 'default-tenant', testId, variantId, converted = false } = req.body;
+      if (!testId || !variantId) return res.status(400).json({ success: false, error: 'testId and variantId are required.' });
+      const result = competitorParity.recordAbResult(tenantId, testId, variantId, converted);
+      res.json(result);
+    } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+  });
+
+  // 46. Best-Time-to-Send Recommender
+  router.get('/wati/send-time/recommend', (req, res) => {
+    try {
+      const segment = req.query.segment || 'general';
+      const timezone = req.query.timezone || 'Asia/Karachi';
+      const result = competitorParity.recommendSendTime(segment, timezone);
+      res.json({ success: true, result });
+    } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+  });
+
+  // 47. Merge-Field Message Renderer
+  router.post('/wati/messages/render', (req, res) => {
+    try {
+      const { template, data = {} } = req.body;
+      if (!template) return res.status(400).json({ success: false, error: 'template is required.' });
+      const result = competitorParity.renderMergeMessage(template, data);
+      res.json({ success: true, result });
+    } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+  });
+
+  // 48. Compliance & Spam Pre-Send Checker
+  router.post('/wati/compliance/check', (req, res) => {
+    try {
+      const { message } = req.body;
+      if (!message) return res.status(400).json({ success: false, error: 'message is required.' });
+      const result = competitorParity.checkMessageCompliance(message);
+      res.json({ success: true, result });
+    } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+  });
+
+  // 49. Stock Demand Forecaster
+  router.post('/wati/stock/forecast', (req, res) => {
+    try {
+      const { productId, currentStock, dailySalesAvg, leadTimeDays = 3 } = req.body;
+      if (!productId || currentStock === undefined || dailySalesAvg === undefined) {
+        return res.status(400).json({ success: false, error: 'productId, currentStock, and dailySalesAvg are required.' });
+      }
+      const result = competitorParity.forecastStockDemand(productId, currentStock, dailySalesAvg, leadTimeDays);
+      res.json({ success: true, result });
+    } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+  });
+
+  // 50. Customer Health Score
+  router.post('/wati/analytics/health-score', (req, res) => {
+    try {
+      const result = competitorParity.computeCustomerHealth(req.body || {});
+      res.json({ success: true, result });
+    } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+  });
+
     return router;
 };
