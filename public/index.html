@@ -3135,6 +3135,14 @@ Create a vertical promo video for ChatGPT Plus, Claude Pro, Cursor Pro, Gemini A
 <button class="btn btn-accent" onclick="aiSuggest()">💡 Suggest Replies</button>
 <div id="ai-suggestions" style="margin-top:14px;display:none;gap:8px;flex-direction:column"></div>
 </div>
+<div class="card"><div class="card-title">Sarcasm / Tone Detector</div>
+<div class="form-group"><label>Customer or Social Comment</label><textarea id="sarcasm-msg" placeholder="Oh great, again late delivery... very helpful"></textarea></div>
+<div class="flex" style="gap:8px;flex-wrap:wrap">
+<button class="btn btn-primary" onclick="detectSarcasm()">Analyze Tone</button>
+<button class="btn btn-secondary" onclick="copySarcasmReply()">Copy Safe Reply</button>
+</div>
+<div id="sarcasm-result" style="margin-top:14px;display:none"></div>
+</div>
 </div>
 </div>
 
@@ -13139,6 +13147,40 @@ async function aiSuggest() {
   } catch (e) {
     toast(e.message, 'error');
   }
+}
+
+let latestSarcasmReply = '';
+
+async function detectSarcasm() {
+  const message = document.getElementById('sarcasm-msg')?.value?.trim();
+  if (!message) return toast('Message required', 'error');
+  try {
+    const d = await api('/api/ai/sarcasm-detect', { method: 'POST', body: JSON.stringify({ message, platform: 'dashboard' }) });
+    const box = document.getElementById('sarcasm-result');
+    if (!box) return;
+    latestSarcasmReply = d.recommendedReply || '';
+    const badgeClass = d.sentimentRisk === 'high' ? 'tag-red' : d.sentimentRisk === 'medium' ? 'tag-orange' : 'tag-green';
+    const cues = (d.cues || []).slice(0, 6).map(c => `<li><b>${escHtml(c.type || 'cue')}</b>: ${escHtml(c.text || '')} <span style="color:var(--muted)">(${Number(c.weight || 0)})</span></li>`).join('');
+    box.style.display = 'block';
+    box.innerHTML = `
+      <div style="padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--bg3)">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
+          <span class="tag ${badgeClass}">${escHtml(d.label || 'not_sarcastic')}</span>
+          <span class="tag tag-purple">Score ${Number(d.score || 0)}/100</span>
+          <span class="tag">Tone: ${escHtml(d.tone || 'neutral')}</span>
+        </div>
+        <div style="font-size:12px;line-height:1.55;color:var(--muted);margin-bottom:10px">${escHtml(d.explanation || '')}</div>
+        ${cues ? `<ul style="font-size:12px;line-height:1.65;margin:0 0 10px 18px">${cues}</ul>` : ''}
+        <div style="font-size:12px;line-height:1.55"><b>Safe reply:</b><br>${escHtml(latestSarcasmReply)}</div>
+      </div>`;
+  } catch (e) {
+    toast(e.message, 'error');
+  }
+}
+
+function copySarcasmReply() {
+  if (!latestSarcasmReply) return toast('Analyze a message first', 'error');
+  copyTextSafe(latestSarcasmReply);
 }
 
 let aiAgentsCache = [];

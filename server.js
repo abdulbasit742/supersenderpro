@@ -43544,16 +43544,239 @@ app.post('/api/ai/generate-options', async (req, res) => {
   }
 });
 
+const SARCASM_IRONY_PHRASES = [
+  'oh great', 'just great', 'oh fantastic', 'how wonderful', 'so helpful',
+  'yeah right', 'oh sure', 'obviously', 'wow thanks', 'thanks a lot',
+  'what a surprise', 'well done', 'brilliant idea', 'you do not say',
+  'no kidding', 'big surprise', 'as if', 'yeah totally', 'of course',
+  'naturally', 'as expected', 'just perfect', 'total genius', 'very helpful',
+  'super helpful', 'sure sure', 'great idea', 'love it'
+];
+
+const SARCASM_URDU_PHRASES = [
+  'wah wah', 'kya baat hai', 'kya bat hai', 'bohat acha', 'bohot acha',
+  'zabardast', 'kamaal kar diya', 'kamal kar diya', 'bilkul theek',
+  'bilkul sahi', 'achha ji', 'acha ji', 'ji bilkul', 'haan haan',
+  'han han', 'zaroor', 'kya khoob', 'wah ji wah', 'bohat zabardast',
+  'bohat khoob', 'shabash', 'shabaash', 'kya idea hai', 'lajawaab',
+  'aik dum sahi', 'ekdum sahi', 'wah bhai wah', 'wah yaar wah',
+  'haan ji haan ji', 'theek hai ji', 'acha acha', 'sahi sahi',
+  'great plan hai', 'kya plan banaya', 'tumhe hi pata sab kuch',
+  'you know everything', 'zaroor bhai zaroor', 'kyu nahi', 'kyun nahi',
+  'bohat aql hai', 'kya dimagh hai', 'mujhe kya pata', 'theek hai phir'
+];
+
+const SARCASM_POSITIVE_WORDS = [
+  'amazing', 'fantastic', 'wonderful', 'brilliant', 'great', 'perfect',
+  'lovely', 'excellent', 'outstanding', 'awesome', 'best', 'genius',
+  'beautiful', 'impressive', 'helpful', 'nice', 'fine', 'good', 'love',
+  'acha', 'sahi', 'zabardast', 'kamal', 'khoob', 'shukriya'
+];
+
+const SARCASM_NEGATIVE_WORDS = [
+  'terrible', 'awful', 'horrible', 'worst', 'disaster', 'fail', 'failed',
+  'pathetic', 'useless', 'worthless', 'hate', 'ruined', 'broken', 'waste',
+  'stupid', 'ridiculous', 'trash', 'garbage', 'nightmare', 'late', 'slow',
+  'issue', 'problem', 'scam', 'fraud', 'fake', 'nahi', 'ghalat', 'bekar',
+  'masla', 'kharaab', 'kharab', 'slow', 'delay'
+];
+
+const SARCASM_HYPERBOLE_WORDS = [
+  'literally', 'absolutely', 'totally', 'completely', 'definitely', '100%',
+  'always', 'never', 'every single', 'worst thing ever', 'best thing ever',
+  'of all time', 'unbelievable', 'bohat zyada', 'itna zyada', 'sab se'
+];
+
+function makeSarcasmSignal(type, text, weight, detail) {
+  return { type, text, weight, detail };
+}
+
+function addSarcasmMatches(signals, lower, phrases, type, weight, detailPrefix) {
+  for (const phrase of phrases) {
+    if (lower.includes(phrase)) {
+      signals.push(makeSarcasmSignal(type, phrase, weight, `${detailPrefix}: "${phrase}"`));
+    }
+  }
+}
+
+function detectSarcasmSignals(rawMessage = '', context = {}) {
+  const original = String(rawMessage || '').trim();
+  const text = original.slice(0, 5000);
+  const lower = text.toLowerCase();
+  const words = lower.split(/\s+/).filter(Boolean);
+  const signals = [];
+
+  if (!text) {
+    return {
+      success: true,
+      sarcasm: false,
+      score: 0,
+      confidence: 0,
+      label: 'empty',
+      sentimentRisk: 'low',
+      tone: 'unknown',
+      cues: [],
+      explanation: 'No message supplied.',
+      recommendedReply: 'Message bhejein taake tone analyze ho sake.',
+      safeReplyTips: ['Ask for the customer message first.'],
+      meta: { capped: false, source: context.source || 'api' }
+    };
+  }
+
+  addSarcasmMatches(signals, lower, SARCASM_IRONY_PHRASES, 'irony_marker', 22, 'Irony marker');
+  addSarcasmMatches(signals, lower, SARCASM_URDU_PHRASES, 'roman_urdu_marker', 24, 'Roman Urdu sarcasm marker');
+  addSarcasmMatches(signals, lower, SARCASM_HYPERBOLE_WORDS, 'hyperbole', 14, 'Hyperbole');
+
+  const repeatedPunctuation = text.match(/[!?]{2,}/g) || [];
+  for (const mark of repeatedPunctuation.slice(0, 8)) {
+    signals.push(makeSarcasmSignal('punctuation', mark, 9, 'Repeated punctuation can signal frustration or sarcasm.'));
+  }
+
+  const ellipsis = text.match(/\.{3,}/g) || [];
+  for (const mark of ellipsis.slice(0, 6)) {
+    signals.push(makeSarcasmSignal('ellipsis', mark, 8, 'Trailing/long ellipsis can imply unsaid meaning.'));
+  }
+
+  const capsWords = text.match(/\b[A-Z]{3,}\b/g) || [];
+  for (const word of capsWords.slice(0, 8)) {
+    signals.push(makeSarcasmSignal('caps', word, 8, 'ALL CAPS word can indicate emphasis or irritation.'));
+  }
+
+  const elongatedWords = text.match(/\b[\w']*([a-zA-Z])\1{2,}[\w']*\b/g) || [];
+  for (const word of elongatedWords.slice(0, 6)) {
+    signals.push(makeSarcasmSignal('elongation', word, 9, 'Elongated word can indicate mocking tone.'));
+  }
+
+  const positives = SARCASM_POSITIVE_WORDS.filter(word => lower.includes(word));
+  const negatives = SARCASM_NEGATIVE_WORDS.filter(word => lower.includes(word));
+  if (positives.length && negatives.length) {
+    signals.push(makeSarcasmSignal(
+      'sentiment_contradiction',
+      `${positives.slice(0, 3).join(', ')} + ${negatives.slice(0, 3).join(', ')}`,
+      28,
+      'Positive and negative sentiment appear together.'
+    ));
+  }
+
+  const contradictionPatterns = [
+    /(great|wonderful|amazing|perfect|acha|zabardast).{0,45}(but|however|lekin|magar|unfortunately|sadly|nahi)/i,
+    /(love|nice|good|sahi).{0,45}(hate|worst|bekar|kharab|masla|problem)/i,
+    /(thanks|shukriya).{0,55}(late|slow|issue|problem|scam|fake|nahi)/i,
+    /(not|never|nahi|na).{0,20}(great|helpful|good|acha|sahi|perfect)/i
+  ];
+  for (const pattern of contradictionPatterns) {
+    const match = text.match(pattern);
+    if (match) {
+      signals.push(makeSarcasmSignal('contradiction', match[0].slice(0, 90), 24, 'Contradictory wording detected.'));
+    }
+  }
+
+  const wordCounts = {};
+  for (const word of words.map(w => w.replace(/[^a-z0-9]/g, '')).filter(w => w.length > 2)) {
+    wordCounts[word] = (wordCounts[word] || 0) + 1;
+  }
+  for (const [word, count] of Object.entries(wordCounts)) {
+    if (count >= 3) {
+      signals.push(makeSarcasmSignal('repetition', word, Math.min(18, Number(count) * 5), `Repeated word ${count}x.`));
+    }
+  }
+
+  const rawScore = signals.reduce((sum, signal) => sum + Number(signal.weight || 0), 0);
+  const score = Math.max(0, Math.min(100, Math.round(rawScore)));
+  const confidence = Math.min(0.98, Number((score / 100).toFixed(2)));
+  const sarcasm = score >= 45 || signals.length >= 3;
+  const possibleSarcasm = score >= 25 || signals.length >= 2;
+  const frustrated = negatives.length >= 2 || /refund|angry|complain|report|scam|fraud|fake|late|delay|masla|kharab/i.test(lower);
+  const label = sarcasm ? 'sarcastic' : possibleSarcasm ? 'possibly_sarcastic' : 'not_sarcastic';
+  const tone = sarcasm ? 'sarcastic' : frustrated ? 'frustrated' : positives.length > negatives.length ? 'positive' : 'neutral';
+  const sentimentRisk = score >= 65 || frustrated ? 'high' : score >= 30 ? 'medium' : 'low';
+  const topCues = signals.sort((a, b) => b.weight - a.weight).slice(0, 10);
+  const explanation = topCues.length
+    ? `Detected ${topCues.length} tone cue(s): ${topCues.slice(0, 4).map(c => c.type).join(', ')}.`
+    : 'No strong sarcasm markers detected.';
+  const recommendedReply = sarcasm || frustrated
+    ? 'Aap bilkul right keh rahe hain, main pehle issue clear karta hoon. Please order/detail share kar dein, main calmly check karke exact solution deta hoon.'
+    : 'Thanks, main help karta hoon. Aap apni requirement ya order detail share kar dein.';
+
+  return {
+    success: true,
+    sarcasm,
+    score,
+    confidence,
+    label,
+    sentimentRisk,
+    tone,
+    cues: topCues,
+    explanation,
+    recommendedReply,
+    safeReplyTips: sarcasm || frustrated
+      ? [
+          'Do not mirror the sarcasm back.',
+          'Acknowledge the emotion first.',
+          'Ask for one concrete detail, then solve.',
+          'Offer admin escalation if payment/order is involved.'
+        ]
+      : [
+          'Keep reply short and clear.',
+          'Ask one useful question only.',
+          'Offer the next action directly.'
+        ],
+    meta: {
+      capped: original.length > text.length,
+      inputLength: original.length,
+      analyzedLength: text.length,
+      platform: context.platform || 'whatsapp',
+      source: context.source || 'api'
+    }
+  };
+}
+
+app.post('/api/ai/sarcasm-detect', (req, res) => {
+  try {
+    const { message, context, platform } = req.body || {};
+    if (!String(message || '').trim()) return res.status(400).json({ error: 'message is required' });
+    res.json(detectSarcasmSignals(message, { ...(context || {}), platform, source: 'ai-sarcasm-detect' }));
+  } catch (e) {
+    console.error('Sarcasm detector failed:', e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.post('/api/social/sarcasm-check', (req, res) => {
+  try {
+    const { message, platform, commentId, postId } = req.body || {};
+    if (!String(message || '').trim()) return res.status(400).json({ error: 'message is required' });
+    const analysis = detectSarcasmSignals(message, { platform: platform || 'social', source: 'social-sarcasm-check' });
+    const action = analysis.sentimentRisk === 'high'
+      ? 'human_review'
+      : analysis.sarcasm ? 'gentle_reply' : 'auto_reply_ok';
+    res.json({
+      success: true,
+      action,
+      commentId: commentId || null,
+      postId: postId || null,
+      analysis
+    });
+  } catch (e) {
+    console.error('Social sarcasm check failed:', e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // AI Reply Suggester (for arbitrary text input)
 app.post('/api/ai/suggest', async (req, res) => {
   try {
     const { message } = req.body || {};
     if (!message) return res.status(400).json({ error: 'message is required' });
-    const sys = `You are a customer support + sales assistant for ${settings.business_name || 'our business'}.\nReply in short bullet points (max 3 bullets), friendly tone. Ask 1 clarifying question if needed.`;
+    const sarcasm = detectSarcasmSignals(message, { platform: 'whatsapp', source: 'ai-suggest' });
+    const toneGuard = sarcasm.sarcasm || sarcasm.sentimentRisk !== 'low'
+      ? '\nThe message may be sarcastic or frustrated. Acknowledge calmly first, do not argue, and avoid sounding robotic.'
+      : '';
+    const sys = `You are a customer support + sales assistant for ${settings.business_name || 'our business'}.\nReply in short bullet points (max 3 bullets), friendly tone. Ask 1 clarifying question if needed.${toneGuard}`;
     const r1 = await callAI(`Customer message: ${message}\nWrite a helpful reply.`, sys);
     const r2 = await callAI(`Customer message: ${message}\nWrite a persuasive reply that tries to close the sale.`, sys);
     const r3 = await callAI(`Customer message: ${message}\nWrite an empathetic reply.`, sys);
-    res.json({ suggestions: [r1, r2, r3] });
+    res.json({ suggestions: [r1, r2, r3], sarcasm });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
