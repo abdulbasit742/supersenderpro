@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agent Sandbox Runtime</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="dot"></span> Agent Sandbox Runtime</div>
+    <div id="policy" class="policy">loading…</div>
+  </header>
+
+  <main class="wrap">
+    <section class="card">
+      <h2>Run an agent (sandboxed)</h2>
+      <div class="row">
+        <select id="agent"></select>
+        <label class="chk"><input type="checkbox" id="dryRun" checked /> dry-run</label>
+      </div>
+      <textarea id="goal" rows="3" placeholder="e.g. give me a sales overview and follow up cold leads"></textarea>
+      <div class="row">
+        <button id="planBtn" class="ghost">Plan only</button>
+        <button id="runBtn" class="primary">Run</button>
+      </div>
+      <div id="transcript" class="transcript"></div>
+    </section>
+
+    <section class="card">
+      <div class="row between">
+        <h2>Approval queue</h2>
+        <button id="refreshQ" class="ghost sm">Refresh</button>
+      </div>
+      <div id="queueStats" class="stats"></div>
+      <div id="queue" class="queue"></div>
+    </section>
+
+    <section class="card">
+      <h2>Confined tools <span id="toolCount" class="muted"></span></h2>
+      <div id="tools" class="tools"></div>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
