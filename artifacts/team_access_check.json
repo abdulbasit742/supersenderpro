@@ -1,0 +1,209 @@
+{
+  "generatedAt": "2026-06-20T12:47:17.125Z",
+  "passed": 40,
+  "failed": 0,
+  "total": 40,
+  "strict": "false",
+  "checks": [
+    {
+      "name": "file lib/teamAccess/index.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/teamAccess/store.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/teamAccess/workspaceRegistry.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/teamAccess/teamMemberRegistry.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/teamAccess/roleRegistry.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/teamAccess/permissionMatrix.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/teamAccess/accessEvaluator.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/teamAccess/seatLimits.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/teamAccess/inviteDrafts.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/teamAccess/riskyActionGate.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file routes/teamAccessRoutes.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/team-access.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/js/team-access.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/css/team-access.css",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "server hook present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "env placeholders present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "gitignore protections present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc TEAM_ACCESS_COMMAND_CENTER.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc TEAM_ROLES_AND_PERMISSIONS.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc TENANT_WORKSPACE_ACCESS.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc SEAT_LIMITS_AND_PLANS.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc INVITE_DRAFT_WORKFLOW.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc RISKY_ACTION_PERMISSION_GATE.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc TEAM_ACCESS_APPROVAL_AUDIT.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc TEAM_ACCESS_ADMIN_COMMANDS.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc TEAM_ACCESS_FLOW_NODES.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "default roles load (>=14)",
+      "ok": true,
+      "detail": "14 roles"
+    },
+    {
+      "name": "default permissions load (>=40)",
+      "ok": true,
+      "detail": "41 permissions"
+    },
+    {
+      "name": "sample workspace created (preview)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "sample member created (masked, preview)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "evaluate dashboard.view allowed",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "support agent blocked from billing.manage",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "tenant isolation blocks mismatch",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "seat usage preview works",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "invite draft created (no live send/token)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "risky action blocked (preview only)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "auth write disabled",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "live invites disabled",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "report generated",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no secret/PII/token leak in report",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}

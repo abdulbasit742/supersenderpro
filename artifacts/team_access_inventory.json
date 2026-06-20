@@ -1,0 +1,219 @@
+{
+  "generatedAt": "2026-06-20T12:46:21.830297+00:00",
+  "project": "SuperSender Pro \u2014 AI Business Command Center",
+  "scope": "Team Seats + Role Permissions + Tenant Workspace Access coordination layer (add-only, non-destructive)",
+  "scan": {
+    "server.js": true,
+    "public/index.html": true,
+    "package.json": true,
+    ".env.example": true,
+    ".gitignore": true,
+    "routes_dir": true,
+    "lib_dir": true,
+    "docs_dir": true,
+    "scripts_dir": true,
+    "tests_dir": true,
+    "artifacts_dir": true
+  },
+  "existingSystems": {
+    "auth_system_found": {
+      "status": "exists",
+      "evidence": [
+        "backend/src/middleware/auth.js",
+        "backend/src/routes/auth.js",
+        "lovable-app/src/lib/auth-hook.ts"
+      ],
+      "action": "do_not_rebuild",
+      "note": "Team Access never modifies auth (no-auth-write)."
+    },
+    "rbac_found": {
+      "status": "partially_exists",
+      "evidence": [
+        "lib/featureFlags (flag-level access)",
+        "lib/saasBilling/tenantPlans.js"
+      ],
+      "action": "extend_only",
+      "note": "No central team-seat RBAC found; coordination layer added."
+    },
+    "tenant_system_found": {
+      "status": "exists",
+      "evidence": [
+        "lib/publicSaasFunnel/tenantProvisionPreview.js",
+        "lib/saasBilling/tenantPlans.js",
+        "docs/PLAN_TENANT_RESELLER_FEATURE_ACCESS.md"
+      ],
+      "action": "do_not_rebuild"
+    },
+    "billing_plan_system_found": {
+      "status": "exists",
+      "evidence": [
+        "lib/saasBilling/",
+        "lib/subscriptionPlans.js",
+        "routes/saasBillingRoutes.js"
+      ],
+      "action": "adapter_only",
+      "note": "seatLimits uses saasBillingAdapter; no billing changes."
+    },
+    "feature_flags_found": {
+      "status": "exists",
+      "evidence": [
+        "lib/featureFlags/",
+        "routes/featureFlagsRoutes.js"
+      ],
+      "action": "adapter_only"
+    },
+    "reseller_portal_found": {
+      "status": "exists",
+      "evidence": [
+        "lib/resellerNetwork.js"
+      ],
+      "action": "adapter_only"
+    },
+    "compliance_center_found": {
+      "status": "exists",
+      "evidence": [
+        "lib/complianceCenter/",
+        "routes/complianceCenterRoutes.js"
+      ],
+      "action": "adapter_only"
+    },
+    "developer_portal_found": {
+      "status": "exists",
+      "evidence": [
+        "lib/developerPortal/",
+        "routes/developerPortalRoutes.js"
+      ],
+      "action": "adapter_only"
+    },
+    "owner_command_found": {
+      "status": "exists",
+      "evidence": [
+        "lib/ownerBriefing/",
+        "routes/ownerBriefingRoutes.js"
+      ],
+      "action": "adapter_only"
+    },
+    "approval_inbox_found": {
+      "status": "not_detected",
+      "evidence": [],
+      "action": "adapter_safe_unavailable"
+    },
+    "audit_ledger_found": {
+      "status": "not_detected",
+      "evidence": [],
+      "action": "adapter_safe_unavailable"
+    },
+    "security_gateway_found": {
+      "status": "not_detected",
+      "evidence": [],
+      "action": "adapter_safe_unavailable"
+    },
+    "support_helpdesk_found": {
+      "status": "not_detected",
+      "evidence": [],
+      "action": "adapter_safe_unavailable"
+    },
+    "customer360_found": {
+      "status": "not_detected",
+      "evidence": [],
+      "action": "adapter_safe_unavailable"
+    },
+    "team_access_found": {
+      "status": "missing",
+      "evidence": [],
+      "action": "build_new_coordination_layer"
+    }
+  },
+  "teamAccessComponents": {
+    "store": {
+      "status": "missing",
+      "resolution": "created",
+      "needs_adapter": false,
+      "needs_route": false,
+      "needs_ui": false,
+      "needs_docs": true,
+      "needs_test": true
+    },
+    "workspaceRegistry": {
+      "status": "missing",
+      "resolution": "created",
+      "tenant_access_risk": "masked_ids",
+      "privacy_risk": "low"
+    },
+    "teamMemberRegistry": {
+      "status": "missing",
+      "resolution": "created",
+      "privacy_risk": "pii_masked",
+      "secret_risk": "none"
+    },
+    "roleRegistry/permissionMatrix": {
+      "status": "missing",
+      "resolution": "created",
+      "permission_risk": "risky_gated"
+    },
+    "accessEvaluator": {
+      "status": "missing",
+      "resolution": "created",
+      "tenant_access_risk": "isolation_enforced",
+      "reseller_access_risk": "isolation_enforced"
+    },
+    "seatLimits/seatUsage": {
+      "status": "missing",
+      "resolution": "created",
+      "needs_adapter": true,
+      "adapter": "saasBilling"
+    },
+    "inviteDrafts": {
+      "status": "missing",
+      "resolution": "created",
+      "secret_risk": "no_token",
+      "privacy_risk": "masked"
+    },
+    "riskyActionGate": {
+      "status": "missing",
+      "resolution": "created",
+      "permission_risk": "live_blocked"
+    },
+    "adapters": {
+      "status": "missing",
+      "resolution": "created",
+      "count": 14,
+      "needs_adapter": true
+    },
+    "routes": {
+      "status": "missing",
+      "resolution": "created",
+      "route_mounted": true,
+      "file": "routes/teamAccessRoutes.js"
+    },
+    "dashboardUI": {
+      "status": "missing",
+      "resolution": "created",
+      "dashboard_linked": true
+    },
+    "checkScript": {
+      "status": "missing",
+      "resolution": "created"
+    },
+    "smokeTest": {
+      "status": "missing",
+      "resolution": "created"
+    },
+    "docs": {
+      "status": "missing",
+      "resolution": "created",
+      "count": 9,
+      "needs_docs": true
+    }
+  },
+  "duplicateRisk": "none \u2014 no pre-existing teamAccess/team-seat module found; auth/RBAC/tenant/billing intentionally NOT rebuilt",
+  "safety": {
+    "dryRun": true,
+    "no_auth_write": true,
+    "no_live_invite": true,
+    "approval_required": true,
+    "tenant_isolation": true,
+    "pii_masked": true,
+    "secrets_excluded": true
+  }
+}

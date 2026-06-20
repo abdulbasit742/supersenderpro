@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Team Access — SuperSender Pro</title>
+<link rel="stylesheet" href="/css/team-access.css" />
+</head>
+<body>
+<header class="ta-header">
+  <div class="ta-brand">🔐 Team Access <span class="ta-tag">Command Center</span></div>
+  <div id="ta-safety-badges" class="ta-badges"></div>
+</header>
+
+<nav class="ta-tabs">
+  <button class="ta-tab active" data-tab="overview">Overview</button>
+  <button class="ta-tab" data-tab="workspaces">Workspaces</button>
+  <button class="ta-tab" data-tab="members">Members</button>
+  <button class="ta-tab" data-tab="matrix">Role Matrix</button>
+  <button class="ta-tab" data-tab="checker">Access Checker</button>
+  <button class="ta-tab" data-tab="seats">Seat Usage</button>
+  <button class="ta-tab" data-tab="invites">Invite Drafts</button>
+  <button class="ta-tab" data-tab="safety">Safety</button>
+</nav>
+
+<main class="ta-main">
+  <section id="overview" class="ta-panel active"><div class="ta-cards" id="ta-overview-cards"></div></section>
+
+  <section id="workspaces" class="ta-panel">
+    <div class="table-wrapper"><table id="ta-workspaces"><thead><tr>
+      <th>Business</th><th>Type</th><th>Plan</th><th>Seats</th><th>Status</th><th>Reseller</th>
+    </tr></thead><tbody></tbody></table></div>
+  </section>
+
+  <section id="members" class="ta-panel">
+    <label class="ta-field">Workspace ID <input id="ta-member-ws" placeholder="ws_..." /></label>
+    <button class="ta-btn" id="ta-load-members">Load members</button>
+    <div class="table-wrapper"><table id="ta-members"><thead><tr>
+      <th>Name</th><th>Role</th><th>Seat</th><th>Status</th><th>Last active</th><th>Actions</th>
+    </tr></thead><tbody></tbody></table></div>
+  </section>
+
+  <section id="matrix" class="ta-panel"><div class="table-wrapper" id="ta-matrix"></div></section>
+
+  <section id="checker" class="ta-panel">
+    <div class="ta-form">
+      <label class="ta-field">Role <input id="ck-role" placeholder="support_agent" /></label>
+      <label class="ta-field">Permission <input id="ck-perm" placeholder="billing.manage" /></label>
+      <label class="ta-field">Workspace ID <input id="ck-ws" placeholder="ws_..." /></label>
+      <label class="ta-field">Tenant ID <input id="ck-tenant" placeholder="t_demo" /></label>
+      <label class="ta-field">Resource Tenant ID <input id="ck-rtenant" placeholder="t_other (optional)" /></label>
+      <button class="ta-btn" id="ck-run">Check access</button>
+    </div>
+    <pre id="ck-result" class="ta-result"></pre>
+  </section>
+
+  <section id="seats" class="ta-panel">
+    <label class="ta-field">Workspace ID <input id="seat-ws" placeholder="ws_..." /></label>
+    <button class="ta-btn" id="seat-run">Seat usage preview</button>
+    <pre id="seat-result" class="ta-result"></pre>
+  </section>
+
+  <section id="invites" class="ta-panel">
+    <div class="ta-form">
+      <label class="ta-field">Workspace ID <input id="inv-ws" placeholder="ws_..." /></label>
+      <label class="ta-field">Role
+        <select id="inv-role"></select>
+      </label>
+      <label class="ta-field">Email (masked) <input id="inv-email" placeholder="name@example.com" /></label>
+      <button class="ta-btn" id="inv-run">Create invite draft (preview)</button>
+    </div>
+    <pre id="inv-result" class="ta-result"></pre>
+    <div class="table-wrapper"><table id="ta-invites"><thead><tr>
+      <th>ID</th><th>Workspace</th><th>Role</th><th>Email</th><th>Status</th><th>Expires</th>
+    </tr></thead><tbody></tbody></table></div>
+  </section>
+
+  <section id="safety" class="ta-panel"><div class="ta-cards" id="ta-safety-cards"></div></section>
+</main>
+
+<a href="/" class="ta-back">← Back to dashboard</a>
+<script src="/js/team-access.js"></script>
+</body>
+</html>

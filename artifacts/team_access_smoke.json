@@ -1,0 +1,113 @@
+{
+  "generatedAt": "2026-06-20T12:47:16.864Z",
+  "passed": 21,
+  "failed": 0,
+  "total": 21,
+  "results": [
+    {
+      "name": "require workspace registry",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require team member registry",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require role registry",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require permission matrix",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require access evaluator",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require seat usage",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require invite drafts",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require risky action gate",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require route module",
+      "pass": true,
+      "detail": "loaded"
+    },
+    {
+      "name": "barrel loads",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "create sample workspace",
+      "pass": true,
+      "detail": "ws_2w4twjrbll"
+    },
+    {
+      "name": "create sample member (masked)",
+      "pass": true,
+      "detail": "masked"
+    },
+    {
+      "name": "evaluate dashboard.view allowed",
+      "pass": true,
+      "detail": "allowed"
+    },
+    {
+      "name": "billing.manage blocked for support agent",
+      "pass": true,
+      "detail": "blocked"
+    },
+    {
+      "name": "tenant mismatch blocked",
+      "pass": true,
+      "detail": "blocked"
+    },
+    {
+      "name": "create invite draft",
+      "pass": true,
+      "detail": "pending_approval"
+    },
+    {
+      "name": "dryRun true",
+      "pass": true,
+      "detail": "dryRun=true"
+    },
+    {
+      "name": "live invite disabled",
+      "pass": true,
+      "detail": "disabled"
+    },
+    {
+      "name": "auth write disabled",
+      "pass": true,
+      "detail": "disabled"
+    },
+    {
+      "name": "risky action blocked (preview)",
+      "pass": true,
+      "detail": "preview"
+    },
+    {
+      "name": "no phone/email/token leaks",
+      "pass": true,
+      "detail": "clean"
+    }
+  ]
+}
