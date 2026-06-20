@@ -1,17 +1,17 @@
 /* public/css/staff-portal.css — Clean, staff-friendly SaaS styling. Mobile responsive. */
 :root{
-  --bg:#f4f6fb; --card:#ffffff; --line:#e3e8f1; --text:#1b2433; --muted:#65728c;
-  --accent:#0d9488; --accent-d:#0b7d72; --ok:#16a34a; --warn:#d97706; --bad:#dc2626;
+  --bg:#f5f7fb; --card:#ffffff; --line:#e4e9f2; --text:#1c2433; --muted:#67748e;
+  --accent:#0f766e; --accent-d:#0c5d56; --ok:#16a34a; --warn:#d97706; --bad:#dc2626;
 }
 @media (prefers-color-scheme: dark){
-  :root{ --bg:#0b1220; --card:#111c30; --line:#1d2940; --text:#e6edf7; --muted:#8da2c0; --accent:#14b8a6; --accent-d:#0d9488; }
+  :root{ --bg:#0b1220; --card:#111c30; --line:#1d2940; --text:#e6edf7; --muted:#8da2c0; --accent:#14b8a6; --accent-d:#0f766e; }
 }
 *{ box-sizing:border-box; }
 body{ margin:0; background:var(--bg); color:var(--text); font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif; line-height:1.5; }
 .sp-hero{ background:linear-gradient(135deg,var(--accent),var(--accent-d)); color:#fff; padding:36px 20px; }
 .sp-hero-inner{ max-width:1080px; margin:0 auto; }
 .sp-hero h1{ margin:0 0 8px; font-size:26px; }
-.sp-sub{ margin:0 0 14px; opacity:.95; max-width:700px; font-size:14px; }
+.sp-sub{ margin:0 0 14px; opacity:.95; max-width:720px; font-size:14px; }
 .sp-badges{ display:flex; gap:8px; flex-wrap:wrap; }
 .sp-badge{ font-size:11px; padding:5px 10px; border-radius:999px; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.3); }
 .sp-main{ max-width:1080px; margin:0 auto; padding:20px; }
@@ -26,11 +26,12 @@ body{ margin:0; background:var(--bg); color:var(--text); font-family:system-ui,S
 .sp-btn:hover{ background:var(--accent-d); }
 .sp-btn.ghost{ background:transparent; color:var(--accent); border:1px solid var(--accent); font-weight:500; }
 .sp-profile{ margin-top:14px; font-size:14px; }
-.sp-profile .row{ display:flex; gap:8px; flex-wrap:wrap; color:var(--muted); } .sp-profile .row b{ color:var(--text); }
+.sp-profile .row{ display:flex; gap:8px; flex-wrap:wrap; color:var(--muted); }
+.sp-profile .row b{ color:var(--text); }
 .sp-error{ margin-top:12px; background:rgba(220,38,38,.08); border:1px solid var(--bad); color:var(--bad); padding:10px 12px; border-radius:9px; font-size:13px; }
 .sp-kpis{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:16px; }
 @media(min-width:640px){ .sp-kpis{ grid-template-columns:repeat(3,1fr); } }
-@media(min-width:980px){ .sp-kpis{ grid-template-columns:repeat(5,1fr); } }
+@media(min-width:980px){ .sp-kpis{ grid-template-columns:repeat(6,1fr); } }
 .sp-kpi{ background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; }
 .sp-kpi .k{ font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; }
 .sp-kpi .v{ font-size:24px; font-weight:700; margin-top:4px; }

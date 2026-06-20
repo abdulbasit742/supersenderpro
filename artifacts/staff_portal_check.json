@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-20T17:06:51.652Z",
-  "passed": 44,
+  "generatedAt": "2026-06-20T17:09:17.658Z",
+  "passed": 50,
   "failed": 0,
-  "total": 44,
+  "total": 50,
   "strict": "false",
   "checks": [
     {
@@ -156,22 +156,12 @@
       "detail": ""
     },
     {
-      "name": "service functions exported",
+      "name": "all service functions exported",
       "ok": true,
       "detail": "all present"
     },
     {
-      "name": "redactor functions exist",
-      "ok": true,
-      "detail": "all present"
-    },
-    {
-      "name": "status dryRun true",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "name": "status liveActionsEnabled false",
+      "name": "status dryRun true + liveActionsEnabled false",
       "ok": true,
       "detail": ""
     },
@@ -181,42 +171,82 @@
       "detail": ""
     },
     {
+      "name": "status piiMasked true",
+      "ok": true,
+      "detail": ""
+    },
+    {
       "name": "status externalCallsEnabled false",
       "ok": true,
       "detail": ""
     },
     {
-      "name": "mask phone",
+      "name": "redactor masks phone",
       "ok": true,
       "detail": "+92******4567"
     },
     {
-      "name": "mask email",
+      "name": "redactor masks email",
       "ok": true,
       "detail": "st***@example.com"
     },
     {
-      "name": "mask cnic",
+      "name": "redactor masks ref",
       "ok": true,
       "detail": ""
     },
     {
-      "name": "mask bank ref",
+      "name": "redactor masks bank",
       "ok": true,
       "detail": ""
     },
     {
-      "name": "mask salary",
+      "name": "redactor masks cnic",
       "ok": true,
       "detail": ""
     },
     {
-      "name": "mask payment ref",
+      "name": "redactor masks salary",
       "ok": true,
       "detail": ""
     },
     {
-      "name": "mask document ref",
+      "name": "redactor masks payment",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "redactor masks document via redactDocument",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "payroll livePayrollMutation false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "leave request liveLeaveMutation false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "expense request liveExpenseMutation false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "hr support liveTicketCreation false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "message draft liveSend false + masked recipient",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "summary piiMasked true + works without modules",
       "ok": true,
       "detail": ""
     },

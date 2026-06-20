@@ -9,13 +9,14 @@
 <body>
 <header class="sp-hero">
   <div class="sp-hero-inner">
-    <h1>Employee Self-Service Portal</h1>
-    <p class="sp-sub">Check your HR &amp; work status anytime. This is a <strong>safe preview</strong> — your private details (salary, CNIC, bank) are masked, nothing is submitted, and no message is sent.</p>
+    <h1>Staff Self-Service HR Center</h1>
+    <p class="sp-sub">Check your HR &amp; work status anytime. This is a <strong>safe preview</strong> — your private details are masked, nothing is submitted, no payroll/attendance is changed, and no message is sent.</p>
     <div id="sp-safety-badges" class="sp-badges"></div>
   </div>
 </header>
 
 <main class="sp-main">
+  <!-- Lookup panel -->
   <section class="sp-card sp-lookup">
     <h2>Check your status</h2>
     <form id="sp-lookup-form" class="sp-form">
@@ -24,7 +25,9 @@
           <option value="demo_preview">Demo preview</option>
           <option value="preview_token">Preview token</option>
           <option value="masked_phone_lookup_preview">Masked phone</option>
+          <option value="staff_reference_preview">Staff reference</option>
           <option value="employee_code_preview">Employee code</option>
+          <option value="branch_staff_preview">Branch staff reference</option>
         </select>
       </label>
       <label class="sp-field">Reference / token <input id="sp-ref" placeholder="preview only" /></label>
@@ -34,25 +37,31 @@
     <div id="sp-error" class="sp-error" hidden></div>
   </section>
 
+  <!-- KPI summary -->
   <section id="sp-kpis" class="sp-kpis"></section>
 
+  <!-- Status sections -->
   <div class="sp-grid">
-    <section class="sp-card"><h3>🕒 Attendance</h3><div id="sp-attendance" class="sp-list"></div></section>
-    <section class="sp-card"><h3>📆 Shifts</h3><div id="sp-shifts" class="sp-list"></div></section>
+    <section class="sp-card"><h3>👤 Profile</h3><div id="sp-profile-card" class="sp-list"></div></section>
+    <section class="sp-card"><h3>🕘 Attendance Today</h3><div id="sp-attendance" class="sp-list"></div></section>
+    <section class="sp-card"><h3>📆 Shift</h3><div id="sp-shifts" class="sp-list"></div></section>
     <section class="sp-card"><h3>🌴 Leave Balance</h3><div id="sp-leave" class="sp-list"></div></section>
-    <section class="sp-card"><h3>💵 Payroll &amp; Payslips</h3><div id="sp-payroll" class="sp-list"></div></section>
+    <section class="sp-card"><h3>💵 Payroll Summary</h3><div id="sp-payroll" class="sp-list"></div></section>
+    <section class="sp-card"><h3>🧾 Payslip Metadata</h3><div id="sp-payslips" class="sp-list"></div></section>
     <section class="sp-card"><h3>📈 Commission</h3><div id="sp-commission" class="sp-list"></div></section>
-    <section class="sp-card"><h3>🧾 Expenses</h3><div id="sp-expenses" class="sp-list"></div></section>
+    <section class="sp-card"><h3>🧮 Expenses &amp; Reimbursements</h3><div id="sp-expenses" class="sp-list"></div></section>
     <section class="sp-card"><h3>✅ Assigned Tasks</h3><div id="sp-tasks" class="sp-list"></div></section>
     <section class="sp-card"><h3>📋 SOP Checklists</h3><div id="sp-sops" class="sp-list"></div></section>
     <section class="sp-card"><h3>🏢 Branch Assignment</h3><div id="sp-branch" class="sp-list"></div></section>
-    <section class="sp-card"><h3>🗂️ Approvals</h3><div id="sp-approvals" class="sp-list"></div></section>
-    <section class="sp-card"><h3>📄 Contracts &amp; Documents</h3><div id="sp-documents" class="sp-list"></div></section>
+    <section class="sp-card"><h3>🔖 Approvals</h3><div id="sp-approvals" class="sp-list"></div></section>
+    <section class="sp-card"><h3>📄 Documents</h3><div id="sp-documents" class="sp-list"></div></section>
+    <section class="sp-card"><h3>📑 Contracts</h3><div id="sp-contracts" class="sp-list"></div></section>
   </div>
 
+  <!-- Draft actions -->
   <section class="sp-card">
     <h2>Need something? Create a safe preview request</h2>
-    <p class="sp-muted">All actions below are previews/drafts only. <strong>Contact HR to complete any real action.</strong></p>
+    <p class="sp-muted">All actions below are previews/drafts only. <strong>Contact HR/admin to complete any real action.</strong></p>
     <div class="sp-actions">
       <button class="sp-btn ghost" data-draft="leave">Draft Leave Request</button>
       <button class="sp-btn ghost" data-draft="expense">Draft Expense Request</button>
@@ -63,8 +72,14 @@
     <div id="sp-draft-out" class="sp-draft-out"></div>
   </section>
 
+  <!-- Audit preview -->
+  <section class="sp-card">
+    <h3>🛡️ Audit Preview</h3>
+    <div id="sp-audit" class="sp-list"></div>
+  </section>
+
   <footer class="sp-footer">
-    <p>🔒 No payroll change · No leave/expense submitted · No message sent · Salary, CNIC &amp; bank details masked · External calls disabled.</p>
+    <p>🔒 dryRun · No payroll/attendance/leave mutation · No live sends · Your private details are masked · External calls disabled.</p>
   </footer>
 </main>
 

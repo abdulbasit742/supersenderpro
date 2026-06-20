@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-20T17:06:51.990Z",
-  "passed": 29,
+  "generatedAt": "2026-06-20T17:09:17.815Z",
+  "passed": 31,
   "failed": 0,
-  "total": 29,
+  "total": 31,
   "results": [
     {
       "name": "require service module",
@@ -20,57 +20,27 @@
       "detail": "loaded"
     },
     {
-      "name": "getStaffPortalStatus works + safe",
+      "name": "portal status is safe",
       "pass": true,
       "detail": "safe"
     },
     {
-      "name": "lookupStaffPreview works + masked",
+      "name": "lookup preview safe + masked",
       "pass": true,
       "detail": "preview_token"
     },
     {
-      "name": "getStaffSummaryPreview works (modules ok)",
+      "name": "summary works even though no real modules",
       "pass": true,
-      "detail": "leave 12"
+      "detail": "1 pending leave"
     },
     {
-      "name": "leave request preview liveLeaveMutation false",
-      "pass": true,
-      "detail": "safe"
-    },
-    {
-      "name": "expense request preview liveExpenseMutation false",
+      "name": "getProfileStatusPreview safe",
       "pass": true,
       "detail": "safe"
     },
     {
-      "name": "payroll livePayrollMutation + livePaymentAction false",
-      "pass": true,
-      "detail": "safe"
-    },
-    {
-      "name": "attendance no checkin/checkout/mutation",
-      "pass": true,
-      "detail": "safe"
-    },
-    {
-      "name": "HR support preview liveTicketCreation false",
-      "pass": true,
-      "detail": "safe"
-    },
-    {
-      "name": "document request preview liveDocumentDownload false",
-      "pass": true,
-      "detail": "safe"
-    },
-    {
-      "name": "message draft preview liveSend false",
-      "pass": true,
-      "detail": "+92******4567"
-    },
-    {
-      "name": "getProfilePreview safe",
+      "name": "getAttendanceStatusPreview safe",
       "pass": true,
       "detail": "safe"
     },
@@ -81,6 +51,11 @@
     },
     {
       "name": "getLeaveStatusPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getPayrollSummaryPreview safe",
       "pass": true,
       "detail": "safe"
     },
@@ -120,17 +95,57 @@
       "detail": "safe"
     },
     {
-      "name": "getDocumentStatusPreview safe",
-      "pass": true,
-      "detail": "safe"
-    },
-    {
       "name": "getContractStatusPreview safe",
       "pass": true,
       "detail": "safe"
     },
     {
-      "name": "audit preview no live write",
+      "name": "getDocumentStatusPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "leave request preview safe (no live leave/approval mutation)",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "expense request preview safe (no live expense mutation)",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "hr support preview safe (no live ticket creation)",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "document request preview safe (no download)",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "message draft preview safe (no live send)",
+      "pass": true,
+      "detail": "+92******4567"
+    },
+    {
+      "name": "payroll preview has no live payroll/payment mutation",
+      "pass": true,
+      "detail": "bank_****"
+    },
+    {
+      "name": "payslip metadata only (no download)",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "attendance has no check-in/out mutation",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "audit preview is local + no live write",
       "pass": true,
       "detail": "7 entries"
     },
@@ -140,14 +155,9 @@
       "detail": "ok"
     },
     {
-      "name": "no full PII in aggregate blob",
+      "name": "no full PII in aggregate response blob",
       "pass": true,
       "detail": "clean"
-    },
-    {
-      "name": "missing-module fallback does not crash",
-      "pass": true,
-      "detail": "ok"
     }
   ]
 }
