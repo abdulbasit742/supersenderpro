@@ -3153,6 +3153,47 @@ Create a vertical promo video for ChatGPT Plus, Claude Pro, Cursor Pro, Gemini A
 <div style="font-size:11px;color:var(--muted);margin-top:8px">Works even if the AI provider is temporarily slow: local fallback stays active.</div>
 </div>
 </div>
+<div class="card" style="margin-top:12px">
+  <div class="flex-between" style="gap:10px;flex-wrap:wrap">
+    <div>
+      <div class="card-title" style="margin:0">Deploy Agent to Groups / Channels</div>
+      <div style="font-size:12px;color:var(--muted)">Select any AI agent and attach it to WhatsApp groups, WhatsApp channels, social platforms, or ecommerce events.</div>
+    </div>
+    <button class="btn btn-secondary btn-sm" onclick="loadAgentPlacements()">Refresh</button>
+  </div>
+  <div class="grid g4" style="gap:8px;margin-top:10px">
+    <div class="form-group"><label>Agent</label><select id="agent-place-agent"></select></div>
+    <div class="form-group"><label>Target Type</label><select id="agent-place-type" onchange="renderAgentPlacementTargetSelect()">
+      <option value="whatsapp_group">WhatsApp Group</option>
+      <option value="whatsapp_channel">WhatsApp Channel</option>
+      <option value="facebook">Facebook</option>
+      <option value="instagram">Instagram</option>
+      <option value="linkedin">LinkedIn</option>
+      <option value="tiktok">TikTok</option>
+      <option value="telegram">Telegram</option>
+      <option value="ecommerce">Ecommerce</option>
+    </select></div>
+    <div class="form-group"><label>Target</label><select id="agent-place-target"></select></div>
+    <div class="form-group"><label>Mode</label><select id="agent-place-mode">
+      <option value="suggest_only">Suggest Only</option>
+      <option value="auto_reply">Auto Reply</option>
+      <option value="auto_forward">Auto Forward</option>
+      <option value="moderate">Moderate</option>
+      <option value="answer_faq">Answer FAQ</option>
+    </select></div>
+  </div>
+  <div class="grid g2" style="gap:8px">
+    <div class="form-group"><label>Trigger Keywords</label><input id="agent-place-keywords" placeholder="price, order, stock, scholarship"/></div>
+    <div class="form-group"><label>Extra Instructions</label><input id="agent-place-instructions" placeholder="Reply short Roman Urdu, require admin approval before posting"/></div>
+  </div>
+  <div class="flex" style="gap:8px;flex-wrap:wrap">
+    <label class="chk"><input type="checkbox" id="agent-place-approval" checked/> Require approval before live send/post</label>
+    <button class="btn btn-primary btn-sm" onclick="deployAgentPlacement()">Deploy Agent</button>
+    <button class="btn btn-secondary btn-sm" onclick="previewAgentPlacementRoute()">Preview Route</button>
+  </div>
+  <div id="agent-placement-preview" style="font-size:12px;color:var(--muted);margin-top:8px"></div>
+  <div id="agent-placements-list" class="scroll-y" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;max-height:320px;margin-top:12px"></div>
+</div>
 </div>
 
 
@@ -13099,6 +13140,8 @@ async function aiSuggest() {
 
 let aiAgentsCache = [];
 let selectedAgentId = '';
+let agentPlacementsCache = [];
+let agentPlacementTargets = {};
 
 function agentBubble(text, out = false) {
   const safe = escHtml(text || '');
@@ -13162,6 +13205,8 @@ async function loadAgents() {
     aiAgentsCache = Array.isArray(data) ? data : (data.agents || []);
     if (!selectedAgentId && aiAgentsCache[0]) selectedAgentId = aiAgentsCache[0].id;
     renderAgentsList();
+    renderAgentPlacementAgentSelect();
+    await loadAgentPlacements(false);
     selectAgent(selectedAgentId);
     const chatBox = document.getElementById('agent-chat-box');
     if (chatBox && !chatBox.dataset.ready) {
@@ -13172,6 +13217,137 @@ async function loadAgents() {
   } catch (e) {
     toast(e.message || 'Agents load failed', 'error');
   }
+}
+
+function renderAgentPlacementAgentSelect() {
+  const select = document.getElementById('agent-place-agent');
+  if (!select) return;
+  select.innerHTML = (aiAgentsCache || []).map(agent =>
+    `<option value="${escHtml(agent.id)}"${agent.id === selectedAgentId ? ' selected' : ''}>${escHtml(agent.emoji || '🧠')} ${escHtml(agent.name || agent.id)}</option>`
+  ).join('') || '<option value="">No agents</option>';
+}
+
+function flatAgentPlacementTargets() {
+  const t = agentPlacementTargets || {};
+  return [
+    ...(t.whatsappGroups || []),
+    ...(t.whatsappChannels || []),
+    ...(t.social || []),
+    ...(t.ecommerce || [])
+  ];
+}
+
+function renderAgentPlacementTargetSelect() {
+  const type = document.getElementById('agent-place-type')?.value || 'whatsapp_group';
+  const target = document.getElementById('agent-place-target');
+  if (!target) return;
+  const rows = flatAgentPlacementTargets().filter(row => row.targetType === type);
+  target.innerHTML = rows.map(row =>
+    `<option value="${escHtml(row.id)}">${escHtml(row.name || row.id)}</option>`
+  ).join('') || `<option value="">Manual target</option>`;
+}
+
+function renderAgentPlacementsList() {
+  const box = document.getElementById('agent-placements-list');
+  if (!box) return;
+  if (!agentPlacementsCache.length) {
+    box.innerHTML = '<div class="empty-state">No deployments yet. Select an agent and target, then Deploy Agent.</div>';
+    return;
+  }
+  box.innerHTML = agentPlacementsCache.map(row => {
+    const agent = row.agent || {};
+    const enabled = row.enabled !== false;
+    return `
+      <div class="card" style="padding:10px;background:${enabled ? 'rgba(0,168,132,.08)' : 'rgba(239,68,68,.08)'}">
+        <div class="flex-between" style="gap:8px">
+          <strong>${escHtml(agent.emoji || '🧠')} ${escHtml(agent.name || row.agentId || 'Agent')}</strong>
+          <span class="tag ${enabled ? 'tag-green' : 'tag-red'}">${enabled ? 'ON' : 'OFF'}</span>
+        </div>
+        <div style="font-size:12px;color:var(--muted);margin-top:6px">${escHtml(row.targetType)} · ${escHtml(row.targetName || row.targetId || '-')}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px">Mode: ${escHtml(row.mode || 'suggest_only')} · Approval: ${row.requireApproval !== false ? 'yes' : 'no'}</div>
+        ${(row.keywords || []).length ? `<div style="font-size:11px;margin-top:6px">${(row.keywords || []).map(k => `<span class="tag tag-purple">${escHtml(k)}</span>`).join(' ')}</div>` : ''}
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
+          <button class="btn btn-secondary btn-sm" onclick="toggleAgentPlacement('${escHtml(row.id)}')">${enabled ? 'Disable' : 'Enable'}</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteAgentPlacement('${escHtml(row.id)}')">Remove</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+async function loadAgentPlacements(showToast = true) {
+  const card = document.getElementById('agent-placements-list');
+  if (!card) return;
+  try {
+    const data = await api('/api/agents/placements');
+    agentPlacementsCache = data.placements || [];
+    agentPlacementTargets = data.targets || {};
+    renderAgentPlacementAgentSelect();
+    renderAgentPlacementTargetSelect();
+    renderAgentPlacementsList();
+    if (showToast) toast('Agent deployments refreshed', 'success');
+  } catch (e) {
+    if (showToast) toast(e.message || 'Agent deployments load failed', 'error');
+  }
+}
+
+async function deployAgentPlacement() {
+  const agentId = document.getElementById('agent-place-agent')?.value || selectedAgentId;
+  const targetType = document.getElementById('agent-place-type')?.value || 'whatsapp_group';
+  const targetSelect = document.getElementById('agent-place-target');
+  const targetId = targetSelect?.value || '';
+  const targetName = targetSelect?.selectedOptions?.[0]?.textContent || targetId;
+  const payload = {
+    agentId,
+    targetType,
+    targetId,
+    targetName,
+    mode: document.getElementById('agent-place-mode')?.value || 'suggest_only',
+    keywords: document.getElementById('agent-place-keywords')?.value || '',
+    instructions: document.getElementById('agent-place-instructions')?.value || '',
+    requireApproval: document.getElementById('agent-place-approval')?.checked !== false,
+    enabled: true
+  };
+  if (!payload.agentId) return toast('Agent select karein', 'error');
+  try {
+    await api('/api/agents/placements', { method: 'POST', body: JSON.stringify(payload) });
+    toast('Agent deployed to target', 'success');
+    await loadAgentPlacements(false);
+  } catch (e) {
+    toast(e.message || 'Deploy failed', 'error');
+  }
+}
+
+async function previewAgentPlacementRoute() {
+  const targetType = document.getElementById('agent-place-type')?.value || 'whatsapp_group';
+  const targetId = document.getElementById('agent-place-target')?.value || '';
+  const message = document.getElementById('agent-place-keywords')?.value || 'price stock order';
+  const box = document.getElementById('agent-placement-preview');
+  try {
+    const data = await api('/api/agents/placements/route-preview', {
+      method: 'POST',
+      body: JSON.stringify({ targetType, targetId, message })
+    });
+    const agent = data.agent || {};
+    if (box) box.innerHTML = `Matched: <b>${escHtml(agent.emoji || '🧠')} ${escHtml(agent.name || agent.id || 'Agent')}</b> · Mode: ${escHtml(data.mode || 'suggest_only')} · Approval: ${data.requireApproval !== false ? 'yes' : 'no'}`;
+  } catch (e) {
+    if (box) box.innerHTML = `<span style="color:var(--red)">Preview failed: ${escHtml(e.message)}</span>`;
+  }
+}
+
+async function toggleAgentPlacement(id) {
+  try {
+    await api('/api/agents/placements/' + encodeURIComponent(id) + '/toggle', { method: 'POST', body: '{}' });
+    await loadAgentPlacements(false);
+  } catch (e) { toast(e.message || 'Toggle failed', 'error'); }
+}
+
+async function deleteAgentPlacement(id) {
+  if (!confirm('Remove this agent deployment?')) return;
+  try {
+    await api('/api/agents/placements/' + encodeURIComponent(id), { method: 'DELETE' });
+    await loadAgentPlacements(false);
+    toast('Agent deployment removed', 'success');
+  } catch (e) { toast(e.message || 'Remove failed', 'error'); }
 }
 
 async function saveAgent() {

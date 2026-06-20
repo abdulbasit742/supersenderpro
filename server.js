@@ -2215,6 +2215,9 @@ const defaultAIAgents = [
 let aiAgents = loadJSON('agents.json', defaultAIAgents);
 if (!Array.isArray(aiAgents) || !aiAgents.length) aiAgents = defaultAIAgents;
 const saveAIAgents = () => saveJSON('agents.json', aiAgents);
+let agentPlacements = loadJSON('agent_placements.json', []);
+if (!Array.isArray(agentPlacements)) agentPlacements = [];
+const saveAgentPlacements = () => saveJSON('agent_placements.json', agentPlacements.slice(0, 1000));
 let laptopProducts = loadJSON('laptop_products.json', []);
 let productBulkSends = loadJSON('bulk_sends.json', []);
 let laptopLeads = loadJSON('laptop_leads.json', []);
@@ -43544,6 +43547,102 @@ function findAIAgent(value = '') {
   ) || aiAgents[0] || defaultAIAgents[0];
 }
 
+function parseAgentPlacementList(value = '') {
+  if (Array.isArray(value)) return value.map(item => String(item || '').trim()).filter(Boolean);
+  return String(value || '').split(',').map(item => item.trim()).filter(Boolean);
+}
+
+function normalizeAgentPlacement(input = {}, existing = null) {
+  const now = new Date().toISOString();
+  const agent = findAIAgent(input.agentId || input.agent || existing?.agentId || '');
+  const targetType = String(input.targetType || existing?.targetType || 'whatsapp_group').trim().toLowerCase();
+  const targetId = String(input.targetId || input.channelId || input.groupId || existing?.targetId || '').trim();
+  const name = String(input.name || existing?.name || `${agent?.name || 'Agent'} on ${targetType}`).trim();
+  return {
+    id: String(existing?.id || input.id || uuid()),
+    name,
+    agentId: String(agent?.id || input.agentId || 'sales-agent'),
+    targetType,
+    targetId,
+    targetName: String(input.targetName || existing?.targetName || targetId || targetType).trim(),
+    mode: ['auto_reply', 'suggest_only', 'auto_forward', 'moderate', 'answer_faq'].includes(String(input.mode || existing?.mode || '').trim())
+      ? String(input.mode || existing?.mode).trim()
+      : 'suggest_only',
+    enabled: input.enabled !== undefined ? input.enabled !== false : (existing ? existing.enabled !== false : true),
+    requireApproval: input.requireApproval !== undefined ? input.requireApproval !== false : (existing ? existing.requireApproval !== false : true),
+    keywords: parseAgentPlacementList(input.keywords ?? existing?.keywords ?? ''),
+    blockedKeywords: parseAgentPlacementList(input.blockedKeywords ?? existing?.blockedKeywords ?? ''),
+    instructions: String(input.instructions || existing?.instructions || '').trim(),
+    createdAt: existing?.createdAt || now,
+    updatedAt: now
+  };
+}
+
+function publicAgentPlacement(row = {}) {
+  const agent = findAIAgent(row.agentId);
+  return {
+    ...row,
+    agent: agent ? { id: agent.id, name: agent.name, emoji: agent.emoji, role: agent.role } : null
+  };
+}
+
+function envList(name) {
+  return String(process.env[name] || '').split(',').map(item => item.trim()).filter(Boolean);
+}
+
+function agentPlacementTargetOptions() {
+  const channelIds = new Set();
+  try { getConfiguredWhatsAppChannels().forEach(id => channelIds.add(id)); } catch (_) {}
+  try { getConfiguredWhatsAppChannelSources().forEach(id => channelIds.add(id)); } catch (_) {}
+  const discovered = Array.isArray(whatsappChannelDiscoveries) ? whatsappChannelDiscoveries : [];
+  discovered.forEach(row => { if (row.channelId) channelIds.add(row.channelId); });
+  const groupIds = Array.from(new Set([
+    ...envList('SELLING_GROUPS'),
+    ...envList('CUSTOMER_GROUPS'),
+    ...envList('AUTO_STOCK_SOURCING_GROUPS')
+  ]));
+  return {
+    whatsappGroups: groupIds.map(id => ({ id, name: id, targetType: 'whatsapp_group' })),
+    whatsappChannels: Array.from(channelIds).map(id => ({
+      id,
+      name: discovered.find(row => row.channelId === id)?.name || id.replace('@newsletter', ''),
+      targetType: 'whatsapp_channel',
+      url: publicWhatsAppChannel(id)
+    })),
+    social: [
+      { id: 'facebook_page', name: 'Facebook Page', targetType: 'facebook' },
+      { id: 'instagram_business', name: 'Instagram Business', targetType: 'instagram' },
+      { id: 'linkedin_page', name: 'LinkedIn', targetType: 'linkedin' },
+      { id: 'tiktok_account', name: 'TikTok', targetType: 'tiktok' },
+      { id: settings.telegram_channel_chat_id || settings.telegram_chat_id || 'telegram_channel', name: 'Telegram Channel', targetType: 'telegram' }
+    ],
+    ecommerce: [
+      { id: 'shopify', name: 'Shopify', targetType: 'ecommerce' },
+      { id: 'woocommerce', name: 'WooCommerce', targetType: 'ecommerce' },
+      { id: 'custom_feed', name: 'Custom Feed', targetType: 'ecommerce' }
+    ]
+  };
+}
+
+function matchAgentPlacement(payload = {}) {
+  const targetType = String(payload.targetType || '').trim().toLowerCase();
+  const targetId = String(payload.targetId || payload.channelId || payload.groupId || '').trim();
+  const text = String(payload.message || payload.text || '').toLowerCase();
+  const rows = (agentPlacements || []).filter(row => row.enabled !== false)
+    .filter(row => !targetType || row.targetType === targetType)
+    .filter(row => !targetId || row.targetId === targetId || !row.targetId)
+    .map(row => {
+      let score = 1;
+      if (targetId && row.targetId === targetId) score += 5;
+      if ((row.keywords || []).some(keyword => text.includes(String(keyword).toLowerCase()))) score += 4;
+      if ((row.blockedKeywords || []).some(keyword => text.includes(String(keyword).toLowerCase()))) score -= 99;
+      return { row, score };
+    })
+    .filter(item => item.score > 0)
+    .sort((a, b) => b.score - a.score);
+  return rows[0]?.row || null;
+}
+
 function normalizeCarouselTemplate(input = {}) {
   const cards = Array.isArray(input.cards) ? input.cards : [];
   return {
@@ -43724,6 +43823,91 @@ app.delete('/api/agents/:id', (req, res) => {
   if (aiAgents.length === before) return res.status(404).json({ error: 'Agent not found' });
   saveAIAgents();
   res.json({ success: true, removed: before - aiAgents.length });
+});
+
+app.get('/api/agents/placement-targets', (_req, res) => {
+  try {
+    res.json({ success: true, targets: agentPlacementTargetOptions() });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/agents/placements', (_req, res) => {
+  try {
+    res.json({
+      success: true,
+      placements: (agentPlacements || []).map(publicAgentPlacement),
+      targets: agentPlacementTargetOptions()
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/agents/placements', (req, res) => {
+  try {
+    const placement = normalizeAgentPlacement(req.body || {});
+    if (!placement.agentId) return res.status(400).json({ success: false, error: 'agentId is required' });
+    if (!placement.targetType) return res.status(400).json({ success: false, error: 'targetType is required' });
+    agentPlacements.unshift(placement);
+    saveAgentPlacements();
+    res.json({ success: true, placement: publicAgentPlacement(placement) });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.put('/api/agents/placements/:id', (req, res) => {
+  try {
+    const idx = (agentPlacements || []).findIndex(row => row.id === req.params.id);
+    if (idx === -1) return res.status(404).json({ success: false, error: 'Placement not found' });
+    agentPlacements[idx] = normalizeAgentPlacement({ ...agentPlacements[idx], ...req.body }, agentPlacements[idx]);
+    saveAgentPlacements();
+    res.json({ success: true, placement: publicAgentPlacement(agentPlacements[idx]) });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/agents/placements/:id/toggle', (req, res) => {
+  try {
+    const row = (agentPlacements || []).find(item => item.id === req.params.id);
+    if (!row) return res.status(404).json({ success: false, error: 'Placement not found' });
+    row.enabled = req.body?.enabled !== undefined ? req.body.enabled !== false : row.enabled === false;
+    row.updatedAt = new Date().toISOString();
+    saveAgentPlacements();
+    res.json({ success: true, placement: publicAgentPlacement(row) });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.delete('/api/agents/placements/:id', (req, res) => {
+  const before = (agentPlacements || []).length;
+  agentPlacements = (agentPlacements || []).filter(row => row.id !== req.params.id);
+  if (agentPlacements.length === before) return res.status(404).json({ success: false, error: 'Placement not found' });
+  saveAgentPlacements();
+  res.json({ success: true, removed: before - agentPlacements.length });
+});
+
+app.post('/api/agents/placements/route-preview', (req, res) => {
+  try {
+    const placement = matchAgentPlacement(req.body || {});
+    const agent = placement ? findAIAgent(placement.agentId) : routeChatToAgent({
+      source: req.body?.targetType || req.body?.source || '',
+      message: req.body?.message || req.body?.text || ''
+    });
+    res.json({
+      success: true,
+      placement: placement ? publicAgentPlacement(placement) : null,
+      agent,
+      mode: placement?.mode || 'suggest_only',
+      requireApproval: placement ? placement.requireApproval !== false : true
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
 });
 
 // Lightweight agent chat backed by the configured AI provider, with a local fallback.
