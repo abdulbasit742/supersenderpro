@@ -1,0 +1,24 @@
+{
+  "module": "Marketplace Intelligence Graph + Seller/Buyer Command Center",
+  "scannedAt": "2026-06-20",
+  "repo": "abdulbasit742/supersenderpro",
+  "summary": "Main server.js already has dealer/seller-rate parsing, ecommerce hub, channel automation (Channel Automation Command Center), Flow Studio, AI provider layer, and an admin command dispatcher. The Marketplace Intelligence graph that unifies seller/buyer/SKU/price/stock signals across these does NOT exist and is the only thing built here.",
+  "areas": [
+    { "area": "Marketplace entity graph (seller/buyer/sku/price/stock/offer/demand)", "status": "missing", "action": "build new under lib/marketplaceIntelligence/" },
+    { "area": "Seller intelligence / trust scoring", "status": "partially_exists", "existing": "seller_rates.json + dealerIntelligence (backend/, wa-sales-bot/)", "action": "safe_to_extend via dealerAdapter; do not rebuild parsers" },
+    { "area": "Buyer demand intelligence", "status": "missing", "action": "build new buyerProfiler/demandScoring" },
+    { "area": "SKU / price / stock radar", "status": "missing", "action": "build new skuResolver/priceRadar/stockRadar" },
+    { "area": "Source ingestion (group/chat/channel/ecommerce/social/dealer/order)", "status": "needs_wiring", "existing": "channelAutomationCenter logs, seller_rates, ecommerce hub", "action": "add dry-run adapters only" },
+    { "area": "AI recommendations", "status": "partially_exists", "existing": "callAIProvider() in server.js, ai/ provider stack", "action": "rule-based dry-run by default; live only when MARKETPLACE_INTELLIGENCE_AI_LIVE=true" },
+    { "area": "Admin dashboard page", "status": "missing", "action": "needs_ui new public/marketplace-intelligence.html" },
+    { "area": "REST API", "status": "missing", "action": "needs_route new routes/marketplaceIntelligenceRoutes.js" },
+    { "area": "WhatsApp admin commands", "status": "needs_wiring", "existing": "handleWhatsAppSocialAdminCommand dispatcher + gate regex", "action": "add adminCommands.js parser and wire hook" },
+    { "area": "Flow Studio triggers/actions", "status": "needs_wiring", "existing": "Flow Studio in server.js (flow_studio_*.json)", "action": "export flowNodes.js registry entries + document integration point" },
+    { "area": "Reports / exports", "status": "missing", "action": "build reportBuilder.js + scripts check" },
+    { "area": "Docs", "status": "needs_docs", "action": "create docs/MARKETPLACE_INTELLIGENCE*.md" },
+    { "area": "Env placeholders", "status": "needs_docs", "action": "append MARKETPLACE_INTELLIGENCE_* to .env.example" },
+    { "area": "Channel Automation Command Center", "status": "exists", "action": "duplicate_risk — DO NOT rebuild; only consume its logs via adapter" },
+    { "area": "Ecommerce hub", "status": "exists", "action": "duplicate_risk — DO NOT rebuild; consume products/orders via adapter" },
+    { "area": "Dealer intelligence", "status": "exists", "action": "duplicate_risk — DO NOT rebuild; consume rates via adapter" }
+  ]
+}

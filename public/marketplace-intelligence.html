@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Marketplace Intelligence · SuperSender Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/css/marketplace-intelligence.css"/>
+</head>
+<body>
+<header>
+  <h1>🧠 Marketplace Intelligence</h1>
+  <div class="hdr-right">
+    <span id="mode" class="mode dry">DRY-RUN</span>
+    <button class="btn ghost" onclick="MI.refreshAll()">↻ Refresh</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="cards" id="cards"></div>
+
+  <div class="toolbar">
+    <input id="searchBox" placeholder="Search seller / buyer / SKU / product / source…" onkeydown="if(event.key==='Enter')MI.search()"/>
+    <select id="searchType">
+      <option value="">All types</option>
+      <option value="seller">Seller</option><option value="buyer">Buyer</option>
+      <option value="sku">SKU</option><option value="product">Product</option>
+      <option value="source">Source</option><option value="alert">Risk/Alert</option>
+    </select>
+    <select id="riskFilter"><option value="">Any risk</option><option value="1">Risky only</option></select>
+    <input id="cityFilter" placeholder="City"/>
+    <button class="btn" onclick="MI.search()">Search</button>
+    <button class="btn ghost" onclick="MI.genDigest()">📊 Digest</button>
+    <button class="btn ghost" onclick="MI.exportReport('json')">⬇ JSON</button>
+    <button class="btn ghost" onclick="MI.exportReport('csv')">⬇ CSV</button>
+    <button class="btn ghost" onclick="MI.exportReport('markdown')">⬇ MD</button>
+  </div>
+  <div id="searchResults"></div>
+
+  <div class="grid2">
+    <section><h2>🏆 Seller Leaderboard</h2><div class="table-wrapper"><table><thead><tr><th>Seller</th><th>Trust</th><th>Rank</th><th>Offers</th><th>Risk</th></tr></thead><tbody id="sellersBody"></tbody></table></div></section>
+    <section><h2>🛒 Buyer Demand Board</h2><div class="table-wrapper"><table><thead><tr><th>Buyer</th><th>Score</th><th>Band</th><th>Requests</th><th>Urgency</th></tr></thead><tbody id="buyersBody"></tbody></table></div></section>
+  </div>
+
+  <div class="grid2">
+    <section><h2>💰 SKU Price Radar</h2><div class="table-wrapper"><table><thead><tr><th>SKU</th><th>Latest</th><th>Min</th><th>Avg</th><th>Max</th><th>Sellers</th></tr></thead><tbody id="pricesBody"></tbody></table></div></section>
+    <section><h2>📦 Stock Radar</h2><div class="table-wrapper"><table><thead><tr><th>SKU</th><th>Signal</th><th>Updates</th></tr></thead><tbody id="stockBody"></tbody></table></div></section>
+  </div>
+
+  <section><h2>💡 Opportunity Board</h2><div class="table-wrapper"><table><thead><tr><th>Type</th><th>SKU</th><th>Detail</th><th>Confidence</th></tr></thead><tbody id="oppsBody"></tbody></table></div></section>
+
+  <div class="grid2">
+    <section><h2>🤖 AI Recommended Actions</h2><div id="recsBox" class="feed"></div></section>
+    <section><h2>📡 Source Activity Feed</h2><div id="historyBox" class="feed"></div></section>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="/js/marketplace-intelligence.js"></script>
+</body>
+</html>

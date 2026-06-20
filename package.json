@@ -36,6 +36,7 @@
     "doctor": "node scripts/doctor.js",
     "voice-ai:check": "node scripts/voice-ai-check.js",
     "voice-ai:smoke": "node tests/smoke/voiceAISmoke.js",
+    "marketplace:intelligence:check": "node scripts/marketplace-intelligence-check.js",
     "agent:serve": "node agent-runtime/server.js",
     "agent:demo": "node agent-runtime/demo.js",
     "agent:cli": "node agent-runtime/cli.js",

@@ -3089,6 +3089,19 @@ try {
   console.error('[ChannelCenter] failed to initialise (non-fatal):', e.message);
 }
 
+// BEGIN MARKETPLACE INTELLIGENCE HOOK
+let marketplaceIntelligence = null;
+try {
+  marketplaceIntelligence = require('./lib/marketplaceIntelligence');
+  const marketplaceIntelligenceRoutes = require('./routes/marketplaceIntelligenceRoutes');
+  app.use('/api/marketplace-intelligence', marketplaceIntelligenceRoutes);
+  app.get('/marketplace-intelligence', (req, res) => res.sendFile(path.join(__dirname, 'public', 'marketplace-intelligence.html')));
+  console.log('[MarketplaceIntel] mounted at /api/marketplace-intelligence (dry-run default)');
+} catch (e) {
+  console.error('[MarketplaceIntel] failed to initialise (non-fatal):', e.message);
+}
+// END MARKETPLACE INTELLIGENCE HOOK
+
 
 let searchIndexRebuildTimer = null;
 function scheduleSearchIndexRebuild(reason = 'data-change', delayMs = Number(process.env.SEARCH_REBUILD_DEBOUNCE_MS || 30000)) {
@@ -31920,7 +31933,7 @@ function splitSocialCommandArgs(text = '') {
 }
 
 function isWhatsAppSocialCommand(text = '') {
-  return /^!(social|connect|suboauth|subscriptionoauth|subaccounts|connectsub|post|draft|approvepost|sharepost|poststatus|comment|telegram|control|admin|menuadmin|server|status|health|complete|completion|setupcheck|setupvalidator|setupfix|doctor|watchdog|cloudapi|officialwa|next50|antigravity|aihub|automationhub|agents|agentcontrol|agenttask|autobuild|claw|claws|zeroclaw|pcagents|importskills|skillpacks|packs|waauto|automation|autosettings|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelfix|channelwatch|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|channelstatus|channelsources|channeltargets|channelqueue|channelapprove|channelreject|channelpublish|pausechannels|resumechannels|addsource|addtarget|route|digest|channeldoctor|report|backup)\b/i.test(String(text || '').trim());
+  return /^!(social|connect|suboauth|subscriptionoauth|subaccounts|connectsub|post|draft|approvepost|sharepost|poststatus|comment|telegram|control|admin|menuadmin|server|status|health|complete|completion|setupcheck|setupvalidator|setupfix|doctor|watchdog|cloudapi|officialwa|next50|antigravity|aihub|automationhub|agents|agentcontrol|agenttask|autobuild|claw|claws|zeroclaw|pcagents|importskills|skillpacks|packs|waauto|automation|autosettings|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelfix|channelwatch|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|channelstatus|channelsources|channeltargets|channelqueue|channelapprove|channelreject|channelpublish|pausechannels|resumechannels|addsource|addtarget|route|digest|channeldoctor|marketstatus|topsellers|topbuyers|sku|price|stock|demand|opportunities|seller|buyer|marketdigest|riskposts|report|backup)\b/i.test(String(text || '').trim());
 }
 
 function adminNumberCandidates() {
@@ -33101,6 +33114,16 @@ async function handleWhatsAppSocialAdminCommand(ctx = {}) {
       }
       return true;
     }
+
+    // ── Marketplace Intelligence commands (Module 9) ──
+    try {
+      const miCommands = require('./lib/marketplaceIntelligence/adminCommands');
+      if (miCommands.isCommand(text)) {
+        try { await reply(miCommands.handle(command, args.slice(1))); }
+        catch (e) { await reply('⚠️ Market command error: ' + e.message); }
+        return true;
+      }
+    } catch (_) { /* marketplace module unavailable — ignore */ }
 
     if (command === '!control' || command === '!admin' || command === '!menuadmin') {
       await reply(buildWhatsAppAdminControlMenu());
