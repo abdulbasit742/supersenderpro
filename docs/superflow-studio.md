@@ -44,6 +44,8 @@ Get the live machine-readable list from `GET /api/flow-studio/node-types`.
 | POST | `/api/flow-studio/flows/:id/pause` | Pause |
 | POST | `/api/flow-studio/flows/:id/run-test` | Dry run (never sends) |
 | POST | `/api/flow-studio/flows/:id/run` | Live run (only if active + `{ "live": true }`) |
+| POST | `/api/flow-studio/trigger/:triggerType` | Trigger all active flows matching a trigger type; dry-run by default |
+| POST | `/api/flow-studio/trigger` | Same as above, with `triggerType` in the body |
 | GET | `/api/flow-studio/runs` | Execution logs (`?flowId=&limit=`) |
 | GET | `/api/flow-studio/templates` | Prebuilt templates |
 | POST | `/api/flow-studio/templates/:id/install` | Install template as editable flow |
@@ -74,6 +76,35 @@ A sample flow is in [`docs/flow-studio-sample-flow.json`](./flow-studio-sample-f
 4. Select a node to edit its **label** and **config JSON** in the right Inspector.
 5. Click **Save**, then **Run Test (Dry run)** to simulate — nothing is sent.
 6. Click **Activate** to enable live execution; live runs require `status === "active"` **and** `{ "live": true }`.
+
+## External triggers
+
+Use the dashboard **External Trigger Tester** card or call:
+
+```bash
+curl -X POST http://localhost:3001/api/flow-studio/trigger/whatsapp_message \
+  -H "Content-Type: application/json" \
+  -d "{\"input\":{\"message\":\"test\"},\"source\":\"n8n\"}"
+```
+
+Trigger names can be sent as `whatsapp_message`, `new_order`, `payment_received`,
+`website_change`, `social_message`, etc. The server normalizes them to
+`trigger.whatsapp_message` style and runs every **active** flow whose trigger
+matches.
+
+External triggers are **dry-run by default**. To allow live execution, set
+`FLOW_STUDIO_TRIGGER_SECRET` and send:
+
+```bash
+curl -X POST "http://localhost:3001/api/flow-studio/trigger/new_order?live=true" \
+  -H "Content-Type: application/json" \
+  -H "x-flow-studio-secret: YOUR_SECRET" \
+  -d "{\"input\":{\"orderId\":\"ORD-1\"},\"source\":\"shopify\"}"
+```
+
+Without the secret, live trigger requests return HTTP 403. This lets n8n,
+Google Sheets, website scrapers, ecommerce connectors, WhatsApp handlers and
+social webhooks safely test flows before real sends/posting are enabled.
 
 ## Launch Doctor
 

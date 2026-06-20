@@ -4448,6 +4448,7 @@ curl -X POST http://localhost:3001/mcp/send \
       <button class="btn btn-secondary" onclick="fsDuplicateFlow()">⧉ Duplicate</button>
       <button class="btn btn-secondary" onclick="fsShowAnalytics()">📊 Analytics</button>
       <button class="btn btn-secondary" onclick="fsRenderDoctor()">🩺 Launch Doctor</button>
+      <button class="btn btn-secondary" onclick="fsRunTriggerDry()">⚡ Trigger Test</button>
       <button class="btn btn-secondary" onclick="fsViewLogs()">📜 View Logs</button>
       <button class="btn btn-secondary" onclick="fsExportJSON()">⬇ Export JSON</button>
       <button class="btn btn-secondary" onclick="document.getElementById('fs-import-file').click()">⬆ Import JSON</button>
@@ -4458,6 +4459,28 @@ curl -X POST http://localhost:3001/mcp/send \
   <!-- Dashboard stats -->
   <div class="grid" id="fs-stats" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:10px"></div>
   <div class="card" id="fs-doctor" style="display:none;margin-bottom:10px"></div>
+
+  <!-- External trigger tester -->
+  <div class="card" id="fs-trigger-card" style="margin-bottom:10px">
+    <div class="flex-between" style="gap:8px;flex-wrap:wrap">
+      <div>
+        <div class="card-title" style="margin:0">External Trigger Tester</div>
+        <div style="font-size:12px;opacity:.7">Dry-run active flows from n8n, WhatsApp, scraper, ecommerce, social or webhook events.</div>
+      </div>
+      <button class="btn btn-primary" onclick="fsRunTriggerDry()">Dry-run matching flows</button>
+    </div>
+    <div class="grid g2" style="gap:8px;margin-top:8px">
+      <div class="form-group" style="margin:0">
+        <label>Trigger type</label>
+        <input id="fs-trigger-type" value="whatsapp_message" placeholder="whatsapp_message / new_order / website_change"/>
+      </div>
+      <div class="form-group" style="margin:0">
+        <label>Sample payload JSON</label>
+        <textarea id="fs-trigger-payload" rows="3" style="font-family:monospace;font-size:11px">{"sample":true,"message":"test event"}</textarea>
+      </div>
+    </div>
+    <div id="fs-trigger-result" style="font-size:12px;margin-top:8px;opacity:.85"></div>
+  </div>
 
   <!-- Approval inbox -->
   <div class="card" id="fs-approvals-card" style="margin-bottom:10px">
@@ -17402,6 +17425,39 @@ async function fsRunTest() {
     fsRenderRunLogs(res.run);
     toast('Dry run complete: ' + (res.run ? res.run.status : 'done'), res.success ? 'success' : 'error');
   } catch (e) { toast('Run test failed: ' + e.message, 'error'); }
+}
+
+async function fsRunTriggerDry() {
+  const typeEl = document.getElementById('fs-trigger-type');
+  const payloadEl = document.getElementById('fs-trigger-payload');
+  const resultEl = document.getElementById('fs-trigger-result');
+  const triggerType = (typeEl?.value || '').trim();
+  if (!triggerType) { toast('Trigger type required', 'error'); return; }
+  let input = {};
+  try {
+    input = JSON.parse(payloadEl?.value || '{}');
+  } catch (e) {
+    toast('Sample payload must be valid JSON', 'error');
+    return;
+  }
+  try {
+    const res = await api('/api/flow-studio/trigger/' + encodeURIComponent(triggerType), {
+      method: 'POST',
+      body: JSON.stringify({ input, source: 'dashboard-trigger-test' })
+    });
+    const rows = (res.results || []).map(row => {
+      const color = row.success ? '#16a34a' : '#ef4444';
+      return `<div style="padding:3px 0;border-top:1px solid rgba(255,255,255,.06)"><b>${escHtml(row.flowName || row.flowId || 'flow')}</b> — <span style="color:${color}">${escHtml(row.status || '')}</span> <span style="opacity:.65">(${escHtml(row.mode || 'dry-run')})</span>${row.error ? `<div style="color:#ef4444">${escHtml(row.error)}</div>` : ''}</div>`;
+    }).join('');
+    if (resultEl) {
+      resultEl.innerHTML = `<b>${escHtml(res.message || 'Trigger test complete.')}</b><div style="opacity:.7">Trigger: ${escHtml(res.triggerType || triggerType)} · Matched: ${escHtml(String(res.matched || 0))}</div>${rows || '<div style="opacity:.6;margin-top:4px">No active matching flows. Activate a flow with this trigger first.</div>'}`;
+    }
+    if (res.results && res.results[0] && typeof fsViewLogs === 'function') fsViewLogs();
+    toast('Trigger dry-run complete: ' + (res.matched || 0) + ' matched', res.success ? 'success' : 'error');
+  } catch (e) {
+    if (resultEl) resultEl.innerHTML = `<span style="color:#ef4444">Trigger failed: ${escHtml(e.message)}</span>`;
+    toast('Trigger failed: ' + e.message, 'error');
+  }
 }
 
 async function fsToggleActivate() {

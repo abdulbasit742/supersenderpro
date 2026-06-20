@@ -48620,6 +48620,96 @@ function buildFlowStudioDoctor() {
   };
 }
 
+function normalizeFlowStudioTriggerType(value = '') {
+  const raw = String(value || '').trim().toLowerCase();
+  if (!raw) return '';
+  if (raw.startsWith('trigger.')) return raw.replace(/\s+/g, '_');
+  return `trigger.${raw.replace(/^trigger[\s._-]*/i, '').replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '')}`;
+}
+
+function flowMatchesTriggerType(flow, triggerType) {
+  if (!flow || flow.status !== 'active') return false;
+  const wanted = normalizeFlowStudioTriggerType(triggerType);
+  if (!wanted || wanted === 'trigger.') return false;
+  if (normalizeFlowStudioTriggerType(flow.triggerType) === wanted) return true;
+  return (flow.nodes || []).some(node => normalizeFlowStudioTriggerType(node.type) === wanted);
+}
+
+function getFlowStudioTriggerSecret() {
+  return String(process.env.FLOW_STUDIO_TRIGGER_SECRET || settings.flow_studio_trigger_secret || '').trim();
+}
+
+function flowStudioTriggerLiveAllowed(req) {
+  const expected = getFlowStudioTriggerSecret();
+  if (!expected) return false;
+  const provided = String(
+    req.headers['x-flow-studio-secret'] ||
+    req.headers['x-webhook-secret'] ||
+    req.body?.secret ||
+    req.query?.secret ||
+    ''
+  ).trim();
+  return provided && provided === expected;
+}
+
+function flowStudioExternalInput(req) {
+  const body = req.body && typeof req.body === 'object' ? req.body : {};
+  const input = body.input && typeof body.input === 'object'
+    ? body.input
+    : (body.payload && typeof body.payload === 'object' ? body.payload : body);
+  const safeInput = { ...input };
+  delete safeInput.secret;
+  delete safeInput.live;
+  return safeInput;
+}
+
+async function triggerFlowStudioFlows(triggerType, input = {}, options = {}) {
+  const normalizedTriggerType = normalizeFlowStudioTriggerType(triggerType);
+  const live = options.live === true;
+  const flows = loadFlowStudioFlows().filter(flow => flowMatchesTriggerType(flow, normalizedTriggerType));
+  const results = [];
+  for (const flow of flows) {
+    try {
+      const result = await runFlow(flow.id, {
+        ...(input && typeof input === 'object' ? input : { value: input }),
+        triggerType: normalizedTriggerType,
+        triggerSource: options.source || 'api',
+        receivedAt: new Date().toISOString()
+      }, { live });
+      results.push({
+        success: result.success !== false,
+        flowId: flow.id,
+        flowName: flow.name,
+        status: result.run?.status || 'completed',
+        mode: result.run?.mode || (live ? 'live' : 'dry-run'),
+        runId: result.run?.id || null,
+        error: result.error || result.run?.error || null
+      });
+    } catch (error) {
+      results.push({
+        success: false,
+        flowId: flow.id,
+        flowName: flow.name,
+        status: 'failed',
+        mode: live ? 'live' : 'dry-run',
+        runId: null,
+        error: error.message
+      });
+    }
+  }
+  return {
+    success: results.every(row => row.success),
+    triggerType: normalizedTriggerType,
+    live,
+    dryRun: !live,
+    matched: flows.length,
+    results,
+    message: flows.length
+      ? `${flows.length} active flow(s) matched ${normalizedTriggerType}.`
+      : `No active flows matched ${normalizedTriggerType}.`
+  };
+}
+
 // ---- Routes ------------------------------------------------------
 app.get('/api/flow-studio/status', (_req, res) => {
   try { res.json(flowStudioJson(buildFlowStudioStatus())); }
@@ -48721,6 +48811,34 @@ app.post('/api/flow-studio/flows/:id/run', async (req, res) => {
     res.json(flowStudioJson(result));
   } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
+
+async function handleFlowStudioExternalTrigger(req, res) {
+  try {
+    const triggerType = normalizeFlowStudioTriggerType(req.params.triggerType || req.body?.triggerType || '');
+    if (!triggerType || triggerType === 'trigger.') {
+      return res.status(400).json({ success: false, error: 'triggerType is required.' });
+    }
+    const requestedLive = req.body?.live === true || String(req.query.live || '').toLowerCase() === 'true';
+    const live = requestedLive && flowStudioTriggerLiveAllowed(req);
+    if (requestedLive && !live) {
+      return res.status(403).json({
+        success: false,
+        error: 'Live external trigger requires FLOW_STUDIO_TRIGGER_SECRET and matching x-flow-studio-secret header.'
+      });
+    }
+    const result = await triggerFlowStudioFlows(triggerType, flowStudioExternalInput(req), {
+      live,
+      source: req.body?.source || req.query.source || 'api'
+    });
+    res.json(flowStudioJson(result));
+  } catch (error) {
+    console.error('[FlowStudio trigger] failed:', error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+app.post('/api/flow-studio/trigger', handleFlowStudioExternalTrigger);
+app.post('/api/flow-studio/trigger/:triggerType', handleFlowStudioExternalTrigger);
 
 app.get('/api/flow-studio/runs', (req, res) => {
   try {
