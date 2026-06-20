@@ -1,0 +1,78 @@
+{
+  "generatedAt": "2026-06-20T08:34:08.739Z",
+  "passed": 14,
+  "failed": 0,
+  "total": 14,
+  "checks": [
+    {
+      "name": "route module present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "server hook present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dashboard page present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dashboard js present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dashboard css present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "env placeholders present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc OWNER_BRIEFING.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc OWNER_DAILY_ROUTINE.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "kpis built",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "briefing built",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dry-run default",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "delivery packet is dry-run",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "history recorded",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no secret leak in briefing",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}

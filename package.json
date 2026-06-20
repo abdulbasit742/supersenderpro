@@ -37,6 +37,8 @@
     "voice-ai:check": "node scripts/voice-ai-check.js",
     "unified-setup:check": "node scripts/unified-setup-check.js",
     "unified-setup:smoke": "node tests/smoke/unifiedSetupSmoke.js",
+    "owner-briefing:check": "node scripts/owner-briefing-check.js",
+    "owner-briefing:smoke": "node tests/smoke/ownerBriefingSmoke.js",
     "voice-ai:smoke": "node tests/smoke/voiceAISmoke.js",
     "marketplace:intelligence:check": "node scripts/marketplace-intelligence-check.js",
     "agent:serve": "node agent-runtime/server.js",

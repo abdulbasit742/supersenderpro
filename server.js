@@ -3112,6 +3112,18 @@ try {
   console.error('[UnifiedSetup] failed to initialise (non-fatal):', e.message);
 }
 // END UNIFIED SETUP WIZARD HOOK
+
+// BEGIN OWNER BRIEFING HOOK
+// Owner daily briefing autopilot (read-only aggregation, dry-run delivery). No external calls.
+try {
+  const ownerBriefingRoutes = require('./routes/ownerBriefingRoutes');
+  app.use('/api/owner-briefing', ownerBriefingRoutes);
+  app.get('/owner-briefing', (req, res) => res.sendFile(path.join(__dirname, 'public', 'owner-briefing.html')));
+  console.log('[OwnerBriefing] mounted at /api/owner-briefing (dry-run default)');
+} catch (e) {
+  console.error('[OwnerBriefing] failed to initialise (non-fatal):', e.message);
+}
+// END OWNER BRIEFING HOOK
 // END MARKETPLACE INTELLIGENCE HOOK
 
 

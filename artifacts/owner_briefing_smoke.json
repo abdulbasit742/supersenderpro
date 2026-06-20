@@ -1,0 +1,63 @@
+{
+  "generatedAt": "2026-06-20T08:34:09.043Z",
+  "passed": 11,
+  "failed": 0,
+  "total": 11,
+  "results": [
+    {
+      "name": "require route module",
+      "pass": true,
+      "detail": "loaded"
+    },
+    {
+      "name": "require barrel",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "data sources never throw",
+      "pass": true,
+      "detail": "7 kpis"
+    },
+    {
+      "name": "build morning briefing",
+      "pass": true,
+      "detail": "2 alerts"
+    },
+    {
+      "name": "build evening summary",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "dry-run true by default",
+      "pass": true,
+      "detail": "dry-run"
+    },
+    {
+      "name": "delivery packet never sends",
+      "pass": true,
+      "detail": "dry_run_manual"
+    },
+    {
+      "name": "alerts evaluate",
+      "pass": true,
+      "detail": "2 alerts"
+    },
+    {
+      "name": "actions derived from alerts",
+      "pass": true,
+      "detail": "2 actions"
+    },
+    {
+      "name": "history records",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "no secrets leak in output",
+      "pass": true,
+      "detail": "clean"
+    }
+  ]
+}

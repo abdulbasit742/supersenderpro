@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Owner Briefing — SuperSender Pro</title>
+  <link rel="stylesheet" href="/css/owner-briefing.css" />
+</head>
+<body>
+  <header class="ob-header">
+    <div class="ob-brand">
+      <span class="ob-logo">📋</span>
+      <div><h1>Owner Daily Briefing</h1><p class="ob-sub">KPIs · alerts · action items · dry-run delivery</p></div>
+    </div>
+    <div id="ob-pill" class="ob-pill">Loading…</div>
+  </header>
+  <main class="ob-main">
+    <section class="ob-section">
+      <div class="ob-tabs">
+        <button class="ob-tab active" id="tab-morning" onclick="OwnerBriefing.generate('morning')">☀️ Morning briefing</button>
+        <button class="ob-tab" id="tab-evening" onclick="OwnerBriefing.generate('evening')">🌙 Evening summary</button>
+      </div>
+    </section>
+    <section class="ob-section">
+      <h2>KPIs</h2>
+      <div class="ob-cards" id="ob-kpis"></div>
+    </section>
+    <div class="ob-grid-2">
+      <section class="ob-section ob-card">
+        <h2>Alerts</h2>
+        <div id="ob-alerts"></div>
+      </section>
+      <section class="ob-section ob-card">
+        <h2>Action Items</h2>
+        <div id="ob-actions"></div>
+      </section>
+    </div>
+    <section class="ob-section ob-card">
+      <h2>Briefing Text <span class="ob-badge">Dry-run</span></h2>
+      <pre class="ob-out" id="ob-text"></pre>
+      <button class="ob-btn" onclick="OwnerBriefing.deliver()">Build Delivery Packet (dry-run)</button>
+      <button class="ob-btn ob-btn-ghost" onclick="OwnerBriefing.copy()">Copy Briefing</button>
+      <pre class="ob-out" id="ob-packet"></pre>
+    </section>
+    <section class="ob-section ob-card">
+      <h2>Schedule &amp; History</h2>
+      <div id="ob-schedule" class="ob-meta"></div>
+      <div id="ob-history" class="ob-history"></div>
+    </section>
+    <footer class="ob-footer">
+      <strong>Read-only &amp; safe:</strong> This briefing only reads existing data and never sends
+      anything by default. Delivery produces a dry-run packet for your approval; no external API is called.
+    </footer>
+  </main>
+  <script src="/js/owner-briefing.js"></script>
+</body>
+</html>
