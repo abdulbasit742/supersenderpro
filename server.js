@@ -3059,34 +3059,18 @@ try {
 }
 // END FEATURE FLAGS HOOK
 
-
-// BEGIN SECURITY GATEWAY HOOK
-// Security Gateway + Rate Limit + Abuse Protection Command Center (coordination layer).
-// Dry-run / report-only by default. No live blocking unless SECURITY_GATEWAY_ENFORCE=true. No external calls. Non-fatal if it fails.
+// BEGIN TEAM ACCESS HOOK
+// Team Seats + Role Permissions + Tenant Workspace Access (dry-run, no-auth-write, no-live-invite by default).
 try {
-  const securityGatewayRoutes = require('./routes/securityGatewayRoutes');
-  app.use('/api/security-gateway', securityGatewayRoutes);
-  app.get('/security-gateway.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'security-gateway.html')));
-  app.get('/security-gateway', (req, res) => res.sendFile(path.join(__dirname, 'public', 'security-gateway.html')));
-  console.log('[SecurityGateway] mounted at /api/security-gateway (dry-run / report-only default)');
+  const teamAccessRoutes = require('./routes/teamAccessRoutes');
+  app.use('/api/team-access', teamAccessRoutes);
+  app.get('/team-access.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'team-access.html')));
+  console.log('[TeamAccess] mounted at /api/team-access (dry-run, no-auth-write, no-live-invite)');
 } catch (e) {
-  console.error('[SecurityGateway] failed to initialise (non-fatal):', e.message);
+  console.error('[TeamAccess] failed to initialise (non-fatal):', e.message);
 }
-// END SECURITY GATEWAY HOOK
+// END TEAM ACCESS HOOK
 
-// BEGIN TENANT ISOLATION HOOK
-// Multi-Tenant Data Isolation + Workspace Boundary + Leak Detection Command Center (coordination layer).
-// Dry-run / report-only by default. No raw private data, no external calls. Non-fatal if it fails.
-try {
-  const tenantIsolationRoutes = require('./routes/tenantIsolationRoutes');
-  app.use('/api/tenant-isolation', tenantIsolationRoutes);
-  app.get('/tenant-isolation.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'tenant-isolation.html')));
-  app.get('/tenant-isolation', (req, res) => res.sendFile(path.join(__dirname, 'public', 'tenant-isolation.html')));
-  console.log('[TenantIsolation] mounted at /api/tenant-isolation (dry-run / report-only default)');
-} catch (e) {
-  console.error('[TenantIsolation] failed to initialise (non-fatal):', e.message);
-}
-// END TENANT ISOLATION HOOK
 
 let searchIndexRebuildTimer = null;
 function scheduleSearchIndexRebuild(reason = 'data-change', delayMs = Number(process.env.SEARCH_REBUILD_DEBOUNCE_MS || 30000)) {
