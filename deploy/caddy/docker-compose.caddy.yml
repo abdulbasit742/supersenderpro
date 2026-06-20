@@ -1,0 +1,29 @@
+# Drop-in replacement for the nginx service that auto-provisions TLS certs.
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml \
+#       -f deploy/caddy/docker-compose.caddy.yml up -d
+services:
+  nginx:
+    profiles: ["disabled"]   # disable the self-signed nginx service
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: caddy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      ACME_EMAIL: ${ACME_EMAIL:?set ACME_EMAIL}
+      APP_DOMAIN: ${APP_DOMAIN:?set APP_DOMAIN}
+      N8N_DOMAIN: ${N8N_DOMAIN:-n8n.localhost}
+    volumes:
+      - ./deploy/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - backend
+      - frontend
+
+volumes:
+  caddy_data:
+  caddy_config:

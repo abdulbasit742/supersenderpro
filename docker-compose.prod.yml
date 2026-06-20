@@ -1,0 +1,85 @@
+# ============================================================
+# Production override -> merged on top of docker-compose.yml
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+# Adds: healthchecks, resource limits, log rotation, hardening.
+# ============================================================
+services:
+  backend:
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3001/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.5"
+          memory: 1024M
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "5" }
+    security_opt: ["no-new-privileges:true"]
+
+  frontend:
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits: { cpus: "1.0", memory: 512M }
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "5" }
+    security_opt: ["no-new-privileges:true"]
+
+  db:
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d ai_tools_db"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    deploy:
+      resources:
+        limits: { cpus: "1.0", memory: 1024M }
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "5" }
+
+  redis:
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - redis_data:/data
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "5" }
+
+  n8n:
+    deploy:
+      resources:
+        limits: { cpus: "1.0", memory: 768M }
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "5" }
+
+  nginx:
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "5" }
+
+volumes:
+  redis_data:

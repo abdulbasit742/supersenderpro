@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Lint, env & smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci --omit=optional || npm install
+      - name: Validate environment schema
+        run: npm run validate:env --if-present
+        env:
+          CI: true
+      - name: Secret scan (repo source)
+        run: npm run secret:scan --if-present
+      - name: Smoke test
+        run: npm run smoke --if-present
+
+  docker-build:
+    name: Build Docker images (no push)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: monolith, context: ., dockerfile: Dockerfile }
+          - { name: backend,  context: ./backend, dockerfile: ./backend/Dockerfile }
+          - { name: frontend, context: ./frontend, dockerfile: ./frontend/Dockerfile }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build ${{ matrix.name }}
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
+          push: false
+          load: false
+          cache-from: type=gha,scope=${{ matrix.name }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.name }}

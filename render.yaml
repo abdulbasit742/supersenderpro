@@ -1,0 +1,35 @@
+# Render.com blueprint. Push this repo to Render and it provisions everything.
+services:
+  - type: web
+    name: supersender-monolith
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: standard
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3001"
+      - fromGroup: supersender-secrets
+
+  - type: redis
+    name: supersender-redis
+    plan: starter
+    maxmemoryPolicy: allkeys-lru
+    ipAllowList: []
+
+databases:
+  - name: supersender-db
+    plan: basic-256mb
+    databaseName: ai_tools_db
+    user: admin
+
+envVarGroups:
+  - name: supersender-secrets
+    envVars:
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: AI_ENABLED
+        value: "true"

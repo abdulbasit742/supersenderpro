@@ -1,0 +1,21 @@
+# Automatic HTTPS via Let's Encrypt. Replace the domains + email below.
+{
+  email {$ACME_EMAIL}
+}
+
+{$APP_DOMAIN} {
+  encode gzip zstd
+  @health path /healthz
+  respond @health "ok" 200
+  reverse_proxy frontend:3000
+  handle_path /api/* {
+    reverse_proxy backend:3001
+  }
+  handle_path /socket.io/* {
+    reverse_proxy backend:3001
+  }
+}
+
+{$N8N_DOMAIN} {
+  reverse_proxy n8n:5678
+}

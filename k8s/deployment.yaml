@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: supersender
+  namespace: supersender
+  labels: { app: supersender }
+spec:
+  replicas: 1            # WhatsApp session is stateful -> keep at 1 unless sharded
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: { maxSurge: 1, maxUnavailable: 0 }
+  selector:
+    matchLabels: { app: supersender }
+  template:
+    metadata:
+      labels: { app: supersender }
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+      containers:
+        - name: app
+          image: ghcr.io/abdulbasit742/supersenderpro/monolith:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3001
+          envFrom:
+            - configMapRef: { name: supersender-config }
+            - secretRef: { name: supersender-secrets }
+          resources:
+            requests: { cpu: "500m", memory: "512Mi" }
+            limits:   { cpu: "1500m", memory: "1536Mi" }
+          livenessProbe:
+            httpGet: { path: /api/health, port: 3001 }
+            initialDelaySeconds: 45
+            periodSeconds: 30
+            failureThreshold: 3
+          readinessProbe:
+            httpGet: { path: /api/health, port: 3001 }
+            initialDelaySeconds: 20
+            periodSeconds: 15
+          volumeMounts:
+            - { name: data, mountPath: /app/data }
+            - { name: wa-auth, mountPath: /app/.wa-auth }
+            - { name: uploads, mountPath: /app/uploads }
+      volumes:
+        - name: data
+          persistentVolumeClaim: { claimName: supersender-data }
+        - name: wa-auth
+          persistentVolumeClaim: { claimName: supersender-wa-auth }
+        - name: uploads
+          persistentVolumeClaim: { claimName: supersender-uploads }
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: { name: supersender-data, namespace: supersender }
+spec:
+  accessModes: [ReadWriteOnce]
+  resources: { requests: { storage: 2Gi } }
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: { name: supersender-wa-auth, namespace: supersender }
+spec:
+  accessModes: [ReadWriteOnce]
+  resources: { requests: { storage: 1Gi } }
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: { name: supersender-uploads, namespace: supersender }
+spec:
+  accessModes: [ReadWriteOnce]
+  resources: { requests: { storage: 2Gi } }

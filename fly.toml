@@ -1,0 +1,32 @@
+# Fly.io app config for the monolith.  Deploy: fly launch --no-deploy && fly deploy
+app = "supersender-pro"
+primary_region = "sin"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  NODE_ENV = "production"
+  PORT = "3001"
+
+[http_service]
+  internal_port = 3001
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [[http_service.checks]]
+    grace_period = "40s"
+    interval = "30s"
+    method = "GET"
+    timeout = "5s"
+    path = "/api/health"
+
+[[vm]]
+  size = "shared-cpu-2x"
+  memory = "2gb"
+
+[mounts]
+  source = "supersender_data"
+  destination = "/app/data"
