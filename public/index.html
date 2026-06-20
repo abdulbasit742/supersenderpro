@@ -2316,6 +2316,57 @@ function searchNav(q) {
       </div>
     </div>
   </div>
+  <div class="card" style="margin-top:12px">
+    <div class="flex-between" style="gap:10px;flex-wrap:wrap;margin-bottom:10px">
+      <div>
+        <div class="card-title" style="margin:0 0 4px">Universal Ecommerce Platform Hub</div>
+        <div style="font-size:12px;color:var(--muted)">Connect Shopify, WooCommerce, Magento, BigCommerce, Ecwid, Daraz, Dukaan, Amazon, eBay, Etsy, Odoo, Zoho, custom websites and JSON feeds.</div>
+      </div>
+      <div class="flex" style="gap:8px;flex-wrap:wrap">
+        <button class="btn btn-secondary btn-sm" onclick="window.open('/ecommerce-hub','_blank')">Open Full Hub</button>
+        <button class="btn btn-secondary btn-sm" onclick="copyEcommerceWebhook()">Copy Webhook</button>
+        <button class="btn btn-primary btn-sm" onclick="syncAllEcommerce()">Sync All</button>
+      </div>
+    </div>
+    <div id="commerce-platform-stats" class="grid g4" style="gap:10px;margin-bottom:12px"></div>
+    <div class="grid g4" style="gap:10px;align-items:end">
+      <div class="form-group"><label>Platform</label><select id="ecommerce-platform-select" onchange="updateEcommerceWebhookPreview()"></select></div>
+      <div class="form-group"><label>Connection Name</label><input id="ecommerce-connection-name" placeholder="Main Shopify Store"/></div>
+      <div class="form-group"><label>Store URL</label><input id="ecommerce-store-url" placeholder="https://store.example.com"/></div>
+      <div class="form-group"><label>Default Category</label><input id="ecommerce-default-category" value="ecommerce"/></div>
+    </div>
+    <div class="grid g4" style="gap:10px">
+      <div class="form-group"><label>Products Feed URL</label><input id="ecommerce-feed-url" placeholder="https://site.com/products.json"/></div>
+      <div class="form-group"><label>Orders Feed URL</label><input id="ecommerce-orders-feed-url" placeholder="https://site.com/orders.json"/></div>
+      <div class="form-group"><label>Access / API Token</label><input id="ecommerce-access-token" placeholder="Optional token"/></div>
+      <div class="form-group"><label>Store Hash / Store ID</label><input id="ecommerce-store-hash" placeholder="BigCommerce hash / Ecwid ID"/></div>
+    </div>
+    <div class="grid g4" style="gap:10px;align-items:end">
+      <div class="form-group"><label>Consumer Key</label><input id="ecommerce-consumer-key" placeholder="WooCommerce key"/></div>
+      <div class="form-group"><label>Consumer Secret</label><input id="ecommerce-consumer-secret" placeholder="WooCommerce secret"/></div>
+      <label class="toggle"><input type="checkbox" id="ecommerce-auto-products" checked/><div class="toggle-track"><div class="toggle-thumb"></div></div><span>Auto Products</span></label>
+      <label class="toggle"><input type="checkbox" id="ecommerce-auto-orders"/><div class="toggle-track"><div class="toggle-thumb"></div></div><span>Auto Orders</span></label>
+    </div>
+    <div class="flex" style="gap:8px;flex-wrap:wrap;margin-top:8px">
+      <button class="btn btn-primary btn-sm" onclick="saveEcommerceConnectionFromUI()">Save Connection</button>
+      <button class="btn btn-secondary btn-sm" onclick="testSelectedEcommerceConnection()">Test Selected</button>
+      <span id="ecommerce-webhook-preview" style="font-size:12px;color:var(--muted);align-self:center"></span>
+    </div>
+    <div class="grid g2" style="gap:12px;margin-top:12px;align-items:start">
+      <div style="overflow:auto;max-height:360px">
+        <table class="tbl">
+          <thead><tr><th>Platform</th><th>Status</th><th>Webhook</th><th>Actions</th></tr></thead>
+          <tbody id="ecommerce-connections-tbody"></tbody>
+        </table>
+      </div>
+      <div style="overflow:auto;max-height:360px">
+        <table class="tbl">
+          <thead><tr><th>Platform</th><th>Products</th><th>Orders</th><th>Bridge</th></tr></thead>
+          <tbody id="ecommerce-feature-matrix"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
   <div class="grid g3" style="gap:12px;align-items:start;margin-top:12px">
     <div class="card">
       <div class="card-title">Smart Checkout Link</div>
@@ -7340,6 +7391,10 @@ async function sendDailySalesReportNow() {
 // Commerce integrations
 let commerceSettingsCache = {};
 let commerceEventsCache = [];
+let ecommerceStatusCache = {};
+let ecommercePlatformsCache = [];
+let ecommerceConnectionsCache = [];
+let ecommerceFeaturesCache = [];
 
 function normalizePhoneDigits(value = '') {
   return String(value || '').replace(/\D/g, '');
@@ -7394,14 +7449,204 @@ function renderCommerceEvents(events = []) {
   }).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:22px">No commerce events yet</td></tr>';
 }
 
+function renderEcommercePlatformSelect(platforms = []) {
+  const select = document.getElementById('ecommerce-platform-select');
+  if (!select) return;
+  const current = select.value || 'shopify';
+  select.innerHTML = (platforms || []).map(item => `<option value="${escHtml(item.slug || '')}">${escHtml(item.label || item.slug || '')}</option>`).join('');
+  select.value = platforms.some(item => item.slug === current) ? current : (platforms[0]?.slug || 'custom');
+  updateEcommerceWebhookPreview();
+}
+
+function ecommercePlatformLabel(slug = '') {
+  const platform = ecommercePlatformsCache.find(item => item.slug === slug);
+  return platform?.label || slug || 'Custom';
+}
+
+function renderEcommercePlatformStats(summary = {}) {
+  const el = document.getElementById('commerce-platform-stats');
+  if (!el) return;
+  const connections = summary.connections || [];
+  const configured = connections.filter(row => row.configured || row.hasSecret).length;
+  const products = Number(summary.importedProducts || 0);
+  const ordersCount = Number(summary.commerceOrders || 0);
+  const platforms = (summary.platforms || ecommercePlatformsCache || []).length;
+  el.innerHTML = `
+    <div class="stat-card"><div class="stat-val">${platforms}</div><div class="stat-label">Platforms Ready</div></div>
+    <div class="stat-card"><div class="stat-val">${connections.length}</div><div class="stat-label">Connections</div></div>
+    <div class="stat-card"><div class="stat-val">${configured}</div><div class="stat-label">Configured</div></div>
+    <div class="stat-card"><div class="stat-val">${products}</div><div class="stat-label">Imported Products</div></div>
+    <div class="stat-card"><div class="stat-val">${ordersCount}</div><div class="stat-label">Commerce Orders</div></div>
+  `;
+}
+
+function renderEcommerceConnections(connections = []) {
+  const tbody = document.getElementById('ecommerce-connections-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = (connections || []).map(row => {
+    const id = escHtml(row.id || '');
+    const webhook = row.webhookUrl || `/api/ecommerce/webhook/${row.platform || 'custom'}/${row.id || ''}`.replace(/\/+$/g, '');
+    const status = row.enabled === false ? 'Paused' : (row.configured || row.hasSecret ? 'Ready' : 'Needs setup');
+    const tag = row.enabled === false ? 'tag-yellow' : ((row.configured || row.hasSecret) ? 'tag-green' : 'tag-red');
+    return `<tr>
+      <td><strong>${escHtml(row.name || ecommercePlatformLabel(row.platform))}</strong><div style="font-size:11px;color:var(--muted)">${escHtml(ecommercePlatformLabel(row.platform))}</div></td>
+      <td><span class="tag ${tag}">${escHtml(status)}</span><div style="font-size:11px;color:var(--muted)">${row.tokenMasked ? 'Token: ' + escHtml(row.tokenMasked) : 'Feed/webhook bridge'}</div></td>
+      <td><code style="font-size:11px">${escHtml(webhook)}</code></td>
+      <td>
+        <div class="flex" style="gap:6px;flex-wrap:wrap">
+          <button class="btn btn-secondary btn-sm" onclick="testEcommerceConnection('${id}')">Test</button>
+          <button class="btn btn-secondary btn-sm" onclick="syncEcommerceConnectionProducts('${id}')">Products</button>
+          <button class="btn btn-secondary btn-sm" onclick="syncEcommerceConnectionOrders('${id}')">Orders</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteEcommerceConnection('${id}')">Delete</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:22px">No ecommerce connections yet. Add one above or use a webhook/feed bridge.</td></tr>';
+}
+
+function renderEcommerceFeatureMatrix(features = []) {
+  const tbody = document.getElementById('ecommerce-feature-matrix');
+  if (!tbody) return;
+  tbody.innerHTML = (features || []).slice(0, 30).map(row => `
+    <tr>
+      <td><strong>${escHtml(row.label || row.platform || row.slug || '')}</strong><div style="font-size:11px;color:var(--muted)">${escHtml(row.auth || row.notes || '')}</div></td>
+      <td>${row.directProductSync || row.productSync ? '<span class="tag tag-green">Yes</span>' : '<span class="tag tag-yellow">Bridge</span>'}</td>
+      <td>${row.directOrderSync || row.orderSync ? '<span class="tag tag-green">Yes</span>' : '<span class="tag tag-yellow">Bridge</span>'}</td>
+      <td>${row.feedBridge || row.webhook ? '<span class="tag tag-blue">Webhook/feed</span>' : '<span class="tag tag-green">Native</span>'}</td>
+    </tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:22px">Feature matrix unavailable</td></tr>';
+}
+
+function updateEcommerceWebhookPreview() {
+  const platform = document.getElementById('ecommerce-platform-select')?.value || 'custom';
+  const base = window.location.origin.replace(/\/$/, '');
+  const text = `${base}/api/ecommerce/webhook/${platform}`;
+  const el = document.getElementById('ecommerce-webhook-preview');
+  if (el) el.textContent = `Webhook: ${text}`;
+  return text;
+}
+
+async function copyEcommerceWebhook() {
+  const text = updateEcommerceWebhookPreview();
+  try {
+    await navigator.clipboard.writeText(text);
+    toast('Ecommerce webhook copied', 'success');
+  } catch (e) {
+    toast(text, 'info');
+  }
+}
+
+function ecommerceConnectionPayloadFromUI() {
+  const platform = document.getElementById('ecommerce-platform-select')?.value || 'custom';
+  const storeHash = document.getElementById('ecommerce-store-hash')?.value?.trim() || '';
+  return {
+    platform,
+    name: document.getElementById('ecommerce-connection-name')?.value?.trim() || ecommercePlatformLabel(platform),
+    storeUrl: document.getElementById('ecommerce-store-url')?.value?.trim() || '',
+    feedUrl: document.getElementById('ecommerce-feed-url')?.value?.trim() || '',
+    ordersFeedUrl: document.getElementById('ecommerce-orders-feed-url')?.value?.trim() || '',
+    defaultCategory: document.getElementById('ecommerce-default-category')?.value?.trim() || 'ecommerce',
+    autoSyncProducts: document.getElementById('ecommerce-auto-products')?.checked === true,
+    autoSyncOrders: document.getElementById('ecommerce-auto-orders')?.checked === true,
+    credentials: {
+      accessToken: document.getElementById('ecommerce-access-token')?.value || '',
+      consumerKey: document.getElementById('ecommerce-consumer-key')?.value || '',
+      consumerSecret: document.getElementById('ecommerce-consumer-secret')?.value || '',
+      storeHash: platform === 'bigcommerce' ? storeHash : '',
+      storeId: platform === 'ecwid' ? storeHash : '',
+      feedUrl: document.getElementById('ecommerce-feed-url')?.value?.trim() || '',
+      ordersFeedUrl: document.getElementById('ecommerce-orders-feed-url')?.value?.trim() || ''
+    }
+  };
+}
+
+async function saveEcommerceConnectionFromUI() {
+  try {
+    const payload = ecommerceConnectionPayloadFromUI();
+    if (!payload.storeUrl && !payload.feedUrl && !payload.ordersFeedUrl && !payload.credentials.accessToken && !payload.credentials.consumerKey) {
+      return toast('Add store URL, feed URL, or API credentials first', 'error');
+    }
+    await api('/api/ecommerce/connections', { method: 'POST', body: JSON.stringify(payload) });
+    toast('Ecommerce connection saved', 'success');
+    await loadCommerce();
+  } catch (e) {
+    toast(e.message || 'Connection save failed', 'error');
+  }
+}
+
+async function testEcommerceConnection(id) {
+  try {
+    const res = await api('/api/ecommerce/connections/' + encodeURIComponent(id) + '/test', { method: 'POST', body: JSON.stringify({}) });
+    toast(`Detected ${res.productsDetected || 0} products and ${res.ordersDetected || 0} orders`, 'success');
+    await loadCommerce();
+  } catch (e) {
+    toast(e.message || 'Connection test failed', 'error');
+  }
+}
+
+async function testSelectedEcommerceConnection() {
+  const latest = ecommerceConnectionsCache[0];
+  if (!latest) return toast('Save a connection first, then test it', 'error');
+  await testEcommerceConnection(latest.id);
+}
+
+async function syncEcommerceConnectionProducts(id) {
+  try {
+    const res = await api('/api/ecommerce/connections/' + encodeURIComponent(id) + '/sync-products', { method: 'POST', body: JSON.stringify({}) });
+    toast(`Products synced: ${res.imported || 0} fetched, ${res.added || 0} added, ${res.updated || 0} updated`, 'success');
+    await loadProducts?.();
+    await loadCommerce();
+  } catch (e) {
+    toast(e.message || 'Product sync failed', 'error');
+  }
+}
+
+async function syncEcommerceConnectionOrders(id) {
+  try {
+    const res = await api('/api/ecommerce/connections/' + encodeURIComponent(id) + '/sync-orders', { method: 'POST', body: JSON.stringify({}) });
+    toast(`Orders synced: ${res.processed || 0}`, 'success');
+    await loadOrders?.();
+    await loadCommerce();
+  } catch (e) {
+    toast(e.message || 'Order sync failed', 'error');
+  }
+}
+
+async function deleteEcommerceConnection(id) {
+  if (!confirm('Delete this ecommerce connection?')) return;
+  try {
+    await api('/api/ecommerce/connections/' + encodeURIComponent(id), { method: 'DELETE' });
+    toast('Ecommerce connection deleted', 'success');
+    await loadCommerce();
+  } catch (e) {
+    toast(e.message || 'Delete failed', 'error');
+  }
+}
+
+async function syncAllEcommerce() {
+  try {
+    const res = await api('/api/ecommerce/sync-all', { method: 'POST', body: JSON.stringify({ products: true, orders: true }) });
+    toast(`Sync all finished: ${(res.results || []).length} connections checked`, 'success');
+    await loadProducts?.();
+    await loadOrders?.();
+    await loadCommerce();
+  } catch (e) {
+    toast(e.message || 'Sync all failed', 'error');
+  }
+}
+
 async function loadCommerce() {
   try {
-    const [settingsRes, eventsRes] = await Promise.all([
+    const [settingsRes, eventsRes, ecommerceRes] = await Promise.all([
       api('/api/commerce/settings'),
-      api('/api/commerce/events?limit=100')
+      api('/api/commerce/events?limit=100'),
+      api('/api/ecommerce/status')
     ]);
     commerceSettingsCache = settingsRes?.settings || settingsRes || {};
     commerceEventsCache = Array.isArray(eventsRes?.events) ? eventsRes.events : [];
+    ecommerceStatusCache = ecommerceRes || {};
+    ecommercePlatformsCache = Array.isArray(ecommerceRes?.platforms) ? ecommerceRes.platforms : [];
+    ecommerceConnectionsCache = Array.isArray(ecommerceRes?.connections) ? ecommerceRes.connections : [];
+    ecommerceFeaturesCache = Array.isArray(ecommerceRes?.features) ? ecommerceRes.features : [];
 
     const settings = commerceSettingsCache;
     const baseUrl = window.location.origin.replace(/\/$/, '');
@@ -7426,6 +7671,10 @@ async function loadCommerce() {
 
     renderCommerceStats(settings, commerceEventsCache);
     renderCommerceEvents(commerceEventsCache);
+    renderEcommercePlatformSelect(ecommercePlatformsCache);
+    renderEcommercePlatformStats(ecommerceStatusCache);
+    renderEcommerceConnections(ecommerceConnectionsCache);
+    renderEcommerceFeatureMatrix(ecommerceFeaturesCache.length ? ecommerceFeaturesCache : ecommercePlatformsCache);
   } catch (e) {
     toast(e.message, 'error');
   }
