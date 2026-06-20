@@ -12,6 +12,10 @@ const relayPlanner = require('../lib/groupCommerce/relayPlanner');
 const agentRegistry = require('../lib/groupCommerce/agentRegistry');
 const pauseManager = require('../lib/groupCommerce/pauseManager');
 const flowNodes = require('../lib/groupCommerce/flowNodes');
+const matchingEngine = require('../lib/groupCommerce/matchingEngine');
+const priceIntelligence = require('../lib/groupCommerce/priceIntelligence');
+const leaderboard = require('../lib/groupCommerce/leaderboard');
+const scheduler = require('../lib/groupCommerce/scheduler');
 
 // 1. GET /api/group-commerce/status - General system health and environment state
 router.get('/status', (req, res) => {
@@ -227,6 +231,61 @@ router.get('/history', (req, res) => {
   try {
     const historyData = store.readHistory();
     res.json({ success: true, history: historyData.history });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+// 15. POST /api/group-commerce/groups/:id/match - Match a buyer request to active sellers
+router.post('/groups/:id/match', (req, res) => {
+  const { id } = req.params;
+  const { buyerRequest } = req.body;
+  if (!buyerRequest) {
+    return res.status(400).json({ success: false, error: 'buyerRequest is required' });
+  }
+  try {
+    const result = matchingEngine.matchBuyerToSellers(id, buyerRequest);
+    res.json(result);
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+// 16. GET /api/group-commerce/groups/:id/price-intel/:sku - Price analytics for a SKU
+router.get('/groups/:id/price-intel/:sku', (req, res) => {
+  try {
+    const result = priceIntelligence.analyzeSku(req.params.id, req.params.sku);
+    res.json(result);
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+// 17. GET /api/group-commerce/groups/:id/market-overview - Aggregate market stats
+router.get('/groups/:id/market-overview', (req, res) => {
+  try {
+    const result = priceIntelligence.marketOverview(req.params.id);
+    res.json(result);
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+// 18. GET /api/group-commerce/groups/:id/leaderboard - Seller trust leaderboard
+router.get('/groups/:id/leaderboard', (req, res) => {
+  try {
+    const result = leaderboard.buildLeaderboard(req.params.id);
+    res.json(result);
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+// 19. POST /api/group-commerce/groups/:id/schedule-broadcast - Plan a scheduled catalog broadcast
+router.post('/groups/:id/schedule-broadcast', (req, res) => {
+  try {
+    const result = scheduler.planScheduledBroadcast(req.params.id, req.body || {});
+    res.json(result);
   } catch (e) {
     res.status(500).json({ success: false, error: e.message });
   }

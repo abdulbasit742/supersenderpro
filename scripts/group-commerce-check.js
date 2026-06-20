@@ -83,6 +83,33 @@ try {
     throw new Error("Sensitive values leaked through privacy shields");
   }
 
+  // 7. Test new feature modules
+  console.log("\n7. Testing new feature modules (matching, price intel, leaderboard, scheduler)...");
+  const matchingEngine = require('../lib/groupCommerce/matchingEngine');
+  const priceIntelligence = require('../lib/groupCommerce/priceIntelligence');
+  const leaderboard = require('../lib/groupCommerce/leaderboard');
+  const scheduler = require('../lib/groupCommerce/scheduler');
+
+  const matchRes = matchingEngine.matchBuyerToSellers("group-123", "need iPhone 13 1 pcs");
+  if (!matchRes.success || !Array.isArray(matchRes.matches)) { throw new Error("Matching engine failed"); }
+  console.log("\u2705 Buyer-Seller matching engine works! Matches found: " + matchRes.matchCount);
+
+  const intel = priceIntelligence.analyzeSku("group-123", "SKU-IPH13");
+  if (!intel.success || typeof intel.pricePosition !== 'number') { throw new Error("Price intelligence failed"); }
+  console.log("\u2705 Price intelligence works! Signal: " + intel.signal);
+
+  const overview = priceIntelligence.marketOverview("group-123");
+  if (!overview.success || typeof overview.totalSkus !== 'number') { throw new Error("Market overview failed"); }
+  console.log("\u2705 Market overview works! Total SKUs: " + overview.totalSkus);
+
+  const board = leaderboard.buildLeaderboard("group-123");
+  if (!board.success || !Array.isArray(board.leaderboard)) { throw new Error("Leaderboard failed"); }
+  console.log("\u2705 Seller leaderboard works! Sellers ranked: " + board.sellerCount);
+
+  const sched = scheduler.planScheduledBroadcast("group-123", { frequency: "daily", timeOfDay: "09:30" });
+  if (!sched.success || !sched.schedule.cron) { throw new Error("Scheduler failed"); }
+  console.log("\u2705 Scheduled broadcast planner works! Cron: " + sched.schedule.cron);
+
   console.log("\n==================================================");
   console.log("🏆 Group Commerce OS Integrity Check: PASSED");
   console.log("==================================================");
