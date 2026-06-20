@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Feature Flags & Rollout Control — SuperSender Pro</title>
+  <link rel="stylesheet" href="/css/feature-flags.css" />
+</head>
+<body>
+  <header class="ff-header">
+    <div class="ff-brand"><span class="ff-logo">🚦</span>
+      <div><h1>Feature Flags & Rollout Control</h1><p class="ff-sub">Rollout previews · access checks · emergency kill switches</p></div></div>
+    <div id="ff-pill" class="ff-pill">Loading…</div>
+  </header>
+  <main class="ff-main">
+    <section class="ff-section"><h2>Overview</h2><div class="ff-cards" id="ff-overview"></div></section>
+
+    <section class="ff-section">
+      <div class="ff-row"><h2>Feature Registry</h2>
+        <input id="ff-search" class="ff-input" placeholder="Search features…" oninput="FF.filter()" /></div>
+      <div class="ff-table-wrap"><table class="ff-table" id="ff-registry">
+        <thead><tr><th>Module</th><th>Feature</th><th>Status</th><th>Mode</th><th>Risk</th><th>Plans</th><th>Kill</th><th></th></tr></thead>
+        <tbody></tbody></table></div>
+    </section>
+
+    <section class="ff-section" id="ff-detail-section" hidden>
+      <div class="ff-row"><h2 id="ff-detail-title">Feature Detail</h2><button class="ff-btn ff-btn-ghost" onclick="FF.closeDetail()">Close</button></div>
+      <div id="ff-detail"></div>
+    </section>
+
+    <div class="ff-grid-2">
+      <section class="ff-section"><h2>Rollout Planner <span class="ff-badge">preview</span></h2>
+        <select id="ff-rollout-key" class="ff-input"></select>
+        <select id="ff-rollout-mode" class="ff-input">
+          <option value="beta_only">beta_only</option><option value="all">all</option>
+          <option value="plan_based">plan_based</option><option value="percentage_preview">percentage_preview</option>
+          <option value="tenant_allowlist">tenant_allowlist</option><option value="off">off</option></select>
+        <input id="ff-rollout-percent" class="ff-input" type="number" min="0" max="100" placeholder="Rollout % (for percentage_preview)" />
+        <button class="ff-btn" onclick="FF.rolloutPreview()">Generate Rollout Preview</button>
+        <pre class="ff-out" id="ff-rollout-out"></pre></section>
+
+      <section class="ff-section"><h2>Kill Switch Center <span class="ff-badge ff-badge-danger">preview-only</span></h2>
+        <select id="ff-kill-key" class="ff-input"></select>
+        <select id="ff-kill-reason" class="ff-input">
+          <option value="security_risk">security_risk</option><option value="compliance_risk">compliance_risk</option>
+          <option value="payment_billing_risk">payment_billing_risk</option><option value="whatsapp_ban_risk">whatsapp_ban_risk</option>
+          <option value="high_error_rate">high_error_rate</option><option value="admin_manual">admin_manual</option></select>
+        <button class="ff-btn ff-btn-danger" onclick="FF.killPreview()">Preview Kill Switch</button>
+        <pre class="ff-out" id="ff-kill-out"></pre></section>
+    </div>
+
+    <div class="ff-grid-2">
+      <section class="ff-section"><h2>Access Checker</h2>
+        <select id="ff-acc-key" class="ff-input"></select>
+        <div class="ff-inline">
+          <input id="ff-acc-tenant" class="ff-input" placeholder="tenantId" />
+          <input id="ff-acc-reseller" class="ff-input" placeholder="resellerId" /></div>
+        <div class="ff-inline">
+          <select id="ff-acc-plan" class="ff-input"><option value="free">free</option><option value="pro">pro</option><option value="business">business</option></select>
+          <select id="ff-acc-role" class="ff-input"><option value="admin">admin</option><option value="owner">owner</option><option value="guest">guest</option></select></div>
+        <label class="ff-chk"><input type="checkbox" id="ff-acc-beta" /> beta group</label>
+        <button class="ff-btn" onclick="FF.accessCheck()">Check Access</button>
+        <pre class="ff-out" id="ff-acc-out"></pre></section>
+
+      <section class="ff-section"><h2>Safety Panel</h2><div class="ff-safety" id="ff-safety"></div></section>
+    </div>
+
+    <footer class="ff-footer"><strong>Safe by default:</strong> All rollout & kill-switch actions are preview-only, dry-run,
+      approval-required and audited. No live writes, no external API calls, no tenant/customer PII, no secrets.</footer>
+  </main>
+  <script src="/js/feature-flags.js"></script>
+</body>
+</html>

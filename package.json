@@ -34,7 +34,9 @@
     "install:hooks": "node scripts/install-hooks.js",
     "doctor": "node scripts/doctor.js",
     "developer-portal:check": "node scripts/developer-portal-check.js",
-    "developer-portal:smoke": "node tests/smoke/developerPortalSmoke.js"
+    "developer-portal:smoke": "node tests/smoke/developerPortalSmoke.js",
+    "feature-flags:check": "node scripts/feature-flags-check.js",
+    "feature-flags:smoke": "node tests/smoke/featureFlagsSmoke.js"
   },
   "dependencies": {
     "@whiskeysockets/baileys": "^7.0.0-rc.9",

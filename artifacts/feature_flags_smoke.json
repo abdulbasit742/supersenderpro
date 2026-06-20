@@ -1,0 +1,83 @@
+{
+  "generatedAt": "2026-06-20T12:22:51.799Z",
+  "passed": 15,
+  "failed": 0,
+  "total": 15,
+  "results": [
+    {
+      "name": "require feature registry",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require evaluator",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require rollout planner",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require kill switch module",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require route module",
+      "pass": true,
+      "detail": "loaded"
+    },
+    {
+      "name": "barrel loads",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "load default flags (>=30)",
+      "pass": true,
+      "detail": "30 flags"
+    },
+    {
+      "name": "evaluate WhatsApp for sample tenant",
+      "pass": true,
+      "detail": "allowed=true"
+    },
+    {
+      "name": "evaluate Developer Portal for sample plan",
+      "pass": true,
+      "detail": "plan_insufficient"
+    },
+    {
+      "name": "generate rollout preview",
+      "pass": true,
+      "detail": "~25% of tenants (preview bucket)"
+    },
+    {
+      "name": "generate kill switch preview",
+      "pass": true,
+      "detail": "preview"
+    },
+    {
+      "name": "dryRun true",
+      "pass": true,
+      "detail": "dryRun=true"
+    },
+    {
+      "name": "live write disabled",
+      "pass": true,
+      "detail": "blocked"
+    },
+    {
+      "name": "approval required (high-risk rollout)",
+      "pass": true,
+      "detail": "approval"
+    },
+    {
+      "name": "no phone/email/token leaks",
+      "pass": true,
+      "detail": "clean"
+    }
+  ]
+}

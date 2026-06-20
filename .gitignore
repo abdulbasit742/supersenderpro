@@ -49,3 +49,10 @@ developer-secrets/
 webhook-secrets/
 *.webhook.raw.json
 *.api-key.raw.json
+
+# Feature Flags protections
+data/feature-flags*.json
+data/feature-rollout*.json
+artifacts/*feature-flags-raw*
+feature-exports/private/
+*.feature.raw.json

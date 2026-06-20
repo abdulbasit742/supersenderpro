@@ -1,0 +1,169 @@
+{
+  "generatedAt": "2026-06-20T12:22:51.476Z",
+  "passed": 32,
+  "failed": 0,
+  "total": 32,
+  "strict": "false",
+  "checks": [
+    {
+      "name": "file lib/featureFlags/index.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/featureFlags/store.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/featureFlags/featureRegistry.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/featureFlags/defaultFeatureRegistry.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/featureFlags/flagEvaluator.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/featureFlags/rolloutPlanner.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/featureFlags/emergencyKillSwitch.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/featureFlags/killSwitches.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file routes/featureFlagsRoutes.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/feature-flags.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/js/feature-flags.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/css/feature-flags.css",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "server hook present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "env placeholders present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "gitignore protections present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc FEATURE_FLAGS_COMMAND_CENTER.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc ROLLOUT_CONTROL_GUIDE.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc EMERGENCY_KILL_SWITCHES.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc FEATURE_ACCESS_EVALUATION.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc PLAN_TENANT_RESELLER_FEATURE_ACCESS.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc FEATURE_FLAGS_APPROVAL_AUDIT.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc FEATURE_FLAGS_ADMIN_COMMANDS.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc FEATURE_FLAGS_FLOW_NODES.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "default registry loads (>=30)",
+      "ok": true,
+      "detail": "30 flags"
+    },
+    {
+      "name": "evaluate sample (tenant/plan/reseller)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "plan insufficiency → upgrade preview",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "rollout preview dry-run",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "kill switch preview only",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "live write disabled",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "kill switch write disabled",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "report generated",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no secret/PII leak in report",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}

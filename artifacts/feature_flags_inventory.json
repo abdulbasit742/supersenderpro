@@ -1,0 +1,55 @@
+{
+  "generatedAt": "2026-06-20T12:22:18.392560+00:00",
+  "module": "feature_flags",
+  "summary": "Scanned repo first. No feature-flag/rollout/kill-switch coordination layer existed; added additively.",
+  "existingSystemsDetected": [
+    {
+      "path": "lib/*/config.js (per-module)",
+      "kind": "module_config",
+      "decision": "left_untouched",
+      "status": "exists"
+    },
+    {
+      "path": "lovable-app/src/components/ui/toggle*.tsx",
+      "kind": "ui_toggle_components",
+      "decision": "irrelevant",
+      "status": "exists"
+    },
+    {
+      "path": "lib/saasBilling, lib/subscriptionPlans.js",
+      "kind": "billing/plans",
+      "decision": "left_untouched",
+      "status": "exists"
+    }
+  ],
+  "duplicateRisk": "none \u2014 no central feature-flag/rollout/kill-switch system existed. Per-module config files are unrelated and not rebuilt.",
+  "areas": {
+    "feature_flag_model": "missing -> created (registry, evaluator, rolloutRules, killSwitches, guards)",
+    "default_feature_registry": "missing -> 30 module flags created",
+    "flag_evaluator": "missing -> flagContext + flagEvaluator + accessDecision",
+    "rollout_planner": "missing -> rolloutPlanner + rolloutPreview + rolloutHistory",
+    "emergency_kill_switch": "missing -> emergencyKillSwitch + killSwitchPlanner (preview-only)",
+    "module_adapters": "missing -> 16 adapters (detect-or-skip)",
+    "approval_audit_security": "integrated via adapters (return unavailable safely)",
+    "api_routes": "missing -> routes/featureFlagsRoutes.js (dry-run safe)",
+    "admin_dashboard": "missing -> public/feature-flags.*",
+    "flow_nodes": "missing -> lib/featureFlags/flowNodes.js (metadata only)",
+    "admin_commands": "missing -> lib/featureFlags/adminCommands.js (integration point)",
+    "server_hook": "needs_route -> marked FEATURE FLAGS HOOK added",
+    "dashboard_link": "needs_ui -> marked nav link added",
+    "env_placeholders": "missing -> 11 FEATURE_FLAGS_* keys added",
+    "gitignore_protections": "added (feature-flags*.json, feature-rollout*.json, raw feature exports)",
+    "docs": "missing -> 8 docs created",
+    "check_script": "missing -> scripts/feature-flags-check.js",
+    "smoke_test": "missing -> tests/smoke/featureFlagsSmoke.js"
+  },
+  "protections": {
+    "liveWrite": "disabled by default",
+    "killSwitchWrite": "disabled by default",
+    "rollout": "preview-only",
+    "approval": "required for high/critical",
+    "audit": "required",
+    "externalAPIs": "none",
+    "privacy": "leak-scan on every response + id masking"
+  }
+}

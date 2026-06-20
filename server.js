@@ -3047,6 +3047,18 @@ const developerPortalRoutes = require('./routes/developerPortalRoutes');
 app.use('/api/developer-portal', developerPortalRoutes);
 // END DEVELOPER PORTAL HOOK
 
+// BEGIN FEATURE FLAGS HOOK
+// Feature Flags + Rollout Control + Emergency Kill Switch (dry-run, preview-only, no live write by default).
+try {
+  const featureFlagsRoutes = require('./routes/featureFlagsRoutes');
+  app.use('/api/feature-flags', featureFlagsRoutes);
+  app.get('/feature-flags.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'feature-flags.html')));
+  console.log('[FeatureFlags] mounted at /api/feature-flags (dry-run, no live write)');
+} catch (e) {
+  console.error('[FeatureFlags] failed to initialise (non-fatal):', e.message);
+}
+// END FEATURE FLAGS HOOK
+
 
 let searchIndexRebuildTimer = null;
 function scheduleSearchIndexRebuild(reason = 'data-change', delayMs = Number(process.env.SEARCH_REBUILD_DEBOUNCE_MS || 30000)) {
