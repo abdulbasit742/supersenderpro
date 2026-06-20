@@ -33,7 +33,7 @@ const force = args.includes('--force');
 const INSECURE_DEFAULTS = {
   DB_PASSWORD: 'strongpassword',
   JWT_SECRET: 'randomstring_change_this',
-  SESSION_SECRET: 'placeholder_session_secret_change_this',
+  SESSION_SECRET: 'placeholder_strong_random_session_secret_change_this',
   ENCRYPTION_KEY: 'change_this_32_byte_secret',
   ADMIN_PASSWORD: 'admin12345'
 };

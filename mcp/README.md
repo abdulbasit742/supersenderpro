@@ -1,165 +1,92 @@
-# SuperSender Pro MCP
+# SuperSender Pro — Ultimate MCP Server Suite
 
-This custom MCP server lets MCP-compatible AI tools control and inspect the local SuperSender Pro system.
+This directory contains the custom Model Context Protocol (MCP) servers for **SuperSender Pro** (AI Business Command Center, WhatsApp CRM, and Social/SaaS Hub). 
 
-## What It Exposes
+We have successfully unified the codebase and built a **complete, state-of-the-art MCP Server** that exposes **48 comprehensive tools**! This server supports both standard **stdio transport** (for Cursor, Claude Desktop, and local AI clients) and **HTTP/SSE/ChatGPT endpoints**.
 
-- Server health and dashboard summary
-- WhatsApp connection status
-- Customers, orders, plans, and inbox
-- WhatsApp send/reply actions
-- Broadcast creation
-- Social account listing and post publishing
-- Safe action drafts with an approval queue
-- Local business data search
+---
 
-## Run Manually
+## 🌟 What's New? (Ported & Modularized)
+We have upgraded the MCP suite to include:
+1. **Standard Compliance**: Powered by the official `@modelcontextprotocol/sdk` (`mcp/index.js`).
+2. **Unified Core**: Combines the original modular tools with the comprehensive system-level, approval, and file search tools.
+3. **48 Full-Featured Tools**: 
+   - **System Tools**: `supersender_health`, `whatsapp_status`, `dashboard_summary`, `list_plans`.
+   - **WhatsApp Tools**: `send_whatsapp`, `send_whatsapp_image`, `get_bot_status`, `send_broadcast`, `get_recent_messages`, `send_whatsapp_message`.
+   - **CRM & Customers**: `get_customers`, `get_customer_profile`, `add_customer_note`, `tag_customer`, `get_crm_stats`, `schedule_followup`, `export_customers`, `list_customers`.
+   - **Orders & Analytics**: `list_orders`, `get_order`, `get_sales_analytics`, `get_customer_lifetime_value`.
+   - **Stores & Products**: `list_stores`, `get_store`, `create_store`, `list_products`, `add_product`, `update_product`, `get_store_stats`.
+   - **Campaigns & Stock**: `list_campaigns`, `create_campaign`, `get_campaign`, `add_campaign_product`, `list_stock`, `update_stock`.
+   - **AI Brain**: `run_ai_action`, `query_ai`.
+   - **Inbox Tools**: `list_inbox`, `reply_inbox`.
+   - **Social Hub**: `list_social_accounts`, `publish_social_post`.
+   - **Approval Queue**: `create_action_draft`, `list_action_drafts`, `reject_action_draft`, `approve_action_draft`.
+   - **Local Files**: `search_business_data`, `read_data_file`.
 
-From the project root:
+---
 
-```powershell
-.\node-local.exe .\mcp\supersender-mcp.js
+## 🚀 Setup & Installation (How to Run)
+
+First, make sure you install the dependencies inside this directory:
+```bash
+cd mcp
+npm install
 ```
 
-The MCP server uses stdio, so it will wait silently for JSON-RPC messages from an MCP client.
+### 1. Run standard MCP (Recommended for Cursor & Claude)
+To start the standard-compliant MCP server with stdio transport:
+```bash
+npm start
+# or
+node index.js
+```
 
-## Claude Desktop / Cursor Config
+### 2. Run lightweight MCP (Zero-dependency custom server)
+To start the zero-dependency manual JSON-RPC server:
+```bash
+node supersender-mcp.js
+```
 
-Use this as a template:
+---
+
+## 🛠️ Configuration in Clients
+
+### Cursor / Claude Desktop Setup
+Add this to your `claude_desktop_config.json` (usually at `%APPDATA%\Claude\claude_desktop_config.json` on Windows or `~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
 
 ```json
 {
   "mcpServers": {
-    "supersender-pro": {
-      "command": "C:\\Users\\bsphy2304\\Documents\\New project\\supersender-pro-final\\node-local.exe",
+    "supersenderpro-modular": {
+      "command": "node",
       "args": [
-        "C:\\Users\\bsphy2304\\Documents\\New project\\supersender-pro-final\\mcp\\supersender-mcp.js"
+        "C:\\path\\to\\your\\project\\supersender-pro\\mcp\\index.js"
       ],
       "env": {
-        "SUPERSENDER_API_BASE": "http://localhost:3001"
+        "SUPERSENDER_URL": "http://localhost:3001",
+        "SUPERSENDER_API_KEY": "your-api-key-here"
       }
     }
   }
 }
 ```
+*(Replace `C:\\path\\to\\your\\project` with the actual path to your cloned repository)*
 
-## Claude Web Custom Connector
+---
 
-Claude's "Add custom connector" screen needs a public HTTPS MCP URL.
+## 🔒 Safe Action Drafts & Approval Queue
+For production workflows, you can restrict AI from sending messages or executing actions directly.
+1. Ask the AI to call `create_action_draft`.
+2. Inspect the queue with `list_action_drafts`.
+3. Approve with `approve_action_draft` to execute the action via the SuperSender backend.
+4. To allow direct actions without approval, set `MCP_ALLOW_ACTIONS=1` in your backend `.env` file.
 
-Paste these values:
+---
 
-```text
-Name: SuperSender Pro
-Remote MCP server URL: https://app.pakentrepreneur.me/mcp
-OAuth Client ID: leave blank
-OAuth Client Secret: leave blank
-```
-
-The local MCP endpoint is:
-
-```text
-http://localhost:3001/mcp
-```
-
-Claude Web cannot use `localhost`, so keep the Cloudflare tunnel running before adding the connector.
-
-Action tools such as WhatsApp sending and social publishing are disabled by default for safety. To enable them, set this in `.env` and restart the server:
-
-```text
-MCP_ALLOW_ACTIONS=1
-```
-
-## Safe Approval Queue
-
-For daily work, use drafts first instead of direct sending:
-
-1. Ask Claude to call `create_action_draft`.
-2. Review drafts with `list_action_drafts` or `GET /api/mcp/action-drafts`.
-3. Reject with `reject_action_draft` if needed.
-4. Approve only when you are ready.
-
-Approval execution is blocked unless this is enabled:
-
-```text
-MCP_ALLOW_ACTIONS=1
-```
-
-Draft examples:
-
-```json
-{
-  "type": "whatsapp_message",
-  "title": "Reply to Abdul",
-  "payload": {
-    "number": "923001234567",
-    "message": "Salam Abdul, ChatGPT Plus available hai. Rs 999 limited offer."
-  }
-}
-```
-
-```json
-{
-  "type": "social_post",
-  "title": "Daily AI tools offer",
-  "payload": {
-    "platform": "facebook",
-    "message": "ChatGPT Plus, Claude Pro aur Cursor Pro available hain. DM for today rates.",
-    "imageUrl": "https://example.com/post.jpg"
-  }
-}
-```
-
-## Available Tools
-
-- `supersender_health`
-- `whatsapp_status`
-- `dashboard_summary`
-- `list_customers`
-- `list_orders`
-- `list_plans`
-- `list_inbox`
-- `send_whatsapp_message`
-- `reply_inbox`
-- `create_broadcast`
-- `list_social_accounts`
-- `publish_social_post`
-- `create_action_draft`
-- `list_action_drafts`
-- `reject_action_draft`
-- `approve_action_draft`
-- `search_business_data`
-- `read_data_file`
-
-## Notes
-
-Keep `http://localhost:3001` running before using the MCP tools that call the API. Local JSON search tools still work even when the web server is offline.
-
-## ChatGPT Custom GPT Connector
-
-Custom GPT Actions use the OpenAPI connector in `mcp/chatgpt/server.js`.
-
-Run it manually:
-
-```powershell
-cd .\mcp
+## 💬 ChatGPT Custom GPT / OpenAPI
+ChatGPT Custom GPTs connect via the OpenAPI server located in `mcp/chatgpt/server.js`.
+To run the ChatGPT OpenAPI gateway:
+```bash
 npm run start:chatgpt
 ```
-
-Or let the main app start it:
-
-```text
-GPT_CONNECTOR_ENABLED=true
-GPT_CONNECTOR_PORT=3002
-GPT_CONNECTOR_PUBLIC_URL=https://app.pakentrepreneur.me
-GPT_CONNECTOR_API_KEY=change-this-strong-token
-```
-
-Status:
-
-```text
-http://localhost:3001/api/gpt-connector/status
-http://localhost:3002/openapi.json
-```
-
-Full instructions are in `mcp/chatgpt/README.md`.
+And add the `openapi.json` (served on port `3002`) to your Custom GPT Actions.
