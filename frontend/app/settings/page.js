@@ -28,6 +28,29 @@ export default function SettingsPage() {
   const [setupCheck, setSetupCheck] = useState(null);
   const [loadingSetup, setLoadingSetup] = useState(false);
   const [importStatus, setImportStatus] = useState('');
+  const [aiTestPrompt, setAiTestPrompt] = useState('Hello, AI!');
+  const [aiTestResponse, setAiTestResponse] = useState('');
+  const [aiTesting, setAiTesting] = useState(false);
+
+  async function testAiModel() {
+    setAiTesting(true);
+    setAiTestResponse('');
+    try {
+      const res = await api('/api/settings/ai-test', {
+        method: 'POST',
+        body: JSON.stringify({ prompt: aiTestPrompt })
+      });
+      if (res.success) {
+        setAiTestResponse(res.response);
+      } else {
+        setAiTestResponse('Error: ' + res.error);
+      }
+    } catch (err) {
+      setAiTestResponse('Failed to execute test prompt: ' + err.message);
+    } finally {
+      setAiTesting(false);
+    }
+  }
 
   async function load() {
     const [saved, groupRows, setupRes] = await Promise.all([
@@ -269,6 +292,95 @@ export default function SettingsPage() {
                 <div className="mt-3 text-sm">{agentResult.answer || 'No direct answer. Route to structured flow or admin handoff.'}</div>
               </div>
             ) : null}
+          </div>
+        </Panel>
+      </div>
+
+      <div className="mt-6 grid gap-4 xl:grid-cols-2">
+        <Panel title="AI Cognitive Model Settings / اے آئی ماڈل سیٹنگز">
+          <div className="grid gap-3 text-sm">
+            <label className="grid gap-1">
+              <span className="text-slate-500 dark:text-slate-400 font-semibold">Active AI Provider</span>
+              <select 
+                className="input" 
+                value={settings.ai_provider || 'groq'} 
+                onChange={(e) => setSettings({ ...settings, ai_provider: e.target.value })}
+              >
+                <option value="groq">Groq Cloud (Llama 3, Mixtral)</option>
+                <option value="openai">OpenAI (GPT-4o, GPT-4o-mini)</option>
+                <option value="anthropic">Anthropic (Claude 3.5 Sonnet)</option>
+                <option value="gemini">Google Gemini (Gemini 1.5/2.0)</option>
+                <option value="deepseek">DeepSeek (DeepSeek V3, R1)</option>
+                <option value="openrouter">OpenRouter (Unified Multi-Model)</option>
+                <option value="ollama">Ollama (Local Models)</option>
+              </select>
+            </label>
+
+            <label className="grid gap-1">
+              <span className="text-slate-500 dark:text-slate-400 font-semibold">Active AI Model Name</span>
+              <input 
+                className="input font-mono" 
+                placeholder="e.g. gpt-4o-mini, claude-3-5-sonnet-latest" 
+                value={settings.ai_model || ''} 
+                onChange={(e) => setSettings({ ...settings, ai_model: e.target.value })} 
+              />
+            </label>
+
+            {settings.ai_provider === 'ollama' ? (
+              <label className="grid gap-1">
+                <span className="text-slate-500 dark:text-slate-400 font-semibold">Ollama Local Host URL</span>
+                <input 
+                  className="input font-mono" 
+                  placeholder="http://localhost:11434" 
+                  value={settings.ollama_host || ''} 
+                  onChange={(e) => setSettings({ ...settings, ollama_host: e.target.value })} 
+                />
+              </label>
+            ) : (
+              <label className="grid gap-1">
+                <span className="text-slate-500 dark:text-slate-400 font-semibold">Provider API Key</span>
+                <input 
+                  type="password"
+                  className="input font-mono" 
+                  placeholder="Paste your API key here" 
+                  value={settings[`${settings.ai_provider || 'groq'}_api_key`] || ''} 
+                  onChange={(e) => setSettings({ ...settings, [`${settings.ai_provider || 'groq'}_api_key`]: e.target.value })} 
+                />
+              </label>
+            )}
+
+            <button type="button" className="btn btn-primary mt-2" onClick={save}>
+              💾 Save AI Configuration
+            </button>
+          </div>
+        </Panel>
+
+        <Panel title="AI Prompt Playground / اے آئی پلے گراؤنڈ">
+          <div className="grid gap-3 text-sm">
+            <label className="grid gap-1">
+              <span className="text-slate-500 dark:text-slate-400 font-semibold font-mono">Test Prompt</span>
+              <input 
+                className="input" 
+                value={aiTestPrompt} 
+                onChange={(e) => setAiTestPrompt(e.target.value)} 
+              />
+            </label>
+            
+            <button 
+              disabled={aiTesting} 
+              type="button" 
+              className="btn btn-primary" 
+              onClick={testAiModel}
+            >
+              {aiTesting ? 'Executing Live LLM call...' : '🚀 Test LLM Prompt'}
+            </button>
+
+            {aiTestResponse && (
+              <div className="rounded-xl border border-line bg-card p-4 space-y-2 max-h-48 overflow-y-auto">
+                <div className="font-semibold text-slate-400 uppercase text-xs">LLM Response:</div>
+                <div className="text-sm font-mono whitespace-pre-wrap">{aiTestResponse}</div>
+              </div>
+            )}
           </div>
         </Panel>
       </div>

@@ -19,7 +19,16 @@ const allowedKeys = new Set([
   'WHATSAPP_NUMBERS',
   'WA_CUSTOMER_SESSION',
   'WA_DEALER_SESSION',
-  'WA_ADMIN_SESSION'
+  'WA_ADMIN_SESSION',
+  'AI_PROVIDER',
+  'AI_MODEL',
+  'OPENAI_API_KEY',
+  'ANTHROPIC_API_KEY',
+  'GEMINI_API_KEY',
+  'DEEPSEEK_API_KEY',
+  'GROQ_API_KEY',
+  'OPENROUTER_API_KEY',
+  'OLLAMA_HOST'
 ]);
 
 function validateSettings(body = {}) {

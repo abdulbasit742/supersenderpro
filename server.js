@@ -27877,6 +27877,11 @@ app.put('/api/handoffs/:id', (req, res) => {
 });
 
 app.get('/api/settings', (req, res) => res.json(settings));
+app.put('/api/settings', (req, res) => {
+  settings = { ...settings, ...req.body };
+  saveJSON('settings.json', settings);
+  res.json(settings);
+});
 app.post('/api/settings', (req, res) => {
   settings = { ...settings, ...req.body };
   const DEFAULT_GMAIL_PAYMENT_SCAN_QUERY = 'newer_than:7d (jazzcash OR easypaisa OR payment OR transaction OR bank OR transfer OR received)';
@@ -27960,6 +27965,19 @@ app.post('/api/settings', (req, res) => {
   saveJSON('settings.json', settings);
   res.json(settings);
 });
+
+app.post('/api/settings/ai-test', async (req, res) => {
+  try {
+    const { prompt } = req.body || {};
+    if (!prompt) return res.status(400).json({ error: 'prompt is required' });
+    const { processPrompt } = require('./ai/aiBrain');
+    const response = await processPrompt(prompt);
+    res.json({ success: true, response });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 
 function normalizeActionTrigger(input = {}) {
   const priorityMap = { low: 1, normal: 1, medium: 2, high: 3, urgent: 4, critical: 4 };
