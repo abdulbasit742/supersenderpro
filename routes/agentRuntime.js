@@ -84,6 +84,28 @@ module.exports = function buildRouter(express) {
     res.json({ success: true, ...runtime.metrics.json() });
   });
 
+  // Action templates (pre-approved routine actions).
+  router.get('/api/agent-runtime/templates', (req, res) =>
+    res.json({ success: true, stats: runtime.templates.stats(), templates: runtime.templates.list({ activeOnly: req.query.activeOnly !== 'false' }) }));
+  router.get('/api/agent-runtime/templates/:id', (req, res) => {
+    const t = runtime.templates.get(req.params.id);
+    res.status(t ? 200 : 404).json(t || { success: false, error: 'not found' });
+  });
+  router.post('/api/agent-runtime/templates', (req, res) => {
+    try { res.json({ success: true, template: runtime.templates.create(req.body) }); }
+    catch (e) { res.status(400).json({ success: false, error: e.message }); }
+  });
+  router.post('/api/agent-runtime/templates/:id/deactivate', (req, res) => {
+    const t = runtime.templates.deactivate(req.params.id);
+    res.json({ success: Boolean(t), template: t });
+  });
+  router.post('/api/agent-runtime/templates/:id/execute', async (req, res) => {
+    try {
+      const { agent, goal, overrideArgs } = req.body || {};
+      res.json(await runtime.templates.execute(req.params.id, { agent, goal, overrideArgs }));
+    } catch (e) { res.status(500).json({ success: false, error: e.message }); }
+  });
+
   return router;
 };
 module.exports.rateLimiter = rateLimiter;

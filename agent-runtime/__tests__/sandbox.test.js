@@ -128,3 +128,31 @@ test('prometheus metrics expose runtime counters', () => {
   assert.match(text, /agent_runtime_queue_total/);
   assert.match(text, /agent_runtime_runs_total/);
 });
+
+test('action templates can be created and listed', () => {
+  const before = runtime.templates.stats().total;
+  const t = runtime.templates.create({ name: 'test-welcome', description: 'Send welcome message', tool: 'send_whatsapp_message', args: { to: '923000000000', message: 'Welcome!' }, createdBy: 'test' });
+  assert.ok(t.id);
+  assert.strictEqual(runtime.templates.stats().total, before + 1);
+  const list = runtime.templates.list();
+  assert.ok(list.some(x => x.id === t.id));
+  // cleanup
+  runtime.templates.deactivate(t.id);
+});
+
+test('template execute skips approval but still enforces policy', async () => {
+  const t = runtime.templates.create({ name: 'test-safe-read', tool: 'list_customers', args: { limit: 5 }, createdBy: 'test' });
+  const res = await runtime.templates.execute(t.id, { agent: 'zeroclaw', goal: 'test' });
+  assert.strictEqual(res.status, 'executed', JSON.stringify(res));
+  assert.strictEqual(res.templateId, t.id);
+  // cleanup
+  runtime.templates.deactivate(t.id);
+});
+
+test('deactivated template cannot execute', async () => {
+  const t = runtime.templates.create({ name: 'test-deact', tool: 'list_customers', args: {}, createdBy: 'test' });
+  runtime.templates.deactivate(t.id);
+  const res = await runtime.templates.execute(t.id, { agent: 'zeroclaw' });
+  assert.strictEqual(res.status, 'error');
+  assert.match(res.error, /deactivated/);
+});

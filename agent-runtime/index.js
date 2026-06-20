@@ -6,6 +6,7 @@ const sandbox = require('./sandbox');
 const queue = require('./approvalQueue');
 const audit = require('./auditLog');
 const metrics = require('./metrics');
+const templates = require('./actionTemplates');
 const { sanitize } = require('./contextSanitizer');
 
 function getStatus() {
@@ -24,6 +25,7 @@ function getStatus() {
       blockedActions: POLICY.blockedActions,
       approvalRequired: POLICY.approvalRequired
     },
+    templates: templates.stats(),
     apiBase: POLICY.apiBase,
     tools: listTools(),
     agents: listAgents(),
@@ -98,6 +100,7 @@ module.exports = {
   approveAndRun: sandbox.executeApproved,
   queue: { list: queue.list, get: queue.get, approve: queue.approve, reject: queue.reject, stats: queue.stats },
   runs: { list: audit.list, get: audit.get, stats: audit.stats },
+  templates: { create: templates.create, list: templates.list, get: templates.get, getByName: templates.getByName, deactivate: templates.deactivate, execute: templates.executeTemplate, stats: templates.stats },
   metrics,
   POLICY
 };
