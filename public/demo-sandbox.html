@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Demo Sandbox &amp; Guided Tour — SuperSender Pro</title>
+  <link rel="stylesheet" href="/css/demo-sandbox.css" />
+  <link rel="stylesheet" href="/css/demo-tour.css" />
+</head>
+<body>
+  <header class="ds-header">
+    <div class="ds-brand"><span class="ds-logo">🧪</span>
+      <div><h1>Demo Sandbox &amp; Guided Tour</h1><p class="ds-sub">Safe demo · fake data · dry-run · live actions blocked</p></div></div>
+    <div id="ds-pill" class="ds-pill">Loading…</div>
+  </header>
+  <main class="ds-main">
+
+    <!-- 1. Demo overview -->
+    <section class="ds-section" id="demo-overview"><h2>Demo Overview</h2>
+      <div class="ds-cards" id="ds-overview"></div></section>
+
+    <!-- 2. Scenario launcher -->
+    <section class="ds-section" id="scenarios"><div class="ds-row">
+      <h2>Scenario Launcher</h2>
+      <span><button class="ds-btn ds-btn-ghost" onclick="Demo.previewData()">Preview Data</button>
+      <button class="ds-btn ds-btn-danger" onclick="Demo.reset()">Reset Demo</button></span></div>
+      <div class="ds-cards" id="ds-scenarios"></div></section>
+
+    <!-- 3. Guided tours -->
+    <section class="ds-section" id="tours"><h2>Guided Tours</h2>
+      <div class="ds-cards" id="ds-tours"></div>
+      <div id="ds-tour-progress" class="ds-progress-wrap" hidden>
+        <div class="ds-progress"><div id="ds-progress-bar" class="ds-progress-bar"></div></div>
+        <span id="ds-tour-next" class="ds-muted"></span></div></section>
+
+    <!-- 4. Demo data preview -->
+    <section class="ds-section"><h2>Demo Data Preview <span class="ds-badge ds-badge-safe">masked · fake</span></h2>
+      <div class="ds-tabs" id="ds-data-tabs"></div>
+      <pre class="ds-out" id="ds-data-out">Click a module above to preview demo data…</pre></section>
+
+    <!-- 5. Safety panel -->
+    <section class="ds-section"><h2>Safety Panel</h2>
+      <div class="ds-safety" id="ds-safety"></div></section>
+
+    <!-- 6. Demo links -->
+    <section class="ds-section"><h2>Explore Modules in Demo</h2>
+      <div class="ds-links" id="ds-links"></div></section>
+
+    <footer class="ds-footer"><strong>100% safe demo:</strong> No real customer data, no external API calls, no WhatsApp/social sending,
+      no payment capture, and no real tenant writes. Everything here is fake, dry-run and non-destructive.</footer>
+  </main>
+  <script src="/js/demo-tour.js"></script>
+  <script src="/js/demo-sandbox.js"></script>
+</body>
+</html>

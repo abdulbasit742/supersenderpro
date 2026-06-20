@@ -44,7 +44,9 @@
     "agent:serve": "node agent-runtime/server.js",
     "agent:demo": "node agent-runtime/demo.js",
     "agent:cli": "node agent-runtime/cli.js",
-    "agent:test": "node --test agent-runtime/__tests__/"
+    "agent:test": "node --test agent-runtime/__tests__/",
+    "demo-sandbox:check": "node scripts/demo-sandbox-check.js",
+    "demo-sandbox:smoke": "node tests/smoke/demoSandboxSmoke.js"
   },
   "dependencies": {
     "@whiskeysockets/baileys": "^7.0.0-rc.9",

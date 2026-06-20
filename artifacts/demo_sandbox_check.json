@@ -1,0 +1,172 @@
+{
+  "generatedAt": "2026-06-20T09:28:42.063Z",
+  "passed": 28,
+  "failed": 0,
+  "total": 28,
+  "strict": "false",
+  "doctor": {
+    "ok": true,
+    "demo": true,
+    "dryRun": true,
+    "blockLiveActions": true,
+    "allowRealData": false,
+    "allowExternalCalls": false,
+    "scenarios": 10,
+    "tours": 10,
+    "liveActionBlockedSample": true,
+    "adapters": {
+      "publicFunnel": false,
+      "customer360": false,
+      "ownerCommand": false,
+      "voiceAI": false,
+      "channelAutomation": false,
+      "marketplace": false,
+      "growthCampaign": false,
+      "kpiCommand": false,
+      "saasBilling": false
+    },
+    "checkedAt": "2026-06-20T09:28:42.062Z"
+  },
+  "checks": [
+    {
+      "name": "file lib/demoSandbox/index.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/demoSandbox/demoConfig.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/demoSandbox/demoModeGuard.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/demoSandbox/demoDataFactory.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/demoSandbox/scenarioRegistry.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/demoSandbox/scenarioRunner.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/demoSandbox/tourRegistry.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/demoSandbox/tourState.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/demoSandbox/demoReset.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file routes/demoSandboxRoutes.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/demo-sandbox.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/js/demo-sandbox.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/css/demo-sandbox.css",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/js/demo-tour.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/css/demo-tour.css",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "server hook present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "env placeholders present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc DEMO_SANDBOX.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc DEMO_SCENARIOS.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc GUIDED_PRODUCT_TOURS.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc DEMO_DATA_SAFETY.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc DEMO_PUBLIC_FUNNEL_INTEGRATION.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "demo data generated",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "sample scenario starts",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "tour steps generated",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "live actions blocked",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doctor reports demo+dryRun",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no PII/secret leak in demo data",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}

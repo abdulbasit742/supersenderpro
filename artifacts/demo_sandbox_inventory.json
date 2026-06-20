@@ -1,0 +1,70 @@
+{
+  "generatedAt": "2026-06-20T09:28:24.006995+00:00",
+  "module": "demo_sandbox_guided_tour",
+  "summary": "Scanned repo before building. No Demo Sandbox + Guided Tour coordination layer existed; added it as an additive layer only.",
+  "existingDemoArtifactsDetected": [
+    {
+      "path": "frontend/lib/demoData.js",
+      "kind": "react_frontend_demo_data",
+      "decision": "left_untouched",
+      "note": "separate React app demo fixtures, not a sandbox command center"
+    },
+    {
+      "path": "agent-runtime/demo.js",
+      "kind": "agent_runtime_dry_run_demo",
+      "decision": "left_untouched",
+      "note": "CLI dry-run demo for agent runtime"
+    },
+    {
+      "path": "agent-runtime/sandbox.js",
+      "kind": "agent_action_sandbox",
+      "decision": "left_untouched",
+      "note": "action sandboxing for agent runtime, unrelated"
+    },
+    {
+      "path": "backend/src/db/seed.js",
+      "kind": "db_seed",
+      "decision": "left_untouched"
+    },
+    {
+      "path": "backend/src/prisma/seed.js",
+      "kind": "prisma_seed",
+      "decision": "left_untouched"
+    }
+  ],
+  "areas": {
+    "demo_mode": "missing -> created (lib/demoSandbox/demoConfig.js)",
+    "demo_data_factory": "missing -> created (lib/demoSandbox/demoDataFactory.js)",
+    "scenario_launcher": "missing -> created (scenarioRegistry.js + scenarioRunner.js)",
+    "guided_tour": "missing -> created (tourRegistry.js + tourState.js + public/js/demo-tour.js)",
+    "demo_routes": "missing -> created (routes/demoSandboxRoutes.js)",
+    "demo_dashboard": "missing -> created (public/demo-sandbox.html + js + css)",
+    "public_funnel_cta": "safe_to_extend -> adapter added (publicFunnelAdapter.js); page hook documented",
+    "module_adapters": "missing -> created (8 module demo adapters)",
+    "server_hook": "needs_wiring -> added marked DEMO SANDBOX HOOK in server.js",
+    "dashboard_link": "needs_ui -> added marked nav link in public/index.html",
+    "env_placeholders": "missing -> added 11 DEMO_SANDBOX_* keys in .env.example",
+    "docs": "missing -> 5 docs created",
+    "check_script": "missing -> scripts/demo-sandbox-check.js",
+    "smoke_test": "missing -> tests/smoke/demoSandboxSmoke.js"
+  },
+  "businessModulesScanned": {
+    "PublicSaaSFunnel": "exists (not rebuilt)",
+    "BusinessSetupWizard": "exists via lib/unifiedSetup (not rebuilt)",
+    "Customer360": "exists (not rebuilt)",
+    "OwnerCommand": "exists via lib/ownerBriefing (not rebuilt)",
+    "VoiceAI": "exists via lib/voiceAI (not rebuilt)",
+    "ChannelAutomation": "exists (not rebuilt)",
+    "MarketplaceIntelligence": "exists (not rebuilt)",
+    "GrowthCampaigns": "exists via routes/growth.js (not rebuilt)",
+    "KPICommand": "exists (not rebuilt)",
+    "ComplianceCenter": "exists (not rebuilt)",
+    "SaaSBilling": "exists via lib/subscriptionPlans.js (not rebuilt)"
+  },
+  "safety": {
+    "demoData": "fake/masked only",
+    "liveActions": "blocked by default",
+    "externalCalls": "disabled",
+    "realData": "disabled"
+  }
+}

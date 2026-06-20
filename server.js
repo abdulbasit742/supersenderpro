@@ -3136,6 +3136,18 @@ try {
   console.error('[ComplianceCenter] failed to initialise (non-fatal):', e.message);
 }
 // END COMPLIANCE CENTER HOOK
+
+// BEGIN DEMO SANDBOX HOOK
+// Demo Sandbox + Guided Product Tour (demo-only, dry-run, live-actions blocked).
+try {
+  const demoSandboxRoutes = require('./routes/demoSandboxRoutes');
+  app.use('/api/demo-sandbox', demoSandboxRoutes);
+  app.get('/demo-sandbox.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'demo-sandbox.html')));
+  console.log('[DemoSandbox] mounted at /api/demo-sandbox (demo-only, dry-run, live actions blocked)');
+} catch (e) {
+  console.error('[DemoSandbox] failed to initialise (non-fatal):', e.message);
+}
+// END DEMO SANDBOX HOOK
 // END MARKETPLACE INTELLIGENCE HOOK
 
 

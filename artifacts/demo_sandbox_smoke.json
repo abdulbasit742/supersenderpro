@@ -1,0 +1,78 @@
+{
+  "generatedAt": "2026-06-20T09:29:16.221Z",
+  "passed": 14,
+  "failed": 0,
+  "total": 14,
+  "results": [
+    {
+      "name": "require demo config",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require demo data factory",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require scenario registry",
+      "pass": true,
+      "detail": "10 scenarios"
+    },
+    {
+      "name": "require scenario runner",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require tour registry",
+      "pass": true,
+      "detail": "10 tours"
+    },
+    {
+      "name": "require route module",
+      "pass": true,
+      "detail": "loaded"
+    },
+    {
+      "name": "barrel loads",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "generate sample demo data",
+      "pass": true,
+      "detail": "8 customers"
+    },
+    {
+      "name": "start AI Tools Reseller scenario",
+      "pass": true,
+      "detail": "5 pages"
+    },
+    {
+      "name": "start Customer 360 tour",
+      "pass": true,
+      "detail": "Profile"
+    },
+    {
+      "name": "demo=true everywhere",
+      "pass": true,
+      "detail": "demo=true"
+    },
+    {
+      "name": "dryRun=true everywhere",
+      "pass": true,
+      "detail": "dryRun=true"
+    },
+    {
+      "name": "live actions blocked",
+      "pass": true,
+      "detail": "blocked"
+    },
+    {
+      "name": "no phone/email/token leaks",
+      "pass": true,
+      "detail": "clean"
+    }
+  ]
+}
