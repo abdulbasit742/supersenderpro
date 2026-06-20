@@ -3097,7 +3097,7 @@ try {
 // END CUSTOMER PORTAL HOOK
 
 // BEGIN STAFF PORTAL HOOK
-// Staff Portal + Employee Self-Service HR Center (preview-only: no payroll/attendance/leave/expense mutation, no sends, PII masked).
+// Staff Portal + Employee Self-Service HR Center (preview-only: no live payroll/attendance/leave/expense mutation, no live send, PII masked, no external calls).
 try {
   const staffPortalRoutes = require('./routes/staffPortalRoutes');
   app.use('/api/staff-portal', staffPortalRoutes);
