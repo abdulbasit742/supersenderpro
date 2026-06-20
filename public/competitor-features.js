@@ -69,6 +69,22 @@ const FEATURES = [
     fields: [{k:'phone',v:'923001234567'}], raw:'signals', rawVal:'{"totalOrders":6,"messages":10,"lastActiveDays":5,"cartValue":12000}' },
   { title: 'CSV Import Validator', sub: 'Validate & de-dupe contacts', method: 'POST', path: '/api/wati/contacts/validate-import',
     fields: [], raw:'contacts', rawVal:'[{"name":"Ali","phone":"923001234567"},{"name":"Bad","phone":"123"}]' },
+
+  { cat: 'Optimization & Quality (Batch 5)' },
+  { title: 'A/B Test Creator', sub: 'Create message variant test', method: 'POST', path: '/api/wati/abtest/create',
+    fields: [{k:'name',v:'CTA Test'}], raw:'variants', rawVal:'["Buy now & save 10%","Order today, limited stock!"]' },
+  { title: 'A/B Test Result', sub: 'Record variant conversion', method: 'POST', path: '/api/wati/abtest/result',
+    fields: [{k:'testId',v:'ABT-XXXX'},{k:'variantId',v:'V1'},{k:'converted',type:'select',opts:['true','false']}] },
+  { title: 'Best-Time-to-Send', sub: 'Optimal broadcast windows', method: 'GET', path: '/api/wati/send-time/recommend',
+    fields: [{k:'segment',v:'students',query:true},{k:'timezone',v:'Asia/Karachi',query:true}] },
+  { title: 'Merge-Field Renderer', sub: 'Personalize {{tokens}}', method: 'POST', path: '/api/wati/messages/render',
+    fields: [{k:'template',type:'textarea',v:'Hi {{name}}, your order {{orderRef}} is ready!'}], raw:'data', rawVal:'{"name":"Ali","orderRef":"ORD-1001"}' },
+  { title: 'Compliance Checker', sub: 'Spam/ban risk pre-check', method: 'POST', path: '/api/wati/compliance/check',
+    fields: [{k:'message',type:'textarea',v:'CONGRATULATIONS YOU WON!!! 100% FREE click here now'}] },
+  { title: 'Stock Demand Forecaster', sub: 'Days until stockout', method: 'POST', path: '/api/wati/stock/forecast',
+    fields: [{k:'productId',v:'AI-PRO-001'},{k:'currentStock',v:'12',type:'number'},{k:'dailySalesAvg',v:'3',type:'number'},{k:'leadTimeDays',v:'3',type:'number'}] },
+  { title: 'Customer Health Score', sub: '0-100 RFM + NPS health', method: 'POST', path: '/api/wati/analytics/health-score',
+    fields: [{k:'recencyDays',v:'10',type:'number'},{k:'totalOrders',v:'5',type:'number'},{k:'totalSpent',v:'18000',type:'number'},{k:'npsScore',v:'9',type:'number'}] },
 ];
 
 const grid = document.getElementById('grid');
