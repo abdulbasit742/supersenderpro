@@ -1,0 +1,128 @@
+{
+  "generatedAt": "2026-06-20T12:45:48.363Z",
+  "passed": 24,
+  "failed": 0,
+  "total": 24,
+  "results": [
+    {
+      "name": "require barrel",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require boundary policy",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require evaluator",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require leak detector",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require route scanner",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require store scanner",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require cross-tenant simulation",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require isolation doctor",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require route module",
+      "pass": true,
+      "detail": "loaded"
+    },
+    {
+      "name": "default posture is dry-run",
+      "pass": true,
+      "detail": "dryRun=true"
+    },
+    {
+      "name": "raw export disabled by default",
+      "pass": true,
+      "detail": "no raw export"
+    },
+    {
+      "name": "Tenant A reading Tenant B is blocked",
+      "pass": true,
+      "detail": "critical"
+    },
+    {
+      "name": "assigned reseller client preview allowed",
+      "pass": true,
+      "detail": "allowed"
+    },
+    {
+      "name": "unassigned reseller client blocked",
+      "pass": true,
+      "detail": "blocked"
+    },
+    {
+      "name": "public requesting private data blocked",
+      "pass": true,
+      "detail": "blocked"
+    },
+    {
+      "name": "developer insufficient scope blocked",
+      "pass": true,
+      "detail": "blocked"
+    },
+    {
+      "name": "payload scan redacts phone/email/token",
+      "pass": true,
+      "detail": "3 findings"
+    },
+    {
+      "name": "secret in payload detected",
+      "pass": true,
+      "detail": "flagged"
+    },
+    {
+      "name": "route scanner runs",
+      "pass": true,
+      "detail": "19 routes"
+    },
+    {
+      "name": "store scanner runs (source-only)",
+      "pass": true,
+      "detail": "436 files"
+    },
+    {
+      "name": "simulations all pass",
+      "pass": true,
+      "detail": "10/10"
+    },
+    {
+      "name": "doctor produces score + status",
+      "pass": true,
+      "detail": "100/100 production_launch_ready_with_caution"
+    },
+    {
+      "name": "no raw export from report",
+      "pass": true,
+      "detail": "blocked"
+    },
+    {
+      "name": "no full phone/email/token leaks in snapshot",
+      "pass": true,
+      "detail": "clean"
+    }
+  ]
+}

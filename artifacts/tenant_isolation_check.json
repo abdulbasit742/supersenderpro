@@ -1,0 +1,106 @@
+{
+  "generatedAt": "2026-06-20T12:45:47.911Z",
+  "passed": 19,
+  "failed": 0,
+  "total": 19,
+  "doctorScore": 100,
+  "doctorStatus": "production_launch_ready_with_caution",
+  "blockers": [],
+  "checks": [
+    {
+      "name": "route module present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "server hook present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dashboard page present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dashboard js present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dashboard css present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "env placeholders present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "gitignore protections present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc TENANT_ISOLATION_COMMAND_CENTER.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc WORKSPACE_BOUNDARY_POLICIES.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc API_RESPONSE_LEAK_DETECTION.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "boundary policies load",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "sample tenant access blocked",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "sample reseller assigned allowed",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "payload leak detector redacts",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "route scanner runs",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "store scanner runs",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "cross-tenant simulations pass",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no secret/full-PII/raw leak in outputs",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doctor produces score",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}

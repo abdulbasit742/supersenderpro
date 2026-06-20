@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tenant Isolation — SuperSender Pro</title>
+  <link rel="stylesheet" href="/css/tenant-isolation.css" />
+</head>
+<body>
+  <header class="ti-header">
+    <div class="ti-title"><span class="ti-ico">🧱</span> Tenant Isolation <small>+ Workspace Boundary + Leak Detection</small></div>
+    <div id="ti-posture" class="ti-posture">Loading…</div>
+  </header>
+  <main class="ti-main">
+    <section class="ti-card"><h2>Overview</h2><div class="ti-grid" id="ti-overview"><div class="ti-muted">Loading…</div></div></section>
+
+    <section class="ti-card"><h2>Boundary Policies</h2>
+      <div class="ti-table-wrap"><table id="ti-policies"><thead><tr><th>Name</th><th>Boundary</th><th>Modules</th><th>Severity</th><th>Redaction</th></tr></thead><tbody><tr><td colspan="5" class="ti-muted">Loading…</td></tr></tbody></table></div>
+    </section>
+
+    <section class="ti-card"><h2>Boundary Evaluator</h2>
+      <div class="ti-tool">
+        <label>Actor <select id="ev-actor"><option>tenant</option><option>reseller</option><option>workspace_member</option><option>developer_app</option><option>public</option></select></label>
+        <button id="ev-run">Run sample check</button>
+        <pre id="ev-out" class="ti-out"></pre>
+      </div>
+    </section>
+
+    <section class="ti-card"><h2>Leak Detector</h2>
+      <div class="ti-tool">
+        <textarea id="leak-input" rows="4" placeholder='Paste sample payload, e.g. {"email":"a@b.com","phone":"+12025550147"}'></textarea>
+        <button id="leak-run">Scan payload</button>
+        <pre id="leak-out" class="ti-out"></pre>
+      </div>
+    </section>
+
+    <section class="ti-card"><h2>Route Scanner</h2><button id="route-run">Scan routes</button>
+      <div class="ti-table-wrap"><table id="ti-routes"><thead><tr><th>File</th><th>Scope</th><th>Auth</th><th>Tenant guard</th><th>Redaction</th><th>Risk</th></tr></thead><tbody></tbody></table></div>
+    </section>
+
+    <section class="ti-card"><h2>Store Scanner</h2><button id="store-run">Scan source</button><pre id="store-out" class="ti-out"></pre></section>
+
+    <section class="ti-card"><h2>Cross-Tenant Simulations</h2><button id="sim-run">Run simulations</button>
+      <div class="ti-table-wrap"><table id="ti-sims"><thead><tr><th>Simulation</th><th>Expected block</th><th>Decision</th><th>Result</th></tr></thead><tbody></tbody></table></div>
+    </section>
+
+    <section class="ti-card"><h2>Safety Panel</h2><ul id="ti-safety" class="ti-safety"><li class="ti-muted">Loading…</li></ul></section>
+  </main>
+  <script src="/js/tenant-isolation.js"></script>
+</body>
+</html>

@@ -38,7 +38,9 @@
     "feature-flags:check": "node scripts/feature-flags-check.js",
     "feature-flags:smoke": "node tests/smoke/featureFlagsSmoke.js",
     "security-gateway:check": "node scripts/security-gateway-check.js",
-    "security-gateway:smoke": "node tests/smoke/securityGatewaySmoke.js"
+    "security-gateway:smoke": "node tests/smoke/securityGatewaySmoke.js",
+    "tenant-isolation:check": "node scripts/tenant-isolation-check.js",
+    "tenant-isolation:smoke": "node tests/smoke/tenantIsolationSmoke.js"
   },
   "dependencies": {
     "@whiskeysockets/baileys": "^7.0.0-rc.9",

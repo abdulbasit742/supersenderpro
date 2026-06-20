@@ -65,3 +65,11 @@ artifacts/*abuse-raw*
 security-exports/private/
 *.security.raw.json
 *.abuse.raw.json
+
+# Tenant Isolation — protect raw tenant/leak reports (redacted-only, no full PII)
+data/tenant-isolation*.json
+artifacts/*tenant-isolation-raw*
+artifacts/*leak-raw*
+tenant-isolation-exports/private/
+*.tenant.raw.json
+*.leak.raw.json

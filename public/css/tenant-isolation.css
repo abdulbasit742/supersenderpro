@@ -1,0 +1,29 @@
+:root { --bg:#0f1419; --card:#161b22; --border:#283039; --txt:#e6edf3; --muted:#8b949e; --ok:#2ea043; --warn:#d29922; --crit:#f85149; }
+* { box-sizing: border-box; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--txt); }
+.ti-header { display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between; padding:16px 24px; border-bottom:1px solid var(--border); background:var(--card); }
+.ti-title { font-size:1.25rem; font-weight:600; }
+.ti-title small { color:var(--muted); font-weight:400; font-size:.8rem; }
+.ti-ico { margin-right:6px; }
+.ti-posture { font-size:.8rem; color:var(--muted); background:#0d1117; padding:6px 12px; border-radius:8px; border:1px solid var(--border); }
+.ti-main { max-width:1100px; margin:0 auto; padding:20px; display:grid; gap:18px; }
+.ti-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; }
+.ti-card h2 { margin:0 0 14px; font-size:1.05rem; }
+.ti-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; }
+.ti-stat { background:#0d1117; border:1px solid var(--border); border-radius:10px; padding:12px; }
+.ti-stat .v { font-size:1.5rem; font-weight:700; }
+.ti-stat .k { font-size:.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; }
+.ti-table-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; font-size:.82rem; }
+th,td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--border); white-space:nowrap; }
+th { color:var(--muted); font-weight:600; }
+.ti-muted { color:var(--muted); }
+button { background:var(--ok); color:#fff; border:0; padding:8px 14px; border-radius:8px; cursor:pointer; font-size:.82rem; margin:4px 6px 4px 0; }
+button:hover { opacity:.9; }
+select,textarea { background:#0d1117; color:var(--txt); border:1px solid var(--border); border-radius:6px; padding:6px 8px; width:100%; max-width:100%; font-family:inherit; }
+.ti-tool { display:flex; flex-direction:column; gap:8px; }
+.ti-out { background:#0d1117; border:1px solid var(--border); border-radius:8px; padding:12px; font-size:.78rem; overflow-x:auto; white-space:pre-wrap; max-height:280px; }
+.ti-safety { list-style:none; padding:0; margin:0; display:grid; gap:8px; }
+.ti-safety li { padding:8px 12px; background:#0d1117; border:1px solid var(--border); border-radius:8px; font-size:.85rem; }
+.risk-low,.pass-yes { color:var(--ok); } .risk-medium { color:var(--warn); } .risk-high,.risk-critical,.pass-no { color:var(--crit); }
+.badge-ok { color:var(--ok); } .badge-off { color:var(--crit); }
