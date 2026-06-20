@@ -1,0 +1,106 @@
+{
+  "generatedAt": "2026-06-20T08:15:33.571Z",
+  "passed": 18,
+  "failed": 0,
+  "total": 18,
+  "readinessScore": 54,
+  "readinessStatus": "setup_needed",
+  "blockers": [
+    "Business Profile: Start configuration",
+    "Admin Auth / RBAC: Add required credentials",
+    "Pilot Launch: Start configuration",
+    "Missing required credential: JWT_SECRET"
+  ],
+  "checks": [
+    {
+      "name": "route module present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "server hook present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dashboard page present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dashboard js present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dashboard css present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "env placeholders present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc UNIFIED_SETUP_WIZARD.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc TENANT_ONBOARDING_AUTOPILOT.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc BUSINESS_PRESETS.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc SETUP_CREDENTIAL_CHECKLIST.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doc PILOT_LAUNCH_GUIDE.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "sample profile created",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "steps generated",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "credential checklist built",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "autopilot plan generated",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "readiness report generated",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "tasks generated",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no secret values leaked",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}

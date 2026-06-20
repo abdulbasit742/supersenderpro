@@ -35,6 +35,8 @@
     "install:hooks": "node scripts/install-hooks.js",
     "doctor": "node scripts/doctor.js",
     "voice-ai:check": "node scripts/voice-ai-check.js",
+    "unified-setup:check": "node scripts/unified-setup-check.js",
+    "unified-setup:smoke": "node tests/smoke/unifiedSetupSmoke.js",
     "voice-ai:smoke": "node tests/smoke/voiceAISmoke.js",
     "marketplace:intelligence:check": "node scripts/marketplace-intelligence-check.js",
     "agent:serve": "node agent-runtime/server.js",

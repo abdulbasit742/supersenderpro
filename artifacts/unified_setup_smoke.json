@@ -1,0 +1,68 @@
+{
+  "generatedAt": "2026-06-20T08:15:33.921Z",
+  "passed": 12,
+  "failed": 0,
+  "total": 12,
+  "results": [
+    {
+      "name": "require route module",
+      "pass": true,
+      "detail": "loaded"
+    },
+    {
+      "name": "require barrel",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "create sample business profile",
+      "pass": true,
+      "detail": "biz_1781943047967_0lpa9t"
+    },
+    {
+      "name": "owner phone/email masked, raw removed",
+      "pass": true,
+      "detail": "****543 / bo***@***.com"
+    },
+    {
+      "name": "generate setup steps",
+      "pass": true,
+      "detail": "26 steps"
+    },
+    {
+      "name": "dry-run flag true by default",
+      "pass": true,
+      "detail": "dry-run"
+    },
+    {
+      "name": "inspect credential checklist",
+      "pass": true,
+      "detail": "31 items"
+    },
+    {
+      "name": "generate autopilot plan",
+      "pass": true,
+      "detail": "13 steps"
+    },
+    {
+      "name": "generate readiness score",
+      "pass": true,
+      "detail": "54/setup_needed"
+    },
+    {
+      "name": "generate onboarding tasks",
+      "pass": true,
+      "detail": "8 tasks"
+    },
+    {
+      "name": "connectors never crash on inspection",
+      "pass": true,
+      "detail": "18 modules"
+    },
+    {
+      "name": "no secrets leak in full output",
+      "pass": true,
+      "detail": "clean"
+    }
+  ]
+}

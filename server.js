@@ -3100,6 +3100,18 @@ try {
 } catch (e) {
   console.error('[MarketplaceIntel] failed to initialise (non-fatal):', e.message);
 }
+
+// BEGIN UNIFIED SETUP WIZARD HOOK
+// Tenant onboarding autopilot (inspect-only, dry-run by default). Never calls external APIs.
+try {
+  const unifiedSetupRoutes = require('./routes/unifiedSetupRoutes');
+  app.use('/api/unified-setup', unifiedSetupRoutes);
+  app.get('/unified-setup', (req, res) => res.sendFile(path.join(__dirname, 'public', 'unified-setup.html')));
+  console.log('[UnifiedSetup] mounted at /api/unified-setup (dry-run default)');
+} catch (e) {
+  console.error('[UnifiedSetup] failed to initialise (non-fatal):', e.message);
+}
+// END UNIFIED SETUP WIZARD HOOK
 // END MARKETPLACE INTELLIGENCE HOOK
 
 

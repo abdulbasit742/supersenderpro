@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unified Setup Wizard — SuperSender Pro</title>
+  <link rel="stylesheet" href="/css/unified-setup.css" />
+</head>
+<body>
+  <header class="us-header">
+    <div class="us-brand">
+      <span class="us-logo">🚀</span>
+      <div>
+        <h1>Unified Setup Wizard</h1>
+        <p class="us-sub">Tenant onboarding autopilot · zero to pilot-ready</p>
+      </div>
+    </div>
+    <div id="us-score-pill" class="us-pill">Loading…</div>
+  </header>
+
+  <main class="us-main">
+    <!-- 1. Overview -->
+    <section class="us-section">
+      <h2>Setup Overview</h2>
+      <div class="us-cards" id="us-overview"></div>
+      <div id="us-blockers" class="us-blockers"></div>
+    </section>
+
+    <!-- 2. Business profile -->
+    <section class="us-section us-card">
+      <h2>Business Profile</h2>
+      <div class="us-form">
+        <input id="bp-name" placeholder="Business name" />
+        <select id="bp-type"></select>
+        <input id="bp-country" placeholder="Country" />
+        <input id="bp-timezone" placeholder="Timezone (e.g. Asia/Karachi)" />
+        <input id="bp-currency" placeholder="Currency (e.g. PKR)" />
+        <input id="bp-goals" placeholder="Automation goals (comma separated)" />
+      </div>
+      <button class="us-btn" onclick="UnifiedSetup.saveProfile()">Save Profile</button>
+      <span id="bp-saved" class="us-saved"></span>
+    </section>
+
+    <!-- 5. Autopilot plan -->
+    <section class="us-section">
+      <h2>Autopilot Plan <span id="us-plan-type" class="us-badge"></span></h2>
+      <div class="us-table-wrap"><table class="us-table" id="us-plan">
+        <thead><tr><th>#</th><th>Step</th><th>Status</th><th>Priority</th></tr></thead><tbody></tbody>
+      </table></div>
+    </section>
+
+    <!-- 3. Setup steps -->
+    <section class="us-section">
+      <h2>Setup Steps</h2>
+      <div class="us-steps" id="us-steps"></div>
+    </section>
+
+    <!-- 4. Credential checklist -->
+    <section class="us-section">
+      <h2>Credential Checklist <span class="us-badge us-badge-safe">names only</span></h2>
+      <div class="us-table-wrap"><table class="us-table" id="us-creds">
+        <thead><tr><th>Group</th><th>Env Var</th><th>Required</th><th>Status</th><th>Purpose</th></tr></thead><tbody></tbody>
+      </table></div>
+    </section>
+
+    <!-- 6. Onboarding tasks -->
+    <section class="us-section">
+      <h2>Onboarding Tasks <button class="us-btn us-btn-ghost" onclick="UnifiedSetup.generateTasks()">Generate from missing setup</button></h2>
+      <div class="us-table-wrap"><table class="us-table" id="us-tasks">
+        <thead><tr><th>Task</th><th>Priority</th><th>Status</th><th>Actions</th></tr></thead><tbody></tbody>
+      </table></div>
+    </section>
+
+    <!-- 7. Export -->
+    <section class="us-section us-card">
+      <h2>Export</h2>
+      <button class="us-btn" onclick="UnifiedSetup.exportReport()">Export Setup Report (JSON)</button>
+      <button class="us-btn us-btn-ghost" onclick="UnifiedSetup.copySummary()">Copy Setup Summary</button>
+      <pre class="us-out" id="us-export"></pre>
+    </section>
+
+    <footer class="us-footer">
+      <strong>Safe by design:</strong> Setup verification is local and <em>dry-run</em> by default.
+      The wizard never stores raw credentials — only env-var names and whether they are set.
+      It never calls external APIs or modifies live modules.
+    </footer>
+  </main>
+  <script src="/js/unified-setup.js"></script>
+</body>
+</html>
