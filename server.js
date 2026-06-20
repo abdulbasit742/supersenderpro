@@ -3066,6 +3066,19 @@ const webhookDispatcher = new WebhookDispatcher();
 const growthRoutes = require('./routes/growth')(loyaltyProgram, webhookDispatcher);
 app.use('/api', growthRoutes);
 
+// ── Channel Automation Command Center (sources/targets/queue/social bridge) ──
+let channelAutomationCenter = null;
+try {
+  const { createChannelAutomationCenter } = require('./lib/channelAutomationCenter');
+  channelAutomationCenter = createChannelAutomationCenter({ dataDir });
+  app.use('/api', require('./routes/channelAutomation')(channelAutomationCenter));
+  app.get('/channel-automation', (req, res) => res.sendFile(path.join(__dirname, 'public', 'channel-automation.html')));
+  channelAutomationCenter.startScheduler();
+  console.log('[ChannelCenter] Channel Automation Command Center mounted at /api/channels/*');
+} catch (e) {
+  console.error('[ChannelCenter] failed to initialise (non-fatal):', e.message);
+}
+
 
 let searchIndexRebuildTimer = null;
 function scheduleSearchIndexRebuild(reason = 'data-change', delayMs = Number(process.env.SEARCH_REBUILD_DEBOUNCE_MS || 30000)) {
@@ -31897,7 +31910,7 @@ function splitSocialCommandArgs(text = '') {
 }
 
 function isWhatsAppSocialCommand(text = '') {
-  return /^!(social|connect|suboauth|subscriptionoauth|subaccounts|connectsub|post|draft|approvepost|sharepost|poststatus|comment|telegram|control|admin|menuadmin|server|status|health|complete|completion|setupcheck|setupvalidator|setupfix|doctor|watchdog|cloudapi|officialwa|next50|antigravity|aihub|automationhub|agents|agentcontrol|agenttask|autobuild|claw|claws|zeroclaw|pcagents|importskills|skillpacks|packs|waauto|automation|autosettings|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelfix|channelwatch|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
+  return /^!(social|connect|suboauth|subscriptionoauth|subaccounts|connectsub|post|draft|approvepost|sharepost|poststatus|comment|telegram|control|admin|menuadmin|server|status|health|complete|completion|setupcheck|setupvalidator|setupfix|doctor|watchdog|cloudapi|officialwa|next50|antigravity|aihub|automationhub|agents|agentcontrol|agenttask|autobuild|claw|claws|zeroclaw|pcagents|importskills|skillpacks|packs|waauto|automation|autosettings|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelfix|channelwatch|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|channelstatus|channelsources|channeltargets|channelqueue|channelapprove|channelreject|channelpublish|pausechannels|resumechannels|addsource|addtarget|route|digest|channeldoctor|report|backup)\b/i.test(String(text || '').trim());
 }
 
 function adminNumberCandidates() {
@@ -33068,6 +33081,17 @@ async function handleWhatsAppSocialAdminCommand(ctx = {}) {
   const reply = async (message) => ctx.reply?.(cleanOutgoingText(message));
 
   try {
+    // ── Channel Automation Command Center commands (Module 7) ──
+    if (channelAutomationCenter && channelAutomationCenter.isAdminCommand(text)) {
+      try {
+        const out = await channelAutomationCenter.handleAdminCommand(command, args.slice(1));
+        await reply(out);
+      } catch (e) {
+        await reply('⚠️ Channel command error: ' + e.message);
+      }
+      return true;
+    }
+
     if (command === '!control' || command === '!admin' || command === '!menuadmin') {
       await reply(buildWhatsAppAdminControlMenu());
       return true;
