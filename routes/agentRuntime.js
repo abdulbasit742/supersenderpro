@@ -60,6 +60,30 @@ module.exports = function buildRouter(express) {
     res.json({ success: Boolean(t), task: t });
   });
 
+  // Explain a single action's sandbox decision without executing it.
+  router.post('/api/agent-runtime/explain', (req, res) => {
+    const { tool, args, dryRun, approved } = req.body || {};
+    res.json(runtime.explain(tool, args || {}, { dryRun, approved: Boolean(approved) }));
+  });
+
+  // Run history (audit log).
+  router.get('/api/agent-runtime/runs', (req, res) =>
+    res.json({ success: true, stats: runtime.runs.stats(),
+      runs: runtime.runs.list({ limit: Number(req.query.limit) || 50, agent: req.query.agent }) }));
+  router.get('/api/agent-runtime/runs/:id', (req, res) => {
+    const r = runtime.runs.get(req.params.id);
+    res.status(r ? 200 : 404).json(r || { success: false, error: 'not found' });
+  });
+
+  // Metrics: JSON or Prometheus text (?format=prometheus).
+  router.get('/api/agent-runtime/metrics', (req, res) => {
+    if (req.query.format === 'prometheus') {
+      res.setHeader('Content-Type', 'text/plain; version=0.0.4');
+      return res.send(runtime.metrics.prometheus());
+    }
+    res.json({ success: true, ...runtime.metrics.json() });
+  });
+
   return router;
 };
 module.exports.rateLimiter = rateLimiter;

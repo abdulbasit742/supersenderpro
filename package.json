@@ -36,6 +36,7 @@
     "doctor": "node scripts/doctor.js",
     "agent:serve": "node agent-runtime/server.js",
     "agent:demo": "node agent-runtime/demo.js",
+    "agent:cli": "node agent-runtime/cli.js",
     "agent:test": "node --test agent-runtime/__tests__/"
   },
   "dependencies": {

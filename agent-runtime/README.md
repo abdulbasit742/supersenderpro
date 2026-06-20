@@ -60,6 +60,10 @@ node agent-runtime/server.js                                                    
 | GET  | `/api/agent-runtime/queue` | Pending/approved/executed drafts |
 | POST | `/api/agent-runtime/queue/:id/approve` | Approve **and execute** a draft |
 | POST | `/api/agent-runtime/queue/:id/reject` | Reject a draft |
+| POST | `/api/agent-runtime/explain` | `{tool,args}` → why it would be allowed/blocked/queued |
+| GET  | `/api/agent-runtime/runs` | Run history (audit log) + stats |
+| GET  | `/api/agent-runtime/runs/:id` | A single recorded run |
+| GET  | `/api/agent-runtime/metrics` | JSON, or Prometheus text with `?format=prometheus` |
 
 Set `AGENT_RUNTIME_API_KEY` to require `Authorization: Bearer <key>` on every route.
 
@@ -75,3 +79,24 @@ Add an adapter in `agents.js`:
 AGENTS.mycrew = { name: 'My Crew', kind: 'llm', plan: async (goal) => ([{ tool: 'list_orders', args: {}, rationale: '...' }]) };
 ```
 Whatever it returns is still forced through the sandbox — it can never exceed the tool set or policy.
+
+## Operability features
+
+- **Audit log** (`auditLog.js`) — every run is recorded to `data/agent-runtime/audit-log.json`; query via `/runs` or the dashboard's *Run history* panel.
+- **Metrics** (`metrics.js`) — `/api/agent-runtime/metrics?format=prometheus` for Prometheus/Grafana scraping.
+- **Approval notifications** (`notify.js`) — set `AGENT_RUNTIME_NOTIFY_URL` to get a webhook POST whenever an action needs approval.
+- **Risky-action quota** — `AGENT_RUNTIME_MAX_RISKY_PER_RUN` (default 5) caps how many medium/high-risk actions a single live run may attempt; the rest are marked `quota_exceeded`.
+- **Explain** — `POST /api/agent-runtime/explain {tool,args}` returns the sandbox decision + classification without executing.
+
+## CLI
+```bash
+npm run agent:cli -- status
+npm run agent:cli -- run "give me a sales overview and follow up cold leads"   # dry-run
+npm run agent:cli -- run "send a reminder" --live                              # live (still gated)
+npm run agent:cli -- queue        # approval queue
+npm run agent:cli -- runs         # run history
+npm run agent:cli -- approve <draftId>
+npm run agent:cli -- explain send_whatsapp_message '{"to":"1","message":"hi"}'
+npm run agent:cli -- metrics --prometheus
+# pick an agent:  AGENT=crewai npm run agent:cli -- run "..."
+```
