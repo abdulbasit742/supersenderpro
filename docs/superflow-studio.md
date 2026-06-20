@@ -228,3 +228,43 @@ counts, average duration and the last 10 runs. Shown in the **📊 Flow Analytic
 
 ### Node library search
 A search box filters the node library by label/type.
+
+---
+
+## v4 additions (shipped)
+
+### Inbound webhook triggers
+Any flow can be fired by an external system (n8n, ecommerce, forms, cron services):
+
+| Method | Route | Purpose |
+|---|---|---|
+| GET | `/api/flow-studio/hooks/:flowId` | Get the hook URL + whether it's protected |
+| POST | `/api/flow-studio/hooks/:flowId` | Fire the flow — the JSON body becomes the run input |
+
+The POST body is used as the flow input. Runs are **dry-run** unless the flow is active and
+`?live=true` is sent. Optional security: set `flow.variables.webhookSecret` and pass it via the
+`x-flow-secret` header or `?secret=` (missing/incorrect → 401). The **🔌 Webhook** card shows
+the URL (copyable) and a secret field.
+
+### Manual live run
+The **▶▶ Live Run** button runs an active flow live on demand (with a confirm dialog).
+
+### Save flow as a custom template
+`POST /api/flow-studio/flows/:id/save-as-template` (or the **🧱 Save as Template** button) turns
+the current flow into a reusable template shown in the gallery (`custom: true`).
+
+### Backup — export / import all
+| Method | Route | Purpose |
+|---|---|---|
+| GET | `/api/flow-studio/export-all` | Download all flows + custom templates as JSON |
+| POST | `/api/flow-studio/import-all` | Import flows (`mode: "merge"\|"replace"`); new IDs assigned |
+
+Toolbar buttons **🗄 Export All** / **📥 Import All** drive these.
+
+### Studio metrics
+`GET /api/flow-studio/metrics?days=14` returns runs-by-day, status totals and the top flows.
+The **📈 Studio Metrics** card renders a 14-day mini bar chart.
+
+### Single-node test
+`POST /api/flow-studio/test-node` dry-runs one node in isolation (`{ node, input }`). The
+**🧪 Test Node** button tests the currently selected node and prints the result to the log panel.

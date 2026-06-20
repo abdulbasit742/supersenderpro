@@ -49518,6 +49518,160 @@ app.get('/api/flow-studio/flows/:id/analytics', (req, res) => {
 });
 
 
+// ===================================================================
+// SuperFlow Studio v4 — Webhook triggers, templates from flows,
+// backup export/import, metrics, single-node test
+// ===================================================================
+
+// ---- Inbound webhook trigger ------------------------------------
+// External systems (n8n, ecommerce, forms) can fire a flow.
+// Security: if flow.variables.webhookSecret is set, it must match
+// the ?secret= query or x-flow-secret header.
+app.get('/api/flow-studio/hooks/:flowId', (req, res) => {
+  try {
+    const flow = loadFlowStudioFlows().find(f => f.id === req.params.flowId);
+    if (!flow) return res.status(404).json({ success: false, error: 'Flow not found' });
+    const base = String(process.env.SUPERSENDER_API_BASE || `http://localhost:${PORT}`).replace(/\/+$/, '');
+    res.json(flowStudioJson({
+      success: true,
+      flowId: flow.id,
+      method: 'POST',
+      url: `${base}/api/flow-studio/hooks/${flow.id}`,
+      protectedHook: !!(flow.variables && flow.variables.webhookSecret),
+      note: 'POST a JSON body; it becomes the flow run input. Dry-run unless the flow is active and live=true is sent.'
+    }));
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.post('/api/flow-studio/hooks/:flowId', async (req, res) => {
+  try {
+    const flow = loadFlowStudioFlows().find(f => f.id === req.params.flowId);
+    if (!flow) return res.status(404).json({ success: false, error: 'Flow not found' });
+    const required = flow.variables && flow.variables.webhookSecret;
+    if (required) {
+      const provided = req.headers['x-flow-secret'] || req.query.secret || (req.body && req.body.__secret);
+      if (String(provided || '') !== String(required)) return res.status(401).json({ success: false, error: 'Invalid webhook secret' });
+    }
+    const body = (req.body && typeof req.body === 'object') ? { ...req.body } : {};
+    delete body.__secret;
+    const live = req.query.live === 'true' || body.__live === true;
+    delete body.__live;
+    const result = await runFlow(flow.id, body, { live });
+    res.json(flowStudioJson(result));
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+// ---- Save an existing flow as a reusable template ---------------
+app.post('/api/flow-studio/flows/:id/save-as-template', (req, res) => {
+  try {
+    const flow = loadFlowStudioFlows().find(f => f.id === req.params.id);
+    if (!flow) return res.status(404).json({ success: false, error: 'Flow not found' });
+    const templates = loadFlowStudioTemplates();
+    const slug = String(req.body?.name || req.body?.id || flow.name || 'custom-template')
+      .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 48) || `custom-${Date.now()}`;
+    let id = slug, n = 2;
+    while (templates.some(t => t.id === id)) id = `${slug}-${n++}`;
+    const tpl = {
+      id,
+      name: req.body?.name || `${flow.name} (template)`,
+      description: req.body?.description || flow.description || 'Custom template saved from a flow.',
+      triggerType: flow.triggerType || (flow.nodes?.[0]?.type) || '',
+      custom: true,
+      nodes: JSON.parse(JSON.stringify(flow.nodes || [])),
+      edges: JSON.parse(JSON.stringify(flow.edges || []))
+    };
+    templates.push(tpl);
+    saveFlowStudioFileSync(FLOW_STUDIO_TEMPLATES_FILE, templates);
+    res.json(flowStudioJson({ success: true, template: tpl }));
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+// ---- Backup: export all / import all ----------------------------
+app.get('/api/flow-studio/export-all', (_req, res) => {
+  try {
+    res.json(flowStudioJson({
+      success: true,
+      exportedAt: new Date().toISOString(),
+      version: 4,
+      flows: loadFlowStudioFlows(),
+      templates: loadFlowStudioTemplates().filter(t => t.custom)
+    }));
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.post('/api/flow-studio/import-all', (req, res) => {
+  try {
+    const incoming = Array.isArray(req.body?.flows) ? req.body.flows : [];
+    const mode = String(req.body?.mode || 'merge');
+    let flows = mode === 'replace' ? [] : loadFlowStudioFlows();
+    const now = new Date().toISOString();
+    let added = 0;
+    for (const f of incoming) {
+      if (!f || typeof f !== 'object') continue;
+      flows.push({
+        ...f,
+        id: flowStudioId('flow'),
+        status: 'draft',
+        createdAt: now, updatedAt: now, lastRunAt: null
+      });
+      added++;
+    }
+    saveFlowStudioFlows(flows);
+    // optional custom templates
+    if (Array.isArray(req.body?.templates) && req.body.templates.length) {
+      const templates = loadFlowStudioTemplates();
+      for (const t of req.body.templates) {
+        if (t && t.id && !templates.some(x => x.id === t.id)) templates.push({ ...t, custom: true });
+      }
+      saveFlowStudioFileSync(FLOW_STUDIO_TEMPLATES_FILE, templates);
+    }
+    res.json(flowStudioJson({ success: true, imported: added, mode, totalFlows: flows.length }));
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+// ---- Aggregate metrics ------------------------------------------
+app.get('/api/flow-studio/metrics', (req, res) => {
+  try {
+    const days = Math.max(1, Math.min(60, Number(req.query.days || 14)));
+    const runs = loadFlowStudioRuns();
+    const flows = loadFlowStudioFlows();
+    const byDay = {};
+    const start = new Date(); start.setHours(0, 0, 0, 0); start.setDate(start.getDate() - (days - 1));
+    for (let i = 0; i < days; i++) { const d = new Date(start); d.setDate(start.getDate() + i); byDay[d.toISOString().slice(0, 10)] = { date: d.toISOString().slice(0, 10), total: 0, completed: 0, failed: 0 }; }
+    const byStatus = { completed: 0, failed: 0, paused_approval: 0 };
+    const perFlow = {};
+    for (const r of runs) {
+      byStatus[r.status] = (byStatus[r.status] || 0) + 1;
+      perFlow[r.flowId] = perFlow[r.flowId] || { flowId: r.flowId, flowName: r.flowName, runs: 0, failed: 0 };
+      perFlow[r.flowId].runs++; if (r.status === 'failed') perFlow[r.flowId].failed++;
+      const key = (r.finishedAt || r.startedAt || '').slice(0, 10);
+      if (byDay[key]) { byDay[key].total++; if (r.status === 'completed') byDay[key].completed++; if (r.status === 'failed') byDay[key].failed++; }
+    }
+    const topFlows = Object.values(perFlow).sort((a, b) => b.runs - a.runs).slice(0, 5);
+    res.json(flowStudioJson({
+      success: true,
+      days,
+      totals: { flows: flows.length, runs: runs.length, ...byStatus },
+      byDay: Object.values(byDay),
+      topFlows
+    }));
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+// ---- Single node test (dry-run a node in isolation) -------------
+app.post('/api/flow-studio/test-node', async (req, res) => {
+  try {
+    const node = req.body?.node;
+    if (!node || !node.type) return res.status(400).json({ success: false, error: 'node with a type is required' });
+    const typeIndex = flowStudioNodeTypeIndex();
+    if (!typeIndex[node.type]) return res.status(400).json({ success: false, error: `Unknown node type: ${node.type}` });
+    const ctx = { flowId: 'test', input: req.body?.input || {}, live: false, vars: {}, log: () => {} };
+    const result = await executeFlowNode({ id: 'test', label: node.label || typeIndex[node.type].label, type: node.type, config: node.config || {} }, ctx);
+    res.json(flowStudioJson({ success: true, result }));
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+
 function shouldServeDashboardSpa(req) {
   const urlPath = String(req.path || '');
   if (req.method !== 'GET') return false;

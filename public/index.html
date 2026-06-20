@@ -4511,6 +4511,13 @@ curl -X POST http://localhost:3001/mcp/send \
       <button class="btn btn-secondary" onclick="fsExportJSON()">⬇ Export JSON</button>
       <button class="btn btn-secondary" onclick="document.getElementById('fs-import-file').click()">⬆ Import JSON</button>
       <input type="file" id="fs-import-file" accept="application/json" style="display:none" onchange="fsImportJSON(event)"/>
+      <button class="btn btn-secondary" onclick="fsLiveRun()">▶▶ Live Run</button>
+      <button class="btn btn-secondary" onclick="fsTestNode()">🧪 Test Node</button>
+      <button class="btn btn-secondary" onclick="fsSaveAsTemplate()">🧱 Save as Template</button>
+      <button class="btn btn-secondary" onclick="fsShowWebhook()">🔌 Webhook</button>
+      <button class="btn btn-secondary" onclick="fsExportAll()">🗄 Export All</button>
+      <button class="btn btn-secondary" onclick="document.getElementById('fs-importall-file').click()">📥 Import All</button>
+      <input type="file" id="fs-importall-file" accept="application/json" style="display:none" onchange="fsImportAll(event)"/>
     </div>
   </div>
 
@@ -4555,6 +4562,18 @@ curl -X POST http://localhost:3001/mcp/send \
     <div class="card" id="fs-analytics-card">
       <div class="card-title" style="margin:0">📊 Flow Analytics</div>
       <div id="fs-analytics" style="font-size:12px;opacity:.7">Save/open a flow and click Analytics.</div>
+    </div>
+  </div>
+
+  <!-- Metrics + webhook -->
+  <div class="grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+    <div class="card">
+      <div class="flex-between"><div class="card-title" style="margin:0">📈 Studio Metrics (14d)</div><button class="btn btn-secondary" onclick="fsRenderMetrics()">Refresh</button></div>
+      <div id="fs-metrics" style="font-size:12px;opacity:.7">Loading…</div>
+    </div>
+    <div class="card" id="fs-webhook-card" style="display:none">
+      <div class="card-title" style="margin:0">🔌 Webhook Trigger</div>
+      <div id="fs-webhook" style="font-size:12px"></div>
     </div>
   </div>
 
@@ -18093,6 +18112,116 @@ async function fsInstallTemplate(id) {
       await orig.apply(this, arguments);
       try { await fsRenderFlowsList(); fsRenderVars(); } catch (e) {}
     };
+  }
+})();
+</script>
+
+<script>
+/* ===== SuperFlow Studio frontend v4 ===== */
+(function () {
+  // ---- Manual live run ----
+  window.fsLiveRun = async function () {
+    if (!fsState.flow || !fsState.flow.id) { toast('Save the flow first', 'info'); return; }
+    if (fsState.flow.status !== 'active') { toast('Activate the flow before a live run', 'info'); return; }
+    if (!confirm('Run this flow LIVE now? Live actions (messages, posts) may be sent.')) return;
+    try {
+      const res = await api('/api/flow-studio/flows/' + encodeURIComponent(fsState.flow.id) + '/run', { method: 'POST', body: JSON.stringify({ live: true, input: {} }) });
+      if (typeof fsRenderRunLogs === 'function' && res.run) fsRenderRunLogs(res.run);
+      toast('Live run: ' + (res.run ? res.run.status : 'done'), res.success ? 'success' : 'error');
+      if (typeof fsRenderStats === 'function') fsRenderStats();
+    } catch (e) { toast('Live run failed: ' + e.message, 'error'); }
+  };
+
+  // ---- Test selected node in isolation ----
+  window.fsTestNode = async function () {
+    const node = (fsState.flow.nodes || []).find(n => n.id === fsState.selected);
+    if (!node) { toast('Select a node to test', 'info'); return; }
+    try {
+      const res = await api('/api/flow-studio/test-node', { method: 'POST', body: JSON.stringify({ node: { type: node.type, label: node.label, config: node.config || {} }, input: {} }) });
+      const panel = document.getElementById('fs-log-panel');
+      if (panel) { const d = document.createElement('div'); d.style.color = '#a78bfa'; d.textContent = `🧪 Test [${node.label}]: ${res.result?.message || JSON.stringify(res.result)}`; panel.appendChild(d); panel.scrollTop = panel.scrollHeight; }
+      toast('Node tested (dry run)', 'success');
+    } catch (e) { toast('Test failed: ' + e.message, 'error'); }
+  };
+
+  // ---- Save current flow as a reusable template ----
+  window.fsSaveAsTemplate = async function () {
+    if (!fsState.flow || !fsState.flow.id) { toast('Save the flow first', 'info'); return; }
+    const name = prompt('Template name:', (fsState.flow.name || 'My Template') + ' (template)');
+    if (name === null) return;
+    try {
+      await api('/api/flow-studio/flows/' + encodeURIComponent(fsState.flow.id) + '/save-as-template', { method: 'POST', body: JSON.stringify({ name }) });
+      toast('Saved as template', 'success');
+      if (typeof fsRenderTemplates === 'function') fsRenderTemplates();
+    } catch (e) { toast('Save as template failed: ' + e.message, 'error'); }
+  };
+
+  // ---- Webhook trigger info ----
+  window.fsShowWebhook = async function () {
+    if (!fsState.flow || !fsState.flow.id) { toast('Save the flow first', 'info'); return; }
+    try {
+      const d = await api('/api/flow-studio/hooks/' + encodeURIComponent(fsState.flow.id));
+      const card = document.getElementById('fs-webhook-card'); const box = document.getElementById('fs-webhook');
+      if (card) card.style.display = 'block';
+      const secret = (fsState.flow.variables && fsState.flow.variables.webhookSecret) || '';
+      box.innerHTML = `
+        <div style="opacity:.7;margin-bottom:4px">POST a JSON body to fire this flow (dry-run unless active &amp; <code>?live=true</code>):</div>
+        <div style="display:flex;gap:4px;margin-bottom:6px"><input id="fs-hook-url" readonly value="${d.url}" style="flex:1;font-size:11px;font-family:monospace;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:inherit;border-radius:4px;padding:4px"/><button class="btn btn-secondary" style="font-size:11px" onclick="navigator.clipboard&amp;&amp;navigator.clipboard.writeText(document.getElementById('fs-hook-url').value);toast('Copied','success')">Copy</button></div>
+        <div class="form-group"><label style="font-size:11px">Webhook secret (optional)</label><input id="fs-hook-secret" value="${secret}" placeholder="leave empty for none" onchange="fsSetWebhookSecret(this.value)" style="width:100%;font-size:11px"/></div>
+        <div style="font-size:10px;opacity:.6">Send secret via <code>x-flow-secret</code> header or <code>?secret=</code>. Remember to Save.</div>`;
+    } catch (e) { toast('Webhook info failed: ' + e.message, 'error'); }
+  };
+  window.fsSetWebhookSecret = function (val) { fsState.flow.variables = fsState.flow.variables || {}; if (val) fsState.flow.variables.webhookSecret = val; else delete fsState.flow.variables.webhookSecret; toast('Secret set (Save to persist)', 'info'); if (typeof fsRenderVars === 'function') fsRenderVars(); };
+
+  // ---- Backup export / import all ----
+  window.fsExportAll = async function () {
+    try {
+      const d = await api('/api/flow-studio/export-all');
+      const blob = new Blob([JSON.stringify(d, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'flow-studio-backup.json'; a.click(); URL.revokeObjectURL(a.href);
+      toast('Exported ' + (d.flows || []).length + ' flows', 'success');
+    } catch (e) { toast('Export all failed: ' + e.message, 'error'); }
+  };
+  window.fsImportAll = function (ev) {
+    const file = ev.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async () => {
+      try {
+        const obj = JSON.parse(reader.result);
+        const res = await api('/api/flow-studio/import-all', { method: 'POST', body: JSON.stringify({ flows: obj.flows || [], templates: obj.templates || [], mode: 'merge' }) });
+        toast('Imported ' + res.imported + ' flows', 'success');
+        if (typeof fsRenderFlowsList === 'function') fsRenderFlowsList();
+        if (typeof fsRenderStats === 'function') fsRenderStats();
+        if (typeof fsRenderTemplates === 'function') fsRenderTemplates();
+      } catch (e) { toast('Import all failed: ' + e.message, 'error'); }
+    };
+    reader.readAsText(file); ev.target.value = '';
+  };
+
+  // ---- Studio metrics (mini bar chart) ----
+  window.fsRenderMetrics = async function () {
+    try {
+      const d = await api('/api/flow-studio/metrics?days=14');
+      const box = document.getElementById('fs-metrics'); if (!box) return;
+      box.style.opacity = '1';
+      const max = Math.max(1, ...d.byDay.map(x => x.total));
+      const bars = d.byDay.map(x => {
+        const h = Math.round((x.total / max) * 40);
+        const col = x.failed > 0 ? '#ef4444' : x.total > 0 ? '#16a34a' : 'rgba(255,255,255,.1)';
+        return `<div title="${x.date}: ${x.total} runs (${x.failed} failed)" style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center"><div style="width:70%;height:${Math.max(2, h)}px;background:${col};border-radius:2px"></div></div>`;
+      }).join('');
+      const t = d.totals || {};
+      box.innerHTML = `
+        <div style="display:flex;align-items:flex-end;gap:2px;height:48px;margin:6px 0">${bars}</div>
+        <div style="font-size:11px;opacity:.75">Runs: ${t.runs || 0} · ✅ ${t.completed || 0} · ❌ ${t.failed || 0} · ⏸ ${t.paused_approval || 0} · Flows: ${t.flows || 0}</div>
+        ${(d.topFlows || []).length ? '<div style="font-size:11px;margin-top:4px;opacity:.8">Top: ' + d.topFlows.map(f => `${f.flowName} (${f.runs})`).join(', ') + '</div>' : ''}`;
+    } catch (e) { /* silent */ }
+  };
+
+  // ---- Hook into loadFlowStudio to render metrics ----
+  if (typeof window.loadFlowStudio === 'function') {
+    const orig = window.loadFlowStudio;
+    window.loadFlowStudio = async function () { await orig.apply(this, arguments); try { await fsRenderMetrics(); } catch (e) {} };
   }
 })();
 </script>
