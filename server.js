@@ -42731,7 +42731,11 @@ app.post('/api/analytics/sentiment', async (req, res) => {
       return res.status(400).json({ error: 'customerId and message are required' });
     }
     const analysis = await sentimentAnalyzer.recordSentiment(customerId, message, direction);
-    res.json(analysis);
+    const sarcasm = detectSarcasmSignals(message, { platform: 'whatsapp_chat', source: 'sentiment-route', direction });
+    res.json({
+      ...(analysis && typeof analysis === 'object' ? analysis : { analysis }),
+      sarcasm
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -45513,17 +45517,20 @@ app.post('/api/ai/suggest-reply', async (req, res) => {
   const { number, name } = req.body;
   if (conversationControlSnapshot(number || '').aiPaused) return res.status(409).json({ error: 'AI replies are stopped for this chat' });
   const latestMessage = String(req.body?.message || '').trim();
-  const compliance = analyzeStructuredIntent(latestMessage);
-  const intent = analyzeCustomerIntent(latestMessage);
+  const conv = waConversations[number] || { history: [] };
+  const lastCustomerMessage = latestMessage || [...(conv.history || [])].reverse().find(h => h?.role === 'user' && h?.msg)?.msg || '';
+  const compliance = analyzeStructuredIntent(lastCustomerMessage);
+  const intent = analyzeCustomerIntent(lastCustomerMessage);
+  const sarcasm = detectSarcasmSignals(lastCustomerMessage, { platform: 'whatsapp_chat', source: 'cockpit-suggest-reply' });
   if (settings.ai_policy_mode === 'structured_only' && settings.allow_open_ended_ai !== true && compliance.openEnded) {
     return res.status(409).json({
       error: 'Open-ended AI replies are blocked by policy mode',
       compliance,
       intent,
+      sarcasm,
       recommendation: 'handoff_to_human'
     });
   }
-  const conv = waConversations[number] || { history: [] };
   const last5 = (conv.history || []).slice(-5).map(h => (h.role === 'user' ? 'Customer' : 'Bot') + ': ' + h.msg).join('\n');
   const cust = customers.find(c => c.number === number);
   const catalogSnip = laptopProducts.filter(p => p.stock).slice(0, 5).map(p => p.name + ' Rs.' + (p.price || 0)).join(', ');
@@ -45531,13 +45538,17 @@ app.post('/api/ai/suggest-reply', async (req, res) => {
     (cust ? ', Plan: ' + (cust.plan || 'none') + ', City: ' + (cust.city || 'unknown') : '') +
     '\nRecent chat:\n' + (last5 || 'No history') +
     '\nAvailable products: ' + (catalogSnip || 'none') +
-    '\nDetected intent: ' + JSON.stringify(intent);
+    '\nDetected intent: ' + JSON.stringify(intent) +
+    '\nTone/sarcasm analysis: ' + JSON.stringify({ label: sarcasm.label, score: sarcasm.score, risk: sarcasm.sentimentRisk, tone: sarcasm.tone });
   const replyStylePrompt = buildAIAutoReplyStylePrompt();
+  const toneGuard = sarcasm.sarcasm || sarcasm.sentimentRisk !== 'low'
+    ? ' Customer may be sarcastic/frustrated. Acknowledge calmly first, do not argue, and offer a concrete next step.'
+    : '';
   try {
-    const reply1 = await callAI(context + '\nWrite a friendly short reply.', 'You are a WhatsApp sales assistant for ' + (settings.business_name || 'Us') + '. Be concise and helpful. Max 2 sentences. ' + replyStylePrompt);
-    const reply2 = await callAI(context + '\nWrite a persuasive reply that tries to close the sale.', 'You are a top sales closer for ' + (settings.business_name || 'Us') + '. Max 2 sentences, create mild urgency. ' + replyStylePrompt);
-    const reply3 = await callAI(context + '\nWrite an empathetic reply that asks a qualifying question.', 'You are a helpful WhatsApp assistant for ' + (settings.business_name || 'Us') + '. Max 2 sentences. ' + replyStylePrompt);
-    res.json({ suggestions: [reply1, reply2, reply3], intent, compliance, style: {
+    const reply1 = await callAI(context + '\nWrite a friendly short reply.', 'You are a WhatsApp sales assistant for ' + (settings.business_name || 'Us') + '. Be concise and helpful. Max 2 sentences. ' + toneGuard + ' ' + replyStylePrompt);
+    const reply2 = await callAI(context + '\nWrite a persuasive reply that tries to close the sale.', 'You are a top sales closer for ' + (settings.business_name || 'Us') + '. Max 2 sentences, create mild urgency. ' + toneGuard + ' ' + replyStylePrompt);
+    const reply3 = await callAI(context + '\nWrite an empathetic reply that asks a qualifying question.', 'You are a helpful WhatsApp assistant for ' + (settings.business_name || 'Us') + '. Max 2 sentences. ' + toneGuard + ' ' + replyStylePrompt);
+    res.json({ suggestions: [reply1, reply2, reply3], intent, compliance, sarcasm, style: {
       language: settings.ai_reply_language || 'auto',
       dialect: settings.ai_reply_dialect || '',
       tone: settings.ai_reply_tone || 'friendly_sales'

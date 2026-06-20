@@ -1674,6 +1674,12 @@ button:disabled { opacity: .68; cursor: not-allowed; box-shadow: none !important
 </style>
 </head>
 <body>
+<div id="boot-paint" style="position:fixed;inset:0;z-index:99999;background:#0b141a;color:#e9edef;display:flex;align-items:center;justify-content:center;font-family:Inter,Arial,sans-serif">
+  <div style="max-width:420px;text-align:center;padding:22px;border:1px solid rgba(0,168,132,.35);border-radius:14px;background:#111b21;box-shadow:0 12px 40px rgba(0,0,0,.35)">
+    <div style="font-size:22px;font-weight:800;margin-bottom:8px">SuperSender Pro loading...</div>
+    <div style="font-size:13px;color:#9fb3bd;line-height:1.55">Agar screen blank rahe to Ctrl+F5 press karein. Server health aur dashboard boot status yahin show ho jayega.</div>
+  </div>
+</div>
 <!-- Sidebar -->
 <div id="sidebar">
   <div class="brand">
@@ -6867,6 +6873,7 @@ async function maybeAutoConnectWA() {
 
 // Init
 window.onload = async () => {
+    const bootPaint = document.getElementById('boot-paint');
     try {
       ensureSectionsInContent();
       applyUiMode();
@@ -6880,7 +6887,20 @@ window.onload = async () => {
       if (!showHashSection()) loadDashboard();
       setTimeout(() => handleWhatsAppDeepLink(), 400);
       initGlobalSearch();
-    } catch(e){}
+      setTimeout(() => { if (bootPaint) bootPaint.style.display = 'none'; }, 350);
+    } catch(e){
+      console.error('Dashboard boot failed:', e);
+      if (bootPaint) {
+        const safeBootMessage = (typeof escHtml === 'function' ? escHtml : (value) => String(value || '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])))(e.message || String(e));
+        bootPaint.style.display = 'flex';
+        bootPaint.innerHTML = `<div style="max-width:520px;text-align:left;padding:22px;border:1px solid rgba(239,68,68,.45);border-radius:14px;background:#111b21;color:#e9edef;box-shadow:0 12px 40px rgba(0,0,0,.35)">
+          <div style="font-size:20px;font-weight:800;margin-bottom:8px;color:#fca5a5">Dashboard boot failed</div>
+          <div style="font-size:13px;color:#cbd5dc;line-height:1.55;margin-bottom:12px">${safeBootMessage}</div>
+          <button class="btn btn-primary" onclick="location.reload()">Reload</button>
+          <a class="btn btn-secondary" style="margin-left:8px;text-decoration:none" href="/api/health" target="_blank">Open Health</a>
+        </div>`;
+      }
+    }
   };
 
 window.addEventListener('hashchange', showHashSection);
@@ -8420,7 +8440,9 @@ async function quickAISuggest() {
   try {
     const res = await api('/api/ai/suggest-reply', { method:'POST', body: JSON.stringify({ number: activeConvNumber, name: activeCustomer?.name || '' }) });
     const suggestions = res.suggestions || [];
-    box.innerHTML = suggestions.map(s => `<div style="padding:6px 8px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;cursor:pointer" onclick="setChatDraft('${escHtml(s).replace(/\\n/g,' ').replace(/'/g, '&#39;')}')">${escHtml(s)}</div>`).join('') || 'No suggestions';
+    const sarcasm = res.sarcasm || {};
+    const toneBadge = sarcasm.label ? `<div style="margin-bottom:8px"><span class="tag ${sarcasm.sentimentRisk === 'high' ? 'tag-red' : sarcasm.sentimentRisk === 'medium' ? 'tag-orange' : 'tag-green'}">${escHtml(sarcasm.label)}</span> <span class="tag tag-purple">Tone: ${escHtml(sarcasm.tone || 'neutral')}</span> <span class="tag">Score ${Number(sarcasm.score || 0)}/100</span></div>` : '';
+    box.innerHTML = toneBadge + ((suggestions.map(s => `<div style="padding:6px 8px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;cursor:pointer" onclick="setChatDraft('${escHtml(s).replace(/\\n/g,' ').replace(/'/g, '&#39;')}')">${escHtml(s)}</div>`).join('')) || 'No suggestions');
   } catch (e) { box.innerText = 'Error: ' + e.message; }
 }
 async function quickSentiment() {
@@ -8430,7 +8452,7 @@ async function quickSentiment() {
     const lastUser = (conv.history || []).slice().reverse().find(h => (h.role||'').toLowerCase()==='user');
     const msg = lastUser?.msg || 'hello';
     const res = await api('/api/analytics/sentiment', { method:'POST', body: JSON.stringify({ customerId: activeCustomer.id, message: msg, direction: 'inbound' }) });
-    toast(`Sentiment: ${res.sentiment || res.label || 'ok'}`, 'success');
+    toast(`Sentiment: ${res.sentiment || res.label || 'ok'} | Tone: ${res.sarcasm?.label || 'not_sarcastic'}`, 'success');
   } catch (e) { toast(e.message, 'error'); }
 }
 async function toggleBot(el) {
