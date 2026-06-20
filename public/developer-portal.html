@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Developer Portal — SuperSender Pro</title>
+<link rel="stylesheet" href="/css/developer-portal.css"/>
+</head>
+<body>
+<header class="dp-header">
+  <h1>🧩 Developer Portal &amp; Webhook Event Hub</h1>
+  <span id="safetyBadge" class="badge">checking…</span>
+</header>
+<nav class="dp-tabs">
+  <button data-tab="overview" class="active">Overview</button>
+  <button data-tab="apps">Apps</button>
+  <button data-tab="catalog">API Catalog</button>
+  <button data-tab="events">Events</button>
+  <button data-tab="webhooks">Webhooks</button>
+  <button data-tab="deliveries">Delivery Logs</button>
+  <button data-tab="docs">Docs</button>
+  <button data-tab="safety">Safety</button>
+</nav>
+<main>
+  <section id="overview" class="tab active"><div id="overviewCards" class="cards"></div></section>
+  <section id="apps" class="tab">
+    <div class="row">
+      <input id="appName" placeholder="App name"/>
+      <select id="appType"><option>n8n</option><option>zapier_style</option><option>make_style</option><option>custom_crm</option><option>generic</option></select>
+      <button id="createApp">Create App (preview)</button>
+    </div>
+    <div id="appList" class="list"></div>
+  </section>
+  <section id="catalog" class="tab"><div id="catalogList" class="list"></div></section>
+  <section id="events" class="tab"><div id="eventList" class="list"></div></section>
+  <section id="webhooks" class="tab">
+    <div class="row">
+      <input id="whUrl" placeholder="https://your-endpoint/webhook"/>
+      <input id="whEvents" placeholder="public_funnel.lead_created,support.ticket_created"/>
+      <button id="createWh">Subscribe (dry-run)</button>
+    </div>
+    <div id="whList" class="list"></div>
+  </section>
+  <section id="deliveries" class="tab"><div id="deliveryList" class="list"></div></section>
+  <section id="docs" class="tab"><div id="docsBox" class="list"></div></section>
+  <section id="safety" class="tab"><div id="safetyBox" class="list"></div></section>
+</main>
+<script src="/js/developer-portal.js"></script>
+</body>
+</html>

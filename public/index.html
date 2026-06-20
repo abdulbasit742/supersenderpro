@@ -1674,12 +1674,6 @@ button:disabled { opacity: .68; cursor: not-allowed; box-shadow: none !important
 </style>
 </head>
 <body>
-<div id="boot-paint" style="position:fixed;inset:0;z-index:99999;background:#0b141a;color:#e9edef;display:flex;align-items:center;justify-content:center;font-family:Inter,Arial,sans-serif">
-  <div style="max-width:420px;text-align:center;padding:22px;border:1px solid rgba(0,168,132,.35);border-radius:14px;background:#111b21;box-shadow:0 12px 40px rgba(0,0,0,.35)">
-    <div style="font-size:22px;font-weight:800;margin-bottom:8px">SuperSender Pro loading...</div>
-    <div style="font-size:13px;color:#9fb3bd;line-height:1.55">Agar screen blank rahe to Ctrl+F5 press karein. Server health aur dashboard boot status yahin show ho jayega.</div>
-  </div>
-</div>
 <!-- Sidebar -->
 <div id="sidebar">
   <div class="brand">
@@ -1841,35 +1835,6 @@ function searchNav(q) {
     <div class="nav-section">Overview</div>
     <div class="nav-item active" onclick="showSection('dashboard')"><span class="ico">📊</span>Dashboard</div>
     <div class="nav-item" onclick="showSection('whatsapp')"><span class="ico">🟢</span>WhatsApp<span class="nav-badge" id="inbox-badge" style="display:none">0</span></div>
-    <!-- BEGIN VOICE AI COMMAND CENTER HOOK -->
-    <div class="nav-item" onclick="window.location.href='/voice-ai.html'"><span class="ico">🎙️</span>Voice AI</div>
-    <!-- END VOICE AI COMMAND CENTER HOOK -->
-    <!-- BEGIN UNIFIED SETUP WIZARD HOOK -->
-    <div class="nav-item" onclick="window.location.href='/unified-setup.html'"><span class="ico">🚀</span>Unified Setup</div>
-    <!-- END UNIFIED SETUP WIZARD HOOK -->
-    <!-- BEGIN OWNER BRIEFING HOOK -->
-    <div class="nav-item" onclick="window.location.href='/owner-briefing.html'"><span class="ico">📋</span>Owner Briefing</div>
-    <!-- END OWNER BRIEFING HOOK -->
-    <!-- BEGIN COMPLIANCE CENTER HOOK -->
-    <div class="nav-item" onclick="window.location.href='/compliance-center.html'"><span class="ico">🛡️</span>Compliance</div>
-    <!-- END COMPLIANCE CENTER HOOK -->
-    <!-- BEGIN MARKETPLACE INTELLIGENCE HOOK -->
-    <a href="/marketplace-intelligence" class="nav-item nav-link" style="text-decoration:none"><span class="ico">🧠</span>Marketplace Intelligence</a>
-    <!-- BEGIN SAAS BILLING HOOK -->
-    <a href="/saas-billing.html" class="nav-item nav-link" style="text-decoration:none"><span class="ico">💳</span>SaaS Billing</a>
-    <!-- END SAAS BILLING HOOK -->
-    <!-- END MARKETPLACE INTELLIGENCE HOOK -->
-    <!-- BEGIN PUBLIC SAAS FUNNEL HOOK -->
-    <div class="nav-section">Public Funnel</div>
-    <a href="/landing.html" class="nav-item nav-link" style="text-decoration:none"><span class="ico">🌐</span>Public Landing</a>
-    <a href="/pricing.html" class="nav-item nav-link" style="text-decoration:none"><span class="ico">💲</span>Pricing</a>
-    <a href="/start.html" class="nav-item nav-link" style="text-decoration:none"><span class="ico">🚀</span>Start Setup</a>
-    <a href="/leads.html" class="nav-item nav-link" style="text-decoration:none"><span class="ico">🎯</span>Leads</a>
-    <!-- END PUBLIC SAAS FUNNEL HOOK -->
-    <!-- BEGIN TEMPLATE MARKETPLACE HOOK -->
-    <a href="/template-marketplace.html" class="nav-item nav-link" style="text-decoration:none"><span class="ico">🧩</span>Template Marketplace</a>
-    <a href="/templates.html" class="nav-item nav-link" style="text-decoration:none"><span class="ico">🚀</span>Templates Gallery</a>
-    <!-- END TEMPLATE MARKETPLACE HOOK -->
     <div class="nav-section">Business</div>
     <div class="nav-item advanced-nav" onclick="showSection('products')"><span class="ico">🛒</span>Product Catalog</div>
     <div class="nav-item" onclick="showSection('bot')"><span class="ico">🤖</span>WA Bot / Conversations</div>
@@ -1881,7 +1846,6 @@ function searchNav(q) {
     <div class="nav-section">Messaging</div>
     <div class="nav-item" onclick="showSection('cockpit')"><span class="ico">🚀</span>AI Inbox Cockpit<span class="nav-badge" id="cockpit-badge" style="display:none">0</span></div>
     <div class="nav-item advanced-nav" onclick="showSection('flows')"><span class="ico">🔀</span>Flow Builder</div>
-    <div class="nav-item advanced-nav" onclick="showSection('flow-studio')"><span class="ico">🧩</span>Flow Studio</div>
     <div class="nav-item advanced-nav" onclick="showSection('smart-broadcast')"><span class="ico">🎯</span>Smart Broadcast</div>
     <div class="nav-item" onclick="showSection('campaigns')"><span class="ico">🚀</span>Campaigns</div>
     <div class="nav-item" onclick="showSection('broadcast')"><span class="ico">📢</span>Broadcast</div>
@@ -2352,57 +2316,6 @@ function searchNav(q) {
       </div>
     </div>
   </div>
-  <div class="card" style="margin-top:12px">
-    <div class="flex-between" style="gap:10px;flex-wrap:wrap;margin-bottom:10px">
-      <div>
-        <div class="card-title" style="margin:0 0 4px">Universal Ecommerce Platform Hub</div>
-        <div style="font-size:12px;color:var(--muted)">Connect Shopify, WooCommerce, Magento, BigCommerce, Ecwid, Daraz, Dukaan, Amazon, eBay, Etsy, Odoo, Zoho, custom websites and JSON feeds.</div>
-      </div>
-      <div class="flex" style="gap:8px;flex-wrap:wrap">
-        <button class="btn btn-secondary btn-sm" onclick="window.open('/ecommerce-hub','_blank')">Open Full Hub</button>
-        <button class="btn btn-secondary btn-sm" onclick="copyEcommerceWebhook()">Copy Webhook</button>
-        <button class="btn btn-primary btn-sm" onclick="syncAllEcommerce()">Sync All</button>
-      </div>
-    </div>
-    <div id="commerce-platform-stats" class="grid g4" style="gap:10px;margin-bottom:12px"></div>
-    <div class="grid g4" style="gap:10px;align-items:end">
-      <div class="form-group"><label>Platform</label><select id="ecommerce-platform-select" onchange="updateEcommerceWebhookPreview()"></select></div>
-      <div class="form-group"><label>Connection Name</label><input id="ecommerce-connection-name" placeholder="Main Shopify Store"/></div>
-      <div class="form-group"><label>Store URL</label><input id="ecommerce-store-url" placeholder="https://store.example.com"/></div>
-      <div class="form-group"><label>Default Category</label><input id="ecommerce-default-category" value="ecommerce"/></div>
-    </div>
-    <div class="grid g4" style="gap:10px">
-      <div class="form-group"><label>Products Feed URL</label><input id="ecommerce-feed-url" placeholder="https://site.com/products.json"/></div>
-      <div class="form-group"><label>Orders Feed URL</label><input id="ecommerce-orders-feed-url" placeholder="https://site.com/orders.json"/></div>
-      <div class="form-group"><label>Access / API Token</label><input id="ecommerce-access-token" placeholder="Optional token"/></div>
-      <div class="form-group"><label>Store Hash / Store ID</label><input id="ecommerce-store-hash" placeholder="BigCommerce hash / Ecwid ID"/></div>
-    </div>
-    <div class="grid g4" style="gap:10px;align-items:end">
-      <div class="form-group"><label>Consumer Key</label><input id="ecommerce-consumer-key" placeholder="WooCommerce key"/></div>
-      <div class="form-group"><label>Consumer Secret</label><input id="ecommerce-consumer-secret" placeholder="WooCommerce secret"/></div>
-      <label class="toggle"><input type="checkbox" id="ecommerce-auto-products" checked/><div class="toggle-track"><div class="toggle-thumb"></div></div><span>Auto Products</span></label>
-      <label class="toggle"><input type="checkbox" id="ecommerce-auto-orders"/><div class="toggle-track"><div class="toggle-thumb"></div></div><span>Auto Orders</span></label>
-    </div>
-    <div class="flex" style="gap:8px;flex-wrap:wrap;margin-top:8px">
-      <button class="btn btn-primary btn-sm" onclick="saveEcommerceConnectionFromUI()">Save Connection</button>
-      <button class="btn btn-secondary btn-sm" onclick="testSelectedEcommerceConnection()">Test Selected</button>
-      <span id="ecommerce-webhook-preview" style="font-size:12px;color:var(--muted);align-self:center"></span>
-    </div>
-    <div class="grid g2" style="gap:12px;margin-top:12px;align-items:start">
-      <div style="overflow:auto;max-height:360px">
-        <table class="tbl">
-          <thead><tr><th>Platform</th><th>Status</th><th>Webhook</th><th>Actions</th></tr></thead>
-          <tbody id="ecommerce-connections-tbody"></tbody>
-        </table>
-      </div>
-      <div style="overflow:auto;max-height:360px">
-        <table class="tbl">
-          <thead><tr><th>Platform</th><th>Products</th><th>Orders</th><th>Bridge</th></tr></thead>
-          <tbody id="ecommerce-feature-matrix"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
   <div class="grid g3" style="gap:12px;align-items:start;margin-top:12px">
     <div class="card">
       <div class="card-title">Smart Checkout Link</div>
@@ -2778,32 +2691,6 @@ function searchNav(q) {
   </div>
   <div class="grid g2" style="margin-top:12px">
     <div class="card">
-      <div class="card-title">Auto Health Watchdog</div>
-      <div class="automation-kicker">Automated diagnostics, auto-fix, and health alerts</div>
-      <div id="wa-channel-watchdog-box" style="font-size:12px;color:var(--muted);line-height:1.7;margin-top:8px">
-        Loading Watchdog state...
-      </div>
-      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
-        <button class="btn btn-secondary btn-sm" onclick="runWatchdogCheck()">Run Diagnostic</button>
-        <button class="btn btn-secondary btn-sm" onclick="toggleWatchdog(true)">Enable</button>
-        <button class="btn btn-secondary btn-sm" onclick="toggleWatchdog(false)">Disable</button>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-title">Channel Settings Exporter</div>
-      <div class="automation-kicker">Backup channel settings, sources, targets, rules, presets</div>
-      <div style="margin-top:12px;display:flex;gap:8px;flex-direction:column">
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn btn-secondary btn-sm" onclick="exportChannelConfig()">Export settings.json</button>
-          <button class="btn btn-primary btn-sm" onclick="document.getElementById('channel-import-file').click()">Import settings.json</button>
-        </div>
-        <input type="file" id="channel-import-file" style="display:none" onchange="importChannelConfig(event)" accept=".json" />
-        <div id="wa-channel-backup-status" style="font-size:11px;color:var(--muted);margin-top:4px">Ready to backup or restore</div>
-      </div>
-    </div>
-  </div>
-  <div class="grid g2" style="margin-top:12px">
-    <div class="card">
       <div class="card-title">Drafts & Scheduled Posts</div>
       <div id="wa-channel-posts" style="font-size:12px;color:var(--muted);line-height:1.6"></div>
     </div>
@@ -3167,14 +3054,6 @@ Create a vertical promo video for ChatGPT Plus, Claude Pro, Cursor Pro, Gemini A
 <button class="btn btn-accent" onclick="aiSuggest()">💡 Suggest Replies</button>
 <div id="ai-suggestions" style="margin-top:14px;display:none;gap:8px;flex-direction:column"></div>
 </div>
-<div class="card"><div class="card-title">Sarcasm / Tone Detector</div>
-<div class="form-group"><label>Customer or Social Comment</label><textarea id="sarcasm-msg" placeholder="Oh great, again late delivery... very helpful"></textarea></div>
-<div class="flex" style="gap:8px;flex-wrap:wrap">
-<button class="btn btn-primary" onclick="detectSarcasm()">Analyze Tone</button>
-<button class="btn btn-secondary" onclick="copySarcasmReply()">Copy Safe Reply</button>
-</div>
-<div id="sarcasm-result" style="margin-top:14px;display:none"></div>
-</div>
 </div>
 </div>
 
@@ -3195,47 +3074,6 @@ Create a vertical promo video for ChatGPT Plus, Claude Pro, Cursor Pro, Gemini A
 <div class="flex"><input id="agent-msg" placeholder="Talk to agent..."/><button class="btn btn-accent" onclick="sendAgentChat()">Send</button></div>
 <div style="font-size:11px;color:var(--muted);margin-top:8px">Works even if the AI provider is temporarily slow: local fallback stays active.</div>
 </div>
-</div>
-<div class="card" style="margin-top:12px">
-  <div class="flex-between" style="gap:10px;flex-wrap:wrap">
-    <div>
-      <div class="card-title" style="margin:0">Deploy Agent to Groups / Channels</div>
-      <div style="font-size:12px;color:var(--muted)">Select any AI agent and attach it to WhatsApp groups, WhatsApp channels, social platforms, or ecommerce events.</div>
-    </div>
-    <button class="btn btn-secondary btn-sm" onclick="loadAgentPlacements()">Refresh</button>
-  </div>
-  <div class="grid g4" style="gap:8px;margin-top:10px">
-    <div class="form-group"><label>Agent</label><select id="agent-place-agent"></select></div>
-    <div class="form-group"><label>Target Type</label><select id="agent-place-type" onchange="renderAgentPlacementTargetSelect()">
-      <option value="whatsapp_group">WhatsApp Group</option>
-      <option value="whatsapp_channel">WhatsApp Channel</option>
-      <option value="facebook">Facebook</option>
-      <option value="instagram">Instagram</option>
-      <option value="linkedin">LinkedIn</option>
-      <option value="tiktok">TikTok</option>
-      <option value="telegram">Telegram</option>
-      <option value="ecommerce">Ecommerce</option>
-    </select></div>
-    <div class="form-group"><label>Target</label><select id="agent-place-target"></select></div>
-    <div class="form-group"><label>Mode</label><select id="agent-place-mode">
-      <option value="suggest_only">Suggest Only</option>
-      <option value="auto_reply">Auto Reply</option>
-      <option value="auto_forward">Auto Forward</option>
-      <option value="moderate">Moderate</option>
-      <option value="answer_faq">Answer FAQ</option>
-    </select></div>
-  </div>
-  <div class="grid g2" style="gap:8px">
-    <div class="form-group"><label>Trigger Keywords</label><input id="agent-place-keywords" placeholder="price, order, stock, scholarship"/></div>
-    <div class="form-group"><label>Extra Instructions</label><input id="agent-place-instructions" placeholder="Reply short Roman Urdu, require admin approval before posting"/></div>
-  </div>
-  <div class="flex" style="gap:8px;flex-wrap:wrap">
-    <label class="chk"><input type="checkbox" id="agent-place-approval" checked/> Require approval before live send/post</label>
-    <button class="btn btn-primary btn-sm" onclick="deployAgentPlacement()">Deploy Agent</button>
-    <button class="btn btn-secondary btn-sm" onclick="previewAgentPlacementRoute()">Preview Route</button>
-  </div>
-  <div id="agent-placement-preview" style="font-size:12px;color:var(--muted);margin-top:8px"></div>
-  <div id="agent-placements-list" class="scroll-y" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;max-height:320px;margin-top:12px"></div>
 </div>
 </div>
 
@@ -4516,136 +4354,6 @@ curl -X POST http://localhost:3001/mcp/send \
 <div class="card"><div id="alerts-list" class="scroll-y"></div></div>
 </div>
 
-<!-- FLOW STUDIO -->
-<div class="section" id="s-flow-studio">
-  <div class="flex-between" style="margin-bottom:10px;flex-wrap:wrap;gap:8px">
-    <div>
-      <div class="card-title" style="margin:0">🧩 SuperFlow Studio — AI Automation Builder</div>
-      <div style="font-size:12px;opacity:.7">No-code AI workflow canvas · <span id="fs-ready-badge">Automation ready</span></div>
-    </div>
-    <div style="display:flex;gap:6px;flex-wrap:wrap">
-      <button class="btn btn-primary" onclick="fsNewFlow()">＋ New Flow</button>
-      <button class="btn btn-secondary" onclick="fsSaveFlow()">💾 Save</button>
-      <button class="btn btn-secondary" onclick="fsRunTest()">🧪 Run Test (Dry run)</button>
-      <button class="btn btn-secondary" onclick="fsToggleActivate()" id="fs-activate-btn">▶ Activate</button>
-      <button class="btn btn-secondary" onclick="fsOpenFlowPicker()">📂 Open</button>
-      <button class="btn btn-secondary" onclick="fsDuplicateFlow()">⧉ Duplicate</button>
-      <button class="btn btn-secondary" onclick="fsShowAnalytics()">📊 Analytics</button>
-      <button class="btn btn-secondary" onclick="fsRenderDoctor()">🩺 Launch Doctor</button>
-      <button class="btn btn-secondary" onclick="fsRunTriggerDry()">⚡ Trigger Test</button>
-      <button class="btn btn-secondary" onclick="fsViewLogs()">📜 View Logs</button>
-      <button class="btn btn-secondary" onclick="fsExportJSON()">⬇ Export JSON</button>
-      <button class="btn btn-secondary" onclick="document.getElementById('fs-import-file').click()">⬆ Import JSON</button>
-      <input type="file" id="fs-import-file" accept="application/json" style="display:none" onchange="fsImportJSON(event)"/>
-      <button class="btn btn-secondary" onclick="fsLiveRun()">▶▶ Live Run</button>
-      <button class="btn btn-secondary" onclick="fsTestNode()">🧪 Test Node</button>
-      <button class="btn btn-secondary" onclick="fsSaveAsTemplate()">🧱 Save as Template</button>
-      <button class="btn btn-secondary" onclick="fsShowWebhook()">🔌 Webhook</button>
-      <button class="btn btn-secondary" onclick="fsExportAll()">🗄 Export All</button>
-      <button class="btn btn-secondary" onclick="document.getElementById('fs-importall-file').click()">📥 Import All</button>
-      <input type="file" id="fs-importall-file" accept="application/json" style="display:none" onchange="fsImportAll(event)"/>
-    </div>
-  </div>
-
-  <!-- Dashboard stats -->
-  <div class="grid" id="fs-stats" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:10px"></div>
-  <div class="card" id="fs-doctor" style="display:none;margin-bottom:10px"></div>
-
-  <!-- External trigger tester -->
-  <div class="card" id="fs-trigger-card" style="margin-bottom:10px">
-    <div class="flex-between" style="gap:8px;flex-wrap:wrap">
-      <div>
-        <div class="card-title" style="margin:0">External Trigger Tester</div>
-        <div style="font-size:12px;opacity:.7">Dry-run active flows from n8n, WhatsApp, scraper, ecommerce, social or webhook events.</div>
-      </div>
-      <button class="btn btn-primary" onclick="fsRunTriggerDry()">Dry-run matching flows</button>
-    </div>
-    <div class="grid g2" style="gap:8px;margin-top:8px">
-      <div class="form-group" style="margin:0">
-        <label>Trigger type</label>
-        <input id="fs-trigger-type" value="whatsapp_message" placeholder="whatsapp_message / new_order / website_change"/>
-      </div>
-      <div class="form-group" style="margin:0">
-        <label>Sample payload JSON</label>
-        <textarea id="fs-trigger-payload" rows="3" style="font-family:monospace;font-size:11px">{"sample":true,"message":"test event"}</textarea>
-      </div>
-    </div>
-    <div id="fs-trigger-result" style="font-size:12px;margin-top:8px;opacity:.85"></div>
-  </div>
-
-  <!-- Approval inbox -->
-  <div class="card" id="fs-approvals-card" style="margin-bottom:10px">
-    <div class="flex-between"><div class="card-title" style="margin:0">✅ Approval Inbox <span class="nav-badge" id="fs-approvals-count" style="display:none">0</span></div><button class="btn btn-secondary" onclick="fsRenderApprovals()">Refresh</button></div>
-    <div id="fs-approvals-list" style="font-size:12px"></div>
-  </div>
-
-  <!-- My flows + analytics -->
-  <div class="grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-    <div class="card">
-      <div class="flex-between"><div class="card-title" style="margin:0">📂 My Flows</div><button class="btn btn-secondary" onclick="fsRenderFlowsList()">Refresh</button></div>
-      <div id="fs-flows-list" class="scroll-y" style="max-height:160px;font-size:12px"></div>
-    </div>
-    <div class="card" id="fs-analytics-card">
-      <div class="card-title" style="margin:0">📊 Flow Analytics</div>
-      <div id="fs-analytics" style="font-size:12px;opacity:.7">Save/open a flow and click Analytics.</div>
-    </div>
-  </div>
-
-  <!-- Metrics + webhook -->
-  <div class="grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-    <div class="card">
-      <div class="flex-between"><div class="card-title" style="margin:0">📈 Studio Metrics (14d)</div><button class="btn btn-secondary" onclick="fsRenderMetrics()">Refresh</button></div>
-      <div id="fs-metrics" style="font-size:12px;opacity:.7">Loading…</div>
-    </div>
-    <div class="card" id="fs-webhook-card" style="display:none">
-      <div class="card-title" style="margin:0">🔌 Webhook Trigger</div>
-      <div id="fs-webhook" style="font-size:12px"></div>
-    </div>
-  </div>
-
-  <!-- Builder layout -->
-  <div class="grid" style="display:grid;grid-template-columns:220px 1fr 280px;gap:10px;align-items:start">
-    <!-- Left: node library -->
-    <div class="card" style="max-height:520px;overflow:auto">
-      <div class="card-title" style="margin-top:0">Node Library</div>
-      <input id="fs-node-search" placeholder="Search nodes..." oninput="fsFilterLibrary(this.value)" style="width:100%;margin-bottom:6px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:inherit;padding:5px;border-radius:6px;font-size:12px"/>
-      <div id="fs-node-library"></div>
-    </div>
-
-    <!-- Center: canvas / node list -->
-    <div class="card" style="min-height:520px">
-      <div class="flex-between">
-        <div class="card-title" style="margin:0"><input id="fs-flow-name" placeholder="Flow name" style="background:transparent;border:none;color:inherit;font-weight:700;font-size:15px;width:60%"/></div>
-        <span id="fs-flow-status" class="nav-badge" style="display:inline-block">draft</span>
-      </div>
-      <input id="fs-flow-desc" placeholder="Description (optional)" style="width:100%;margin:6px 0;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:inherit;padding:6px;border-radius:6px"/>
-      <div style="display:flex;gap:6px;margin:4px 0">
-        <button class="btn btn-secondary" id="fs-view-btn" onclick="fsToggleCanvasView()" style="font-size:11px;padding:3px 8px">🔲 Visual canvas</button>
-        <button class="btn btn-secondary" onclick="fsAutoLayout()" style="font-size:11px;padding:3px 8px">↳ Auto layout</button>
-      </div>
-      <div id="fs-vars" style="margin:4px 0"></div>
-      <div id="fs-canvas" style="display:flex;flex-direction:column;gap:8px;margin-top:8px"></div>
-      <div id="fs-canvas-empty" style="opacity:.6;font-size:13px;padding:20px;text-align:center">Click a node in the library to add it to the flow →</div>
-    </div>
-
-    <!-- Right: inspector -->
-    <div class="card" style="max-height:520px;overflow:auto">
-      <div class="card-title" style="margin-top:0">Inspector</div>
-      <div id="fs-inspector"><div style="opacity:.6;font-size:13px">Select a node to edit its config.</div></div>
-    </div>
-  </div>
-
-  <!-- Bottom: execution / log panel -->
-  <div class="card" style="margin-top:10px">
-    <div class="flex-between"><div class="card-title" style="margin:0">Execution / Logs</div><button class="btn btn-secondary" onclick="fsViewLogs()">Refresh</button></div>
-    <div id="fs-log-panel" class="scroll-y" style="max-height:220px;font-family:monospace;font-size:12px"></div>
-  </div>
-
-  <!-- Template gallery -->
-  <div class="flex-between" style="margin:14px 0 6px"><div class="card-title" style="margin:0">Template Gallery</div></div>
-  <div class="grid" id="fs-templates" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px"></div>
-</div>
-
 <!-- SETTINGS -->
 <div class="section" id="s-settings">
 <div class="grid g2">
@@ -5456,7 +5164,6 @@ function showSection(id, triggerEl) {
     plans: 'Plans',
     cockpit: 'Unified Inbox',
     flows: 'Automation Flows',
-    'flow-studio': 'Flow Studio',
     'smart-broadcast': 'Smart Campaigns',
     campaigns: 'Campaigns',
     broadcast: 'Broadcast',
@@ -5503,7 +5210,6 @@ function showSection(id, triggerEl) {
   else if (id === 'business-tools') loadBusinessTools();
   else if (id === 'social') loadSocialHub();
   else if (id === 'wa-channels') loadWAChannels();
-  else if (id === 'flow-studio') { if (typeof loadFlowStudio === 'function') loadFlowStudio(); }
   // other loaders are attached later via overrides/hooks
 }
 
@@ -6890,7 +6596,6 @@ async function maybeAutoConnectWA() {
 
 // Init
 window.onload = async () => {
-    const bootPaint = document.getElementById('boot-paint');
     try {
       ensureSectionsInContent();
       applyUiMode();
@@ -6904,20 +6609,7 @@ window.onload = async () => {
       if (!showHashSection()) loadDashboard();
       setTimeout(() => handleWhatsAppDeepLink(), 400);
       initGlobalSearch();
-      setTimeout(() => { if (bootPaint) bootPaint.style.display = 'none'; }, 350);
-    } catch(e){
-      console.error('Dashboard boot failed:', e);
-      if (bootPaint) {
-        const safeBootMessage = (typeof escHtml === 'function' ? escHtml : (value) => String(value || '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])))(e.message || String(e));
-        bootPaint.style.display = 'flex';
-        bootPaint.innerHTML = `<div style="max-width:520px;text-align:left;padding:22px;border:1px solid rgba(239,68,68,.45);border-radius:14px;background:#111b21;color:#e9edef;box-shadow:0 12px 40px rgba(0,0,0,.35)">
-          <div style="font-size:20px;font-weight:800;margin-bottom:8px;color:#fca5a5">Dashboard boot failed</div>
-          <div style="font-size:13px;color:#cbd5dc;line-height:1.55;margin-bottom:12px">${safeBootMessage}</div>
-          <button class="btn btn-primary" onclick="location.reload()">Reload</button>
-          <a class="btn btn-secondary" style="margin-left:8px;text-decoration:none" href="/api/health" target="_blank">Open Health</a>
-        </div>`;
-      }
-    }
+    } catch(e){}
   };
 
 window.addEventListener('hashchange', showHashSection);
@@ -7622,10 +7314,6 @@ async function sendDailySalesReportNow() {
 // Commerce integrations
 let commerceSettingsCache = {};
 let commerceEventsCache = [];
-let ecommerceStatusCache = {};
-let ecommercePlatformsCache = [];
-let ecommerceConnectionsCache = [];
-let ecommerceFeaturesCache = [];
 
 function normalizePhoneDigits(value = '') {
   return String(value || '').replace(/\D/g, '');
@@ -7680,204 +7368,14 @@ function renderCommerceEvents(events = []) {
   }).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:22px">No commerce events yet</td></tr>';
 }
 
-function renderEcommercePlatformSelect(platforms = []) {
-  const select = document.getElementById('ecommerce-platform-select');
-  if (!select) return;
-  const current = select.value || 'shopify';
-  select.innerHTML = (platforms || []).map(item => `<option value="${escHtml(item.slug || '')}">${escHtml(item.label || item.slug || '')}</option>`).join('');
-  select.value = platforms.some(item => item.slug === current) ? current : (platforms[0]?.slug || 'custom');
-  updateEcommerceWebhookPreview();
-}
-
-function ecommercePlatformLabel(slug = '') {
-  const platform = ecommercePlatformsCache.find(item => item.slug === slug);
-  return platform?.label || slug || 'Custom';
-}
-
-function renderEcommercePlatformStats(summary = {}) {
-  const el = document.getElementById('commerce-platform-stats');
-  if (!el) return;
-  const connections = summary.connections || [];
-  const configured = connections.filter(row => row.configured || row.hasSecret).length;
-  const products = Number(summary.importedProducts || 0);
-  const ordersCount = Number(summary.commerceOrders || 0);
-  const platforms = (summary.platforms || ecommercePlatformsCache || []).length;
-  el.innerHTML = `
-    <div class="stat-card"><div class="stat-val">${platforms}</div><div class="stat-label">Platforms Ready</div></div>
-    <div class="stat-card"><div class="stat-val">${connections.length}</div><div class="stat-label">Connections</div></div>
-    <div class="stat-card"><div class="stat-val">${configured}</div><div class="stat-label">Configured</div></div>
-    <div class="stat-card"><div class="stat-val">${products}</div><div class="stat-label">Imported Products</div></div>
-    <div class="stat-card"><div class="stat-val">${ordersCount}</div><div class="stat-label">Commerce Orders</div></div>
-  `;
-}
-
-function renderEcommerceConnections(connections = []) {
-  const tbody = document.getElementById('ecommerce-connections-tbody');
-  if (!tbody) return;
-  tbody.innerHTML = (connections || []).map(row => {
-    const id = escHtml(row.id || '');
-    const webhook = row.webhookUrl || `/api/ecommerce/webhook/${row.platform || 'custom'}/${row.id || ''}`.replace(/\/+$/g, '');
-    const status = row.enabled === false ? 'Paused' : (row.configured || row.hasSecret ? 'Ready' : 'Needs setup');
-    const tag = row.enabled === false ? 'tag-yellow' : ((row.configured || row.hasSecret) ? 'tag-green' : 'tag-red');
-    return `<tr>
-      <td><strong>${escHtml(row.name || ecommercePlatformLabel(row.platform))}</strong><div style="font-size:11px;color:var(--muted)">${escHtml(ecommercePlatformLabel(row.platform))}</div></td>
-      <td><span class="tag ${tag}">${escHtml(status)}</span><div style="font-size:11px;color:var(--muted)">${row.tokenMasked ? 'Token: ' + escHtml(row.tokenMasked) : 'Feed/webhook bridge'}</div></td>
-      <td><code style="font-size:11px">${escHtml(webhook)}</code></td>
-      <td>
-        <div class="flex" style="gap:6px;flex-wrap:wrap">
-          <button class="btn btn-secondary btn-sm" onclick="testEcommerceConnection('${id}')">Test</button>
-          <button class="btn btn-secondary btn-sm" onclick="syncEcommerceConnectionProducts('${id}')">Products</button>
-          <button class="btn btn-secondary btn-sm" onclick="syncEcommerceConnectionOrders('${id}')">Orders</button>
-          <button class="btn btn-danger btn-sm" onclick="deleteEcommerceConnection('${id}')">Delete</button>
-        </div>
-      </td>
-    </tr>`;
-  }).join('') || '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:22px">No ecommerce connections yet. Add one above or use a webhook/feed bridge.</td></tr>';
-}
-
-function renderEcommerceFeatureMatrix(features = []) {
-  const tbody = document.getElementById('ecommerce-feature-matrix');
-  if (!tbody) return;
-  tbody.innerHTML = (features || []).slice(0, 30).map(row => `
-    <tr>
-      <td><strong>${escHtml(row.label || row.platform || row.slug || '')}</strong><div style="font-size:11px;color:var(--muted)">${escHtml(row.auth || row.notes || '')}</div></td>
-      <td>${row.directProductSync || row.productSync ? '<span class="tag tag-green">Yes</span>' : '<span class="tag tag-yellow">Bridge</span>'}</td>
-      <td>${row.directOrderSync || row.orderSync ? '<span class="tag tag-green">Yes</span>' : '<span class="tag tag-yellow">Bridge</span>'}</td>
-      <td>${row.feedBridge || row.webhook ? '<span class="tag tag-blue">Webhook/feed</span>' : '<span class="tag tag-green">Native</span>'}</td>
-    </tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:22px">Feature matrix unavailable</td></tr>';
-}
-
-function updateEcommerceWebhookPreview() {
-  const platform = document.getElementById('ecommerce-platform-select')?.value || 'custom';
-  const base = window.location.origin.replace(/\/$/, '');
-  const text = `${base}/api/ecommerce/webhook/${platform}`;
-  const el = document.getElementById('ecommerce-webhook-preview');
-  if (el) el.textContent = `Webhook: ${text}`;
-  return text;
-}
-
-async function copyEcommerceWebhook() {
-  const text = updateEcommerceWebhookPreview();
-  try {
-    await navigator.clipboard.writeText(text);
-    toast('Ecommerce webhook copied', 'success');
-  } catch (e) {
-    toast(text, 'info');
-  }
-}
-
-function ecommerceConnectionPayloadFromUI() {
-  const platform = document.getElementById('ecommerce-platform-select')?.value || 'custom';
-  const storeHash = document.getElementById('ecommerce-store-hash')?.value?.trim() || '';
-  return {
-    platform,
-    name: document.getElementById('ecommerce-connection-name')?.value?.trim() || ecommercePlatformLabel(platform),
-    storeUrl: document.getElementById('ecommerce-store-url')?.value?.trim() || '',
-    feedUrl: document.getElementById('ecommerce-feed-url')?.value?.trim() || '',
-    ordersFeedUrl: document.getElementById('ecommerce-orders-feed-url')?.value?.trim() || '',
-    defaultCategory: document.getElementById('ecommerce-default-category')?.value?.trim() || 'ecommerce',
-    autoSyncProducts: document.getElementById('ecommerce-auto-products')?.checked === true,
-    autoSyncOrders: document.getElementById('ecommerce-auto-orders')?.checked === true,
-    credentials: {
-      accessToken: document.getElementById('ecommerce-access-token')?.value || '',
-      consumerKey: document.getElementById('ecommerce-consumer-key')?.value || '',
-      consumerSecret: document.getElementById('ecommerce-consumer-secret')?.value || '',
-      storeHash: platform === 'bigcommerce' ? storeHash : '',
-      storeId: platform === 'ecwid' ? storeHash : '',
-      feedUrl: document.getElementById('ecommerce-feed-url')?.value?.trim() || '',
-      ordersFeedUrl: document.getElementById('ecommerce-orders-feed-url')?.value?.trim() || ''
-    }
-  };
-}
-
-async function saveEcommerceConnectionFromUI() {
-  try {
-    const payload = ecommerceConnectionPayloadFromUI();
-    if (!payload.storeUrl && !payload.feedUrl && !payload.ordersFeedUrl && !payload.credentials.accessToken && !payload.credentials.consumerKey) {
-      return toast('Add store URL, feed URL, or API credentials first', 'error');
-    }
-    await api('/api/ecommerce/connections', { method: 'POST', body: JSON.stringify(payload) });
-    toast('Ecommerce connection saved', 'success');
-    await loadCommerce();
-  } catch (e) {
-    toast(e.message || 'Connection save failed', 'error');
-  }
-}
-
-async function testEcommerceConnection(id) {
-  try {
-    const res = await api('/api/ecommerce/connections/' + encodeURIComponent(id) + '/test', { method: 'POST', body: JSON.stringify({}) });
-    toast(`Detected ${res.productsDetected || 0} products and ${res.ordersDetected || 0} orders`, 'success');
-    await loadCommerce();
-  } catch (e) {
-    toast(e.message || 'Connection test failed', 'error');
-  }
-}
-
-async function testSelectedEcommerceConnection() {
-  const latest = ecommerceConnectionsCache[0];
-  if (!latest) return toast('Save a connection first, then test it', 'error');
-  await testEcommerceConnection(latest.id);
-}
-
-async function syncEcommerceConnectionProducts(id) {
-  try {
-    const res = await api('/api/ecommerce/connections/' + encodeURIComponent(id) + '/sync-products', { method: 'POST', body: JSON.stringify({}) });
-    toast(`Products synced: ${res.imported || 0} fetched, ${res.added || 0} added, ${res.updated || 0} updated`, 'success');
-    await loadProducts?.();
-    await loadCommerce();
-  } catch (e) {
-    toast(e.message || 'Product sync failed', 'error');
-  }
-}
-
-async function syncEcommerceConnectionOrders(id) {
-  try {
-    const res = await api('/api/ecommerce/connections/' + encodeURIComponent(id) + '/sync-orders', { method: 'POST', body: JSON.stringify({}) });
-    toast(`Orders synced: ${res.processed || 0}`, 'success');
-    await loadOrders?.();
-    await loadCommerce();
-  } catch (e) {
-    toast(e.message || 'Order sync failed', 'error');
-  }
-}
-
-async function deleteEcommerceConnection(id) {
-  if (!confirm('Delete this ecommerce connection?')) return;
-  try {
-    await api('/api/ecommerce/connections/' + encodeURIComponent(id), { method: 'DELETE' });
-    toast('Ecommerce connection deleted', 'success');
-    await loadCommerce();
-  } catch (e) {
-    toast(e.message || 'Delete failed', 'error');
-  }
-}
-
-async function syncAllEcommerce() {
-  try {
-    const res = await api('/api/ecommerce/sync-all', { method: 'POST', body: JSON.stringify({ products: true, orders: true }) });
-    toast(`Sync all finished: ${(res.results || []).length} connections checked`, 'success');
-    await loadProducts?.();
-    await loadOrders?.();
-    await loadCommerce();
-  } catch (e) {
-    toast(e.message || 'Sync all failed', 'error');
-  }
-}
-
 async function loadCommerce() {
   try {
-    const [settingsRes, eventsRes, ecommerceRes] = await Promise.all([
+    const [settingsRes, eventsRes] = await Promise.all([
       api('/api/commerce/settings'),
-      api('/api/commerce/events?limit=100'),
-      api('/api/ecommerce/status')
+      api('/api/commerce/events?limit=100')
     ]);
     commerceSettingsCache = settingsRes?.settings || settingsRes || {};
     commerceEventsCache = Array.isArray(eventsRes?.events) ? eventsRes.events : [];
-    ecommerceStatusCache = ecommerceRes || {};
-    ecommercePlatformsCache = Array.isArray(ecommerceRes?.platforms) ? ecommerceRes.platforms : [];
-    ecommerceConnectionsCache = Array.isArray(ecommerceRes?.connections) ? ecommerceRes.connections : [];
-    ecommerceFeaturesCache = Array.isArray(ecommerceRes?.features) ? ecommerceRes.features : [];
 
     const settings = commerceSettingsCache;
     const baseUrl = window.location.origin.replace(/\/$/, '');
@@ -7902,10 +7400,6 @@ async function loadCommerce() {
 
     renderCommerceStats(settings, commerceEventsCache);
     renderCommerceEvents(commerceEventsCache);
-    renderEcommercePlatformSelect(ecommercePlatformsCache);
-    renderEcommercePlatformStats(ecommerceStatusCache);
-    renderEcommerceConnections(ecommerceConnectionsCache);
-    renderEcommerceFeatureMatrix(ecommerceFeaturesCache.length ? ecommerceFeaturesCache : ecommercePlatformsCache);
   } catch (e) {
     toast(e.message, 'error');
   }
@@ -8457,9 +7951,7 @@ async function quickAISuggest() {
   try {
     const res = await api('/api/ai/suggest-reply', { method:'POST', body: JSON.stringify({ number: activeConvNumber, name: activeCustomer?.name || '' }) });
     const suggestions = res.suggestions || [];
-    const sarcasm = res.sarcasm || {};
-    const toneBadge = sarcasm.label ? `<div style="margin-bottom:8px"><span class="tag ${sarcasm.sentimentRisk === 'high' ? 'tag-red' : sarcasm.sentimentRisk === 'medium' ? 'tag-orange' : 'tag-green'}">${escHtml(sarcasm.label)}</span> <span class="tag tag-purple">Tone: ${escHtml(sarcasm.tone || 'neutral')}</span> <span class="tag">Score ${Number(sarcasm.score || 0)}/100</span></div>` : '';
-    box.innerHTML = toneBadge + ((suggestions.map(s => `<div style="padding:6px 8px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;cursor:pointer" onclick="setChatDraft('${escHtml(s).replace(/\\n/g,' ').replace(/'/g, '&#39;')}')">${escHtml(s)}</div>`).join('')) || 'No suggestions');
+    box.innerHTML = suggestions.map(s => `<div style="padding:6px 8px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;cursor:pointer" onclick="setChatDraft('${escHtml(s).replace(/\\n/g,' ').replace(/'/g, '&#39;')}')">${escHtml(s)}</div>`).join('') || 'No suggestions';
   } catch (e) { box.innerText = 'Error: ' + e.message; }
 }
 async function quickSentiment() {
@@ -8469,7 +7961,7 @@ async function quickSentiment() {
     const lastUser = (conv.history || []).slice().reverse().find(h => (h.role||'').toLowerCase()==='user');
     const msg = lastUser?.msg || 'hello';
     const res = await api('/api/analytics/sentiment', { method:'POST', body: JSON.stringify({ customerId: activeCustomer.id, message: msg, direction: 'inbound' }) });
-    toast(`Sentiment: ${res.sentiment || res.label || 'ok'} | Tone: ${res.sarcasm?.label || 'not_sarcastic'}`, 'success');
+    toast(`Sentiment: ${res.sentiment || res.label || 'ok'}`, 'success');
   } catch (e) { toast(e.message, 'error'); }
 }
 async function toggleBot(el) {
@@ -10550,7 +10042,6 @@ async function loadWAChannels() {
     renderChannelRelayInbox(data.relay || []);
     renderWAChannelHistory(data.history || []);
     await previewWAChannelPost(false);
-    await loadWatchdogStatus();
   } catch (e) {
     toast(e.message || 'Could not load WA channels', 'error');
   }
@@ -10848,122 +10339,6 @@ async function deleteWAChannelPost(id) {
   } catch (e) {
     toast(e.message || 'Delete failed', 'error');
   }
-}
-
-async function loadWatchdogStatus() {
-  try {
-    const data = await api('/api/wa/channels/watchdog');
-    const box = document.getElementById('wa-channel-watchdog-box');
-    if (box && data.status) {
-      const s = data.status;
-      const reasonsList = (s.lastReasons || []).map(r => `<li>${escHtml(r)}</li>`).join('');
-      const blockersList = (s.blockers || []).map(b => `<li style="color:var(--red)">${escHtml(b)}</li>`).join('');
-      box.innerHTML = `
-        <div><b>Watchdog:</b> <span class="tag tag-${s.enabled ? 'green' : 'orange'}">${s.enabled ? 'Enabled' : 'Disabled'}</span></div>
-        <div><b>Auto-Fix:</b> <span class="tag tag-${s.autoFix ? 'green' : 'gray'}">${s.autoFix ? 'ON' : 'OFF'}</span></div>
-        <div><b>Ready Score:</b> <span style="font-weight:bold;color:${s.readyScore >= 65 ? 'var(--green)' : 'var(--red)'}">${s.readyScore}/100</span> (Min: ${s.minReadyScore})</div>
-        <div><b>Status:</b> ${escHtml(s.status)}</div>
-        <div><b>Interval:</b> ${s.intervalMinutes} min</div>
-        ${s.lastRunAt ? `<div><b>Last Run:</b> ${escHtml(new Date(s.lastRunAt).toLocaleString())}</div>` : ''}
-        ${s.lastAutoFixAt ? `<div><b>Last Auto-Fix:</b> ${escHtml(new Date(s.lastAutoFixAt).toLocaleString())}</div>` : ''}
-        ${blockersList ? `<div style="margin-top:6px"><b>Blockers:</b><ul style="margin:4px 0;padding-left:16px">${blockersList}</ul></div>` : ''}
-        ${reasonsList ? `<div style="margin-top:6px"><b>Last Run Notes:</b><ul style="margin:4px 0;padding-left:16px">${reasonsList}</ul></div>` : ''}
-      `;
-    }
-  } catch (e) {
-    console.error('Error loading watchdog status:', e);
-  }
-}
-
-async function runWatchdogCheck() {
-  try {
-    toast('Running watchdog diagnostic sweep...', 'info');
-    const res = await api('/api/wa/channels/watchdog', {
-      method: 'POST',
-      body: JSON.stringify({ action: 'run' })
-    });
-    if (res.success) {
-      toast('Watchdog diagnostics completed!', 'success');
-    } else {
-      toast(res.error || 'Watchdog run completed with warnings', 'warning');
-    }
-    await loadWatchdogStatus();
-  } catch (e) {
-    toast('Watchdog failed: ' + e.message, 'error');
-  }
-}
-
-async function toggleWatchdog(enable) {
-  try {
-    const res = await api('/api/wa/channels/watchdog', {
-      method: 'POST',
-      body: JSON.stringify({
-        action: enable ? 'on' : 'off',
-        intervalMinutes: 10,
-        minReadyScore: 65,
-        autoFix: true
-      })
-    });
-    toast(res.message || `Watchdog ${enable ? 'enabled' : 'disabled'}`, 'success');
-    await loadWatchdogStatus();
-  } catch (e) {
-    toast('Failed to update watchdog state: ' + e.message, 'error');
-  }
-}
-
-async function exportChannelConfig() {
-  try {
-    const data = await api('/api/wa/channels/export-config');
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `whatsapp_channels_config_${new Date().toISOString().split('T')[0]}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    toast('Settings exported successfully', 'success');
-  } catch (e) {
-    toast('Export failed: ' + e.message, 'error');
-  }
-}
-
-async function importChannelConfig(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const statusEl = document.getElementById('wa-channel-backup-status');
-  if (statusEl) statusEl.textContent = 'Importing...';
-  try {
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      try {
-        const payload = JSON.parse(e.target.result);
-        const res = await api('/api/wa/channels/import-config', {
-          method: 'POST',
-          body: JSON.stringify(payload)
-        });
-        if (res.success) {
-          toast('Configuration imported successfully!', 'success');
-          if (statusEl) {
-            statusEl.innerHTML = `<span style="color:var(--green)">Imported targets: ${res.summary?.targets || 0}, sources: ${res.summary?.sources || 0}</span>`;
-          }
-          await loadWAChannels();
-          await loadWatchdogStatus();
-        } else {
-          throw new Error(res.error || 'Failed to import configuration');
-        }
-      } catch (err) {
-        toast('Import failed: ' + err.message, 'error');
-        if (statusEl) statusEl.innerHTML = `<span style="color:var(--red)">Error: ${err.message}</span>`;
-      }
-    };
-    reader.readAsText(file);
-  } catch (err) {
-    toast('File reading failed: ' + err.message, 'error');
-    if (statusEl) statusEl.innerHTML = `<span style="color:var(--red)">Error: ${err.message}</span>`;
-  }
-  event.target.value = '';
 }
 
 async function loadLogs() {
@@ -13216,44 +12591,8 @@ async function aiSuggest() {
   }
 }
 
-let latestSarcasmReply = '';
-
-async function detectSarcasm() {
-  const message = document.getElementById('sarcasm-msg')?.value?.trim();
-  if (!message) return toast('Message required', 'error');
-  try {
-    const d = await api('/api/ai/sarcasm-detect', { method: 'POST', body: JSON.stringify({ message, platform: 'dashboard' }) });
-    const box = document.getElementById('sarcasm-result');
-    if (!box) return;
-    latestSarcasmReply = d.recommendedReply || '';
-    const badgeClass = d.sentimentRisk === 'high' ? 'tag-red' : d.sentimentRisk === 'medium' ? 'tag-orange' : 'tag-green';
-    const cues = (d.cues || []).slice(0, 6).map(c => `<li><b>${escHtml(c.type || 'cue')}</b>: ${escHtml(c.text || '')} <span style="color:var(--muted)">(${Number(c.weight || 0)})</span></li>`).join('');
-    box.style.display = 'block';
-    box.innerHTML = `
-      <div style="padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--bg3)">
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
-          <span class="tag ${badgeClass}">${escHtml(d.label || 'not_sarcastic')}</span>
-          <span class="tag tag-purple">Score ${Number(d.score || 0)}/100</span>
-          <span class="tag">Tone: ${escHtml(d.tone || 'neutral')}</span>
-        </div>
-        <div style="font-size:12px;line-height:1.55;color:var(--muted);margin-bottom:10px">${escHtml(d.explanation || '')}</div>
-        ${cues ? `<ul style="font-size:12px;line-height:1.65;margin:0 0 10px 18px">${cues}</ul>` : ''}
-        <div style="font-size:12px;line-height:1.55"><b>Safe reply:</b><br>${escHtml(latestSarcasmReply)}</div>
-      </div>`;
-  } catch (e) {
-    toast(e.message, 'error');
-  }
-}
-
-function copySarcasmReply() {
-  if (!latestSarcasmReply) return toast('Analyze a message first', 'error');
-  copyTextSafe(latestSarcasmReply);
-}
-
 let aiAgentsCache = [];
 let selectedAgentId = '';
-let agentPlacementsCache = [];
-let agentPlacementTargets = {};
 
 function agentBubble(text, out = false) {
   const safe = escHtml(text || '');
@@ -13317,8 +12656,6 @@ async function loadAgents() {
     aiAgentsCache = Array.isArray(data) ? data : (data.agents || []);
     if (!selectedAgentId && aiAgentsCache[0]) selectedAgentId = aiAgentsCache[0].id;
     renderAgentsList();
-    renderAgentPlacementAgentSelect();
-    await loadAgentPlacements(false);
     selectAgent(selectedAgentId);
     const chatBox = document.getElementById('agent-chat-box');
     if (chatBox && !chatBox.dataset.ready) {
@@ -13329,137 +12666,6 @@ async function loadAgents() {
   } catch (e) {
     toast(e.message || 'Agents load failed', 'error');
   }
-}
-
-function renderAgentPlacementAgentSelect() {
-  const select = document.getElementById('agent-place-agent');
-  if (!select) return;
-  select.innerHTML = (aiAgentsCache || []).map(agent =>
-    `<option value="${escHtml(agent.id)}"${agent.id === selectedAgentId ? ' selected' : ''}>${escHtml(agent.emoji || '🧠')} ${escHtml(agent.name || agent.id)}</option>`
-  ).join('') || '<option value="">No agents</option>';
-}
-
-function flatAgentPlacementTargets() {
-  const t = agentPlacementTargets || {};
-  return [
-    ...(t.whatsappGroups || []),
-    ...(t.whatsappChannels || []),
-    ...(t.social || []),
-    ...(t.ecommerce || [])
-  ];
-}
-
-function renderAgentPlacementTargetSelect() {
-  const type = document.getElementById('agent-place-type')?.value || 'whatsapp_group';
-  const target = document.getElementById('agent-place-target');
-  if (!target) return;
-  const rows = flatAgentPlacementTargets().filter(row => row.targetType === type);
-  target.innerHTML = rows.map(row =>
-    `<option value="${escHtml(row.id)}">${escHtml(row.name || row.id)}</option>`
-  ).join('') || `<option value="">Manual target</option>`;
-}
-
-function renderAgentPlacementsList() {
-  const box = document.getElementById('agent-placements-list');
-  if (!box) return;
-  if (!agentPlacementsCache.length) {
-    box.innerHTML = '<div class="empty-state">No deployments yet. Select an agent and target, then Deploy Agent.</div>';
-    return;
-  }
-  box.innerHTML = agentPlacementsCache.map(row => {
-    const agent = row.agent || {};
-    const enabled = row.enabled !== false;
-    return `
-      <div class="card" style="padding:10px;background:${enabled ? 'rgba(0,168,132,.08)' : 'rgba(239,68,68,.08)'}">
-        <div class="flex-between" style="gap:8px">
-          <strong>${escHtml(agent.emoji || '🧠')} ${escHtml(agent.name || row.agentId || 'Agent')}</strong>
-          <span class="tag ${enabled ? 'tag-green' : 'tag-red'}">${enabled ? 'ON' : 'OFF'}</span>
-        </div>
-        <div style="font-size:12px;color:var(--muted);margin-top:6px">${escHtml(row.targetType)} · ${escHtml(row.targetName || row.targetId || '-')}</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:4px">Mode: ${escHtml(row.mode || 'suggest_only')} · Approval: ${row.requireApproval !== false ? 'yes' : 'no'}</div>
-        ${(row.keywords || []).length ? `<div style="font-size:11px;margin-top:6px">${(row.keywords || []).map(k => `<span class="tag tag-purple">${escHtml(k)}</span>`).join(' ')}</div>` : ''}
-        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
-          <button class="btn btn-secondary btn-sm" onclick="toggleAgentPlacement('${escHtml(row.id)}')">${enabled ? 'Disable' : 'Enable'}</button>
-          <button class="btn btn-danger btn-sm" onclick="deleteAgentPlacement('${escHtml(row.id)}')">Remove</button>
-        </div>
-      </div>`;
-  }).join('');
-}
-
-async function loadAgentPlacements(showToast = true) {
-  const card = document.getElementById('agent-placements-list');
-  if (!card) return;
-  try {
-    const data = await api('/api/agents/placements');
-    agentPlacementsCache = data.placements || [];
-    agentPlacementTargets = data.targets || {};
-    renderAgentPlacementAgentSelect();
-    renderAgentPlacementTargetSelect();
-    renderAgentPlacementsList();
-    if (showToast) toast('Agent deployments refreshed', 'success');
-  } catch (e) {
-    if (showToast) toast(e.message || 'Agent deployments load failed', 'error');
-  }
-}
-
-async function deployAgentPlacement() {
-  const agentId = document.getElementById('agent-place-agent')?.value || selectedAgentId;
-  const targetType = document.getElementById('agent-place-type')?.value || 'whatsapp_group';
-  const targetSelect = document.getElementById('agent-place-target');
-  const targetId = targetSelect?.value || '';
-  const targetName = targetSelect?.selectedOptions?.[0]?.textContent || targetId;
-  const payload = {
-    agentId,
-    targetType,
-    targetId,
-    targetName,
-    mode: document.getElementById('agent-place-mode')?.value || 'suggest_only',
-    keywords: document.getElementById('agent-place-keywords')?.value || '',
-    instructions: document.getElementById('agent-place-instructions')?.value || '',
-    requireApproval: document.getElementById('agent-place-approval')?.checked !== false,
-    enabled: true
-  };
-  if (!payload.agentId) return toast('Agent select karein', 'error');
-  try {
-    await api('/api/agents/placements', { method: 'POST', body: JSON.stringify(payload) });
-    toast('Agent deployed to target', 'success');
-    await loadAgentPlacements(false);
-  } catch (e) {
-    toast(e.message || 'Deploy failed', 'error');
-  }
-}
-
-async function previewAgentPlacementRoute() {
-  const targetType = document.getElementById('agent-place-type')?.value || 'whatsapp_group';
-  const targetId = document.getElementById('agent-place-target')?.value || '';
-  const message = document.getElementById('agent-place-keywords')?.value || 'price stock order';
-  const box = document.getElementById('agent-placement-preview');
-  try {
-    const data = await api('/api/agents/placements/route-preview', {
-      method: 'POST',
-      body: JSON.stringify({ targetType, targetId, message })
-    });
-    const agent = data.agent || {};
-    if (box) box.innerHTML = `Matched: <b>${escHtml(agent.emoji || '🧠')} ${escHtml(agent.name || agent.id || 'Agent')}</b> · Mode: ${escHtml(data.mode || 'suggest_only')} · Approval: ${data.requireApproval !== false ? 'yes' : 'no'}`;
-  } catch (e) {
-    if (box) box.innerHTML = `<span style="color:var(--red)">Preview failed: ${escHtml(e.message)}</span>`;
-  }
-}
-
-async function toggleAgentPlacement(id) {
-  try {
-    await api('/api/agents/placements/' + encodeURIComponent(id) + '/toggle', { method: 'POST', body: '{}' });
-    await loadAgentPlacements(false);
-  } catch (e) { toast(e.message || 'Toggle failed', 'error'); }
-}
-
-async function deleteAgentPlacement(id) {
-  if (!confirm('Remove this agent deployment?')) return;
-  try {
-    await api('/api/agents/placements/' + encodeURIComponent(id), { method: 'DELETE' });
-    await loadAgentPlacements(false);
-    toast('Agent deployment removed', 'success');
-  } catch (e) { toast(e.message || 'Remove failed', 'error'); }
 }
 
 async function saveAgent() {
@@ -17529,745 +16735,11 @@ if (typeof socket !== 'undefined') {
 }
 
 </script>
-<script>
-/* ===== SuperFlow Studio frontend ===== */
-window.fsState = { flow: null, categories: [], typeIndex: {}, selected: null };
 
-function fsNewFlowObject() {
-  return { id: null, name: 'Untitled flow', description: '', status: 'draft', triggerType: '', nodes: [], edges: [], variables: {} };
-}
-
-async function loadFlowStudio() {
-  try {
-    if (!fsState.flow) fsState.flow = fsNewFlowObject();
-    const nt = await api('/api/flow-studio/node-types');
-    fsState.categories = nt.categories || [];
-    fsState.typeIndex = {};
-    fsState.categories.forEach(c => c.nodes.forEach(n => { fsState.typeIndex[n.type] = Object.assign({ category: c.category }, n); }));
-    fsRenderLibrary();
-    fsRenderCanvas();
-    fsRenderInspector();
-    await fsRenderStats();
-    await fsRenderDoctor(false);
-    await fsRenderTemplates();
-    await fsViewLogs();
-  } catch (e) { toast('Flow Studio load failed: ' + e.message, 'error'); }
-}
-
-async function fsRenderStats() {
-  try {
-    const s = await api('/api/flow-studio/status');
-    const ir = s.integrationsReady || {};
-    const readyCount = Object.values(ir).filter(Boolean).length;
-    const items = [
-      ['Active flows', s.activeFlows || 0],
-      ['Paused', s.pausedFlows || 0],
-      ['Total flows', s.flowCount || 0],
-      ['Failed runs', s.failedRuns || 0],
-      ['Queue pending', s.queuePending || 0],
-      ['Integrations', readyCount + '/' + Object.keys(ir).length]
-    ];
-    document.getElementById('fs-stats').innerHTML = items.map(([k, v]) =>
-      `<div class="card" style="padding:10px"><div style="font-size:11px;opacity:.7">${k}</div><div style="font-size:20px;font-weight:700">${v}</div></div>`).join('');
-    document.getElementById('fs-ready-badge').innerText = readyCount > 0 ? 'Automation ready' : 'Setup needed';
-  } catch (e) { /* silent */ }
-}
-
-async function fsRenderDoctor(showToast = true) {
-  const box = document.getElementById('fs-doctor');
-  if (!box) return;
-  try {
-    const d = await api('/api/flow-studio/doctor');
-    const score = Number(d.readinessScore || 0);
-    const color = score >= 85 ? '#16a34a' : score >= 65 ? '#d97706' : '#ef4444';
-    const missing = d.missingIntegrations || [];
-    const warnings = d.warnings || [];
-    const actions = d.nextActions || [];
-    const readyRows = Object.entries(d.integrationsReady || {})
-      .map(([name, ready]) => `<span class="tag ${ready ? 'tag-green' : 'tag-orange'}" style="margin:2px">${escHtml(name)}: ${ready ? 'ready' : 'missing'}</span>`)
-      .join('');
-    box.style.display = 'block';
-    box.innerHTML = `
-      <div class="flex-between" style="gap:10px;align-items:flex-start;flex-wrap:wrap">
-        <div>
-          <div class="card-title" style="margin:0">Launch Doctor</div>
-          <div style="font-size:12px;opacity:.7">Flow automation readiness, validation and integration health.</div>
-        </div>
-        <div style="font-size:26px;font-weight:800;color:${color}">${score}%</div>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin:10px 0">
-        <div><div style="font-size:11px;opacity:.65">Level</div><b>${escHtml(d.level || 'unknown')}</b></div>
-        <div><div style="font-size:11px;opacity:.65">Active flows</div><b>${escHtml(String(d.summary?.activeFlows || 0))}</b></div>
-        <div><div style="font-size:11px;opacity:.65">Templates</div><b>${escHtml(String(d.summary?.templateCount || 0))}</b></div>
-        <div><div style="font-size:11px;opacity:.65">Failed runs</div><b>${escHtml(String(d.summary?.failedRuns || 0))}</b></div>
-      </div>
-      <div style="margin:8px 0">${readyRows || '<span class="tag tag-orange">No integration status</span>'}</div>
-      ${missing.length ? `<div style="font-size:12px;color:#fbbf24;margin-top:6px">Missing: ${escHtml(missing.join(', '))}</div>` : ''}
-      ${warnings.length ? `<div style="margin-top:8px"><b>Warnings</b><ul style="margin:6px 0 0 18px">${warnings.map(w => `<li>${escHtml(w)}</li>`).join('')}</ul></div>` : ''}
-      ${actions.length ? `<div style="margin-top:8px"><b>Next actions</b><ul style="margin:6px 0 0 18px">${actions.map(a => `<li>${escHtml(a)}</li>`).join('')}</ul></div>` : '<div style="margin-top:8px;color:#16a34a">No critical action required.</div>'}
-    `;
-    if (showToast) toast('Launch Doctor refreshed', 'success');
-  } catch (e) {
-    box.style.display = 'block';
-    box.innerHTML = `<div class="card-title" style="margin:0">Launch Doctor</div><div style="color:#ef4444;margin-top:6px">Doctor failed: ${escHtml(e.message)}</div>`;
-    if (showToast) toast('Launch Doctor failed: ' + e.message, 'error');
-  }
-}
-
-function fsRenderLibrary() {
-  const box = document.getElementById('fs-node-library');
-  box.innerHTML = fsState.categories.map(cat => `
-    <div style="margin-bottom:8px">
-      <div style="font-size:11px;text-transform:uppercase;opacity:.6;margin-bottom:4px">${cat.label}</div>
-      ${cat.nodes.map(n => `<div class="fs-lib-node" onclick="fsAddNode('${n.type}')" style="cursor:pointer;padding:5px 7px;border-radius:6px;margin-bottom:3px;background:rgba(255,255,255,.04);font-size:12px">${n.icon || '•'} ${n.label}</div>`).join('')}
-    </div>`).join('');
-}
-
-function fsAddNode(type) {
-  const def = fsState.typeIndex[type];
-  if (!def) return;
-  const id = 'n' + (fsState.flow.nodes.length + 1) + '_' + Math.random().toString(36).slice(2, 6);
-  const node = { id, type, label: def.label, position: { x: 80 + fsState.flow.nodes.length * 40, y: 120 }, config: {}, next: [] };
-  const nodes = fsState.flow.nodes;
-  if (nodes.length) { const prev = nodes[nodes.length - 1]; prev.next = [id]; fsState.flow.edges.push({ id: 'e' + Date.now(), from: prev.id, to: id, condition: '' }); }
-  nodes.push(node);
-  if (type.startsWith('trigger.') && !fsState.flow.triggerType) fsState.flow.triggerType = type;
-  fsState.selected = id;
-  fsRenderCanvas(); fsRenderInspector();
-}
-
-function fsRenderCanvas() {
-  const f = fsState.flow;
-  document.getElementById('fs-flow-name').value = f.name || '';
-  document.getElementById('fs-flow-desc').value = f.description || '';
-  document.getElementById('fs-flow-status').innerText = f.status || 'draft';
-  const btn = document.getElementById('fs-activate-btn');
-  btn.innerText = f.status === 'active' ? '⏸ Pause' : '▶ Activate';
-  const canvas = document.getElementById('fs-canvas');
-  const empty = document.getElementById('fs-canvas-empty');
-  if (!f.nodes.length) { canvas.innerHTML = ''; empty.style.display = 'block'; return; }
-  empty.style.display = 'none';
-  canvas.innerHTML = f.nodes.map((n, i) => {
-    const def = fsState.typeIndex[n.type] || {};
-    const sel = fsState.selected === n.id;
-    const cat = (n.type || '').split('.')[0];
-    const color = { trigger: '#16a34a', ai: '#8b5cf6', action: '#2563eb', logic: '#d97706', data: '#0891b2' }[cat] || '#64748b';
-    return `<div onclick="fsSelectNode('${n.id}')" style="cursor:pointer;border:1px solid ${sel ? color : 'rgba(255,255,255,.1)'};border-left:4px solid ${color};border-radius:8px;padding:8px 10px;background:${sel ? 'rgba(255,255,255,.06)' : 'rgba(255,255,255,.02)'}">
-      <div class="flex-between"><div style="font-size:13px;font-weight:600">${def.icon || '•'} ${n.label}</div><div style="font-size:10px;opacity:.6">${cat}</div></div>
-      <div style="font-size:10px;opacity:.5;font-family:monospace">${n.type}</div>
-    </div>${i < f.nodes.length - 1 ? '<div style="text-align:center;opacity:.4">↓</div>' : ''}`;
-  }).join('');
-}
-
-function fsSelectNode(id) { fsState.selected = id; fsRenderCanvas(); fsRenderInspector(); }
-
-function fsRenderInspector() {
-  const box = document.getElementById('fs-inspector');
-  const node = fsState.flow.nodes.find(n => n.id === fsState.selected);
-  if (!node) { box.innerHTML = '<div style="opacity:.6;font-size:13px">Select a node to edit its config.</div>'; return; }
-  const isAction = (node.type || '').startsWith('action.');
-  const isBroadcast = /send_whatsapp|send_channel_post|post_facebook|post_instagram|post_linkedin/.test(node.type);
-  box.innerHTML = `
-    <div class="form-group"><label>Label</label><input value="${(node.label || '').replace(/"/g, '&quot;')}" onchange="fsUpdateNode('label', this.value)"/></div>
-    <div class="form-group"><label>Config (JSON)</label><textarea rows="6" onchange="fsUpdateConfig(this.value)" style="width:100%;font-family:monospace;font-size:11px">${JSON.stringify(node.config || {}, null, 2)}</textarea></div>
-    ${isBroadcast ? `<div style="font-size:11px;opacity:.7;border:1px dashed rgba(255,255,255,.15);padding:6px;border-radius:6px;margin-bottom:8px">⚠️ Safety: promotional broadcast needs <b>optInSegment</b>, <b>maxFrequencyPerDay</b>, and <b>requireApproval:true</b>. Social posting supports <b>draft:true</b>.</div>` : ''}
-    <button class="btn btn-secondary" onclick="fsDeleteNode('${node.id}')" style="width:100%">🗑 Delete node</button>`;
-}
-
-function fsUpdateNode(key, val) { const n = fsState.flow.nodes.find(x => x.id === fsState.selected); if (n) { n[key] = val; fsRenderCanvas(); } }
-function fsUpdateConfig(text) { const n = fsState.flow.nodes.find(x => x.id === fsState.selected); if (!n) return; try { n.config = JSON.parse(text || '{}'); toast('Config updated', 'success'); } catch (e) { toast('Invalid JSON', 'error'); } }
-function fsDeleteNode(id) {
-  fsState.flow.nodes = fsState.flow.nodes.filter(n => n.id !== id);
-  fsState.flow.edges = fsState.flow.edges.filter(e => e.from !== id && e.to !== id);
-  fsState.flow.nodes.forEach(n => { n.next = (n.next || []).filter(x => x !== id); });
-  fsState.selected = null; fsRenderCanvas(); fsRenderInspector();
-}
-
-function fsNewFlow() { fsState.flow = fsNewFlowObject(); fsState.selected = null; fsRenderCanvas(); fsRenderInspector(); toast('New flow created', 'success'); }
-
-function fsSyncFromForm() {
-  fsState.flow.name = document.getElementById('fs-flow-name').value || 'Untitled flow';
-  fsState.flow.description = document.getElementById('fs-flow-desc').value || '';
-}
-
-async function fsSaveFlow() {
-  fsSyncFromForm();
-  try {
-    const f = fsState.flow;
-    let res;
-    if (f.id) res = await api('/api/flow-studio/flows/' + encodeURIComponent(f.id), { method: 'PUT', body: JSON.stringify(f) });
-    else res = await api('/api/flow-studio/flows', { method: 'POST', body: JSON.stringify(f) });
-    fsState.flow = res.flow;
-    fsRenderCanvas();
-    if (res.validation && !res.validation.valid) toast('Saved with warnings: ' + res.validation.errors.join('; '), 'info');
-    else toast('Flow saved', 'success');
-    fsRenderStats();
-  } catch (e) { toast('Save failed: ' + e.message, 'error'); }
-}
-
-async function fsRunTest() {
-  if (!fsState.flow.id) { await fsSaveFlow(); }
-  if (!fsState.flow.id) return;
-  try {
-    const res = await api('/api/flow-studio/flows/' + encodeURIComponent(fsState.flow.id) + '/run-test', { method: 'POST', body: JSON.stringify({ input: {} }) });
-    fsRenderRunLogs(res.run);
-    toast('Dry run complete: ' + (res.run ? res.run.status : 'done'), res.success ? 'success' : 'error');
-  } catch (e) { toast('Run test failed: ' + e.message, 'error'); }
-}
-
-async function fsRunTriggerDry() {
-  const typeEl = document.getElementById('fs-trigger-type');
-  const payloadEl = document.getElementById('fs-trigger-payload');
-  const resultEl = document.getElementById('fs-trigger-result');
-  const triggerType = (typeEl?.value || '').trim();
-  if (!triggerType) { toast('Trigger type required', 'error'); return; }
-  let input = {};
-  try {
-    input = JSON.parse(payloadEl?.value || '{}');
-  } catch (e) {
-    toast('Sample payload must be valid JSON', 'error');
-    return;
-  }
-  try {
-    const res = await api('/api/flow-studio/trigger/' + encodeURIComponent(triggerType), {
-      method: 'POST',
-      body: JSON.stringify({ input, source: 'dashboard-trigger-test' })
-    });
-    const rows = (res.results || []).map(row => {
-      const color = row.success ? '#16a34a' : '#ef4444';
-      return `<div style="padding:3px 0;border-top:1px solid rgba(255,255,255,.06)"><b>${escHtml(row.flowName || row.flowId || 'flow')}</b> — <span style="color:${color}">${escHtml(row.status || '')}</span> <span style="opacity:.65">(${escHtml(row.mode || 'dry-run')})</span>${row.error ? `<div style="color:#ef4444">${escHtml(row.error)}</div>` : ''}</div>`;
-    }).join('');
-    if (resultEl) {
-      resultEl.innerHTML = `<b>${escHtml(res.message || 'Trigger test complete.')}</b><div style="opacity:.7">Trigger: ${escHtml(res.triggerType || triggerType)} · Matched: ${escHtml(String(res.matched || 0))}</div>${rows || '<div style="opacity:.6;margin-top:4px">No active matching flows. Activate a flow with this trigger first.</div>'}`;
-    }
-    if (res.results && res.results[0] && typeof fsViewLogs === 'function') fsViewLogs();
-    toast('Trigger dry-run complete: ' + (res.matched || 0) + ' matched', res.success ? 'success' : 'error');
-  } catch (e) {
-    if (resultEl) resultEl.innerHTML = `<span style="color:#ef4444">Trigger failed: ${escHtml(e.message)}</span>`;
-    toast('Trigger failed: ' + e.message, 'error');
-  }
-}
-
-async function fsToggleActivate() {
-  if (!fsState.flow.id) { await fsSaveFlow(); if (!fsState.flow.id) return; }
-  const activate = fsState.flow.status !== 'active';
-  try {
-    const res = await api('/api/flow-studio/flows/' + encodeURIComponent(fsState.flow.id) + '/' + (activate ? 'activate' : 'pause'), { method: 'POST', body: '{}' });
-    fsState.flow = res.flow; fsRenderCanvas(); fsRenderStats();
-    toast(activate ? 'Flow activated (Live run enabled)' : 'Flow paused', 'success');
-  } catch (e) { toast((activate ? 'Activate' : 'Pause') + ' failed: ' + e.message, 'error'); }
-}
-
-function fsRenderRunLogs(run) {
-  const panel = document.getElementById('fs-log-panel');
-  if (!run) { panel.innerHTML = '<div style="opacity:.6">No run data.</div>'; return; }
-  const head = `<div style="margin-bottom:6px"><b>[${run.mode}]</b> ${run.flowName} — <span style="color:${run.status === 'failed' ? '#ef4444' : run.status === 'paused_approval' ? '#d97706' : '#16a34a'}">${run.status}</span> · ${run.nodeCount} nodes</div>`;
-  panel.innerHTML = head + (run.logs || []).map(l => {
-    const c = l.status === 'error' ? '#ef4444' : l.kind === 'approval' ? '#d97706' : l.kind === 'action' ? '#2563eb' : 'inherit';
-    return `<div style="color:${c};padding:2px 0">• ${l.label || l.kind || ''}: ${l.message || ''}</div>`;
-  }).join('');
-}
-
-async function fsViewLogs() {
-  try {
-    const flowId = fsState.flow && fsState.flow.id ? '?flowId=' + encodeURIComponent(fsState.flow.id) + '&limit=20' : '?limit=20';
-    const res = await api('/api/flow-studio/runs' + flowId);
-    const runs = res.runs || [];
-    const panel = document.getElementById('fs-log-panel');
-    if (!runs.length) { panel.innerHTML = '<div style="opacity:.6">No runs yet. Use Run Test to dry-run a flow.</div>'; return; }
-    panel.innerHTML = runs.map(r => {
-      const c = r.status === 'failed' ? '#ef4444' : r.status === 'paused_approval' ? '#d97706' : '#16a34a';
-      return `<div style="padding:3px 0;border-bottom:1px solid rgba(255,255,255,.06)"><b>[${r.mode}]</b> ${r.flowName} — <span style="color:${c}">${r.status}</span> · ${new Date(r.finishedAt).toLocaleString()} · ${r.nodeCount} nodes</div>`;
-    }).join('');
-  } catch (e) { toast('Logs load failed: ' + e.message, 'error'); }
-}
-
-function fsExportJSON() {
-  fsSyncFromForm();
-  const blob = new Blob([JSON.stringify(fsState.flow, null, 2)], { type: 'application/json' });
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-  a.download = (fsState.flow.name || 'flow').replace(/[^a-z0-9]+/gi, '-').toLowerCase() + '.json';
-  a.click(); URL.revokeObjectURL(a.href);
-  toast('Exported JSON', 'success');
-}
-
-function fsImportJSON(ev) {
-  const file = ev.target.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = () => {
-    try { const obj = JSON.parse(reader.result); obj.id = null; obj.status = 'draft'; fsState.flow = Object.assign(fsNewFlowObject(), obj); fsState.selected = null; fsRenderCanvas(); fsRenderInspector(); toast('Imported flow (save to persist)', 'success'); }
-    catch (e) { toast('Import failed: invalid JSON', 'error'); }
-  };
-  reader.readAsText(file); ev.target.value = '';
-}
-
-async function fsRenderTemplates() {
-  try {
-    const res = await api('/api/flow-studio/templates');
-    document.getElementById('fs-templates').innerHTML = (res.templates || []).map(t => `
-      <div class="card" style="padding:10px">
-        <div style="font-weight:600;font-size:13px">${t.name}</div>
-        <div style="font-size:11px;opacity:.7;margin:4px 0;min-height:30px">${t.description || ''}</div>
-        <div style="font-size:10px;opacity:.5;margin-bottom:6px">${(t.nodes || []).length} nodes</div>
-        <button class="btn btn-secondary" style="width:100%" onclick="fsInstallTemplate('${t.id}')">Install</button>
-      </div>`).join('');
-  } catch (e) { /* silent */ }
-}
-
-async function fsInstallTemplate(id) {
-  try {
-    const res = await api('/api/flow-studio/templates/' + encodeURIComponent(id) + '/install', { method: 'POST', body: '{}' });
-    fsState.flow = res.flow; fsState.selected = null;
-    fsRenderCanvas(); fsRenderInspector(); fsRenderStats();
-    toast('Template installed as editable flow', 'success');
-  } catch (e) { toast('Install failed: ' + e.message, 'error'); }
-}
-</script>
-
-<script>
-/* ===== SuperFlow Studio frontend v2: approvals, duplicate, visual canvas ===== */
-(function () {
-  if (window.fsState) { fsState.visual = false; }
-
-  // ---- Approval inbox ----
-  window.fsRenderApprovals = async function () {
-    try {
-      const res = await api('/api/flow-studio/approvals');
-      const list = res.approvals || [];
-      const badge = document.getElementById('fs-approvals-count');
-      if (badge) { badge.style.display = list.length ? 'inline-block' : 'none'; badge.innerText = list.length; }
-      const box = document.getElementById('fs-approvals-list');
-      if (!box) return;
-      if (!list.length) { box.innerHTML = '<div style="opacity:.6;padding:6px 0">No pending approvals. Human-approval nodes pause runs and show here.</div>'; return; }
-      box.innerHTML = list.map(a => `
-        <div style="border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px;margin-bottom:6px">
-          <div class="flex-between"><b>${a.flowName || a.flowId}</b><span style="font-size:10px;opacity:.6">${new Date(a.createdAt).toLocaleString()}</span></div>
-          <div style="font-size:11px;opacity:.7">Pending node: ${a.pendingNode || '-'} · mode: ${a.mode || 'dry-run'}</div>
-          <div style="display:flex;gap:6px;margin-top:6px">
-            <button class="btn btn-primary" style="font-size:11px;padding:3px 8px" onclick="fsResolveApproval('${a.id}','approve')">Approve & resume</button>
-            <button class="btn btn-secondary" style="font-size:11px;padding:3px 8px" onclick="fsResolveApproval('${a.id}','reject')">Reject</button>
-          </div>
-        </div>`).join('');
-    } catch (e) { /* silent */ }
-  };
-
-  window.fsResolveApproval = async function (id, decision) {
-    try {
-      const res = await api('/api/flow-studio/approvals/' + encodeURIComponent(id) + '/resolve', { method: 'POST', body: JSON.stringify({ decision }) });
-      toast(decision === 'approve' ? 'Approved — flow resumed (dry run)' : 'Approval rejected', 'success');
-      if (res.resumeRun && typeof fsRenderRunLogs === 'function') fsRenderRunLogs(res.resumeRun);
-      fsRenderApprovals();
-      if (typeof fsRenderStats === 'function') fsRenderStats();
-    } catch (e) { toast('Resolve failed: ' + e.message, 'error'); }
-  };
-
-  // ---- Duplicate flow ----
-  window.fsDuplicateFlow = async function () {
-    if (!fsState.flow || !fsState.flow.id) { toast('Save the flow first, then duplicate', 'info'); return; }
-    try {
-      const res = await api('/api/flow-studio/flows/' + encodeURIComponent(fsState.flow.id) + '/duplicate', { method: 'POST', body: '{}' });
-      fsState.flow = res.flow; fsState.selected = null;
-      fsRenderCanvas(); if (typeof fsRenderInspector === 'function') fsRenderInspector();
-      toast('Flow duplicated as draft', 'success');
-    } catch (e) { toast('Duplicate failed: ' + e.message, 'error'); }
-  };
-
-  // ---- Canvas view toggle + auto layout ----
-  window.fsToggleCanvasView = function () {
-    fsState.visual = !fsState.visual;
-    const btn = document.getElementById('fs-view-btn');
-    if (btn) btn.innerText = fsState.visual ? '📋 List view' : '🔲 Visual canvas';
-    fsRenderCanvas();
-  };
-
-  window.fsAutoLayout = function () {
-    (fsState.flow.nodes || []).forEach((n, i) => { n.position = { x: 30 + (i % 4) * 200, y: 30 + Math.floor(i / 4) * 130 }; });
-    fsRenderCanvas();
-    toast('Auto layout applied', 'success');
-  };
-
-  // ---- Override fsRenderCanvas with list + visual modes ----
-  const catColor = c => ({ trigger: '#16a34a', ai: '#8b5cf6', action: '#2563eb', logic: '#d97706', data: '#0891b2' }[c] || '#64748b');
-
-  window.fsRenderCanvas = function () {
-    const f = fsState.flow;
-    const nameEl = document.getElementById('fs-flow-name'); if (nameEl) nameEl.value = f.name || '';
-    const descEl = document.getElementById('fs-flow-desc'); if (descEl) descEl.value = f.description || '';
-    const stEl = document.getElementById('fs-flow-status'); if (stEl) stEl.innerText = f.status || 'draft';
-    const aBtn = document.getElementById('fs-activate-btn'); if (aBtn) aBtn.innerText = f.status === 'active' ? '⏸ Pause' : '▶ Activate';
-    const canvas = document.getElementById('fs-canvas');
-    const empty = document.getElementById('fs-canvas-empty');
-    if (!canvas) return;
-    if (!f.nodes.length) { canvas.innerHTML = ''; canvas.style.position = ''; if (empty) empty.style.display = 'block'; return; }
-    if (empty) empty.style.display = 'none';
-
-    if (!fsState.visual) {
-      canvas.style.position = '';
-      canvas.style.height = '';
-      canvas.style.display = 'flex';
-      canvas.innerHTML = f.nodes.map((n, i) => {
-        const def = (fsState.typeIndex[n.type] || {});
-        const sel = fsState.selected === n.id;
-        const cat = (n.type || '').split('.')[0];
-        const color = catColor(cat);
-        return `<div onclick="fsSelectNode('${n.id}')" style="cursor:pointer;border:1px solid ${sel ? color : 'rgba(255,255,255,.1)'};border-left:4px solid ${color};border-radius:8px;padding:8px 10px;background:${sel ? 'rgba(255,255,255,.06)' : 'rgba(255,255,255,.02)'}">
-          <div class="flex-between"><div style="font-size:13px;font-weight:600">${def.icon || '•'} ${n.label}</div><div style="font-size:10px;opacity:.6">${cat}</div></div>
-          <div style="font-size:10px;opacity:.5;font-family:monospace">${n.type}</div>
-        </div>${i < f.nodes.length - 1 ? '<div style="text-align:center;opacity:.4">↓</div>' : ''}`;
-      }).join('');
-      return;
-    }
-
-    // Visual draggable canvas
-    f.nodes.forEach((n, i) => { if (!n.position || typeof n.position.x !== 'number') n.position = { x: 30 + (i % 4) * 200, y: 30 + Math.floor(i / 4) * 130 }; });
-    canvas.style.display = 'block';
-    canvas.style.position = 'relative';
-    canvas.style.height = '460px';
-    canvas.style.overflow = 'auto';
-    canvas.style.background = 'repeating-linear-gradient(0deg,transparent,transparent 23px,rgba(255,255,255,.03) 24px),repeating-linear-gradient(90deg,transparent,transparent 23px,rgba(255,255,255,.03) 24px)';
-    const W = 1200, H = 900;
-    const edges = (f.edges && f.edges.length) ? f.edges : [];
-    const byId = {}; f.nodes.forEach(n => byId[n.id] = n);
-    const lines = edges.map(e => {
-      const a = byId[e.from], b = byId[e.to]; if (!a || !b) return '';
-      const x1 = a.position.x + 80, y1 = a.position.y + 24, x2 = b.position.x + 80, y2 = b.position.y + 24;
-      return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="rgba(255,255,255,.25)" stroke-width="2" marker-end="url(#fsArrow)"/>`;
-    }).join('');
-    canvas.innerHTML = `<svg width="${W}" height="${H}" style="position:absolute;top:0;left:0;pointer-events:none">
-        <defs><marker id="fsArrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="rgba(255,255,255,.4)"/></marker></defs>${lines}
-      </svg>` +
-      f.nodes.map(n => {
-        const def = (fsState.typeIndex[n.type] || {});
-        const cat = (n.type || '').split('.')[0];
-        const color = catColor(cat);
-        const sel = fsState.selected === n.id;
-        return `<div class="fs-vnode" data-id="${n.id}" style="position:absolute;left:${n.position.x}px;top:${n.position.y}px;width:160px;cursor:move;border:1px solid ${sel ? color : 'rgba(255,255,255,.15)'};border-left:4px solid ${color};border-radius:8px;padding:6px 8px;background:#1a1f2b;box-shadow:0 2px 8px rgba(0,0,0,.3)">
-          <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${def.icon || '•'} ${n.label}</div>
-          <div style="font-size:9px;opacity:.5;font-family:monospace">${cat}</div>
-        </div>`;
-      }).join('');
-
-    // drag handlers
-    canvas.querySelectorAll('.fs-vnode').forEach(el => {
-      el.addEventListener('mousedown', startDrag);
-      el.addEventListener('click', ev => { if (!el._moved) fsSelectNode(el.dataset.id); });
-    });
-    function startDrag(ev) {
-      ev.preventDefault();
-      const el = ev.currentTarget; el._moved = false;
-      const node = byId[el.dataset.id];
-      const startX = ev.clientX, startY = ev.clientY, ox = node.position.x, oy = node.position.y;
-      function move(e) {
-        const dx = e.clientX - startX, dy = e.clientY - startY;
-        if (Math.abs(dx) > 3 || Math.abs(dy) > 3) el._moved = true;
-        node.position.x = Math.max(0, ox + dx); node.position.y = Math.max(0, oy + dy);
-        el.style.left = node.position.x + 'px'; el.style.top = node.position.y + 'px';
-        fsRedrawEdges();
-      }
-      function up() { document.removeEventListener('mousemove', move); document.removeEventListener('mouseup', up); }
-      document.addEventListener('mousemove', move); document.addEventListener('mouseup', up);
-    }
-    function fsRedrawEdges() {
-      const svg = canvas.querySelector('svg'); if (!svg) return;
-      svg.querySelectorAll('line').forEach(l => l.remove());
-      edges.forEach(e => {
-        const a = byId[e.from], b = byId[e.to]; if (!a || !b) return;
-        const ln = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        ln.setAttribute('x1', a.position.x + 80); ln.setAttribute('y1', a.position.y + 24);
-        ln.setAttribute('x2', b.position.x + 80); ln.setAttribute('y2', b.position.y + 24);
-        ln.setAttribute('stroke', 'rgba(255,255,255,.25)'); ln.setAttribute('stroke-width', '2'); ln.setAttribute('marker-end', 'url(#fsArrow)');
-        svg.appendChild(ln);
-      });
-    }
-  };
-
-  // ---- Wrap loadFlowStudio to also load approvals ----
-  if (typeof window.loadFlowStudio === 'function') {
-    const orig = window.loadFlowStudio;
-    window.loadFlowStudio = async function () { await orig.apply(this, arguments); try { await fsRenderApprovals(); } catch (e) {} };
-  }
-})();
-</script>
-
-<script>
-/* ===== SuperFlow Studio frontend v3 ===== */
-(function () {
-  // ---- Node library search (override render with filter) ----
-  window.fsFilterLibrary = function (term) { fsState.libFilter = (term || '').toLowerCase(); fsRenderLibrary(); };
-  window.fsRenderLibrary = function () {
-    const box = document.getElementById('fs-node-library'); if (!box) return;
-    const f = fsState.libFilter || '';
-    box.innerHTML = (fsState.categories || []).map(cat => {
-      const nodes = cat.nodes.filter(n => !f || (n.label + ' ' + n.type).toLowerCase().includes(f));
-      if (!nodes.length) return '';
-      return `<div style="margin-bottom:8px">
-        <div style="font-size:11px;text-transform:uppercase;opacity:.6;margin-bottom:4px">${cat.label}</div>
-        ${nodes.map(n => `<div onclick="fsAddNode('${n.type}')" style="cursor:pointer;padding:5px 7px;border-radius:6px;margin-bottom:3px;background:rgba(255,255,255,.04);font-size:12px">${n.icon || '•'} ${n.label}</div>`).join('')}
-      </div>`;
-    }).join('') || '<div style="opacity:.5;font-size:12px">No matching nodes.</div>';
-  };
-
-  // ---- My Flows list + open existing ----
-  window.fsRenderFlowsList = async function () {
-    try {
-      const res = await api('/api/flow-studio/flows');
-      const flows = res.flows || [];
-      const box = document.getElementById('fs-flows-list'); if (!box) return;
-      if (!flows.length) { box.innerHTML = '<div style="opacity:.6;padding:4px 0">No saved flows yet. Install a template or create one.</div>'; return; }
-      box.innerHTML = flows.slice().reverse().map(fl => {
-        const c = fl.status === 'active' ? '#16a34a' : fl.status === 'paused' ? '#d97706' : '#64748b';
-        const cur = fsState.flow && fsState.flow.id === fl.id;
-        return `<div class="flex-between" style="padding:4px 6px;border-radius:6px;${cur ? 'background:rgba(255,255,255,.06)' : ''}">
-          <div style="cursor:pointer;flex:1" onclick="fsOpenFlow('${fl.id}')"><span style="color:${c}">●</span> ${fl.name} <span style="opacity:.5;font-size:10px">(${(fl.nodes || []).length})</span></div>
-          <button class="btn btn-secondary" style="font-size:10px;padding:2px 6px" onclick="fsDeleteFlow('${fl.id}')">🗑</button>
-        </div>`;
-      }).join('');
-    } catch (e) { /* silent */ }
-  };
-  window.fsOpenFlowPicker = function () { fsRenderFlowsList(); toast('Pick a flow from "My Flows" below', 'info'); };
-  window.fsOpenFlow = async function (id) {
-    try {
-      const res = await api('/api/flow-studio/flows/' + encodeURIComponent(id));
-      fsState.flow = res.flow; fsState.selected = null;
-      fsRenderCanvas(); fsRenderInspector(); fsRenderVars(); fsRenderFlowsList();
-      toast('Opened: ' + (res.flow.name || id), 'success');
-    } catch (e) { toast('Open failed: ' + e.message, 'error'); }
-  };
-  window.fsDeleteFlow = async function (id) {
-    if (!confirm('Delete this flow?')) return;
-    try {
-      await api('/api/flow-studio/flows/' + encodeURIComponent(id), { method: 'DELETE' });
-      if (fsState.flow && fsState.flow.id === id) fsNewFlow();
-      fsRenderFlowsList(); if (typeof fsRenderStats === 'function') fsRenderStats();
-      toast('Flow deleted', 'success');
-    } catch (e) { toast('Delete failed: ' + e.message, 'error'); }
-  };
-
-  // ---- Variables + schedule editor ----
-  window.fsRenderVars = function () {
-    const box = document.getElementById('fs-vars'); if (!box) return;
-    const v = (fsState.flow && fsState.flow.variables) || {};
-    const isSched = (fsState.flow.nodes || []).some(n => n.type === 'trigger.schedule');
-    box.innerHTML = `<details style="font-size:12px"><summary style="cursor:pointer;opacity:.8">⚙ Variables & schedule</summary>
-      <textarea id="fs-vars-json" rows="3" onchange="fsSaveVars(this.value)" style="width:100%;font-family:monospace;font-size:11px;margin-top:4px">${JSON.stringify(v, null, 2)}</textarea>
-      ${isSched ? `<label style="display:flex;align-items:center;gap:6px;margin-top:4px"><input type="checkbox" id="fs-sched-live" ${v.scheduleLive ? 'checked' : ''} onchange="fsToggleScheduleLive(this.checked)"/> Allow LIVE scheduled runs (default dry run)</label>` : ''}
-    </details>`;
-  };
-  window.fsSaveVars = function (text) { try { fsState.flow.variables = JSON.parse(text || '{}'); toast('Variables updated', 'success'); fsRenderVars(); } catch (e) { toast('Invalid JSON', 'error'); } };
-  window.fsToggleScheduleLive = function (on) { fsState.flow.variables = fsState.flow.variables || {}; fsState.flow.variables.scheduleLive = !!on; toast(on ? 'Live scheduled runs enabled' : 'Scheduled runs are dry-run', 'info'); fsRenderVars(); };
-
-  // ---- Connection / branch editor (extend inspector) ----
-  window.fsRenderInspector = function () {
-    const box = document.getElementById('fs-inspector'); if (!box) return;
-    const node = (fsState.flow.nodes || []).find(n => n.id === fsState.selected);
-    if (!node) { box.innerHTML = '<div style="opacity:.6;font-size:13px">Select a node to edit its config & connections.</div>'; return; }
-    const isBroadcast = /send_whatsapp|send_channel_post|post_facebook|post_instagram|post_linkedin/.test(node.type);
-    const others = (fsState.flow.nodes || []).filter(n => n.id !== node.id);
-    const nexts = Array.isArray(node.next) ? node.next : [];
-    const branchHelp = node.type === 'logic.if_else'
-      ? `<div class="form-group"><label>Condition (e.g. reply == YES)</label><input value="${(node.config?.condition || '').replace(/"/g, '&quot;')}" onchange="fsSetNodeConfigKey('condition', this.value)"/></div><div style="font-size:10px;opacity:.6;margin-bottom:6px">Tip: label one edge condition "true" and another "false".</div>`
-      : node.type === 'logic.switch_intent'
-      ? `<div class="form-group"><label>Switch variable (default: intent)</label><input value="${(node.config?.var || 'intent').replace(/"/g, '&quot;')}" onchange="fsSetNodeConfigKey('var', this.value)"/></div><div style="font-size:10px;opacity:.6;margin-bottom:6px">Tip: set each edge condition to an intent value, or "default".</div>` : '';
-    box.innerHTML = `
-      <div class="form-group"><label>Label</label><input value="${(node.label || '').replace(/"/g, '&quot;')}" onchange="fsUpdateNode('label', this.value)"/></div>
-      <div style="font-size:10px;opacity:.5;font-family:monospace;margin-bottom:6px">${node.type}</div>
-      ${branchHelp}
-      <div class="form-group"><label>Config (JSON)</label><textarea rows="5" onchange="fsUpdateConfig(this.value)" style="width:100%;font-family:monospace;font-size:11px">${JSON.stringify(node.config || {}, null, 2)}</textarea></div>
-      <div class="form-group"><label>Connections (next steps)</label>
-        ${others.length ? others.map(o => {
-          const on = nexts.includes(o.id);
-          const edge = (fsState.flow.edges || []).find(e => e.from === node.id && e.to === o.id);
-          return `<div style="display:flex;align-items:center;gap:4px;margin-bottom:3px;font-size:11px">
-            <input type="checkbox" ${on ? 'checked' : ''} onchange="fsSetConnection('${node.id}','${o.id}',this.checked)"/>
-            <span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${o.label}</span>
-            ${on ? `<input placeholder="cond" value="${(edge?.condition || '').replace(/"/g, '&quot;')}" onchange="fsSetEdgeCondition('${node.id}','${o.id}',this.value)" style="width:70px;font-size:10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:inherit;border-radius:4px;padding:2px"/>` : ''}
-          </div>`;
-        }).join('') : '<div style="opacity:.5;font-size:11px">Add more nodes to connect.</div>'}
-      </div>
-      ${isBroadcast ? `<div style="font-size:11px;opacity:.7;border:1px dashed rgba(255,255,255,.15);padding:6px;border-radius:6px;margin-bottom:8px">⚠️ Safety: broadcast needs <b>optInSegment</b>, <b>maxFrequencyPerDay</b>, <b>requireApproval:true</b>. Social posting supports <b>draft:true</b>.</div>` : ''}
-      <button class="btn btn-secondary" onclick="fsDeleteNode('${node.id}')" style="width:100%">🗑 Delete node</button>`;
-  };
-  window.fsSetNodeConfigKey = function (key, val) { const n = fsState.flow.nodes.find(x => x.id === fsState.selected); if (!n) return; n.config = n.config || {}; n.config[key] = val; toast('Saved', 'success'); };
-  window.fsSetConnection = function (from, to, on) {
-    const n = fsState.flow.nodes.find(x => x.id === from); if (!n) return;
-    n.next = Array.isArray(n.next) ? n.next : [];
-    fsState.flow.edges = fsState.flow.edges || [];
-    if (on) {
-      if (!n.next.includes(to)) n.next.push(to);
-      if (!fsState.flow.edges.some(e => e.from === from && e.to === to)) fsState.flow.edges.push({ id: 'e' + Date.now() + Math.random().toString(36).slice(2, 5), from, to, condition: '' });
-    } else {
-      n.next = n.next.filter(x => x !== to);
-      fsState.flow.edges = fsState.flow.edges.filter(e => !(e.from === from && e.to === to));
-    }
-    fsRenderInspector(); fsRenderCanvas();
-  };
-  window.fsSetEdgeCondition = function (from, to, cond) {
-    const e = (fsState.flow.edges || []).find(x => x.from === from && x.to === to);
-    if (e) { e.condition = cond; toast('Edge condition set', 'success'); }
-  };
-
-  // ---- Analytics ----
-  window.fsShowAnalytics = async function () {
-    if (!fsState.flow || !fsState.flow.id) { toast('Save or open a flow first', 'info'); return; }
-    try {
-      const d = await api('/api/flow-studio/flows/' + encodeURIComponent(fsState.flow.id) + '/analytics');
-      const box = document.getElementById('fs-analytics'); if (!box) return;
-      box.style.opacity = '1';
-      box.innerHTML = `
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0">
-          <div><div style="font-size:18px;font-weight:700">${d.successRate}%</div><div style="font-size:10px;opacity:.6">Success rate</div></div>
-          <div><div style="font-size:18px;font-weight:700">${d.totalRuns}</div><div style="font-size:10px;opacity:.6">Total runs</div></div>
-          <div><div style="font-size:18px;font-weight:700">${Math.round((d.avgDurationMs || 0))}ms</div><div style="font-size:10px;opacity:.6">Avg duration</div></div>
-        </div>
-        <div style="font-size:11px;opacity:.7">✅ ${d.completed} · ❌ ${d.failed} · ⏸ ${d.paused}</div>
-        <div style="margin-top:6px">${(d.recent || []).map(r => {
-          const c = r.status === 'failed' ? '#ef4444' : r.status === 'paused_approval' ? '#d97706' : '#16a34a';
-          return `<div style="font-size:11px;padding:2px 0"><span style="color:${c}">●</span> [${r.mode}] ${r.status} · ${r.nodeCount} nodes · ${r.finishedAt ? new Date(r.finishedAt).toLocaleTimeString() : ''}</div>`;
-        }).join('') || '<span style="opacity:.5">No runs yet</span>'}</div>`;
-    } catch (e) { toast('Analytics failed: ' + e.message, 'error'); }
-  };
-
-  // ---- Live run streaming via Socket.IO ----
-  function fsStreamLog(entry) {
-    if (typeof currentSection !== 'undefined' && currentSection !== 'flow-studio') return;
-    const panel = document.getElementById('fs-log-panel'); if (!panel) return;
-    const div = document.createElement('div');
-    if (entry.system) { div.style.color = '#38bdf8'; div.textContent = entry.system; }
-    else {
-      const c = entry.status === 'error' ? '#ef4444' : entry.kind === 'approval' ? '#d97706' : entry.kind === 'action' ? '#2563eb' : 'inherit';
-      div.style.color = c; div.textContent = `• ${entry.label || entry.kind || ''}: ${entry.message || ''}`;
-    }
-    panel.appendChild(div); panel.scrollTop = panel.scrollHeight;
-  }
-  try {
-    if (typeof socket !== 'undefined' && socket && socket.on) {
-      socket.on('flow-studio:run-start', d => fsStreamLog({ system: `▶ Live run started [${d.mode}] — ${d.flowName}` }));
-      socket.on('flow-studio:node', d => fsStreamLog(d.log || {}));
-      socket.on('flow-studio:run-end', d => fsStreamLog({ system: `■ Run ${d.status} · ${d.nodeCount} nodes` }));
-    }
-  } catch (e) { /* socket not ready */ }
-
-  // ---- Hook loadFlowStudio to also load flows list, vars ----
-  if (typeof window.loadFlowStudio === 'function') {
-    const orig = window.loadFlowStudio;
-    window.loadFlowStudio = async function () {
-      await orig.apply(this, arguments);
-      try { await fsRenderFlowsList(); fsRenderVars(); } catch (e) {}
-    };
-  }
-})();
-</script>
-
-<script>
-/* ===== SuperFlow Studio frontend v4 ===== */
-(function () {
-  // ---- Manual live run ----
-  window.fsLiveRun = async function () {
-    if (!fsState.flow || !fsState.flow.id) { toast('Save the flow first', 'info'); return; }
-    if (fsState.flow.status !== 'active') { toast('Activate the flow before a live run', 'info'); return; }
-    if (!confirm('Run this flow LIVE now? Live actions (messages, posts) may be sent.')) return;
-    try {
-      const res = await api('/api/flow-studio/flows/' + encodeURIComponent(fsState.flow.id) + '/run', { method: 'POST', body: JSON.stringify({ live: true, input: {} }) });
-      if (typeof fsRenderRunLogs === 'function' && res.run) fsRenderRunLogs(res.run);
-      toast('Live run: ' + (res.run ? res.run.status : 'done'), res.success ? 'success' : 'error');
-      if (typeof fsRenderStats === 'function') fsRenderStats();
-    } catch (e) { toast('Live run failed: ' + e.message, 'error'); }
-  };
-
-  // ---- Test selected node in isolation ----
-  window.fsTestNode = async function () {
-    const node = (fsState.flow.nodes || []).find(n => n.id === fsState.selected);
-    if (!node) { toast('Select a node to test', 'info'); return; }
-    try {
-      const res = await api('/api/flow-studio/test-node', { method: 'POST', body: JSON.stringify({ node: { type: node.type, label: node.label, config: node.config || {} }, input: {} }) });
-      const panel = document.getElementById('fs-log-panel');
-      if (panel) { const d = document.createElement('div'); d.style.color = '#a78bfa'; d.textContent = `🧪 Test [${node.label}]: ${res.result?.message || JSON.stringify(res.result)}`; panel.appendChild(d); panel.scrollTop = panel.scrollHeight; }
-      toast('Node tested (dry run)', 'success');
-    } catch (e) { toast('Test failed: ' + e.message, 'error'); }
-  };
-
-  // ---- Save current flow as a reusable template ----
-  window.fsSaveAsTemplate = async function () {
-    if (!fsState.flow || !fsState.flow.id) { toast('Save the flow first', 'info'); return; }
-    const name = prompt('Template name:', (fsState.flow.name || 'My Template') + ' (template)');
-    if (name === null) return;
-    try {
-      await api('/api/flow-studio/flows/' + encodeURIComponent(fsState.flow.id) + '/save-as-template', { method: 'POST', body: JSON.stringify({ name }) });
-      toast('Saved as template', 'success');
-      if (typeof fsRenderTemplates === 'function') fsRenderTemplates();
-    } catch (e) { toast('Save as template failed: ' + e.message, 'error'); }
-  };
-
-  // ---- Webhook trigger info ----
-  window.fsShowWebhook = async function () {
-    if (!fsState.flow || !fsState.flow.id) { toast('Save the flow first', 'info'); return; }
-    try {
-      const d = await api('/api/flow-studio/hooks/' + encodeURIComponent(fsState.flow.id));
-      const card = document.getElementById('fs-webhook-card'); const box = document.getElementById('fs-webhook');
-      if (card) card.style.display = 'block';
-      const secret = (fsState.flow.variables && fsState.flow.variables.webhookSecret) || '';
-      box.innerHTML = `
-        <div style="opacity:.7;margin-bottom:4px">POST a JSON body to fire this flow (dry-run unless active &amp; <code>?live=true</code>):</div>
-        <div style="display:flex;gap:4px;margin-bottom:6px"><input id="fs-hook-url" readonly value="${d.url}" style="flex:1;font-size:11px;font-family:monospace;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:inherit;border-radius:4px;padding:4px"/><button class="btn btn-secondary" style="font-size:11px" onclick="navigator.clipboard&amp;&amp;navigator.clipboard.writeText(document.getElementById('fs-hook-url').value);toast('Copied','success')">Copy</button></div>
-        <div class="form-group"><label style="font-size:11px">Webhook secret (optional)</label><input id="fs-hook-secret" value="${secret}" placeholder="leave empty for none" onchange="fsSetWebhookSecret(this.value)" style="width:100%;font-size:11px"/></div>
-        <div style="font-size:10px;opacity:.6">Send secret via <code>x-flow-secret</code> header or <code>?secret=</code>. Remember to Save.</div>`;
-    } catch (e) { toast('Webhook info failed: ' + e.message, 'error'); }
-  };
-  window.fsSetWebhookSecret = function (val) { fsState.flow.variables = fsState.flow.variables || {}; if (val) fsState.flow.variables.webhookSecret = val; else delete fsState.flow.variables.webhookSecret; toast('Secret set (Save to persist)', 'info'); if (typeof fsRenderVars === 'function') fsRenderVars(); };
-
-  // ---- Backup export / import all ----
-  window.fsExportAll = async function () {
-    try {
-      const d = await api('/api/flow-studio/export-all');
-      const blob = new Blob([JSON.stringify(d, null, 2)], { type: 'application/json' });
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'flow-studio-backup.json'; a.click(); URL.revokeObjectURL(a.href);
-      toast('Exported ' + (d.flows || []).length + ' flows', 'success');
-    } catch (e) { toast('Export all failed: ' + e.message, 'error'); }
-  };
-  window.fsImportAll = function (ev) {
-    const file = ev.target.files[0]; if (!file) return;
-    const reader = new FileReader();
-    reader.onload = async () => {
-      try {
-        const obj = JSON.parse(reader.result);
-        const res = await api('/api/flow-studio/import-all', { method: 'POST', body: JSON.stringify({ flows: obj.flows || [], templates: obj.templates || [], mode: 'merge' }) });
-        toast('Imported ' + res.imported + ' flows', 'success');
-        if (typeof fsRenderFlowsList === 'function') fsRenderFlowsList();
-        if (typeof fsRenderStats === 'function') fsRenderStats();
-        if (typeof fsRenderTemplates === 'function') fsRenderTemplates();
-      } catch (e) { toast('Import all failed: ' + e.message, 'error'); }
-    };
-    reader.readAsText(file); ev.target.value = '';
-  };
-
-  // ---- Studio metrics (mini bar chart) ----
-  window.fsRenderMetrics = async function () {
-    try {
-      const d = await api('/api/flow-studio/metrics?days=14');
-      const box = document.getElementById('fs-metrics'); if (!box) return;
-      box.style.opacity = '1';
-      const max = Math.max(1, ...d.byDay.map(x => x.total));
-      const bars = d.byDay.map(x => {
-        const h = Math.round((x.total / max) * 40);
-        const col = x.failed > 0 ? '#ef4444' : x.total > 0 ? '#16a34a' : 'rgba(255,255,255,.1)';
-        return `<div title="${x.date}: ${x.total} runs (${x.failed} failed)" style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center"><div style="width:70%;height:${Math.max(2, h)}px;background:${col};border-radius:2px"></div></div>`;
-      }).join('');
-      const t = d.totals || {};
-      box.innerHTML = `
-        <div style="display:flex;align-items:flex-end;gap:2px;height:48px;margin:6px 0">${bars}</div>
-        <div style="font-size:11px;opacity:.75">Runs: ${t.runs || 0} · ✅ ${t.completed || 0} · ❌ ${t.failed || 0} · ⏸ ${t.paused_approval || 0} · Flows: ${t.flows || 0}</div>
-        ${(d.topFlows || []).length ? '<div style="font-size:11px;margin-top:4px;opacity:.8">Top: ' + d.topFlows.map(f => `${f.flowName} (${f.runs})`).join(', ') + '</div>' : ''}`;
-    } catch (e) { /* silent */ }
-  };
-
-  // ---- Hook into loadFlowStudio to render metrics ----
-  if (typeof window.loadFlowStudio === 'function') {
-    const orig = window.loadFlowStudio;
-    window.loadFlowStudio = async function () { await orig.apply(this, arguments); try { await fsRenderMetrics(); } catch (e) {} };
-  }
-})();
-</script>
-
+<!-- BEGIN DEVELOPER PORTAL HOOK -->
+<a href="/developer-portal.html" class="nav-link" style="position:fixed;bottom:14px;right:14px;background:#3b82f6;color:#fff;padding:10px 16px;border-radius:10px;text-decoration:none;font-family:system-ui;z-index:9999">🧩 Developer Portal</a>
+<a href="/developers.html" class="nav-link" style="position:fixed;bottom:14px;right:190px;background:#111c30;color:#fff;padding:10px 16px;border-radius:10px;text-decoration:none;font-family:system-ui;z-index:9999;border:1px solid #1d2940">Developers</a>
+<!-- END DEVELOPER PORTAL HOOK -->
 </body>
 </html>
 

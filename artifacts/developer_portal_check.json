@@ -1,0 +1,113 @@
+{
+  "generatedAt": "2026-06-20T12:10:28.158Z",
+  "passed": 21,
+  "total": 21,
+  "blockers": [],
+  "results": [
+    {
+      "name": "file:routes/developerPortalRoutes.js",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "file:lib/developerPortal/store.js",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "file:lib/developerPortal/developerRegistry.js",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "file:lib/developerPortal/apiEndpointCatalog.js",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "file:lib/developerPortal/webhookEventCatalog.js",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "file:lib/developerPortal/webhookSubscriptions.js",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "file:lib/developerPortal/webhookDeliveryPreview.js",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "file:public/developer-portal.html",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "file:public/developers.html",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "route_mounted",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "env_placeholders",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "gitignore_protections",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "create_app",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "fake_api_key_preview",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "no_hash_exposed",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "create_subscription",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "url_masked",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "delivery_dry_run",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "no_live_delivery",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "openapi_generated",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "policy_safe_defaults",
+      "pass": true,
+      "detail": ""
+    }
+  ]
+}

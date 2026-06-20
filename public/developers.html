@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Developers — SuperSender Pro</title>
+<link rel="stylesheet" href="/css/developers.css"/>
+</head>
+<body>
+<header><h1>SuperSender Pro for Developers</h1><p>Build integrations, automate workflows, and connect your tools.</p></header>
+<main>
+  <section class="hero">
+    <h2>Integrate everything over a safe API + webhook layer</h2>
+    <p>Connect n8n, Zapier-style tools, Make.com-style scenarios, custom CRMs, dashboards, and ecommerce tools — using redacted, preview-safe events.</p>
+    <a class="cta" href="#access">Request Developer Access</a>
+  </section>
+  <section><h3>What you can integrate</h3><div id="apps" class="grid"></div></section>
+  <section><h3>API overview</h3><p>A redacted, preview-first REST API. Authentication uses an <code>X-API-Key</code> header. See the OpenAPI catalog at <code>/api/developer-portal/openapi.json</code>.</p></section>
+  <section><h3>Webhook events (public-safe)</h3><div id="events" class="grid"></div></section>
+  <section><h3>n8n / Zapier-style usage</h3><p>Subscribe to events like <code>public_funnel.lead_created</code>. Every payload is redacted (no full phone, email, payment refs, or secrets). Deliveries are dry-run/simulated until live mode is explicitly enabled by an admin.</p></section>
+  <section id="access" class="access"><h3>Request developer access</h3><p>Contact your account admin to provision a developer app. API keys are issued as one-time previews and never shown again.</p></section>
+</main>
+<footer><p>No private endpoints, secrets, or admin-only routes are exposed on this page.</p></footer>
+<script src="/js/developers.js"></script>
+</body>
+</html>

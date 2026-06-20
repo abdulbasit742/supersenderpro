@@ -33,13 +33,19 @@ creds.json
 *token*
 *secret*
 *credential*
-!lib/unifiedSetup/credentialChecklist.js
 .next/
 dist/
 build/
 coverage/
 ssl/
 
-# Agent runtime local data
-data/agent-runtime/
-agent-runtime/__tests__/.tmp/
+# Developer Portal protections
+data/developer-portal*.json
+data/developer-webhooks*.json
+data/developer-webhook-deliveries*.json
+artifacts/*webhook-raw*
+artifacts/*developer-raw*
+developer-secrets/
+webhook-secrets/
+*.webhook.raw.json
+*.api-key.raw.json

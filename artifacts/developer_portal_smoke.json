@@ -1,0 +1,17 @@
+{
+  "generatedAt": "2026-06-20T12:10:28.216Z",
+  "result": "PASS",
+  "appId": "app_0122410e11cbe4f5",
+  "subId": "whsub_1878eaaa35f877fe",
+  "checks": [
+    "registry",
+    "api_catalog",
+    "event_catalog",
+    "demo_key",
+    "subscription",
+    "payload_redaction",
+    "dry_run",
+    "no_live",
+    "no_leak"
+  ]
+}

@@ -1,0 +1,111 @@
+{
+  "generatedAt": "2026-06-20T12:09:41.701298Z",
+  "target": "Developer API + Webhook Event Hub + External Integration Portal",
+  "modules": {
+    "developer_portal_core": {
+      "status": "missing->built",
+      "files": [
+        "lib/developerPortal/store.js",
+        "developerRegistry.js",
+        "safetyGuard.js",
+        "privacyGuard.js",
+        "redactor.js",
+        "scopes.js",
+        "rateLimits.js",
+        "apiKeys.js"
+      ],
+      "safe_to_extend": true,
+      "route_mounted": true,
+      "dashboard_linked": true
+    },
+    "api_catalog": {
+      "status": "missing->built",
+      "files": [
+        "lib/developerPortal/apiEndpointCatalog.js",
+        "openApiBuilder.js",
+        "apiCatalog.js"
+      ],
+      "needs_docs": false,
+      "needs_test": false,
+      "secret_risk": "none"
+    },
+    "webhook_event_hub": {
+      "status": "missing->built",
+      "files": [
+        "lib/developerPortal/webhookEventCatalog.js",
+        "eventSchemas.js",
+        "eventRedactor.js"
+      ],
+      "privacy_risk": "redacted",
+      "webhook_delivery_risk": "dry_run_only"
+    },
+    "webhook_subscriptions": {
+      "status": "missing->built",
+      "files": [
+        "lib/developerPortal/webhookSubscriptions.js",
+        "webhookValidator.js",
+        "webhookSigning.js",
+        "webhookDeliveryPreview.js",
+        "webhookDeliveryLog.js",
+        "webhookReplay.js",
+        "webhookPayloadBuilder.js"
+      ],
+      "webhook_delivery_risk": "no_live_by_default",
+      "secret_risk": "hashed_preview_only"
+    },
+    "adapters": {
+      "status": "built",
+      "note": "safe detection only; never mutate source; redacted previews",
+      "files": [
+        "lib/developerPortal/adapters/*"
+      ]
+    },
+    "routes": {
+      "status": "built",
+      "files": [
+        "routes/developerPortalRoutes.js"
+      ],
+      "route_mounted": true
+    },
+    "ui": {
+      "status": "built",
+      "files": [
+        "public/developer-portal.html",
+        "public/developers.html",
+        "public/js/*",
+        "public/css/*"
+      ],
+      "dashboard_linked": true
+    },
+    "docs": {
+      "status": "built",
+      "files": [
+        "docs/DEVELOPER_PORTAL_*.md",
+        "docs/API_*.md",
+        "docs/WEBHOOK_*.md"
+      ]
+    },
+    "scripts_tests": {
+      "status": "built",
+      "files": [
+        "scripts/developer-portal-check.js",
+        "tests/smoke/developerPortalSmoke.js"
+      ]
+    }
+  },
+  "existing_systems_detected_not_rebuilt": [
+    "n8n bridge",
+    "MCP connector",
+    "Flow Studio (/api/flows)",
+    "Compliance Center",
+    "Backup",
+    "Template Approvals"
+  ],
+  "safety": {
+    "dry_run_default": true,
+    "live_webhooks": false,
+    "real_keys": false,
+    "redact_payloads": true,
+    "approval_required": true
+  }
+}
