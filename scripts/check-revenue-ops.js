@@ -22,7 +22,10 @@ const EXPORTS = ['getRevenueOpsStatus', 'getPipelineDashboardData', 'getLeadRegi
   'getOpportunityRegistryPreview', 'getOpportunityPreview', 'analyzeRevenueOpsPreview', 'calculateDealScorePreview',
   'calculatePipelineHealthPreview', 'calculateForecastPreview', 'calculateFollowupReadinessPreview',
   'calculateConversionAnalyticsPreview', 'calculateRepPerformancePreview', 'calculateRevenueRiskPreview',
-  'getRevenueRecommendationsPreview', 'compareOpportunitiesPreview', 'getRevenueAuditPreview'];
+  'getRevenueRecommendationsPreview', 'compareOpportunitiesPreview', 'getRevenueAuditPreview',
+  'calculateLeadScorePreview', 'getDealAgingPreview', 'calculateSalesVelocityPreview',
+  'calculateQuotaAttainmentPreview', 'getWinLossAnalysisPreview', 'getNextBestActionsPreview',
+  'getFunnelAnalysisPreview', 'getExportPreview'];
 
 if (!failHard) {
   add('all required exports present', EXPORTS.every((f) => typeof revenueOps[f] === 'function'),
@@ -78,6 +81,37 @@ if (!failHard) {
   const audit = revenueOps.getRevenueAuditPreview();
   add('audit raw not exposed', audit.rawAuditExposed === false);
   add('audit no leak', red.hasLeak(audit) === false);
+
+  // extended analytics
+  const ls = revenueOps.calculateLeadScorePreview({ lead: { source: 'Referral', stage: 'Qualified', replies: 4, lastContactDays: 2 } });
+  assertSafe('lead-score', ls);
+  add('lead score in 0..100', ls.leadScore >= 0 && ls.leadScore <= 100, String(ls.leadScore));
+  add('lead score deterministic', revenueOps.calculateLeadScorePreview({ lead: { source: 'Referral', stage: 'Qualified', replies: 4, lastContactDays: 2 } }).leadScore === ls.leadScore);
+
+  const ag = revenueOps.getDealAgingPreview(); assertSafe('deal-aging', ag);
+  add('deal aging buckets present', !!ag.bucketsPreview && typeof ag.staleCountPreview === 'number');
+  add('deal aging no leak', red.hasLeak(ag) === false);
+
+  const sv = revenueOps.calculateSalesVelocityPreview(); assertSafe('sales-velocity', sv);
+  add('velocity banded (no raw amount)', !/\b\d{5,}\b/.test(sv.salesVelocityBandPreview), sv.salesVelocityBandPreview);
+
+  const qa = revenueOps.calculateQuotaAttainmentPreview({ targetBand: 'high' }); assertSafe('quota', qa);
+  add('quota attainment percent number', typeof qa.attainmentPercentPreview === 'number');
+  add('quota banded (no raw amount)', !/\b\d{5,}\b/.test(JSON.stringify(qa)), 'banded');
+
+  const wl = revenueOps.getWinLossAnalysisPreview(); assertSafe('win-loss', wl);
+  add('win-loss overall rate number', typeof wl.overallWinRatePreview === 'number');
+
+  const nba = revenueOps.getNextBestActionsPreview(); assertSafe('nba', nba);
+  add('next best actions array', Array.isArray(nba.nextBestActionsPreview));
+  add('nba masks customer', nba.nextBestActionsPreview.every((a) => a.maskedCustomerName.includes('*')));
+
+  const fn = revenueOps.getFunnelAnalysisPreview(); assertSafe('funnel', fn);
+  add('funnel preview array', Array.isArray(fn.funnelPreview));
+
+  const ex = revenueOps.getExportPreview(); assertSafe('export', ex);
+  add('export writes no file', ex.fileWritten === false);
+  add('export no leak (masked rows)', red.hasLeak(ex) === false);
 }
 
 const passed = checks.filter((c) => c.ok).length;

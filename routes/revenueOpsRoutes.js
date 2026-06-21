@@ -47,6 +47,18 @@ router.post('/revenue-risk', safe((req) => revenueOps.calculateRevenueRiskPrevie
 router.post('/recommendations', safe((req) => revenueOps.getRevenueRecommendationsPreview(body(req))));
 router.post('/opportunities/compare-preview', safe((req) => revenueOps.compareOpportunitiesPreview(body(req))));
 
+/* Extended analytics (preview-only) */
+router.post('/lead-score', safe((req) => revenueOps.calculateLeadScorePreview(body(req))));
+router.get('/deal-aging', safe(() => revenueOps.getDealAgingPreview()));
+router.post('/deal-aging', safe((req) => revenueOps.getDealAgingPreview(body(req))));
+router.post('/sales-velocity', safe((req) => revenueOps.calculateSalesVelocityPreview(body(req))));
+router.get('/sales-velocity', safe(() => revenueOps.calculateSalesVelocityPreview()));
+router.post('/quota-attainment', safe((req) => revenueOps.calculateQuotaAttainmentPreview(body(req))));
+router.get('/win-loss', safe(() => revenueOps.getWinLossAnalysisPreview()));
+router.get('/next-best-actions', safe(() => revenueOps.getNextBestActionsPreview()));
+router.get('/funnel', safe(() => revenueOps.getFunnelAnalysisPreview()));
+router.get('/export-preview', safe(() => revenueOps.getExportPreview()));
+
 /* Audit */
 router.get('/audit-preview', safe(() => revenueOps.getRevenueAuditPreview()));
 
