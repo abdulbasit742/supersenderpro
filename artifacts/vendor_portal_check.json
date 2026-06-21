@@ -1,0 +1,269 @@
+{
+  "generatedAt": "2026-06-21T03:50:30.904Z",
+  "passed": 52,
+  "failed": 0,
+  "total": 52,
+  "strict": "false",
+  "checks": [
+    {
+      "name": "file lib/vendorPortal/store.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/vendorPortal/vendorPortalModel.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/vendorPortal/vendorPortalService.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/vendorPortal/statusSummaryPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/vendorPortal/vendorProfilePreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/vendorPortal/tierStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/vendorPortal/accountStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/vendorPortal/supplyCatalogPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/vendorPortal/purchasePriceListPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/vendorPortal/purchaseOrderStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/vendorPortal/grnStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/vendorPortal/invoiceSubmissionPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/vendorPortal/invoicePaymentStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/vendorPortal/outstandingPayablePreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/vendorPortal/paymentSchedulePreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/vendorPortal/deliveryStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/vendorPortal/qualityInspectionPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/vendorPortal/complianceDocumentPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/vendorPortal/contractStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/vendorPortal/ratingStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/vendorPortal/documentRequestPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/vendorPortal/paymentQueryPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/vendorPortal/supportRequestPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/vendorPortal/messageDrafts.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/vendorPortal/auditPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/vendorPortal/redactor.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file routes/vendorPortalRoutes.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/vendor-portal.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/js/vendor-portal.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/css/vendor-portal.css",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "server hook present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "route module loads",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "all service functions exported",
+      "ok": true,
+      "detail": "all present"
+    },
+    {
+      "name": "status dryRun true + liveActionsEnabled false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "status vendorPortalPublicLive false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "status piiMasked true",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "status externalCallsEnabled false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "redactor masks phone",
+      "ok": true,
+      "detail": "+92******4567"
+    },
+    {
+      "name": "redactor masks email",
+      "ok": true,
+      "detail": "ve****@example.com"
+    },
+    {
+      "name": "redactor masks PO ref",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "redactor masks invoice ref",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "redactor masks payment ref",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "redactor masks bank ref",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "redactor masks tax ref",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "redactor masks document ref",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "invoice submission liveInvoiceSubmission false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "invoice/payment livePaymentAction false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "PO livePOMutation false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "document request liveDocumentDownload false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "message draft liveSend false + masked recipient",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "summary piiMasked true + works without modules",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no PII/secret leak",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Vendor Portal — SuperSender Pro</title>
+<link rel="stylesheet" href="/css/vendor-portal.css" />
+</head>
+<body>
+<header class="vp-hero">
+  <div class="vp-hero-inner">
+    <h1>Vendor / Supplier Portal &amp; Procurement Self-Service</h1>
+    <p class="vp-sub">Preview your supplier account, purchase orders, GRNs, invoices, payables, compliance and more. This is a <strong>safe preview</strong> — your private details are masked, nothing is submitted, no payment is made, and no message is sent.</p>
+    <div id="vp-safety-badges" class="vp-badges"></div>
+  </div>
+</header>
+
+<main class="vp-main">
+  <section class="vp-card vp-lookup">
+    <h2>Check your status</h2>
+    <form id="vp-lookup-form" class="vp-form">
+      <label class="vp-field">Lookup method
+        <select id="vp-mode">
+          <option value="demo_preview">Demo preview</option>
+          <option value="preview_token">Preview token</option>
+          <option value="masked_phone_lookup_preview">Masked phone</option>
+          <option value="vendor_reference_preview">Vendor reference</option>
+          <option value="vendor_code_preview">Vendor code</option>
+          <option value="supplier_account_preview">Supplier account reference</option>
+        </select>
+      </label>
+      <label class="vp-field">Reference / token <input id="vp-ref" placeholder="preview only" /></label>
+      <button type="submit" class="vp-btn">Check Status Preview</button>
+    </form>
+    <div id="vp-profile" class="vp-profile"></div>
+    <div id="vp-error" class="vp-error" hidden></div>
+  </section>
+
+  <section id="vp-kpis" class="vp-kpis"></section>
+
+  <div class="vp-grid">
+    <section class="vp-card"><h3>🏢 Account &amp; Tier</h3><div id="vp-account" class="vp-list"></div></section>
+    <section class="vp-card"><h3>📦 Supply Catalog</h3><div id="vp-catalog" class="vp-list"></div></section>
+    <section class="vp-card"><h3>🏷️ Agreed Price List</h3><div id="vp-price" class="vp-list"></div></section>
+    <section class="vp-card"><h3>📋 Purchase Orders</h3><div id="vp-pos" class="vp-list"></div></section>
+    <section class="vp-card"><h3>📥 Goods Receipt (GRN)</h3><div id="vp-grns" class="vp-list"></div></section>
+    <section class="vp-card"><h3>🧾 Invoices &amp; Payments</h3><div id="vp-invoices" class="vp-list"></div></section>
+    <section class="vp-card"><h3>💳 Payables &amp; Schedule</h3><div id="vp-payables" class="vp-list"></div></section>
+    <section class="vp-card"><h3>🚚 Deliveries</h3><div id="vp-deliveries" class="vp-list"></div></section>
+    <section class="vp-card"><h3>🔬 Quality Inspections</h3><div id="vp-quality" class="vp-list"></div></section>
+    <section class="vp-card"><h3>📑 Compliance Documents</h3><div id="vp-compliance" class="vp-list"></div></section>
+    <section class="vp-card"><h3>⭐ Vendor Rating</h3><div id="vp-rating" class="vp-list"></div></section>
+    <section class="vp-card"><h3>📄 Contracts &amp; Documents</h3><div id="vp-documents" class="vp-list"></div></section>
+  </div>
+
+  <section class="vp-card">
+    <h2>Need something? Create a safe preview request</h2>
+    <p class="vp-muted">All actions below are previews/drafts only. <strong>Contact procurement to complete any real action.</strong></p>
+    <div class="vp-actions">
+      <button class="vp-btn ghost" data-draft="invoice">Draft Invoice Submission</button>
+      <button class="vp-btn ghost" data-draft="payment">Draft Payment Query</button>
+      <button class="vp-btn ghost" data-draft="support">Draft Support Request</button>
+      <button class="vp-btn ghost" data-draft="message">Draft Message</button>
+      <button class="vp-btn ghost" data-draft="document">View Document Request Preview</button>
+    </div>
+    <div id="vp-draft-out" class="vp-draft-out"></div>
+  </section>
+
+  <section class="vp-card">
+    <h3>🛡️ Audit Preview</h3>
+    <div id="vp-audit" class="vp-list"></div>
+  </section>
+
+  <footer class="vp-footer">
+    <p>🔒 dryRun · No PO/GRN/invoice/payment/price mutation · No live sends · Your private details are masked · External calls disabled.</p>
+  </footer>
+</main>
+
+<script src="/js/vendor-portal.js"></script>
+</body>
+</html>

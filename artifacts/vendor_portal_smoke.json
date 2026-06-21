@@ -1,0 +1,158 @@
+{
+  "generatedAt": "2026-06-21T03:50:31.047Z",
+  "passed": 30,
+  "failed": 0,
+  "total": 30,
+  "results": [
+    {
+      "name": "require service module",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require redactor",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require route module",
+      "pass": true,
+      "detail": "loaded"
+    },
+    {
+      "name": "portal status is safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "lookup preview safe + masked",
+      "pass": true,
+      "detail": "preview_token"
+    },
+    {
+      "name": "summary works even though no real modules",
+      "pass": true,
+      "detail": "1 unpaid"
+    },
+    {
+      "name": "getVendorProfilePreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getTierStatusPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getAccountStatusPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getSupplyCatalogPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getPurchasePriceListPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getPurchaseOrderStatusPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getGrnStatusPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getInvoicePaymentStatusPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getOutstandingPayablePreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getPaymentSchedulePreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getQualityInspectionPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getComplianceDocumentPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getContractStatusPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getRatingStatusPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "invoice submission safe (no live submission/payment)",
+      "pass": true,
+      "detail": "total 10"
+    },
+    {
+      "name": "invoice/payment safe (no live payment action)",
+      "pass": true,
+      "detail": "pay_****"
+    },
+    {
+      "name": "outstanding payable safe (no payment action)",
+      "pass": true,
+      "detail": "160000"
+    },
+    {
+      "name": "document request safe (no download)",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "payment query safe (no payment action/send)",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "support request safe (no live ticket creation)",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "message draft safe (no live send)",
+      "pass": true,
+      "detail": "+92******4567"
+    },
+    {
+      "name": "audit preview is local + no live write",
+      "pass": true,
+      "detail": "7 entries"
+    },
+    {
+      "name": "redactor masking examples",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "no full PII in aggregate response blob",
+      "pass": true,
+      "detail": "clean"
+    }
+  ]
+}
