@@ -3108,6 +3108,18 @@ try {
 }
 // END STAFF PORTAL HOOK
 
+// BEGIN DEALER PORTAL HOOK
+// Dealer/Reseller Portal + B2B Order Self-Service Center (preview-only: no live order/stock/price/invoice/payment/credit mutation, no live send, PII masked, no external calls).
+try {
+  const dealerPortalRoutes = require('./routes/dealerPortalRoutes');
+  app.use('/api/dealer-portal', dealerPortalRoutes);
+  app.get('/dealer-portal.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'dealer-portal.html')));
+  console.log('[DealerPortal] mounted at /api/dealer-portal (preview-only, PII masked, no live actions)');
+} catch (e) {
+  console.error('[DealerPortal] failed to initialise (non-fatal):', e.message);
+}
+// END DEALER PORTAL HOOK
+
 
 let searchIndexRebuildTimer = null;
 function scheduleSearchIndexRebuild(reason = 'data-change', delayMs = Number(process.env.SEARCH_REBUILD_DEBOUNCE_MS || 30000)) {
