@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-21T03:23:06.538Z",
-  "passed": 58,
+  "generatedAt": "2026-06-21T12:11:17.152Z",
+  "passed": 117,
   "failed": 0,
-  "total": 58,
+  "total": 117,
   "strict": "false",
   "checks": [
     {
@@ -161,6 +161,196 @@
       "detail": ""
     },
     {
+      "name": "file lib/dealerPortal/onboardingPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/complianceDocumentPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/contractPricePreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/tierDiscountPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/volumeDiscountPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/dynamicPricingPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/warehouseStockPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/branchStockPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/bulkImportPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/reorderSuggestionPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/productSubstitutionPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/crossSellUpsellPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/quoteNegotiationPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/quoteApprovalPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/backorderPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/partialShipmentPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/statementPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/creditRiskPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/disputeCenterPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/rebateIncentivePreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/targetAchievementPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/leaderboardPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/territoryPerformancePreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/channelConflictPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/leadRegistrationPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/dealRegistrationPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/riskScorePreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/analyticsPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/aiInsightPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/moduleAdapters.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/businessVerificationPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/priceProtectionPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/promotionEligibilityPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/regionStockPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/cartRiskPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/dealerQuoteComparisonPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/deliveryEtaRiskPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/dealerClaimPipelinePreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
       "name": "file routes/dealerPortalRoutes.js",
       "ok": true,
       "detail": ""
@@ -177,6 +367,21 @@
     },
     {
       "name": "file public/css/dealer-portal.css",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/dealer-portal.webmanifest",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/dealer-portal-sw.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/assets/dealer-portal-icon.svg",
       "ok": true,
       "detail": ""
     },
@@ -287,6 +492,96 @@
     },
     {
       "name": "summary piiMasked true + works without modules",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dynamic pricing livePriceMutation false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "bulk import liveImport false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "quote negotiation liveQuoteMutation false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "credit risk liveCreditMutation false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dispute liveDisputeCreation false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "lead registration liveLeadCreation false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "channel conflict liveCrmMutation false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "ai insight liveAiCall false + no external call",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "risk score no external call",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "redactor masks shipment ref",
+      "ok": true,
+      "detail": "ship_****"
+    },
+    {
+      "name": "status advancedFeaturesEnabledPreview true",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "business verification no live mutation/download",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "price protection livePriceMutation false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "cart risk no live order/stock/credit mutation",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "quote comparison liveQuoteMutation false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "delivery ETA risk no live mutation",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "claim pipeline liveClaimMutation false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "catalog item status no mutation",
       "ok": true,
       "detail": ""
     },

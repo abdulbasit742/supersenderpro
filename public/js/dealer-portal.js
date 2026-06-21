@@ -113,6 +113,124 @@ async function loadAll() {
   rows('#dp-audit', audit.auditPreview, (a) => `<div class="dp-row"><span>${esc(a.action)}</span><span>${esc(a.dealerMasked)}</span>${badge('preview', 'ok')}</div>`);
 }
 
+// ---- Advanced B2B Commerce Operating System sections ----
+async function loadAdvanced() {
+  const [onboarding, compliance, contractPrices, tierDisc, volDisc, warehouse, branch,
+    backorders, partial, statement, creditRisk, rebates, targets, leaderboard, territory, risk, analytics, ai] =
+    await Promise.all([
+      api('/onboarding'), api('/compliance-documents'), api('/contract-prices'), api('/tier-discounts'),
+      api('/volume-discounts', 'POST', { qty: 120 }), api('/warehouse-stock'), api('/branch-stock'),
+      api('/backorders'), api('/partial-shipments'), api('/statement'), api('/credit-risk'),
+      api('/rebates-incentives'), api('/targets-achievements'), api('/leaderboard'), api('/territory-performance'),
+      api('/risk-score'), api('/analytics'), api('/ai-insight-preview', 'POST', {}),
+    ]);
+
+  $('#dp-onboarding').innerHTML = (onboarding && onboarding.ok)
+    ? `<div class="dp-row"><span>Stage</span>${badge(onboarding.stagePreview, statusClass(onboarding.stagePreview))}</div>`
+      + `<div class="dp-row"><span>KYC</span>${badge(onboarding.kycStatusPreview, statusClass(onboarding.kycStatusPreview))}</div>`
+      + `<div class="dp-row"><span>Steps</span><b>${esc(onboarding.stepsDonePreview)}/${esc(onboarding.stepsTotalPreview)}</b></div>`
+      + ((compliance && compliance.complianceDocumentsPreview) || []).map((d) => `<div class="dp-row"><span>${esc(d.nameSafe)}</span>${badge(d.statusPreview, statusClass(d.statusPreview))}</div>`).join('')
+    : '<div class="dp-empty">No onboarding preview.</div>';
+
+  rows('#dp-contract-prices', contractPrices.contractPricesPreview, (p) => `<div class="dp-row"><span class="id">${esc(p.productIdPreview)}</span><span>Retail ${money(p.retailPricePreview)}</span><span>Contract <b>${money(p.contractPricePreview)}</b></span></div>`);
+
+  $('#dp-discounts').innerHTML = ((tierDisc && tierDisc.ok) || (volDisc && volDisc.ok))
+    ? `<div class="dp-row"><span>Your tier</span>${badge(tierDisc.tierPreview, 'ok')}<span><b>${esc(tierDisc.tierDiscountPercentPreview)}%</b></span></div>`
+      + (volDisc.volumeTiersPreview || []).map((t) => `<div class="dp-row"><span>≥ ${esc(t.minQtyPreview)} units</span><span><b>${esc(t.percentPreview)}%</b></span></div>`).join('')
+      + `<div class="dp-row"><span>Applicable @ 120</span>${badge(volDisc.applicableVolumeDiscountPreview + '%', 'ok')}</div>`
+    : '<div class="dp-empty">No discount preview.</div>';
+
+  rows('#dp-warehouse', warehouse.warehouseStockPreview, (w) => `<div class="dp-row"><span><b>${esc(w.warehousePreview)}</b></span><span>${(w.itemsPreview || []).map((i) => esc(i.productIdPreview) + ':' + esc(i.qtyPreview)).join(' · ')}</span></div>`);
+  rows('#dp-branch', branch.branchStockPreview, (b) => `<div class="dp-row"><span><b>${esc(b.branchPreview)}</b></span><span>${(b.itemsPreview || []).map((i) => esc(i.productIdPreview) + ':' + esc(i.qtyPreview)).join(' · ')}</span></div>`);
+
+  const boItems = [
+    ...(backorders.backordersPreview || []).map((b) => `<div class="dp-row"><span class="id">${esc(b.backorderIdPreview)}</span><span>${esc(b.productIdPreview)} ×${esc(b.qtyPreview)}</span>${badge('backorder', 'warn')}</div>`),
+    ...(partial.partialShipmentsPreview || []).map((p) => `<div class="dp-row"><span class="id">${esc(p.shipmentIdPreview)}</span><span>shipped ${esc(p.shippedQtyPreview)} / pending ${esc(p.pendingQtyPreview)}</span>${badge(p.statusPreview, 'warn')}</div>`),
+  ];
+  $('#dp-backorders').innerHTML = boItems.length ? boItems.join('') : '<div class="dp-empty">Nothing to show in this preview.</div>';
+
+  $('#dp-statement').innerHTML = (statement && statement.ok)
+    ? `<div class="dp-row"><span>Opening</span><b>${money(statement.openingBalancePreview)}</b></div>`
+      + `<div class="dp-row"><span>Charges</span><b>${money(statement.chargesPreview)}</b></div>`
+      + `<div class="dp-row"><span>Payments</span><b>${money(statement.paymentsPreview)}</b></div>`
+      + `<div class="dp-row"><span>Closing</span>${badge(money(statement.closingBalancePreview), 'warn')}</div>`
+    : '<div class="dp-empty">No statement preview.</div>';
+
+  $('#dp-credit-risk').innerHTML = (creditRisk && creditRisk.ok)
+    ? `<div class="dp-row"><span>Risk level</span>${badge(creditRisk.creditRiskLevelPreview, statusClass(creditRisk.creditRiskLevelPreview === 'low' ? 'active' : creditRisk.creditRiskLevelPreview === 'high' ? 'block' : 'pending'))}</div>`
+      + `<div class="dp-row"><span>Overdue</span><b>${money(creditRisk.overdueAmountPreview)}</b></div>`
+      + `<div class="dp-row"><span>Available credit</span><b>${money(creditRisk.availableCreditPreview)}</b></div>`
+      + `<div class="dp-row"><span>Recommended</span>${badge(creditRisk.recommendedActionPreview, 'warn')}</div>`
+    : '<div class="dp-empty">No credit risk preview.</div>';
+
+  rows('#dp-rebates', rebates.rebatesIncentivesPreview, (r) => `<div class="dp-row"><span>${esc(r.schemeSafe)}</span>${badge(r.statusPreview, statusClass(r.statusPreview))}</div>`);
+
+  $('#dp-targets').innerHTML = (targets && targets.ok)
+    ? `<div class="dp-row"><span>Target</span><b>${money(targets.targetPreview)}</b></div>`
+      + `<div class="dp-row"><span>Achieved</span><b>${money(targets.achievedPreview)}</b></div>`
+      + `<div class="dp-row"><span>Progress</span>${badge(targets.achievementPercentPreview + '%', targets.achievementPercentPreview >= 80 ? 'ok' : 'warn')}</div>`
+    : '<div class="dp-empty">No target preview.</div>';
+
+  rows('#dp-leaderboard', leaderboard.leaderboardPreview, (l) => `<div class="dp-row"><span>#${esc(l.rankPreview)}</span><span>${esc(l.dealerMasked)}</span><span><b>${esc(l.scorePreview)}</b></span></div>`);
+
+  $('#dp-territory').innerHTML = (territory && territory.ok)
+    ? `<div class="dp-row"><span>Region</span><b>${esc(territory.regionPreview)}</b></div>`
+      + `<div class="dp-row"><span>Performance</span>${badge(territory.performancePercentPreview + '%', 'ok')}</div>`
+      + `<div class="dp-row"><span>Rank in region</span><b>#${esc(territory.rankPreview)}</b> / ${esc(territory.dealersInRegionPreview)}</div>`
+    : '<div class="dp-empty">No territory preview.</div>';
+
+  $('#dp-risk').innerHTML = (risk && risk.ok)
+    ? `<div class="dp-row"><span>Score</span>${badge(risk.riskScorePreview, risk.riskLevelPreview === 'low' ? 'ok' : risk.riskLevelPreview === 'high' ? 'bad' : 'warn')}</div>`
+      + `<div class="dp-row"><span>Level</span>${badge(risk.riskLevelPreview, risk.riskLevelPreview === 'low' ? 'ok' : 'warn')}</div>`
+      + (risk.riskSignalsPreview || []).map((s) => `<div class="dp-row"><span>${esc(s)}</span>${badge('signal', 'warn')}</div>`).join('')
+    : '<div class="dp-empty">No risk preview.</div>';
+
+  $('#dp-analytics').innerHTML = (analytics && analytics.ok && analytics.metricsPreview)
+    ? Object.entries(analytics.metricsPreview).map(([k, v]) => `<div class="dp-row"><span>${esc(k.replace(/Preview$/, ''))}</span><b>${typeof v === 'number' ? money(v) : esc(v)}</b></div>`).join('')
+    : '<div class="dp-empty">No analytics preview.</div>';
+
+  $('#dp-ai').innerHTML = (ai && ai.ok)
+    ? `<div class="dp-row"><span>${esc(ai.insightPreview)}</span>${badge('offline', 'ok')}</div>`
+      + (ai.recommendationPreview || []).map((r) => `<div class="dp-row"><span>• ${esc(r)}</span></div>`).join('')
+    : '<div class="dp-empty">No AI insight preview.</div>';
+}
+
+// ---- v2: Distributor B2B Commerce OS sections ----
+async function loadAdvanced2() {
+  const [verification, priceProt, promos, region, eta, claims, cart, quoteCompare] = await Promise.all([
+    api('/business-verification'), api('/price-protection-preview', 'POST', { productId: 'prod_1' }),
+    api('/promotion-eligibility'), api('/region-stock'), api('/delivery-eta-risk'), api('/claim-pipeline'),
+    api('/cart-risk-preview', 'POST', { items: [{ productId: 'prod_1', qty: 60 }, { productId: 'prod_2', qty: 5 }] }),
+    api('/dealer-quote-comparison-preview', 'POST', { productId: 'prod_1' }),
+  ]);
+
+  $('#dp-verification').innerHTML = (verification && verification.ok)
+    ? `<div class="dp-row"><span>Status</span>${badge(verification.verificationStatusPreview, statusClass(verification.verificationStatusPreview))}</div>`
+      + `<div class="dp-row"><span>Business name</span>${badge(verification.businessNameVerifiedPreview ? 'verified' : 'pending', verification.businessNameVerifiedPreview ? 'ok' : 'warn')}</div>`
+      + `<div class="dp-row"><span>Tax</span>${badge(verification.taxVerifiedPreview ? 'verified' : 'pending', verification.taxVerifiedPreview ? 'ok' : 'warn')}</div>`
+      + `<div class="dp-row"><span>Bank</span>${badge(verification.bankVerifiedPreview ? 'verified' : 'pending', verification.bankVerifiedPreview ? 'ok' : 'warn')}</div>`
+    : '<div class="dp-empty">No verification preview.</div>';
+
+  rows('#dp-price-protection', priceProt.priceProtectionPreview, (p) => `<div class="dp-row"><span class="id">${esc(p.productIdPreview)}</span><span>${money(p.oldPricePreview)} → <b>${money(p.newPricePreview)}</b></span>${badge('protected', 'ok')}</div>`);
+  rows('#dp-promotions', promos.promotionEligibilityPreview, (p) => `<div class="dp-row"><span>${esc(p.nameSafe)}</span>${badge(p.eligiblePreview ? 'eligible' : 'not eligible', p.eligiblePreview ? 'ok' : 'warn')}</div>`);
+  rows('#dp-region', region.regionStockPreview, (r) => `<div class="dp-row"><span><b>${esc(r.regionPreview)}</b></span><span>${(r.itemsPreview || []).map((i) => esc(i.productIdPreview) + ':' + esc(i.qtyPreview)).join(' · ')}</span></div>`);
+
+  $('#dp-cart-risk').innerHTML = (cart && cart.ok)
+    ? `<div class="dp-row"><span>Risk level</span>${badge(cart.cartRiskLevelPreview, cart.cartRiskLevelPreview === 'low' ? 'ok' : cart.cartRiskLevelPreview === 'high' ? 'bad' : 'warn')}</div>`
+      + `<div class="dp-row"><span>Subtotal</span><b>${money(cart.cartSubtotalPreview)}</b></div>`
+      + `<div class="dp-row"><span>Credit available</span><b>${money(cart.creditAvailablePreview)}</b></div>`
+      + (cart.riskFlagsPreview || []).map((f) => `<div class="dp-row"><span>${esc(f)}</span>${badge('flag', 'warn')}</div>`).join('')
+    : '<div class="dp-empty">No cart risk preview.</div>';
+
+  $('#dp-quote-compare').innerHTML = (quoteCompare && quoteCompare.ok)
+    ? (quoteCompare.scenariosPreview || []).map((s) => `<div class="dp-row"><span>${esc(s.labelPreview)}</span><b>${money(s.unitPricePreview)}</b></div>`).join('')
+      + `<div class="dp-row"><span>Best</span>${badge(quoteCompare.bestOptionPreview, 'ok')}</div>`
+    : '<div class="dp-empty">No comparison preview.</div>';
+
+  rows('#dp-eta-risk', eta.deliveryEtaRiskPreview, (d) => `<div class="dp-row"><span class="id">${esc(d.deliveryIdPreview)}</span><span>${esc(d.carrierSafe)}</span>${badge('ETA ' + d.etaRiskPreview, d.etaRiskPreview === 'low' ? 'ok' : 'bad')}</div>`);
+  rows('#dp-claim-pipeline', claims.claimPipelinePreview, (c) => `<div class="dp-row"><span class="id">${esc(c.claimIdPreview)}</span><span>${esc(c.typeSafe)}</span>${badge(c.stagePreview, statusClass(c.stagePreview))}</div>`);
+}
+
 // Draft preview actions
 const DRAFTS = {
   bulk: () => api('/bulk-order-draft-preview', 'POST', { items: [{ productId: 'prod_1', qty: 60 }, { productId: 'prod_3', qty: 100 }] }),
@@ -121,6 +239,20 @@ const DRAFTS = {
   support: () => api('/support-request-preview', 'POST', { subject: 'Dealer query', message: 'I have a question about my account.' }),
   message: () => api('/message-draft-preview', 'POST', { message: 'Hello, this is a preview message.' }),
   document: () => api('/document-request-preview', 'POST', { documentId: 'doc_6001' }),
+  dynamicPrice: () => api('/dynamic-pricing-preview', 'POST', { productId: 'prod_1', qty: 120 }),
+  bulkImport: () => api('/bulk-import-preview', 'POST', { csv: 'productId,qty\nprod_1,60\nprod_3,100\nprod_2,5' }),
+  quoteNegotiation: () => api('/quote-negotiation-preview', 'POST', { requestedDiscount: 15 }),
+  reorder: () => api('/reorder-suggestion-preview', 'POST', {}),
+  substitution: () => api('/product-substitution-preview', 'POST', { productId: 'prod_2' }),
+  crossSell: () => api('/cross-sell-upsell-preview', 'POST', { productId: 'prod_1' }),
+  dispute: () => api('/dispute-preview', 'POST', { invoiceId: 'inv_2001', reason: 'Amount mismatch', message: 'Please review the invoice total.' }),
+  lead: () => api('/lead-registration-preview', 'POST', { company: 'Prospect Retail', estimatedValue: 250000 }),
+  deal: () => api('/deal-registration-preview', 'POST', { name: 'Bulk Supply Q3', value: 600000 }),
+  channelConflict: () => api('/channel-conflict-preview', 'POST', { region: 'South' }),
+  aiInsight: () => api('/ai-insight-preview', 'POST', {}),
+  priceProtection: () => api('/price-protection-preview', 'POST', { productId: 'prod_1' }),
+  cartRisk: () => api('/cart-risk-preview', 'POST', { items: [{ productId: 'prod_1', qty: 60 }, { productId: 'prod_2', qty: 5 }] }),
+  quoteComparison: () => api('/dealer-quote-comparison-preview', 'POST', { productId: 'prod_1' }),
 };
 $$('[data-draft]').forEach((b) => b.addEventListener('click', async () => {
   const out = $('#dp-draft-out');
@@ -135,4 +267,13 @@ $('#dp-lookup-form').addEventListener('submit', (e) => { e.preventDefault(); loa
 (async function init() {
   await loadStatus();
   await loadAll();
+  await loadAdvanced();
+  await loadAdvanced2();
 })();
+
+// PWA: register the offline-safe service worker (same-origin static assets only; never caches API/preview responses).
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/dealer-portal-sw.js', { scope: '/dealer-portal.html' }).catch(() => { /* preview-safe: ignore */ });
+  });
+}

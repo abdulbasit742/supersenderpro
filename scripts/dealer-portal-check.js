@@ -17,9 +17,23 @@ const LIB = [
   'shipmentStatusPreview.js', 'returnClaimStatusPreview.js', 'warrantyClaimStatusPreview.js', 'loyaltyStatusPreview.js',
   'contractStatusPreview.js', 'documentRequestPreview.js', 'paymentQueryPreview.js', 'supportRequestPreview.js',
   'messageDrafts.js', 'auditPreview.js', 'redactor.js',
+  // ---- Advanced B2B Commerce Operating System ----
+  'onboardingPreview.js', 'complianceDocumentPreview.js', 'contractPricePreview.js', 'tierDiscountPreview.js',
+  'volumeDiscountPreview.js', 'dynamicPricingPreview.js', 'warehouseStockPreview.js', 'branchStockPreview.js',
+  'bulkImportPreview.js', 'reorderSuggestionPreview.js', 'productSubstitutionPreview.js', 'crossSellUpsellPreview.js',
+  'quoteNegotiationPreview.js', 'quoteApprovalPreview.js', 'backorderPreview.js', 'partialShipmentPreview.js',
+  'statementPreview.js', 'creditRiskPreview.js', 'disputeCenterPreview.js', 'rebateIncentivePreview.js',
+  'targetAchievementPreview.js', 'leaderboardPreview.js', 'territoryPerformancePreview.js', 'channelConflictPreview.js',
+  'leadRegistrationPreview.js', 'dealRegistrationPreview.js', 'riskScorePreview.js', 'analyticsPreview.js',
+  'aiInsightPreview.js', 'moduleAdapters.js',
+  // ---- v2 ----
+  'businessVerificationPreview.js', 'priceProtectionPreview.js', 'promotionEligibilityPreview.js',
+  'regionStockPreview.js', 'cartRiskPreview.js', 'dealerQuoteComparisonPreview.js', 'deliveryEtaRiskPreview.js',
+  'dealerClaimPipelinePreview.js',
 ];
 LIB.forEach((f) => add(`file lib/dealerPortal/${f}`, exists(`lib/dealerPortal/${f}`)));
-['routes/dealerPortalRoutes.js', 'public/dealer-portal.html', 'public/js/dealer-portal.js', 'public/css/dealer-portal.css']
+['routes/dealerPortalRoutes.js', 'public/dealer-portal.html', 'public/js/dealer-portal.js', 'public/css/dealer-portal.css',
+  'public/dealer-portal.webmanifest', 'public/dealer-portal-sw.js', 'public/assets/dealer-portal-icon.svg']
   .forEach((f) => add(`file ${f}`, exists(f)));
 
 add('server hook present', exists('server.js') && fs.readFileSync(path.join(ROOT, 'server.js'), 'utf8').includes('DEALER PORTAL HOOK'));
@@ -37,7 +51,18 @@ try {
     'createQuotationRequestPreview', 'getOrderStatusPreview', 'getInvoicePaymentStatusPreview', 'getCreditLimitPreview',
     'getOutstandingBalancePreview', 'getCommissionMarginPreview', 'getReturnClaimStatusPreview', 'getWarrantyClaimStatusPreview',
     'getLoyaltyStatusPreview', 'getContractStatusPreview', 'createDocumentRequestPreview', 'createPaymentQueryPreview',
-    'createSupportRequestPreview', 'createMessageDraftPreview', 'getAuditPreview'];
+    'createSupportRequestPreview', 'createMessageDraftPreview', 'getAuditPreview',
+    'getOnboardingPreview', 'getComplianceDocumentPreview', 'getContractPricePreview', 'getTierDiscountPreview',
+    'getVolumeDiscountPreview', 'createDynamicPricingPreview', 'getWarehouseStockPreview', 'getBranchStockPreview',
+    'createBulkImportPreview', 'createReorderSuggestionPreview', 'createProductSubstitutionPreview',
+    'createCrossSellUpsellPreview', 'createQuoteNegotiationPreview', 'createQuoteApprovalPreview',
+    'getOutstandingStatementPreview', 'getCreditRiskPreview', 'createDisputePreview', 'getRebateIncentivePreview',
+    'getTargetAchievementPreview', 'getLeaderboardPreview', 'getTerritoryPerformancePreview',
+    'createChannelConflictPreview', 'createLeadRegistrationPreview', 'createDealRegistrationPreview',
+    'getRiskScorePreview', 'getAnalyticsPreview', 'createAiInsightPreview',
+    'getBusinessVerificationPreview', 'createPriceProtectionPreview', 'getPromotionEligibilityPreview',
+    'getRegionStockPreview', 'createCartRiskPreview', 'createDealerQuoteComparisonPreview',
+    'getDeliveryEtaRiskPreview', 'getClaimPipelinePreview', 'getCatalogItemStatus'];
   add('all service functions exported', fns.every((f) => typeof svc[f] === 'function'), fns.filter((f) => typeof svc[f] !== 'function').join(',') || 'all present');
 
   const status = svc.getDealerPortalStatus();
@@ -70,8 +95,50 @@ try {
   const sum = svc.getDealerSummaryPreview({});
   add('summary piiMasked true + works without modules', sum.piiMasked === true);
 
-  leakBlob = JSON.stringify({ status, bulk, quote, inv, cr, doc, msg, sum,
-    catalog: svc.getCatalogPreview({}), price: svc.getDealerPriceListPreview({}), orders: svc.listOrders({}), audit: svc.getAuditPreview() });
+  // ---- Advanced B2B Commerce Operating System safety checks ----
+  const dyn = svc.createDynamicPricingPreview({ productId: 'prod_1', qty: 120 });
+  add('dynamic pricing livePriceMutation false', dyn.livePriceMutation === false);
+  const imp = svc.createBulkImportPreview({ csv: 'productId,qty\nprod_1,60' });
+  add('bulk import liveImport false', imp.liveImport === false && imp.liveOrderCreation === false);
+  const qn = svc.createQuoteNegotiationPreview({ requestedDiscount: 15 });
+  add('quote negotiation liveQuoteMutation false', qn.liveQuoteMutation === false && qn.liveApprovalMutation === false);
+  const crk = svc.getCreditRiskPreview({});
+  add('credit risk liveCreditMutation false', crk.liveCreditMutation === false);
+  const dsp = svc.createDisputePreview({ invoiceId: 'inv_2001', reason: 'x' });
+  add('dispute liveDisputeCreation false', dsp.liveDisputeCreation === false && dsp.liveInvoiceMutation === false);
+  const lead = svc.createLeadRegistrationPreview({ company: 'X' });
+  add('lead registration liveLeadCreation false', lead.liveLeadCreation === false && lead.liveCrmMutation === false);
+  const ch = svc.createChannelConflictPreview({ region: 'South' });
+  add('channel conflict liveCrmMutation false', ch.liveCrmMutation === false && ch.liveAssignmentMutation === false);
+  const ai = svc.createAiInsightPreview({});
+  add('ai insight liveAiCall false + no external call', ai.liveAiCall === false && ai.externalCallsEnabled === false);
+  const rsk = svc.getRiskScorePreview({});
+  add('risk score no external call', rsk.externalCallsEnabled === false);
+
+  // ---- v2 advanced safety checks ----
+  add('redactor masks shipment ref', red.maskShipmentRef('shp_3101') === 'ship_****', red.maskShipmentRef('shp_3101'));
+  add('status advancedFeaturesEnabledPreview true', status.advancedFeaturesEnabledPreview === true);
+  const bv = svc.getBusinessVerificationPreview({});
+  add('business verification no live mutation/download', bv.liveVerificationMutation === false && bv.liveDocumentDownload === false);
+  const pp = svc.createPriceProtectionPreview({ productId: 'prod_1' });
+  add('price protection livePriceMutation false', pp.livePriceMutation === false);
+  const cart = svc.createCartRiskPreview({ items: [{ productId: 'prod_2', qty: 5 }] });
+  add('cart risk no live order/stock/credit mutation', cart.liveOrderCreation === false && cart.liveStockMutation === false && cart.liveCreditMutation === false);
+  const qc = svc.createDealerQuoteComparisonPreview({ productId: 'prod_1' });
+  add('quote comparison liveQuoteMutation false', qc.liveQuoteMutation === false);
+  const eta = svc.getDeliveryEtaRiskPreview({});
+  add('delivery ETA risk no live mutation', eta.liveDeliveryMutation === false && eta.liveShipmentMutation === false);
+  const cp2 = svc.getClaimPipelinePreview({});
+  add('claim pipeline liveClaimMutation false', cp2.liveClaimMutation === false);
+  const catItem = svc.getCatalogItemStatus({ id: 'prod_1' });
+  add('catalog item status no mutation', catItem.livePriceMutation === false && catItem.liveStockMutation === false);
+
+  leakBlob = JSON.stringify({ status, bulk, quote, inv, cr, doc, msg, sum, dyn, imp, qn, crk, dsp, lead, ch, ai, rsk,
+    bv, pp, cart, qc, eta, cp2, catItem,
+    promo: svc.getPromotionEligibilityPreview({}), region: svc.getRegionStockPreview({}),
+    catalog: svc.getCatalogPreview({}), price: svc.getDealerPriceListPreview({}), orders: svc.listOrders({}), audit: svc.getAuditPreview(),
+    warehouse: svc.getWarehouseStockPreview({}), branch: svc.getBranchStockPreview({}), statement: svc.getOutstandingStatementPreview({}),
+    leaderboard: svc.getLeaderboardPreview({}), analytics: svc.getAnalyticsPreview({}) });
   add('no PII/secret leak', !red.hasLeak(leakBlob));
 } catch (e) {
   add('functional pipeline', false, e.message);

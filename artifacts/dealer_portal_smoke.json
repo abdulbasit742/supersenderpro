@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-21T03:23:06.697Z",
-  "passed": 34,
+  "generatedAt": "2026-06-21T12:11:17.505Z",
+  "passed": 82,
   "failed": 0,
-  "total": 34,
+  "total": 82,
   "results": [
     {
       "name": "require service module",
@@ -120,6 +120,106 @@
       "detail": "safe"
     },
     {
+      "name": "getOnboardingPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getComplianceDocumentPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getContractPricePreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getTierDiscountPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getVolumeDiscountPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getWarehouseStockPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getBranchStockPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getOutstandingStatementPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getCreditRiskPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getRebateIncentivePreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getTargetAchievementPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getLeaderboardPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getTerritoryPerformancePreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getRiskScorePreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getAnalyticsPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getBusinessVerificationPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getPromotionEligibilityPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getRegionStockPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getDeliveryEtaRiskPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getClaimPipelinePreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
       "name": "bulk order draft safe (no live order creation/stock reservation)",
       "pass": true,
       "detail": "total 49200"
@@ -163,6 +263,146 @@
       "name": "audit preview is local + no live write",
       "pass": true,
       "detail": "8 entries"
+    },
+    {
+      "name": "dynamic pricing safe (no live price mutation)",
+      "pass": true,
+      "detail": "final 738"
+    },
+    {
+      "name": "bulk import safe (no live import/order)",
+      "pass": true,
+      "detail": "1 valid"
+    },
+    {
+      "name": "reorder suggestion safe (no order creation)",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "product substitution safe (no order creation)",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "cross-sell/upsell safe (no order creation)",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "quote negotiation safe (no quote/approval mutation)",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "quote approval safe (no approval mutation)",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "credit risk safe (no credit mutation)",
+      "pass": true,
+      "detail": "medium"
+    },
+    {
+      "name": "dispute preview safe (no dispute/invoice/payment mutation)",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "lead registration safe (no lead/CRM creation)",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "deal registration safe (no deal/CRM creation)",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "channel conflict safe (no CRM/assignment mutation)",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "AI insight safe (no live AI call, no external call)",
+      "pass": true,
+      "detail": "2 recs"
+    },
+    {
+      "name": "risk score safe (no external call)",
+      "pass": true,
+      "detail": "score 70"
+    },
+    {
+      "name": "backorders + partial shipments safe",
+      "pass": true,
+      "detail": "1 bo / 1 ps"
+    },
+    {
+      "name": "no full PII in advanced aggregate blob",
+      "pass": true,
+      "detail": "clean"
+    },
+    {
+      "name": "status advancedFeaturesEnabledPreview true",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "business verification safe (no mutation/download)",
+      "pass": true,
+      "detail": "partially_verified_preview"
+    },
+    {
+      "name": "price protection safe (no price mutation)",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "promotion eligibility safe (no promotion mutation)",
+      "pass": true,
+      "detail": "2 promos"
+    },
+    {
+      "name": "region stock safe (no stock mutation/reservation)",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "cart risk safe (no order/stock/credit mutation)",
+      "pass": true,
+      "detail": "medium"
+    },
+    {
+      "name": "dealer quote comparison safe (no quote mutation)",
+      "pass": true,
+      "detail": "tier_adjusted_preview"
+    },
+    {
+      "name": "delivery ETA risk safe (no delivery/shipment mutation)",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "claim pipeline safe (no claim mutation)",
+      "pass": true,
+      "detail": "3 claims"
+    },
+    {
+      "name": "catalog item status safe (no mutation)",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "redactor masks shipment ref",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "no full PII in v2 aggregate blob",
+      "pass": true,
+      "detail": "clean"
     },
     {
       "name": "redactor masking examples",

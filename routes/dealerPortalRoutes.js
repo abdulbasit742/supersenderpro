@@ -83,4 +83,66 @@ router.post('/message-draft-preview', safe((req) => svc.createMessageDraftPrevie
 /* Audit preview */
 router.get('/audit-preview', safe(() => svc.getAuditPreview()));
 
+/* ---- Advanced B2B Commerce Operating System routes (preview-only) ---- */
+
+/* Onboarding / compliance */
+router.get('/onboarding', safe(() => svc.getOnboardingPreview({})));
+router.get('/compliance-documents', safe(() => svc.getComplianceDocumentPreview({})));
+
+/* Advanced pricing */
+router.get('/contract-prices', safe(() => svc.getContractPricePreview({})));
+router.get('/tier-discounts', safe(() => svc.getTierDiscountPreview({})));
+router.get('/volume-discounts', safe((req) => svc.getVolumeDiscountPreview(body(req))));
+router.post('/dynamic-pricing-preview', safe((req) => svc.createDynamicPricingPreview(body(req))));
+
+/* Stock (warehouse / branch) */
+router.get('/warehouse-stock', safe(() => svc.getWarehouseStockPreview({})));
+router.get('/branch-stock', safe(() => svc.getBranchStockPreview({})));
+
+/* Ordering intelligence drafts */
+router.post('/bulk-import-preview', safe((req) => svc.createBulkImportPreview(body(req))));
+router.post('/reorder-suggestion-preview', safe((req) => svc.createReorderSuggestionPreview(body(req))));
+router.post('/product-substitution-preview', safe((req) => svc.createProductSubstitutionPreview(body(req))));
+router.post('/cross-sell-upsell-preview', safe((req) => svc.createCrossSellUpsellPreview(body(req))));
+
+/* Quotes (negotiation / approval) */
+router.post('/quote-negotiation-preview', safe((req) => svc.createQuoteNegotiationPreview(body(req))));
+router.post('/quote-approval-preview', safe((req) => svc.createQuoteApprovalPreview(body(req))));
+
+/* Orders extensions */
+router.get('/backorders', safe(() => svc.listBackorders({})));
+router.get('/partial-shipments', safe(() => svc.listPartialShipments({})));
+router.get('/deliveries/:id/status', safe((req) => svc.listDeliveries(withId(req))));
+router.get('/shipments/:id/status', safe((req) => svc.listShipments(withId(req))));
+
+/* Finance extensions */
+router.get('/statement', safe(() => svc.getOutstandingStatementPreview({})));
+router.get('/credit-risk', safe(() => svc.getCreditRiskPreview({})));
+router.post('/dispute-preview', safe((req) => svc.createDisputePreview(body(req))));
+
+/* Incentives / channel */
+router.get('/rebates-incentives', safe(() => svc.getRebateIncentivePreview({})));
+router.get('/targets-achievements', safe(() => svc.getTargetAchievementPreview({})));
+router.get('/leaderboard', safe(() => svc.getLeaderboardPreview({})));
+router.get('/territory-performance', safe(() => svc.getTerritoryPerformancePreview({})));
+router.post('/channel-conflict-preview', safe((req) => svc.createChannelConflictPreview(body(req))));
+router.post('/lead-registration-preview', safe((req) => svc.createLeadRegistrationPreview(body(req))));
+router.post('/deal-registration-preview', safe((req) => svc.createDealRegistrationPreview(body(req))));
+
+/* Risk / analytics / AI insight (no live AI call) */
+router.get('/risk-score', safe(() => svc.getRiskScorePreview({})));
+router.get('/analytics', safe(() => svc.getAnalyticsPreview({})));
+router.post('/ai-insight-preview', safe((req) => svc.createAiInsightPreview(body(req))));
+
+/* ---- v2: Distributor B2B Commerce OS routes (preview-only) ---- */
+router.get('/business-verification', safe(() => svc.getBusinessVerificationPreview({})));
+router.get('/catalog/:id/status', safe((req) => svc.getCatalogItemStatus(withId(req))));
+router.post('/price-protection-preview', safe((req) => svc.createPriceProtectionPreview(body(req))));
+router.get('/promotion-eligibility', safe(() => svc.getPromotionEligibilityPreview({})));
+router.get('/region-stock', safe(() => svc.getRegionStockPreview({})));
+router.post('/cart-risk-preview', safe((req) => svc.createCartRiskPreview(body(req))));
+router.post('/dealer-quote-comparison-preview', safe((req) => svc.createDealerQuoteComparisonPreview(body(req))));
+router.get('/delivery-eta-risk', safe(() => svc.getDeliveryEtaRiskPreview({})));
+router.get('/claim-pipeline', safe(() => svc.getClaimPipelinePreview({})));
+
 module.exports = router;
