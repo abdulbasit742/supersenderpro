@@ -3120,6 +3120,18 @@ try {
 }
 // END DEALER PORTAL HOOK
 
+// BEGIN VENDOR PORTAL HOOK
+// Vendor/Supplier Portal + Procurement Self-Service Center (preview-only: no live PO/GRN/invoice/payment/price mutation, no live send, PII masked, no external calls).
+try {
+  const vendorPortalRoutes = require('./routes/vendorPortalRoutes');
+  app.use('/api/vendor-portal', vendorPortalRoutes);
+  app.get('/vendor-portal.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'vendor-portal.html')));
+  console.log('[VendorPortal] mounted at /api/vendor-portal (preview-only, PII masked, no live actions)');
+} catch (e) {
+  console.error('[VendorPortal] failed to initialise (non-fatal):', e.message);
+}
+// END VENDOR PORTAL HOOK
+
 
 let searchIndexRebuildTimer = null;
 function scheduleSearchIndexRebuild(reason = 'data-change', delayMs = Number(process.env.SEARCH_REBUILD_DEBOUNCE_MS || 30000)) {
