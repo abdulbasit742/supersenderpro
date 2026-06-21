@@ -1,0 +1,173 @@
+{
+  "generatedAt": "2026-06-21T06:09:01.519Z",
+  "passed": 33,
+  "failed": 0,
+  "total": 33,
+  "results": [
+    {
+      "name": "require service module",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require redactor",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "require route module",
+      "pass": true,
+      "detail": "loaded"
+    },
+    {
+      "name": "portal status is safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "lookup preview safe + masked",
+      "pass": true,
+      "detail": "preview_token"
+    },
+    {
+      "name": "summary works even though no real modules",
+      "pass": true,
+      "detail": "3 outlets"
+    },
+    {
+      "name": "getFranchiseProfilePreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getTierStatusPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getOutletAccountStatusPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getSalesSummaryPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getTargetAchievementPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getRoyaltySummaryPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getRoyaltyPaymentStatusPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getOutstandingPayablePreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getInventoryAllocationPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getOrderStatusPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getMarketingFundPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getHeadcountPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getComplianceChecklistPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getTerritoryAssignmentPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "getContractStatusPreview safe",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "replenishment draft safe (no live order/stock)",
+      "pass": true,
+      "detail": "1 items"
+    },
+    {
+      "name": "royalty summary safe (no royalty/payment mutation)",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "royalty payment safe (no payment action)",
+      "pass": true,
+      "detail": "pay_****"
+    },
+    {
+      "name": "outstanding payable safe (no payment action)",
+      "pass": true,
+      "detail": "93000"
+    },
+    {
+      "name": "inventory safe (no stock mutation/reservation)",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "marketing fund safe (no fund/payment mutation)",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "document request safe (no download)",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "support request safe (no live ticket creation)",
+      "pass": true,
+      "detail": "safe"
+    },
+    {
+      "name": "message draft safe (no live send)",
+      "pass": true,
+      "detail": "+92******4567"
+    },
+    {
+      "name": "audit preview is local + no live write",
+      "pass": true,
+      "detail": "6 entries"
+    },
+    {
+      "name": "redactor masking examples",
+      "pass": true,
+      "detail": "ok"
+    },
+    {
+      "name": "no full PII in aggregate response blob",
+      "pass": true,
+      "detail": "clean"
+    }
+  ]
+}

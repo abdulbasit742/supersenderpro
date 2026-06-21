@@ -1,0 +1,269 @@
+{
+  "generatedAt": "2026-06-21T06:09:01.374Z",
+  "passed": 52,
+  "failed": 0,
+  "total": 52,
+  "strict": "false",
+  "checks": [
+    {
+      "name": "file lib/franchisePortal/store.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/franchisePortal/franchisePortalModel.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/franchisePortal/franchisePortalService.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/franchisePortal/statusSummaryPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/franchisePortal/franchiseProfilePreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/franchisePortal/tierStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/franchisePortal/outletAccountStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/franchisePortal/outletListPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/franchisePortal/salesSummaryPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/franchisePortal/targetAchievementPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/franchisePortal/royaltySummaryPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/franchisePortal/royaltyPaymentStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/franchisePortal/outstandingPayablePreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/franchisePortal/inventoryAllocationPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/franchisePortal/replenishmentDraftPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/franchisePortal/orderStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/franchisePortal/settlementStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/franchisePortal/marketingFundPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/franchisePortal/headcountPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/franchisePortal/complianceChecklistPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/franchisePortal/territoryAssignmentPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/franchisePortal/contractStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/franchisePortal/documentRequestPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/franchisePortal/supportRequestPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/franchisePortal/messageDrafts.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/franchisePortal/auditPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/franchisePortal/redactor.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file routes/franchisePortalRoutes.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/franchise-portal.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/js/franchise-portal.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/css/franchise-portal.css",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "server hook present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "route module loads",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "all service functions exported",
+      "ok": true,
+      "detail": "all present"
+    },
+    {
+      "name": "status dryRun true + liveActionsEnabled false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "status franchisePortalPublicLive false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "status piiMasked true",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "status externalCallsEnabled false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "redactor masks phone",
+      "ok": true,
+      "detail": "+92******4567"
+    },
+    {
+      "name": "redactor masks email",
+      "ok": true,
+      "detail": "fr*******@example.com"
+    },
+    {
+      "name": "redactor masks order ref",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "redactor masks invoice ref",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "redactor masks payment ref",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "redactor masks tax ref",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "redactor masks document ref",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "replenishment liveOrderCreation false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "royalty liveRoyaltyMutation false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "royalty payment livePaymentAction false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "document request liveDocumentDownload false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "message draft liveSend false + masked recipient",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "summary piiMasked true + works without modules",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no PII/secret leak",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}

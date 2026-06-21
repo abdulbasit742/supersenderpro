@@ -1,0 +1,49 @@
+/* public/css/franchise-portal.css — Clean, franchise-friendly SaaS styling. Mobile responsive. */
+:root{
+  --bg:#f5f7fb; --card:#ffffff; --line:#e4e9f2; --text:#1c2433; --muted:#67748e;
+  --accent:#0369a1; --accent-d:#075985; --ok:#16a34a; --warn:#d97706; --bad:#dc2626;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#0b1220; --card:#111c30; --line:#1d2940; --text:#e6edf7; --muted:#8da2c0; --accent:#0ea5e9; --accent-d:#0369a1; }
+}
+*{ box-sizing:border-box; }
+body{ margin:0; background:var(--bg); color:var(--text); font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif; line-height:1.5; }
+.fp-hero{ background:linear-gradient(135deg,var(--accent),var(--accent-d)); color:#fff; padding:36px 20px; }
+.fp-hero-inner{ max-width:1100px; margin:0 auto; }
+.fp-hero h1{ margin:0 0 8px; font-size:24px; }
+.fp-sub{ margin:0 0 14px; opacity:.95; max-width:760px; font-size:14px; }
+.fp-badges{ display:flex; gap:8px; flex-wrap:wrap; }
+.fp-badge{ font-size:11px; padding:5px 10px; border-radius:999px; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.3); }
+.fp-main{ max-width:1100px; margin:0 auto; padding:20px; }
+.fp-card{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px; margin-bottom:16px; }
+.fp-card h2{ margin:0 0 12px; font-size:18px; } .fp-card h3{ margin:0 0 10px; font-size:15px; }
+.fp-muted{ color:var(--muted); font-size:13px; }
+.fp-form{ display:grid; grid-template-columns:1fr; gap:10px; }
+@media(min-width:640px){ .fp-form{ grid-template-columns:1fr 1fr auto; align-items:end; } }
+.fp-field{ display:flex; flex-direction:column; gap:5px; font-size:12px; color:var(--muted); }
+.fp-field input,.fp-field select{ background:var(--bg); border:1px solid var(--line); color:var(--text); padding:10px; border-radius:9px; font-family:inherit; font-size:14px; }
+.fp-btn{ background:var(--accent); color:#fff; border:none; padding:11px 16px; border-radius:9px; cursor:pointer; font-size:14px; font-weight:600; }
+.fp-btn:hover{ background:var(--accent-d); }
+.fp-btn.ghost{ background:transparent; color:var(--accent); border:1px solid var(--accent); font-weight:500; }
+.fp-profile{ margin-top:14px; font-size:14px; }
+.fp-profile .row{ display:flex; gap:8px; flex-wrap:wrap; color:var(--muted); }
+.fp-profile .row b{ color:var(--text); }
+.fp-error{ margin-top:12px; background:rgba(220,38,38,.08); border:1px solid var(--bad); color:var(--bad); padding:10px 12px; border-radius:9px; font-size:13px; }
+.fp-kpis{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:16px; }
+@media(min-width:640px){ .fp-kpis{ grid-template-columns:repeat(3,1fr); } }
+@media(min-width:980px){ .fp-kpis{ grid-template-columns:repeat(6,1fr); } }
+.fp-kpi{ background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; }
+.fp-kpi .k{ font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; }
+.fp-kpi .v{ font-size:22px; font-weight:700; margin-top:4px; }
+.fp-grid{ display:grid; grid-template-columns:1fr; gap:16px; }
+@media(min-width:760px){ .fp-grid{ grid-template-columns:1fr 1fr; } }
+.fp-list{ display:flex; flex-direction:column; gap:8px; }
+.fp-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px; border:1px solid var(--line); border-radius:10px; background:var(--bg); font-size:13px; }
+.fp-row .id{ font-family:ui-monospace,monospace; color:var(--muted); }
+.fp-empty{ color:var(--muted); font-size:13px; font-style:italic; padding:8px 0; }
+.badge{ font-size:11px; padding:3px 9px; border-radius:999px; border:1px solid var(--line); white-space:nowrap; }
+.badge.ok{ color:var(--ok); border-color:var(--ok); } .badge.warn{ color:var(--warn); border-color:var(--warn); } .badge.bad{ color:var(--bad); border-color:var(--bad); }
+.fp-actions{ display:flex; flex-wrap:wrap; gap:10px; margin:12px 0; }
+.fp-draft-out{ background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:14px; font-size:13px; white-space:pre-wrap; min-height:20px; display:none; }
+.fp-draft-out.show{ display:block; }
+.fp-footer{ text-align:center; color:var(--muted); font-size:12px; padding:16px 0; }

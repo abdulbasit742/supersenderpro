@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Franchise Portal — SuperSender Pro</title>
+<link rel="stylesheet" href="/css/franchise-portal.css" />
+</head>
+<body>
+<header class="fp-hero">
+  <div class="fp-hero-inner">
+    <h1>Franchise / Branch Partner Portal &amp; Multi-Outlet Self-Service</h1>
+    <p class="fp-sub">Preview your franchise account, outlets, sales vs targets, royalty, replenishment, compliance and more. This is a <strong>safe preview</strong> — your private details are masked, nothing is ordered, no payment is made, and no message is sent.</p>
+    <div id="fp-safety-badges" class="fp-badges"></div>
+  </div>
+</header>
+
+<main class="fp-main">
+  <section class="fp-card fp-lookup">
+    <h2>Check your status</h2>
+    <form id="fp-lookup-form" class="fp-form">
+      <label class="fp-field">Lookup method
+        <select id="fp-mode">
+          <option value="demo_preview">Demo preview</option>
+          <option value="preview_token">Preview token</option>
+          <option value="masked_phone_lookup_preview">Masked phone</option>
+          <option value="franchise_reference_preview">Franchise reference</option>
+          <option value="franchise_code_preview">Franchise code</option>
+          <option value="outlet_account_preview">Outlet account reference</option>
+        </select>
+      </label>
+      <label class="fp-field">Reference / token <input id="fp-ref" placeholder="preview only" /></label>
+      <button type="submit" class="fp-btn">Check Status Preview</button>
+    </form>
+    <div id="fp-profile" class="fp-profile"></div>
+    <div id="fp-error" class="fp-error" hidden></div>
+  </section>
+
+  <section id="fp-kpis" class="fp-kpis"></section>
+
+  <div class="fp-grid">
+    <section class="fp-card"><h3>🏢 Account &amp; Tier</h3><div id="fp-account" class="fp-list"></div></section>
+    <section class="fp-card"><h3>🏬 Outlets</h3><div id="fp-outlets" class="fp-list"></div></section>
+    <section class="fp-card"><h3>💹 Sales Summary</h3><div id="fp-sales" class="fp-list"></div></section>
+    <section class="fp-card"><h3>🎯 Target vs Achievement</h3><div id="fp-targets" class="fp-list"></div></section>
+    <section class="fp-card"><h3>💰 Royalty &amp; Fees</h3><div id="fp-royalty" class="fp-list"></div></section>
+    <section class="fp-card"><h3>🧾 Royalty Invoices &amp; Payable</h3><div id="fp-payables" class="fp-list"></div></section>
+    <section class="fp-card"><h3>📦 Inventory Allocation</h3><div id="fp-inventory" class="fp-list"></div></section>
+    <section class="fp-card"><h3>📋 Replenishment Orders</h3><div id="fp-orders" class="fp-list"></div></section>
+    <section class="fp-card"><h3>📣 Marketing Fund</h3><div id="fp-fund" class="fp-list"></div></section>
+    <section class="fp-card"><h3>👥 Headcount</h3><div id="fp-headcount" class="fp-list"></div></section>
+    <section class="fp-card"><h3>✅ Compliance Checklist</h3><div id="fp-compliance" class="fp-list"></div></section>
+    <section class="fp-card"><h3>🗺️ Territory</h3><div id="fp-territory" class="fp-list"></div></section>
+    <section class="fp-card"><h3>📑 Contracts &amp; Documents</h3><div id="fp-documents" class="fp-list"></div></section>
+  </div>
+
+  <section class="fp-card">
+    <h2>Need something? Create a safe preview request</h2>
+    <p class="fp-muted">All actions below are previews/drafts only. <strong>Contact your franchise manager to complete any real action.</strong></p>
+    <div class="fp-actions">
+      <button class="fp-btn ghost" data-draft="replenishment">Draft Replenishment Order</button>
+      <button class="fp-btn ghost" data-draft="support">Draft Support Request</button>
+      <button class="fp-btn ghost" data-draft="message">Draft Message</button>
+      <button class="fp-btn ghost" data-draft="document">View Document Request Preview</button>
+    </div>
+    <div id="fp-draft-out" class="fp-draft-out"></div>
+  </section>
+
+  <section class="fp-card">
+    <h3>🛡️ Audit Preview</h3>
+    <div id="fp-audit" class="fp-list"></div>
+  </section>
+
+  <footer class="fp-footer">
+    <p>🔒 dryRun · No order/stock/royalty/payment/fund mutation · No live sends · Your private details are masked · External calls disabled.</p>
+  </footer>
+</main>
+
+<script src="/js/franchise-portal.js"></script>
+</body>
+</html>
