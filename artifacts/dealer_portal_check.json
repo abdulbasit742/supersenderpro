@@ -1,0 +1,299 @@
+{
+  "generatedAt": "2026-06-21T03:23:06.538Z",
+  "passed": 58,
+  "failed": 0,
+  "total": 58,
+  "strict": "false",
+  "checks": [
+    {
+      "name": "file lib/dealerPortal/store.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/dealerPortalModel.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/dealerPortalService.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/statusSummaryPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/dealerProfilePreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/tierStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/b2bAccountStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/catalogPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/dealerPriceListPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/wholesalePricePreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/stockAvailabilityPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/moqPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/bulkOrderDraftPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/quotationRequestPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/orderStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/invoicePaymentStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/creditLimitPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/outstandingBalancePreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/commissionMarginPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/deliveryStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/shipmentStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/returnClaimStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/warrantyClaimStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/loyaltyStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/contractStatusPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/documentRequestPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/paymentQueryPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/supportRequestPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/messageDrafts.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/auditPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/redactor.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file routes/dealerPortalRoutes.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/dealer-portal.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/js/dealer-portal.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/css/dealer-portal.css",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "server hook present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "route module loads",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "all service functions exported",
+      "ok": true,
+      "detail": "all present"
+    },
+    {
+      "name": "status dryRun true + liveActionsEnabled false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "status dealerPortalPublicLive false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "status piiMasked true",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "status externalCallsEnabled false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "redactor masks phone",
+      "ok": true,
+      "detail": "+92******4567"
+    },
+    {
+      "name": "redactor masks email",
+      "ok": true,
+      "detail": "de****@example.com"
+    },
+    {
+      "name": "redactor masks order ref",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "redactor masks invoice ref",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "redactor masks payment ref",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "redactor masks credit ref",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "redactor masks tax ref",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "redactor masks document ref",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "bulk order liveOrderCreation false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "quotation liveQuotationCreation false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "invoice livePaymentAction false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "credit liveCreditMutation false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "document request liveDocumentDownload false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "message draft liveSend false + masked recipient",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "summary piiMasked true + works without modules",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no PII/secret leak",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}

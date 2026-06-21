@@ -1,0 +1,49 @@
+/* public/css/dealer-portal.css — Clean, dealer-friendly SaaS styling. Mobile responsive. */
+:root{
+  --bg:#f5f7fb; --card:#ffffff; --line:#e4e9f2; --text:#1c2433; --muted:#67748e;
+  --accent:#7c3aed; --accent-d:#6326c9; --ok:#16a34a; --warn:#d97706; --bad:#dc2626;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#0b1220; --card:#111c30; --line:#1d2940; --text:#e6edf7; --muted:#8da2c0; --accent:#8b5cf6; --accent-d:#7c3aed; }
+}
+*{ box-sizing:border-box; }
+body{ margin:0; background:var(--bg); color:var(--text); font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif; line-height:1.5; }
+.dp-hero{ background:linear-gradient(135deg,var(--accent),var(--accent-d)); color:#fff; padding:36px 20px; }
+.dp-hero-inner{ max-width:1100px; margin:0 auto; }
+.dp-hero h1{ margin:0 0 8px; font-size:24px; }
+.dp-sub{ margin:0 0 14px; opacity:.95; max-width:760px; font-size:14px; }
+.dp-badges{ display:flex; gap:8px; flex-wrap:wrap; }
+.dp-badge{ font-size:11px; padding:5px 10px; border-radius:999px; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.3); }
+.dp-main{ max-width:1100px; margin:0 auto; padding:20px; }
+.dp-card{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px; margin-bottom:16px; }
+.dp-card h2{ margin:0 0 12px; font-size:18px; } .dp-card h3{ margin:0 0 10px; font-size:15px; }
+.dp-muted{ color:var(--muted); font-size:13px; }
+.dp-form{ display:grid; grid-template-columns:1fr; gap:10px; }
+@media(min-width:640px){ .dp-form{ grid-template-columns:1fr 1fr auto; align-items:end; } }
+.dp-field{ display:flex; flex-direction:column; gap:5px; font-size:12px; color:var(--muted); }
+.dp-field input,.dp-field select{ background:var(--bg); border:1px solid var(--line); color:var(--text); padding:10px; border-radius:9px; font-family:inherit; font-size:14px; }
+.dp-btn{ background:var(--accent); color:#fff; border:none; padding:11px 16px; border-radius:9px; cursor:pointer; font-size:14px; font-weight:600; }
+.dp-btn:hover{ background:var(--accent-d); }
+.dp-btn.ghost{ background:transparent; color:var(--accent); border:1px solid var(--accent); font-weight:500; }
+.dp-profile{ margin-top:14px; font-size:14px; }
+.dp-profile .row{ display:flex; gap:8px; flex-wrap:wrap; color:var(--muted); }
+.dp-profile .row b{ color:var(--text); }
+.dp-error{ margin-top:12px; background:rgba(220,38,38,.08); border:1px solid var(--bad); color:var(--bad); padding:10px 12px; border-radius:9px; font-size:13px; }
+.dp-kpis{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:16px; }
+@media(min-width:640px){ .dp-kpis{ grid-template-columns:repeat(3,1fr); } }
+@media(min-width:980px){ .dp-kpis{ grid-template-columns:repeat(6,1fr); } }
+.dp-kpi{ background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; }
+.dp-kpi .k{ font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; }
+.dp-kpi .v{ font-size:22px; font-weight:700; margin-top:4px; }
+.dp-grid{ display:grid; grid-template-columns:1fr; gap:16px; }
+@media(min-width:760px){ .dp-grid{ grid-template-columns:1fr 1fr; } }
+.dp-list{ display:flex; flex-direction:column; gap:8px; }
+.dp-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px; border:1px solid var(--line); border-radius:10px; background:var(--bg); font-size:13px; }
+.dp-row .id{ font-family:ui-monospace,monospace; color:var(--muted); }
+.dp-empty{ color:var(--muted); font-size:13px; font-style:italic; padding:8px 0; }
+.badge{ font-size:11px; padding:3px 9px; border-radius:999px; border:1px solid var(--line); white-space:nowrap; }
+.badge.ok{ color:var(--ok); border-color:var(--ok); } .badge.warn{ color:var(--warn); border-color:var(--warn); } .badge.bad{ color:var(--bad); border-color:var(--bad); }
+.dp-actions{ display:flex; flex-wrap:wrap; gap:10px; margin:12px 0; }
+.dp-draft-out{ background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:14px; font-size:13px; white-space:pre-wrap; min-height:20px; display:none; }
+.dp-draft-out.show{ display:block; }
+.dp-footer{ text-align:center; color:var(--muted); font-size:12px; padding:16px 0; }

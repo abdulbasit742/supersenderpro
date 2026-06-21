@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dealer Portal — SuperSender Pro</title>
+<link rel="stylesheet" href="/css/dealer-portal.css" />
+</head>
+<body>
+<header class="dp-hero">
+  <div class="dp-hero-inner">
+    <h1>Dealer / Reseller Portal &amp; B2B Self-Service Center</h1>
+    <p class="dp-sub">Preview your B2B account, dealer pricing, stock, orders, invoices, credit and more. This is a <strong>safe preview</strong> — your private details are masked, nothing is ordered, no payment is made, and no message is sent.</p>
+    <div id="dp-safety-badges" class="dp-badges"></div>
+  </div>
+</header>
+
+<main class="dp-main">
+  <!-- Lookup panel -->
+  <section class="dp-card dp-lookup">
+    <h2>Check your status</h2>
+    <form id="dp-lookup-form" class="dp-form">
+      <label class="dp-field">Lookup method
+        <select id="dp-mode">
+          <option value="demo_preview">Demo preview</option>
+          <option value="preview_token">Preview token</option>
+          <option value="masked_phone_lookup_preview">Masked phone</option>
+          <option value="dealer_reference_preview">Dealer reference</option>
+          <option value="dealer_code_preview">Dealer code</option>
+          <option value="b2b_account_preview">B2B account reference</option>
+        </select>
+      </label>
+      <label class="dp-field">Reference / token <input id="dp-ref" placeholder="preview only" /></label>
+      <button type="submit" class="dp-btn">Check Status Preview</button>
+    </form>
+    <div id="dp-profile" class="dp-profile"></div>
+    <div id="dp-error" class="dp-error" hidden></div>
+  </section>
+
+  <!-- KPI summary -->
+  <section id="dp-kpis" class="dp-kpis"></section>
+
+  <!-- Status sections -->
+  <div class="dp-grid">
+    <section class="dp-card"><h3>🏢 Account &amp; Tier</h3><div id="dp-account" class="dp-list"></div></section>
+    <section class="dp-card"><h3>📦 Product Catalog</h3><div id="dp-catalog" class="dp-list"></div></section>
+    <section class="dp-card"><h3>🏷️ Dealer Price List</h3><div id="dp-price" class="dp-list"></div></section>
+    <section class="dp-card"><h3>🧱 Wholesale Prices &amp; MOQ</h3><div id="dp-wholesale" class="dp-list"></div></section>
+    <section class="dp-card"><h3>📊 Stock Availability</h3><div id="dp-stock" class="dp-list"></div></section>
+    <section class="dp-card"><h3>📋 Orders</h3><div id="dp-orders" class="dp-list"></div></section>
+    <section class="dp-card"><h3>🧾 Invoices &amp; Payments</h3><div id="dp-invoices" class="dp-list"></div></section>
+    <section class="dp-card"><h3>💳 Credit &amp; Balance</h3><div id="dp-credit" class="dp-list"></div></section>
+    <section class="dp-card"><h3>📈 Commission / Margin</h3><div id="dp-commission" class="dp-list"></div></section>
+    <section class="dp-card"><h3>🚚 Delivery &amp; Shipments</h3><div id="dp-delivery" class="dp-list"></div></section>
+    <section class="dp-card"><h3>↩️ Returns &amp; Warranty Claims</h3><div id="dp-returns" class="dp-list"></div></section>
+    <section class="dp-card"><h3>⭐ Loyalty &amp; Rewards</h3><div id="dp-loyalty" class="dp-list"></div></section>
+    <section class="dp-card"><h3>📑 Contracts &amp; Documents</h3><div id="dp-documents" class="dp-list"></div></section>
+  </div>
+
+  <!-- Draft actions -->
+  <section class="dp-card">
+    <h2>Need something? Create a safe preview request</h2>
+    <p class="dp-muted">All actions below are previews/drafts only. <strong>Contact your account manager to complete any real action.</strong></p>
+    <div class="dp-actions">
+      <button class="dp-btn ghost" data-draft="bulk">Draft Bulk Order</button>
+      <button class="dp-btn ghost" data-draft="quotation">Draft Quotation Request</button>
+      <button class="dp-btn ghost" data-draft="payment">Draft Payment Query</button>
+      <button class="dp-btn ghost" data-draft="support">Draft Support Request</button>
+      <button class="dp-btn ghost" data-draft="message">Draft Message</button>
+      <button class="dp-btn ghost" data-draft="document">View Document Request Preview</button>
+    </div>
+    <div id="dp-draft-out" class="dp-draft-out"></div>
+  </section>
+
+  <!-- Audit preview -->
+  <section class="dp-card">
+    <h3>🛡️ Audit Preview</h3>
+    <div id="dp-audit" class="dp-list"></div>
+  </section>
+
+  <footer class="dp-footer">
+    <p>🔒 dryRun · No order/stock/price/invoice/credit mutation · No live sends · Your private details are masked · External calls disabled.</p>
+  </footer>
+</main>
+
+<script src="/js/dealer-portal.js"></script>
+</body>
+</html>
