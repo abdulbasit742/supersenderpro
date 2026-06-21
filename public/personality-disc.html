@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SuperSender Pro - DISC Personality Lab</title>
+  <link rel="stylesheet" href="/css/personality-disc.css" />
+</head>
+<body>
+  <main class="disc-shell">
+    <header class="disc-hero">
+      <div>
+        <p class="eyebrow">Sales intelligence preview</p>
+        <h1>DISC Personality Lab</h1>
+        <p class="subcopy">Paste WhatsApp messages, detect client style, and draft a better sales reply without sending anything live.</p>
+      </div>
+      <div class="status-card">
+        <span class="dot"></span>
+        <div>
+          <strong id="statusText">Checking...</strong>
+          <small>Dry-run only. No external API calls.</small>
+        </div>
+      </div>
+    </header>
+
+    <section class="grid two">
+      <article class="panel">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">Input</p>
+            <h2>Analyze Messages</h2>
+          </div>
+          <button id="sampleBtn" class="secondary">Load sample</button>
+        </div>
+        <label>Client ID / phone alias</label>
+        <input id="clientId" placeholder="cust_92300xxxxxxx or demo-client" />
+        <label>Messages, one per line</label>
+        <textarea id="messages" rows="10" placeholder="Paste customer messages here..."></textarea>
+        <div class="actions">
+          <button id="analyzeBtn">Analyze</button>
+          <button id="clearBtn" class="secondary">Clear</button>
+        </div>
+      </article>
+
+      <article class="panel result-panel">
+        <p class="eyebrow">Result</p>
+        <h2 id="resultTitle">No analysis yet</h2>
+        <p id="resultDescription" class="muted">Run an analysis to see DISC type, confidence, tips, and sales approach.</p>
+        <div id="scoreBars" class="score-bars"></div>
+        <div class="split">
+          <div>
+            <h3>Reply Tips</h3>
+            <ul id="tipsList"></ul>
+          </div>
+          <div>
+            <h3>Avoid</h3>
+            <ul id="avoidList"></ul>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="grid two">
+      <article class="panel">
+        <p class="eyebrow">Draft preview</p>
+        <h2>Tailored Sales Reply</h2>
+        <label>Offer / plan</label>
+        <input id="offer" value="ChatGPT Plus monthly plan" />
+        <label>Customer latest message</label>
+        <textarea id="customerMessage" rows="5" placeholder="Customer ka latest message paste karein..."></textarea>
+        <div class="actions">
+          <button id="draftBtn">Generate Draft</button>
+        </div>
+        <pre id="draftOutput">Draft will appear here.</pre>
+      </article>
+
+      <article class="panel">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">Saved clients</p>
+            <h2>Profile Memory</h2>
+          </div>
+          <button id="refreshClientsBtn" class="secondary">Refresh</button>
+        </div>
+        <div id="clientList" class="client-list"></div>
+      </article>
+    </section>
+
+    <section class="panel">
+      <p class="eyebrow">Playbook</p>
+      <h2>DISC Sales Rules</h2>
+      <div id="profileGrid" class="profile-grid"></div>
+    </section>
+  </main>
+  <script src="/js/personality-disc.js"></script>
+</body>
+</html>

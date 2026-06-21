@@ -3144,6 +3144,18 @@ try {
 }
 // END FRANCHISE PORTAL HOOK
 
+// BEGIN PERSONALITY DISC HOOK
+// WhatsApp DISC Personality Lab (preview-only: no live send, no external calls, JSON memory only).
+try {
+  const personalityRoutes = require('./routes/personalityRoutes');
+  app.use('/api/personality', personalityRoutes);
+  app.get('/personality-disc.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'personality-disc.html')));
+  console.log('[PersonalityDISC] mounted at /api/personality (preview-only, no live actions)');
+} catch (e) {
+  console.error('[PersonalityDISC] failed to initialise (non-fatal):', e.message);
+}
+// END PERSONALITY DISC HOOK
+
 
 let searchIndexRebuildTimer = null;
 function scheduleSearchIndexRebuild(reason = 'data-change', delayMs = Number(process.env.SEARCH_REBUILD_DEBOUNCE_MS || 30000)) {
