@@ -14,10 +14,11 @@ const LIB = [
   'featureFlags.js', 'envReadinessScanner.js', 'secretPresenceChecker.js', 'whatsappReadiness.js',
   'cloudApiReadiness.js', 'aiProviderReadiness.js', 'ragReadiness.js', 'queueReadiness.js',
   'databaseReadiness.js', 'storageReadiness.js', 'integrationHealth.js', 'webhookReadiness.js',
-  'campaignReadiness.js', 'rateLimitReadiness.js', 'safetyGuardReport.js', 'piiLeakScannerPreview.js',
-  'duplicateDetector.js', 'brokenReferenceScanner.js', 'smokeTestInventory.js', 'packageScriptInventory.js',
-  'releaseReadinessScore.js', 'riskScore.js', 'logPreview.js', 'auditPreview.js', 'backupReadiness.js',
-  'deploymentChecklist.js', 'recommendationEngine.js',
+  'campaignReadiness.js', 'templateReadiness.js', 'rateLimitReadiness.js', 'securityPosture.js',
+  'safetyGuardReport.js', 'piiLeakScannerPreview.js', 'duplicateDetector.js', 'brokenReferenceScanner.js',
+  'publicPageSafetyScanner.js', 'smokeTestInventory.js', 'packageScriptInventory.js', 'checkCommandInventory.js',
+  'releaseReadinessScore.js', 'riskScore.js', 'logPreview.js', 'auditPreview.js', 'errorPatternPreview.js',
+  'backupReadiness.js', 'deploymentChecklist.js', 'recommendationEngine.js',
 ];
 LIB.forEach((f) => add(`file lib/platformControl/${f}`, exists(`lib/platformControl/${f}`)));
 ['routes/platformControlRoutes.js', 'public/platform-control.html', 'public/js/platform-control.js',
@@ -33,13 +34,14 @@ try {
   require('../routes/platformControlRoutes');
   add('route module loads', true);
 
-  const fns = ['getPlatformControlStatus', 'getPlatformSummary', 'getArchitecture', 'getSafety',
-    'getModuleRegistry', 'getRouteInventory', 'getDashboardRegistry', 'getFeatureFlags', 'getPackageScripts',
+  const fns = ['getPlatformControlStatus', 'getPlatformSummary', 'getArchitecture', 'getArchitecturePreview', 'getSafety',
+    'getModuleRegistry', 'getRouteInventory', 'getDashboardRegistry', 'getFeatureFlags', 'getPackageScripts', 'getCheckCommands',
     'getEnvReadiness', 'getSecretPresence', 'getWhatsAppReadiness', 'getCloudApiReadiness', 'getAiProviderReadiness',
     'getRagReadiness', 'getQueueReadiness', 'getDatabaseReadiness', 'getStorageReadiness', 'getIntegrationHealth',
-    'getWebhookReadiness', 'getCampaignReadiness', 'getRateLimitReadiness', 'getBackupReadiness', 'getDeploymentChecklist',
-    'getSafetyGuardReport', 'getPiiLeakPreview', 'getDuplicateReport', 'getBrokenReferences', 'getLogPreview',
-    'getAuditPreview', 'getReleaseReadinessScore', 'getRiskScore', 'getRecommendations',
+    'getWebhookReadiness', 'getCampaignReadiness', 'getTemplateReadiness', 'getRateLimitReadiness', 'getSecurityPosture',
+    'getBackupReadiness', 'getDeploymentChecklist', 'getSafetyGuardReport', 'getPiiLeakPreview', 'getDuplicateReport',
+    'getBrokenReferences', 'getPublicPageSafety', 'getLogPreview', 'getAuditPreview', 'getErrorPatterns',
+    'getReleaseReadinessScore', 'getRiskScore', 'getRecommendations',
     'getChecksPreview', 'runChecksPreview', 'getSmokeTestsPreview', 'runSmokeTestsPreview'];
   add('all API functions exported', fns.every((f) => typeof pc[f] === 'function'),
     fns.filter((f) => typeof pc[f] !== 'function').join(',') || 'all present');
@@ -61,6 +63,16 @@ try {
   add('redactor masks log message', red.redactLog({ message: 'call +923001234567 or a@b.com' }).message.includes('*'));
   add('redactor masks name', red.maskName('Abdul') === 'A***');
   add('redactor redactError hides stack', red.redactError(new Error('boom')).hasStack === false);
+  add('redactor redactWebhookPayload hides values', red.redactWebhookPayload({ token: 'abc', to: '+923001234567' }).valuesExposed === false);
+  add('redactor redactPackageScript flags danger', red.redactPackageScript('rm -rf /').dangerous === true);
+
+  // architecture + new readiness scanners
+  add('architecture preview shape', !!pc.getArchitecturePreview().architecturePreview);
+  add('template readiness liveTemplateSyncEnabled false', pc.getTemplateReadiness().liveTemplateSyncEnabled === false);
+  add('security posture secretsExposed false', pc.getSecurityPosture().secretsExposed === false);
+  add('public page safety scan works', Array.isArray(pc.getPublicPageSafety().unsafePagesPreview));
+  add('check commands inventory works', Array.isArray(pc.getCheckCommands().checkCommandsPreview));
+  add('error patterns rawErrorsExposed false', pc.getErrorPatterns().rawErrorsExposed === false);
 
   // env readiness never exposes values
   const env = pc.getEnvReadiness();

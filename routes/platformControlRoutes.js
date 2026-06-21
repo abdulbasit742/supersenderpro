@@ -43,6 +43,7 @@ router.get('/routes', safe(() => pc.getRouteInventory()));
 router.get('/dashboard-pages', safe(() => pc.getDashboardRegistry()));
 router.get('/feature-flags', safe(() => pc.getFeatureFlags()));
 router.get('/package-scripts', safe(() => pc.getPackageScripts()));
+router.get('/check-commands', safe(() => pc.getCheckCommands()));
 
 /* ---- Readiness ---- */
 router.get('/readiness', safe(() => pc.getReadinessOverview()));
@@ -58,7 +59,9 @@ router.get('/readiness/storage', safe(() => pc.getStorageReadiness()));
 router.get('/readiness/integrations', safe(() => pc.getIntegrationHealth()));
 router.get('/readiness/webhooks', safe(() => pc.getWebhookReadiness()));
 router.get('/readiness/campaigns', safe(() => pc.getCampaignReadiness()));
+router.get('/readiness/templates', safe(() => pc.getTemplateReadiness()));
 router.get('/readiness/rate-limits', safe(() => pc.getRateLimitReadiness()));
+router.get('/readiness/security', safe(() => pc.getSecurityPosture()));
 router.get('/readiness/backup', safe(() => pc.getBackupReadiness()));
 router.get('/readiness/deployment', safe(() => pc.getDeploymentChecklist()));
 
@@ -68,9 +71,10 @@ router.get('/safety/duplicate-routes', safe(() => pc.getDuplicateReport()));
 router.get('/safety/duplicate-dashboard-links', safe(() => pc.getDuplicateReport()));
 router.get('/safety/broken-references', safe(() => pc.getBrokenReferences()));
 router.get('/safety/route-mounts', safe(() => pc.getRouteInventory()));
-router.get('/safety/public-pages', safe(() => pc.getDashboardRegistry()));
+router.get('/safety/public-pages', safe(() => pc.getPublicPageSafety()));
 router.get('/safety/log-preview', safe(() => pc.getLogPreview()));
 router.get('/safety/audit-preview', safe(() => pc.getAuditPreview()));
+router.get('/safety/error-patterns', safe(() => pc.getErrorPatterns()));
 router.get('/safety/guard-report', safe(() => pc.getSafetyGuardReport()));
 
 /* ---- Scoring ---- */

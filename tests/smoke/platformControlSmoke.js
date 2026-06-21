@@ -46,6 +46,13 @@ check('campaign readiness works', () => { const r = pc.getCampaignReadiness(); a
 check('rate limit readiness works', () => { const r = pc.getRateLimitReadiness(); assertSafe(r, 'rl'); return 'safe'; });
 check('backup readiness works', () => { const r = pc.getBackupReadiness(); assertSafe(r, 'bk'); assert(r.liveBackupExecution === false, 'bk'); return 'safe'; });
 check('deployment checklist works', () => { const r = pc.getDeploymentChecklist(); assertSafe(r, 'dep'); assert(Array.isArray(r.checklistPreview), 'arr'); return `${r.readyCountPreview}/${r.totalPreview} ready`; });
+check('architecture preview works', () => { const r = pc.getArchitecturePreview(); assertSafe(r, 'arch'); assert(r.architecturePreview && typeof r.architecturePreview === 'object', 'shape'); return 'ok'; });
+check('package script inventory works', () => { const r = pc.getPackageScripts(); assertSafe(r, 'pkg'); assert(typeof r.totalPreview === 'number', 'total'); return `${r.totalPreview} scripts`; });
+check('check command inventory works', () => { const r = pc.getCheckCommands(); assertSafe(r, 'chk'); assert(Array.isArray(r.checkCommandsPreview), 'arr'); return `${r.totalPreview} cmds`; });
+check('template readiness works without live sync', () => { const r = pc.getTemplateReadiness(); assertSafe(r, 'tpl'); assert(r.liveTemplateSyncEnabled === false, 'sync'); return 'safe'; });
+check('security posture works + no exposure', () => { const r = pc.getSecurityPosture(); assertSafe(r, 'sec'); assert(r.secretsExposed === false && r.piiMasked === true, 'exp'); return 'safe'; });
+check('public page safety scan works', () => { const r = pc.getPublicPageSafety(); assertSafe(r, 'pub'); assert(Array.isArray(r.unsafePagesPreview), 'arr'); return `${r.totalUnsafePreview} unsafe`; });
+check('error pattern preview masks data', () => { const r = pc.getErrorPatterns(); assertSafe(r, 'err'); assert(r.rawErrorsExposed === false && r.stackTracesExposed === false, 'raw'); return 'safe'; });
 
 check('safety guard report works', () => { const r = pc.getSafetyGuardReport(); assertSafe(r, 'guard'); assert(Array.isArray(r.safetySignalsPreview), 'arr'); return `${r.safetySignalsPreview.length} signals`; });
 check('pii leak preview masks data', () => { const r = pc.getPiiLeakPreview(); assertSafe(r, 'pii'); assert(r.piiMasked === true, 'masked'); return `${r.totalFindingsPreview} findings`; });

@@ -106,3 +106,38 @@ Both run **offline** (no server, no network) and write artifacts to `artifacts/`
 - No existing route, page, nav link, module, or data is modified or removed.
 - No new runtime dependency is introduced (uses only `express`, already in the repo).
 - All operations are read-only previews — the live system behaviour is unchanged.
+
+## Additional scanners
+
+- **Architecture preview** (`/architecture`) — detects backend, dashboard, storage, WhatsApp, AI, queue and
+  integrations from the repo layout (`detected_preview` / `not_detected_preview`).
+- **Template readiness** (`/readiness/templates`) — WhatsApp/message template modules + default template/lang
+  presence; live sync disabled.
+- **Security posture** (`/readiness/security`) — public-secret risk, raw-log risk, missing auth keys,
+  security-header hint; never exposes secrets or PII.
+- **Public page safety scanner** (`/safety/public-pages`) — flags public pages containing secret-like strings
+  and missing JS/CSS/asset references.
+- **Check command inventory** (`/check-commands`) — lists check/test/lint/smoke scripts and flags dangerous
+  command patterns (no execution).
+- **Error pattern preview** (`/safety/error-patterns`) — redaction-safe catalogue of common error patterns;
+  no real logs or stack traces.
+
+## How to interpret the readiness score
+
+`/score/release-readiness` returns `scorePreview` (0–100), a letter `gradePreview` (A–F) and `passPreview`
+(true only when score ≥ 75 and there are no blockers). The score starts at 100 and is reduced by missing
+required env keys, missing core modules, pending deployment-checklist items, and a fraction of the risk score.
+Resolve `blockers` first, then re-scan.
+
+## How to interpret the risk score
+
+`/score/risk` returns `riskScorePreview` (0 best … 100 worst) and `riskLevelPreview` (`low` < 30,
+`medium` 30–59, `high` ≥ 60). Signals include missing required env, broken references, duplicate route mounts,
+duplicate dashboard links, public-asset PII/secret findings, and dangerous package scripts.
+
+## Recommended production next steps
+
+1. Configure all required env keys (`/readiness/env`) and confirm secret presence (`/readiness/secrets`).
+2. Clear safety signals from `/safety/guard-report` (duplicates, broken references, unsafe public pages).
+3. Drive the release readiness score to grade B+ with zero blockers.
+4. Wire `npm run platform-control:check` and `:smoke` into CI as a pre-release gate.
