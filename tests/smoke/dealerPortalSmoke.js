@@ -34,7 +34,10 @@ check('summary works even though no real modules', () => { const s = svc.getDeal
  'getOnboardingPreview', 'getComplianceDocumentPreview', 'getContractPricePreview', 'getTierDiscountPreview',
  'getVolumeDiscountPreview', 'getWarehouseStockPreview', 'getBranchStockPreview', 'getOutstandingStatementPreview',
  'getCreditRiskPreview', 'getRebateIncentivePreview', 'getTargetAchievementPreview', 'getLeaderboardPreview',
- 'getTerritoryPerformancePreview', 'getRiskScorePreview', 'getAnalyticsPreview'].forEach((fn) => {
+ 'getTerritoryPerformancePreview', 'getRiskScorePreview', 'getAnalyticsPreview',
+ // ---- v2 getters ----
+ 'getBusinessVerificationPreview', 'getPromotionEligibilityPreview', 'getRegionStockPreview',
+ 'getDeliveryEtaRiskPreview', 'getClaimPipelinePreview'].forEach((fn) => {
   check(`${fn} safe`, () => { const r = svc[fn]({}); assertSafe(r, fn); return 'safe'; });
 });
 
@@ -70,6 +73,29 @@ check('no full PII in advanced aggregate blob', () => {
     br: svc.getBranchStockPreview({}), statement: svc.getOutstandingStatementPreview({}), crk: svc.getCreditRiskPreview({}),
     lead: svc.createLeadRegistrationPreview({ company: 'X' }), leaderboard: svc.getLeaderboardPreview({}),
     ai: svc.createAiInsightPreview({}), analytics: svc.getAnalyticsPreview({}), dsp: svc.createDisputePreview({ invoiceId: 'inv_1' }),
+  });
+  assert(!red.hasLeak(blob), 'leak detected');
+  return 'clean';
+});
+
+// ---- v2: Distributor B2B Commerce OS action previews ----
+check('status advancedFeaturesEnabledPreview true', () => { const s = svc.getDealerPortalStatus(); assert(s.advancedFeaturesEnabledPreview === true, 'flag'); return 'ok'; });
+check('business verification safe (no mutation/download)', () => { const r = svc.getBusinessVerificationPreview({}); assertSafe(r, 'bv'); assert(r.liveVerificationMutation === false && r.liveDocumentDownload === false, 'live'); return r.verificationStatusPreview; });
+check('price protection safe (no price mutation)', () => { const r = svc.createPriceProtectionPreview({ productId: 'prod_1' }); assertSafe(r, 'pp'); assert(r.livePriceMutation === false, 'live'); return 'safe'; });
+check('promotion eligibility safe (no promotion mutation)', () => { const r = svc.getPromotionEligibilityPreview({}); assertSafe(r, 'promo'); assert(r.livePromotionMutation === false, 'live'); return `${r.promotionEligibilityPreview.length} promos`; });
+check('region stock safe (no stock mutation/reservation)', () => { const r = svc.getRegionStockPreview({}); assertSafe(r, 'region'); assert(r.liveStockMutation === false && r.liveStockReservation === false, 'live'); return 'safe'; });
+check('cart risk safe (no order/stock/credit mutation)', () => { const r = svc.createCartRiskPreview({ items: [{ productId: 'prod_2', qty: 5 }] }); assertSafe(r, 'cart'); assert(r.liveOrderCreation === false && r.liveStockMutation === false && r.liveCreditMutation === false, 'live'); return r.cartRiskLevelPreview; });
+check('dealer quote comparison safe (no quote mutation)', () => { const r = svc.createDealerQuoteComparisonPreview({ productId: 'prod_1' }); assertSafe(r, 'qc'); assert(r.liveQuoteMutation === false, 'live'); return r.bestOptionPreview; });
+check('delivery ETA risk safe (no delivery/shipment mutation)', () => { const r = svc.getDeliveryEtaRiskPreview({}); assertSafe(r, 'eta'); assert(r.liveDeliveryMutation === false && r.liveShipmentMutation === false, 'live'); return 'safe'; });
+check('claim pipeline safe (no claim mutation)', () => { const r = svc.getClaimPipelinePreview({}); assertSafe(r, 'clm'); assert(r.liveClaimMutation === false, 'live'); return `${r.claimPipelinePreview.length} claims`; });
+check('catalog item status safe (no mutation)', () => { const r = svc.getCatalogItemStatus({ id: 'prod_1' }); assertSafe(r, 'catItem'); assert(r.livePriceMutation === false && r.liveStockMutation === false, 'live'); return 'safe'; });
+check('redactor masks shipment ref', () => { assert(red.maskShipmentRef('shp_3101') === 'ship_****', 'shipment'); return 'ok'; });
+check('no full PII in v2 aggregate blob', () => {
+  const blob = JSON.stringify({
+    bv: svc.getBusinessVerificationPreview({}), pp: svc.createPriceProtectionPreview({ productId: 'prod_1' }),
+    promo: svc.getPromotionEligibilityPreview({}), region: svc.getRegionStockPreview({}),
+    cart: svc.createCartRiskPreview({ items: [{ productId: 'prod_1', qty: 60 }] }), qc: svc.createDealerQuoteComparisonPreview({ productId: 'prod_1' }),
+    eta: svc.getDeliveryEtaRiskPreview({}), clm: svc.getClaimPipelinePreview({}), catItem: svc.getCatalogItemStatus({ id: 'prod_1' }),
   });
   assert(!red.hasLeak(blob), 'leak detected');
   return 'clean';

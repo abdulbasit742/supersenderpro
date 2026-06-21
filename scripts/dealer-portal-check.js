@@ -26,6 +26,10 @@ const LIB = [
   'targetAchievementPreview.js', 'leaderboardPreview.js', 'territoryPerformancePreview.js', 'channelConflictPreview.js',
   'leadRegistrationPreview.js', 'dealRegistrationPreview.js', 'riskScorePreview.js', 'analyticsPreview.js',
   'aiInsightPreview.js', 'moduleAdapters.js',
+  // ---- v2 ----
+  'businessVerificationPreview.js', 'priceProtectionPreview.js', 'promotionEligibilityPreview.js',
+  'regionStockPreview.js', 'cartRiskPreview.js', 'dealerQuoteComparisonPreview.js', 'deliveryEtaRiskPreview.js',
+  'dealerClaimPipelinePreview.js',
 ];
 LIB.forEach((f) => add(`file lib/dealerPortal/${f}`, exists(`lib/dealerPortal/${f}`)));
 ['routes/dealerPortalRoutes.js', 'public/dealer-portal.html', 'public/js/dealer-portal.js', 'public/css/dealer-portal.css']
@@ -54,7 +58,10 @@ try {
     'getOutstandingStatementPreview', 'getCreditRiskPreview', 'createDisputePreview', 'getRebateIncentivePreview',
     'getTargetAchievementPreview', 'getLeaderboardPreview', 'getTerritoryPerformancePreview',
     'createChannelConflictPreview', 'createLeadRegistrationPreview', 'createDealRegistrationPreview',
-    'getRiskScorePreview', 'getAnalyticsPreview', 'createAiInsightPreview'];
+    'getRiskScorePreview', 'getAnalyticsPreview', 'createAiInsightPreview',
+    'getBusinessVerificationPreview', 'createPriceProtectionPreview', 'getPromotionEligibilityPreview',
+    'getRegionStockPreview', 'createCartRiskPreview', 'createDealerQuoteComparisonPreview',
+    'getDeliveryEtaRiskPreview', 'getClaimPipelinePreview', 'getCatalogItemStatus'];
   add('all service functions exported', fns.every((f) => typeof svc[f] === 'function'), fns.filter((f) => typeof svc[f] !== 'function').join(',') || 'all present');
 
   const status = svc.getDealerPortalStatus();
@@ -107,7 +114,27 @@ try {
   const rsk = svc.getRiskScorePreview({});
   add('risk score no external call', rsk.externalCallsEnabled === false);
 
+  // ---- v2 advanced safety checks ----
+  add('redactor masks shipment ref', red.maskShipmentRef('shp_3101') === 'ship_****', red.maskShipmentRef('shp_3101'));
+  add('status advancedFeaturesEnabledPreview true', status.advancedFeaturesEnabledPreview === true);
+  const bv = svc.getBusinessVerificationPreview({});
+  add('business verification no live mutation/download', bv.liveVerificationMutation === false && bv.liveDocumentDownload === false);
+  const pp = svc.createPriceProtectionPreview({ productId: 'prod_1' });
+  add('price protection livePriceMutation false', pp.livePriceMutation === false);
+  const cart = svc.createCartRiskPreview({ items: [{ productId: 'prod_2', qty: 5 }] });
+  add('cart risk no live order/stock/credit mutation', cart.liveOrderCreation === false && cart.liveStockMutation === false && cart.liveCreditMutation === false);
+  const qc = svc.createDealerQuoteComparisonPreview({ productId: 'prod_1' });
+  add('quote comparison liveQuoteMutation false', qc.liveQuoteMutation === false);
+  const eta = svc.getDeliveryEtaRiskPreview({});
+  add('delivery ETA risk no live mutation', eta.liveDeliveryMutation === false && eta.liveShipmentMutation === false);
+  const cp2 = svc.getClaimPipelinePreview({});
+  add('claim pipeline liveClaimMutation false', cp2.liveClaimMutation === false);
+  const catItem = svc.getCatalogItemStatus({ id: 'prod_1' });
+  add('catalog item status no mutation', catItem.livePriceMutation === false && catItem.liveStockMutation === false);
+
   leakBlob = JSON.stringify({ status, bulk, quote, inv, cr, doc, msg, sum, dyn, imp, qn, crk, dsp, lead, ch, ai, rsk,
+    bv, pp, cart, qc, eta, cp2, catItem,
+    promo: svc.getPromotionEligibilityPreview({}), region: svc.getRegionStockPreview({}),
     catalog: svc.getCatalogPreview({}), price: svc.getDealerPriceListPreview({}), orders: svc.listOrders({}), audit: svc.getAuditPreview(),
     warehouse: svc.getWarehouseStockPreview({}), branch: svc.getBranchStockPreview({}), statement: svc.getOutstandingStatementPreview({}),
     leaderboard: svc.getLeaderboardPreview({}), analytics: svc.getAnalyticsPreview({}) });

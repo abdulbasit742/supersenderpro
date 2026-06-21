@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-21T10:37:06.856Z",
-  "passed": 97,
+  "generatedAt": "2026-06-21T11:16:32.834Z",
+  "passed": 114,
   "failed": 0,
-  "total": 97,
+  "total": 114,
   "strict": "false",
   "checks": [
     {
@@ -311,6 +311,46 @@
       "detail": ""
     },
     {
+      "name": "file lib/dealerPortal/businessVerificationPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/priceProtectionPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/promotionEligibilityPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/regionStockPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/cartRiskPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/dealerQuoteComparisonPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/deliveryEtaRiskPreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/dealerPortal/dealerClaimPipelinePreview.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
       "name": "file routes/dealerPortalRoutes.js",
       "ok": true,
       "detail": ""
@@ -482,6 +522,51 @@
     },
     {
       "name": "risk score no external call",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "redactor masks shipment ref",
+      "ok": true,
+      "detail": "ship_****"
+    },
+    {
+      "name": "status advancedFeaturesEnabledPreview true",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "business verification no live mutation/download",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "price protection livePriceMutation false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "cart risk no live order/stock/credit mutation",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "quote comparison liveQuoteMutation false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "delivery ETA risk no live mutation",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "claim pipeline liveClaimMutation false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "catalog item status no mutation",
       "ok": true,
       "detail": ""
     },

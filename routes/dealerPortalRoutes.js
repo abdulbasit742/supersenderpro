@@ -134,4 +134,15 @@ router.get('/risk-score', safe(() => svc.getRiskScorePreview({})));
 router.get('/analytics', safe(() => svc.getAnalyticsPreview({})));
 router.post('/ai-insight-preview', safe((req) => svc.createAiInsightPreview(body(req))));
 
+/* ---- v2: Distributor B2B Commerce OS routes (preview-only) ---- */
+router.get('/business-verification', safe(() => svc.getBusinessVerificationPreview({})));
+router.get('/catalog/:id/status', safe((req) => svc.getCatalogItemStatus(withId(req))));
+router.post('/price-protection-preview', safe((req) => svc.createPriceProtectionPreview(body(req))));
+router.get('/promotion-eligibility', safe(() => svc.getPromotionEligibilityPreview({})));
+router.get('/region-stock', safe(() => svc.getRegionStockPreview({})));
+router.post('/cart-risk-preview', safe((req) => svc.createCartRiskPreview(body(req))));
+router.post('/dealer-quote-comparison-preview', safe((req) => svc.createDealerQuoteComparisonPreview(body(req))));
+router.get('/delivery-eta-risk', safe(() => svc.getDeliveryEtaRiskPreview({})));
+router.get('/claim-pipeline', safe(() => svc.getClaimPipelinePreview({})));
+
 module.exports = router;

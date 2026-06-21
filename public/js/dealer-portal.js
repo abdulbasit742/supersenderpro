@@ -195,6 +195,42 @@ async function loadAdvanced() {
     : '<div class="dp-empty">No AI insight preview.</div>';
 }
 
+// ---- v2: Distributor B2B Commerce OS sections ----
+async function loadAdvanced2() {
+  const [verification, priceProt, promos, region, eta, claims, cart, quoteCompare] = await Promise.all([
+    api('/business-verification'), api('/price-protection-preview', 'POST', { productId: 'prod_1' }),
+    api('/promotion-eligibility'), api('/region-stock'), api('/delivery-eta-risk'), api('/claim-pipeline'),
+    api('/cart-risk-preview', 'POST', { items: [{ productId: 'prod_1', qty: 60 }, { productId: 'prod_2', qty: 5 }] }),
+    api('/dealer-quote-comparison-preview', 'POST', { productId: 'prod_1' }),
+  ]);
+
+  $('#dp-verification').innerHTML = (verification && verification.ok)
+    ? `<div class="dp-row"><span>Status</span>${badge(verification.verificationStatusPreview, statusClass(verification.verificationStatusPreview))}</div>`
+      + `<div class="dp-row"><span>Business name</span>${badge(verification.businessNameVerifiedPreview ? 'verified' : 'pending', verification.businessNameVerifiedPreview ? 'ok' : 'warn')}</div>`
+      + `<div class="dp-row"><span>Tax</span>${badge(verification.taxVerifiedPreview ? 'verified' : 'pending', verification.taxVerifiedPreview ? 'ok' : 'warn')}</div>`
+      + `<div class="dp-row"><span>Bank</span>${badge(verification.bankVerifiedPreview ? 'verified' : 'pending', verification.bankVerifiedPreview ? 'ok' : 'warn')}</div>`
+    : '<div class="dp-empty">No verification preview.</div>';
+
+  rows('#dp-price-protection', priceProt.priceProtectionPreview, (p) => `<div class="dp-row"><span class="id">${esc(p.productIdPreview)}</span><span>${money(p.oldPricePreview)} → <b>${money(p.newPricePreview)}</b></span>${badge('protected', 'ok')}</div>`);
+  rows('#dp-promotions', promos.promotionEligibilityPreview, (p) => `<div class="dp-row"><span>${esc(p.nameSafe)}</span>${badge(p.eligiblePreview ? 'eligible' : 'not eligible', p.eligiblePreview ? 'ok' : 'warn')}</div>`);
+  rows('#dp-region', region.regionStockPreview, (r) => `<div class="dp-row"><span><b>${esc(r.regionPreview)}</b></span><span>${(r.itemsPreview || []).map((i) => esc(i.productIdPreview) + ':' + esc(i.qtyPreview)).join(' · ')}</span></div>`);
+
+  $('#dp-cart-risk').innerHTML = (cart && cart.ok)
+    ? `<div class="dp-row"><span>Risk level</span>${badge(cart.cartRiskLevelPreview, cart.cartRiskLevelPreview === 'low' ? 'ok' : cart.cartRiskLevelPreview === 'high' ? 'bad' : 'warn')}</div>`
+      + `<div class="dp-row"><span>Subtotal</span><b>${money(cart.cartSubtotalPreview)}</b></div>`
+      + `<div class="dp-row"><span>Credit available</span><b>${money(cart.creditAvailablePreview)}</b></div>`
+      + (cart.riskFlagsPreview || []).map((f) => `<div class="dp-row"><span>${esc(f)}</span>${badge('flag', 'warn')}</div>`).join('')
+    : '<div class="dp-empty">No cart risk preview.</div>';
+
+  $('#dp-quote-compare').innerHTML = (quoteCompare && quoteCompare.ok)
+    ? (quoteCompare.scenariosPreview || []).map((s) => `<div class="dp-row"><span>${esc(s.labelPreview)}</span><b>${money(s.unitPricePreview)}</b></div>`).join('')
+      + `<div class="dp-row"><span>Best</span>${badge(quoteCompare.bestOptionPreview, 'ok')}</div>`
+    : '<div class="dp-empty">No comparison preview.</div>';
+
+  rows('#dp-eta-risk', eta.deliveryEtaRiskPreview, (d) => `<div class="dp-row"><span class="id">${esc(d.deliveryIdPreview)}</span><span>${esc(d.carrierSafe)}</span>${badge('ETA ' + d.etaRiskPreview, d.etaRiskPreview === 'low' ? 'ok' : 'bad')}</div>`);
+  rows('#dp-claim-pipeline', claims.claimPipelinePreview, (c) => `<div class="dp-row"><span class="id">${esc(c.claimIdPreview)}</span><span>${esc(c.typeSafe)}</span>${badge(c.stagePreview, statusClass(c.stagePreview))}</div>`);
+}
+
 // Draft preview actions
 const DRAFTS = {
   bulk: () => api('/bulk-order-draft-preview', 'POST', { items: [{ productId: 'prod_1', qty: 60 }, { productId: 'prod_3', qty: 100 }] }),
@@ -214,6 +250,9 @@ const DRAFTS = {
   deal: () => api('/deal-registration-preview', 'POST', { name: 'Bulk Supply Q3', value: 600000 }),
   channelConflict: () => api('/channel-conflict-preview', 'POST', { region: 'South' }),
   aiInsight: () => api('/ai-insight-preview', 'POST', {}),
+  priceProtection: () => api('/price-protection-preview', 'POST', { productId: 'prod_1' }),
+  cartRisk: () => api('/cart-risk-preview', 'POST', { items: [{ productId: 'prod_1', qty: 60 }, { productId: 'prod_2', qty: 5 }] }),
+  quoteComparison: () => api('/dealer-quote-comparison-preview', 'POST', { productId: 'prod_1' }),
 };
 $$('[data-draft]').forEach((b) => b.addEventListener('click', async () => {
   const out = $('#dp-draft-out');
@@ -229,4 +268,5 @@ $('#dp-lookup-form').addEventListener('submit', (e) => { e.preventDefault(); loa
   await loadStatus();
   await loadAll();
   await loadAdvanced();
+  await loadAdvanced2();
 })();

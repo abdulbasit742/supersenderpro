@@ -1,8 +1,8 @@
 # Dealer Portal Check
 
-Generated: 2026-06-21T10:37:06.856Z
+Generated: 2026-06-21T11:16:32.834Z
 
-**97/97 passed**
+**114/114 passed**
 
 | Check | Result | Detail |
 |---|---|---|
@@ -67,6 +67,14 @@ Generated: 2026-06-21T10:37:06.856Z
 | file lib/dealerPortal/analyticsPreview.js | PASS |  |
 | file lib/dealerPortal/aiInsightPreview.js | PASS |  |
 | file lib/dealerPortal/moduleAdapters.js | PASS |  |
+| file lib/dealerPortal/businessVerificationPreview.js | PASS |  |
+| file lib/dealerPortal/priceProtectionPreview.js | PASS |  |
+| file lib/dealerPortal/promotionEligibilityPreview.js | PASS |  |
+| file lib/dealerPortal/regionStockPreview.js | PASS |  |
+| file lib/dealerPortal/cartRiskPreview.js | PASS |  |
+| file lib/dealerPortal/dealerQuoteComparisonPreview.js | PASS |  |
+| file lib/dealerPortal/deliveryEtaRiskPreview.js | PASS |  |
+| file lib/dealerPortal/dealerClaimPipelinePreview.js | PASS |  |
 | file routes/dealerPortalRoutes.js | PASS |  |
 | file public/dealer-portal.html | PASS |  |
 | file public/js/dealer-portal.js | PASS |  |
@@ -102,4 +110,13 @@ Generated: 2026-06-21T10:37:06.856Z
 | channel conflict liveCrmMutation false | PASS |  |
 | ai insight liveAiCall false + no external call | PASS |  |
 | risk score no external call | PASS |  |
+| redactor masks shipment ref | PASS | ship_**** |
+| status advancedFeaturesEnabledPreview true | PASS |  |
+| business verification no live mutation/download | PASS |  |
+| price protection livePriceMutation false | PASS |  |
+| cart risk no live order/stock/credit mutation | PASS |  |
+| quote comparison liveQuoteMutation false | PASS |  |
+| delivery ETA risk no live mutation | PASS |  |
+| claim pipeline liveClaimMutation false | PASS |  |
+| catalog item status no mutation | PASS |  |
 | no PII/secret leak | PASS |  |
