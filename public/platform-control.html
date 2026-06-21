@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Platform Control · Observability + Safety OS · SuperSender Pro</title>
+  <link rel="stylesheet" href="/css/platform-control.css" />
+</head>
+<body>
+  <div class="wrap">
+    <!-- 1. Hero -->
+    <section class="hero">
+      <h1>Advanced Platform Control + Observability + Safety OS</h1>
+      <p>Read-only, preview-only command center. Scans modules, routes, dashboards, feature flags,
+         environment, integrations, readiness, risk and recommendations — without any live action,
+         external call, send, payment, or secret/PII exposure.</p>
+      <!-- 2. Safety badges -->
+      <div class="badges" id="safety-badges"></div>
+    </section>
+
+    <!-- Toolbar: Preview / Scan only -->
+    <div class="toolbar">
+      <button class="primary" id="btn-refresh">Refresh Status Preview</button>
+      <button id="btn-modules">Scan Modules Preview</button>
+      <button id="btn-routes">Scan Routes Preview</button>
+      <button id="btn-dash">Scan Dashboard Preview</button>
+      <button id="btn-readiness">Scan Readiness Preview</button>
+      <button id="btn-recs">View Recommendations</button>
+      <button id="btn-checks">Preview Check Plan</button>
+      <button id="btn-smoke">Preview Smoke Plan</button>
+    </div>
+
+    <!-- 3-5. Summary + scores -->
+    <div class="card-grid">
+      <div class="card"><h3>System Status</h3><div id="status-card"></div></div>
+      <div class="card"><h3>System Summary</h3><div id="summary-card"></div></div>
+      <div class="card"><h3>Release Readiness Score</h3>
+        <div class="score"><div class="gauge" id="release-gauge"><span>0</span></div><div id="release-meta" style="flex:1"></div></div>
+      </div>
+      <div class="card"><h3>Risk Score</h3>
+        <div class="score"><div class="gauge" id="risk-gauge"><span>0</span></div><div id="risk-meta" style="flex:1"></div></div>
+      </div>
+    </div>
+
+    <!-- 30. Recommendations -->
+    <div class="sec-title">Recommended Next Actions</div>
+    <div class="card full"><h3>Recommendations</h3><div id="recs-card"></div></div>
+
+    <!-- 6-9. Registries -->
+    <div class="sec-title">Registries</div>
+    <div class="card-grid">
+      <div class="card"><h3>Module Registry</h3><div id="modules-card"></div></div>
+      <div class="card"><h3>API Route Inventory</h3><div id="routes-card"></div></div>
+      <div class="card"><h3>Dashboard Pages</h3><div id="pages-card"></div></div>
+      <div class="card"><h3>Feature Flags</h3><div id="flags-card"></div></div>
+    </div>
+
+    <!-- 10-21. Readiness -->
+    <div class="sec-title">Readiness Scanners</div>
+    <div class="card-grid">
+      <div class="card"><h3>Environment</h3><div id="env-card"></div></div>
+      <div class="card"><h3>Secret Presence</h3><div id="secrets-card"></div></div>
+      <div class="card"><h3>WhatsApp</h3><div id="wa-card"></div></div>
+      <div class="card"><h3>WhatsApp Cloud</h3><div id="wac-card"></div></div>
+      <div class="card"><h3>AI Providers</h3><div id="ai-card"></div></div>
+      <div class="card"><h3>RAG / Vector</h3><div id="rag-card"></div></div>
+      <div class="card"><h3>Queue / Worker</h3><div id="queue-card"></div></div>
+      <div class="card"><h3>Database / Storage</h3><div id="db-card"></div></div>
+      <div class="card"><h3>Integration Health</h3><div id="integ-card"></div></div>
+      <div class="card"><h3>Webhooks</h3><div id="webhook-card"></div></div>
+      <div class="card"><h3>Campaigns</h3><div id="campaign-card"></div></div>
+      <div class="card"><h3>Rate Limits</h3><div id="ratelimit-card"></div></div>
+      <div class="card"><h3>Backup / Restore</h3><div id="backup-card"></div></div>
+      <div class="card"><h3>Deployment Checklist</h3><div id="deploy-card"></div></div>
+    </div>
+
+    <!-- 22-29. Safety & quality -->
+    <div class="sec-title">Safety &amp; Quality</div>
+    <div class="card-grid">
+      <div class="card"><h3>Safety Guard Report</h3><div id="safety-card"></div></div>
+      <div class="card"><h3>Broken References</h3><div id="broken-card"></div></div>
+      <div class="card"><h3>Log Preview (redacted)</h3><div id="logs-card"></div></div>
+      <div class="card"><h3>Audit Preview (redacted)</h3><div id="audit-card"></div></div>
+      <div class="card"><h3>Check / Smoke Plan (preview)</h3><div id="checks-card"></div></div>
+    </div>
+
+    <p class="muted" style="margin-top:24px">
+      Platform Control is additive and read-only. It never sends messages, calls external APIs, runs dangerous
+      scripts, exposes secrets, or modifies existing modules. All actions above are previews only.
+    </p>
+  </div>
+  <script src="/js/platform-control.js"></script>
+</body>
+</html>
