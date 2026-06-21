@@ -47,3 +47,6 @@ body{ margin:0; background:var(--bg); color:var(--text); font-family:system-ui,S
 .dp-draft-out{ background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:14px; font-size:13px; white-space:pre-wrap; min-height:20px; display:none; }
 .dp-draft-out.show{ display:block; }
 .dp-footer{ text-align:center; color:var(--muted); font-size:12px; padding:16px 0; }
+
+/* Advanced B2B Commerce Operating System section heading */
+.dp-section-title{ margin:30px 0 4px; font-size:20px; color:var(--text); border-top:1px solid var(--line); padding-top:22px; }

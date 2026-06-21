@@ -17,6 +17,15 @@ const LIB = [
   'shipmentStatusPreview.js', 'returnClaimStatusPreview.js', 'warrantyClaimStatusPreview.js', 'loyaltyStatusPreview.js',
   'contractStatusPreview.js', 'documentRequestPreview.js', 'paymentQueryPreview.js', 'supportRequestPreview.js',
   'messageDrafts.js', 'auditPreview.js', 'redactor.js',
+  // ---- Advanced B2B Commerce Operating System ----
+  'onboardingPreview.js', 'complianceDocumentPreview.js', 'contractPricePreview.js', 'tierDiscountPreview.js',
+  'volumeDiscountPreview.js', 'dynamicPricingPreview.js', 'warehouseStockPreview.js', 'branchStockPreview.js',
+  'bulkImportPreview.js', 'reorderSuggestionPreview.js', 'productSubstitutionPreview.js', 'crossSellUpsellPreview.js',
+  'quoteNegotiationPreview.js', 'quoteApprovalPreview.js', 'backorderPreview.js', 'partialShipmentPreview.js',
+  'statementPreview.js', 'creditRiskPreview.js', 'disputeCenterPreview.js', 'rebateIncentivePreview.js',
+  'targetAchievementPreview.js', 'leaderboardPreview.js', 'territoryPerformancePreview.js', 'channelConflictPreview.js',
+  'leadRegistrationPreview.js', 'dealRegistrationPreview.js', 'riskScorePreview.js', 'analyticsPreview.js',
+  'aiInsightPreview.js', 'moduleAdapters.js',
 ];
 LIB.forEach((f) => add(`file lib/dealerPortal/${f}`, exists(`lib/dealerPortal/${f}`)));
 ['routes/dealerPortalRoutes.js', 'public/dealer-portal.html', 'public/js/dealer-portal.js', 'public/css/dealer-portal.css']
@@ -37,7 +46,15 @@ try {
     'createQuotationRequestPreview', 'getOrderStatusPreview', 'getInvoicePaymentStatusPreview', 'getCreditLimitPreview',
     'getOutstandingBalancePreview', 'getCommissionMarginPreview', 'getReturnClaimStatusPreview', 'getWarrantyClaimStatusPreview',
     'getLoyaltyStatusPreview', 'getContractStatusPreview', 'createDocumentRequestPreview', 'createPaymentQueryPreview',
-    'createSupportRequestPreview', 'createMessageDraftPreview', 'getAuditPreview'];
+    'createSupportRequestPreview', 'createMessageDraftPreview', 'getAuditPreview',
+    'getOnboardingPreview', 'getComplianceDocumentPreview', 'getContractPricePreview', 'getTierDiscountPreview',
+    'getVolumeDiscountPreview', 'createDynamicPricingPreview', 'getWarehouseStockPreview', 'getBranchStockPreview',
+    'createBulkImportPreview', 'createReorderSuggestionPreview', 'createProductSubstitutionPreview',
+    'createCrossSellUpsellPreview', 'createQuoteNegotiationPreview', 'createQuoteApprovalPreview',
+    'getOutstandingStatementPreview', 'getCreditRiskPreview', 'createDisputePreview', 'getRebateIncentivePreview',
+    'getTargetAchievementPreview', 'getLeaderboardPreview', 'getTerritoryPerformancePreview',
+    'createChannelConflictPreview', 'createLeadRegistrationPreview', 'createDealRegistrationPreview',
+    'getRiskScorePreview', 'getAnalyticsPreview', 'createAiInsightPreview'];
   add('all service functions exported', fns.every((f) => typeof svc[f] === 'function'), fns.filter((f) => typeof svc[f] !== 'function').join(',') || 'all present');
 
   const status = svc.getDealerPortalStatus();
@@ -70,8 +87,30 @@ try {
   const sum = svc.getDealerSummaryPreview({});
   add('summary piiMasked true + works without modules', sum.piiMasked === true);
 
-  leakBlob = JSON.stringify({ status, bulk, quote, inv, cr, doc, msg, sum,
-    catalog: svc.getCatalogPreview({}), price: svc.getDealerPriceListPreview({}), orders: svc.listOrders({}), audit: svc.getAuditPreview() });
+  // ---- Advanced B2B Commerce Operating System safety checks ----
+  const dyn = svc.createDynamicPricingPreview({ productId: 'prod_1', qty: 120 });
+  add('dynamic pricing livePriceMutation false', dyn.livePriceMutation === false);
+  const imp = svc.createBulkImportPreview({ csv: 'productId,qty\nprod_1,60' });
+  add('bulk import liveImport false', imp.liveImport === false && imp.liveOrderCreation === false);
+  const qn = svc.createQuoteNegotiationPreview({ requestedDiscount: 15 });
+  add('quote negotiation liveQuoteMutation false', qn.liveQuoteMutation === false && qn.liveApprovalMutation === false);
+  const crk = svc.getCreditRiskPreview({});
+  add('credit risk liveCreditMutation false', crk.liveCreditMutation === false);
+  const dsp = svc.createDisputePreview({ invoiceId: 'inv_2001', reason: 'x' });
+  add('dispute liveDisputeCreation false', dsp.liveDisputeCreation === false && dsp.liveInvoiceMutation === false);
+  const lead = svc.createLeadRegistrationPreview({ company: 'X' });
+  add('lead registration liveLeadCreation false', lead.liveLeadCreation === false && lead.liveCrmMutation === false);
+  const ch = svc.createChannelConflictPreview({ region: 'South' });
+  add('channel conflict liveCrmMutation false', ch.liveCrmMutation === false && ch.liveAssignmentMutation === false);
+  const ai = svc.createAiInsightPreview({});
+  add('ai insight liveAiCall false + no external call', ai.liveAiCall === false && ai.externalCallsEnabled === false);
+  const rsk = svc.getRiskScorePreview({});
+  add('risk score no external call', rsk.externalCallsEnabled === false);
+
+  leakBlob = JSON.stringify({ status, bulk, quote, inv, cr, doc, msg, sum, dyn, imp, qn, crk, dsp, lead, ch, ai, rsk,
+    catalog: svc.getCatalogPreview({}), price: svc.getDealerPriceListPreview({}), orders: svc.listOrders({}), audit: svc.getAuditPreview(),
+    warehouse: svc.getWarehouseStockPreview({}), branch: svc.getBranchStockPreview({}), statement: svc.getOutstandingStatementPreview({}),
+    leaderboard: svc.getLeaderboardPreview({}), analytics: svc.getAnalyticsPreview({}) });
   add('no PII/secret leak', !red.hasLeak(leakBlob));
 } catch (e) {
   add('functional pipeline', false, e.message);
