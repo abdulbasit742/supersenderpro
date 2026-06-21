@@ -3144,6 +3144,19 @@ try {
 }
 // END FRANCHISE PORTAL HOOK
 
+// BEGIN REVENUE OPS HOOK
+// Revenue Operations + Sales Pipeline Command Center (dry-run, preview-only, read-only:
+// no live sends, no Meta/AI/payment calls, no CRM/deal/customer mutation, PII masked).
+try {
+  const revenueOpsRoutes = require('./routes/revenueOpsRoutes');
+  app.use('/api/revenue-ops', revenueOpsRoutes);
+  app.get('/revenue-ops.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'revenue-ops.html')));
+  console.log('[RevenueOps] mounted at /api/revenue-ops (dry-run, preview-only, no live actions)');
+} catch (e) {
+  console.error('[RevenueOps] failed to initialise (non-fatal):', e.message);
+}
+// END REVENUE OPS HOOK
+
 
 let searchIndexRebuildTimer = null;
 function scheduleSearchIndexRebuild(reason = 'data-change', delayMs = Number(process.env.SEARCH_REBUILD_DEBOUNCE_MS || 30000)) {
