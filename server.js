@@ -3132,6 +3132,18 @@ try {
 }
 // END VENDOR PORTAL HOOK
 
+// BEGIN FRANCHISE PORTAL HOOK
+// Franchise/Branch Partner Portal + Multi-Outlet Self-Service Center (preview-only: no live order/stock/royalty/payment/fund mutation, no live send, PII masked, no external calls).
+try {
+  const franchisePortalRoutes = require('./routes/franchisePortalRoutes');
+  app.use('/api/franchise-portal', franchisePortalRoutes);
+  app.get('/franchise-portal.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'franchise-portal.html')));
+  console.log('[FranchisePortal] mounted at /api/franchise-portal (preview-only, PII masked, no live actions)');
+} catch (e) {
+  console.error('[FranchisePortal] failed to initialise (non-fatal):', e.message);
+}
+// END FRANCHISE PORTAL HOOK
+
 
 let searchIndexRebuildTimer = null;
 function scheduleSearchIndexRebuild(reason = 'data-change', delayMs = Number(process.env.SEARCH_REBUILD_DEBOUNCE_MS || 30000)) {
