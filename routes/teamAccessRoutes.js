@@ -43,7 +43,7 @@ router.get('/matrix', safe(()=>({ ok:true, matrix:T.matrix.matrix() })));
 router.post('/roles/:id/permission-preview', safe((req)=>T.roles.permissionChangePreview(req.params.id, (req.body||{}).add||[], (req.body||{}).remove||[])));
 
 // Access checks
-router.post('/check', safe((req)=>({ ok:true, decision:T.evaluator.evaluate(req.body||{}) })));
+router.post('/check', safe((req)=>{ const decision=T.evaluator.evaluate(req.body||{}); if(String((req.query||{}).record)==='true') T.accessHistory.record(decision,{ kind:'api_check' }); return { ok:true, decision }; }));
 router.post('/check/tenant', safe((req)=>({ ok:true, decision:T.evaluator.checkTenant(req.body||{}) })));
 router.post('/check/reseller', safe((req)=>({ ok:true, decision:T.evaluator.checkReseller(req.body||{}) })));
 router.post('/check/risky-action', safe((req)=>({ ok:true, decision:T.riskyActionGate.check(req.body||{}) })));
@@ -57,6 +57,16 @@ router.post('/workspaces/:id/invite-draft', safe((req)=>T.invites.create({ ...(r
 router.get('/invites', safe((req)=>({ ok:true, invites:T.invites.list(Number(req.query.limit)||100) })));
 router.get('/invites/:id', safe((req)=>{ const i=T.invites.get(req.params.id); return i?{ ok:true, invite:i }:{ ok:false, error:'not_found' }; }));
 router.post('/invites/:id/cancel-preview', safe((req)=>T.invites.cancelPreview(req.params.id)));
+
+// Seat-limit monitor (preview upgrade recommendations)
+router.get('/seat-warnings', safe(()=>({ ok:true, summary:T.seatLimitMonitor.summary(), warnings:T.seatLimitMonitor.warnings() })));
+router.get('/seat-scan', safe(()=>({ ok:true, scan:T.seatLimitMonitor.scan() })));
+
+// Bulk access checks
+router.post('/check/bulk', safe((req)=>T.bulkAccess.checkMany((req.body||{}).items||[])));
+
+// Redacted access-decision history (local, gitignored)
+router.get('/history', safe((req)=>({ ok:true, history:T.accessHistory.list(Number(req.query.limit)||100) })));
 
 // Flow nodes (metadata only)
 router.get('/flow-nodes', safe(()=>({ ok:true, ...T.flowNodes.registry() })));

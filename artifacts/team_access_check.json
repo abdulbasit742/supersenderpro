@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-20T12:47:17.125Z",
-  "passed": 40,
+  "generatedAt": "2026-06-21T07:25:34.676Z",
+  "passed": 48,
   "failed": 0,
-  "total": 40,
+  "total": 48,
   "strict": "false",
   "checks": [
     {
@@ -52,6 +52,21 @@
     },
     {
       "name": "file lib/teamAccess/riskyActionGate.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/teamAccess/seatLimitMonitor.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/teamAccess/accessHistory.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file lib/teamAccess/bulkAccess.js",
       "ok": true,
       "detail": ""
     },
@@ -192,6 +207,31 @@
     },
     {
       "name": "live invites disabled",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "seat monitor summary works",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "seat monitor scan returns rows",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "bulk access check (1 allow / 1 block)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "access history record (redacted)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "access history list",
       "ok": true,
       "detail": ""
     },

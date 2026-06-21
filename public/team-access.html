@@ -20,6 +20,7 @@
   <button class="ta-tab" data-tab="checker">Access Checker</button>
   <button class="ta-tab" data-tab="seats">Seat Usage</button>
   <button class="ta-tab" data-tab="invites">Invite Drafts</button>
+  <button class="ta-tab" data-tab="monitor">Seat Monitor</button>
   <button class="ta-tab" data-tab="safety">Safety</button>
 </nav>
 
@@ -72,6 +73,17 @@
     <pre id="inv-result" class="ta-result"></pre>
     <div class="table-wrapper"><table id="ta-invites"><thead><tr>
       <th>ID</th><th>Workspace</th><th>Role</th><th>Email</th><th>Status</th><th>Expires</th>
+    </tr></thead><tbody></tbody></table></div>
+  </section>
+
+  <section id="monitor" class="ta-panel">
+    <div class="ta-cards" id="ta-monitor-cards"></div>
+    <div class="table-wrapper"><table id="ta-seat-warnings"><thead><tr>
+      <th>Business</th><th>Plan</th><th>Seats</th><th>Level</th><th>Upgrade preview</th>
+    </tr></thead><tbody></tbody></table></div>
+    <h4 style="margin:18px 0 6px">Recent access history (redacted)</h4>
+    <div class="table-wrapper"><table id="ta-history"><thead><tr>
+      <th>When</th><th>Role</th><th>Permission</th><th>Allowed</th><th>Approval</th>
     </tr></thead><tbody></tbody></table></div>
   </section>
 

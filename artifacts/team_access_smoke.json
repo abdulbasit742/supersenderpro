@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-20T12:47:16.864Z",
-  "passed": 21,
+  "generatedAt": "2026-06-21T07:25:34.580Z",
+  "passed": 24,
   "failed": 0,
-  "total": 21,
+  "total": 24,
   "results": [
     {
       "name": "require workspace registry",
@@ -57,7 +57,7 @@
     {
       "name": "create sample workspace",
       "pass": true,
-      "detail": "ws_2w4twjrbll"
+      "detail": "ws_51as8gpgiy"
     },
     {
       "name": "create sample member (masked)",
@@ -103,6 +103,21 @@
       "name": "risky action blocked (preview)",
       "pass": true,
       "detail": "preview"
+    },
+    {
+      "name": "seat limit monitor summary",
+      "pass": true,
+      "detail": "total=1"
+    },
+    {
+      "name": "bulk access check",
+      "pass": true,
+      "detail": "1/1"
+    },
+    {
+      "name": "access history record + list",
+      "pass": true,
+      "detail": "recorded"
     },
     {
       "name": "no phone/email/token leaks",

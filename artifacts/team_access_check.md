@@ -1,8 +1,8 @@
 # Team Access Check
 
-Generated: 2026-06-20T12:47:17.125Z
+Generated: 2026-06-21T07:25:34.676Z
 
-**40/40 passed**
+**48/48 passed**
 
 | Check | Result | Detail |
 |---|---|---|
@@ -16,6 +16,9 @@ Generated: 2026-06-20T12:47:17.125Z
 | file lib/teamAccess/seatLimits.js | ✅ |  |
 | file lib/teamAccess/inviteDrafts.js | ✅ |  |
 | file lib/teamAccess/riskyActionGate.js | ✅ |  |
+| file lib/teamAccess/seatLimitMonitor.js | ✅ |  |
+| file lib/teamAccess/accessHistory.js | ✅ |  |
+| file lib/teamAccess/bulkAccess.js | ✅ |  |
 | file routes/teamAccessRoutes.js | ✅ |  |
 | file public/team-access.html | ✅ |  |
 | file public/js/team-access.js | ✅ |  |
@@ -44,5 +47,10 @@ Generated: 2026-06-20T12:47:17.125Z
 | risky action blocked (preview only) | ✅ |  |
 | auth write disabled | ✅ |  |
 | live invites disabled | ✅ |  |
+| seat monitor summary works | ✅ |  |
+| seat monitor scan returns rows | ✅ |  |
+| bulk access check (1 allow / 1 block) | ✅ |  |
+| access history record (redacted) | ✅ |  |
+| access history list | ✅ |  |
 | report generated | ✅ |  |
 | no secret/PII/token leak in report | ✅ |  |

@@ -43,3 +43,10 @@ npm run team-access:smoke
 
 ## What NOT to commit
 `.env`, `data/team-access*.json`, `data/team-invites*.json`, raw member/invite data, tokens, secrets. See `.gitignore`.
+
+
+## Added features (v2)
+- **Seat-limit monitor** (`lib/teamAccess/seatLimitMonitor.js`): scans all workspaces, flags `near` (>=80% of cap) and `exceeded` seats with upgrade previews. API: `GET /api/team-access/seat-warnings`, `GET /api/team-access/seat-scan`.
+- **Bulk access checks** (`lib/teamAccess/bulkAccess.js`): evaluate many permission checks at once. API: `POST /api/team-access/check/bulk` with `{ items:[...] }`.
+- **Redacted access history** (`lib/teamAccess/accessHistory.js`): local, gitignored, redacted decision trail. API: `GET /api/team-access/history`; `POST /check?record=true` records a redacted entry.
+- **Dashboard Seat Monitor tab**: seat-warning cards/table + recent redacted access history.

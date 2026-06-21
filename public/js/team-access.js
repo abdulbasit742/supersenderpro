@@ -81,4 +81,18 @@ async function loadInvites(){
   $('#ta-invites tbody').innerHTML=(invites||[]).map(i=>`<tr><td>${i.id}</td><td>${i.workspaceId}</td><td>${i.roleId}</td>
     <td>${i.emailMasked||'-'}</td><td>${i.status}</td><td>${(i.expiresAtPreview||'').slice(0,10)}</td></tr>`).join('')||'<tr><td colspan=6>No invite drafts</td></tr>';
 }
-(async function init(){ try{ await loadOverview(); await loadRolesIntoSelect(); await loadInvites(); }catch(e){ console.error('[TeamAccess]',e); } })();
+
+async function loadMonitor(){
+  const sw=await api('/seat-warnings');
+  const cards=[['Workspaces', sw.summary?sw.summary.total:'-'],['OK', sw.summary?sw.summary.ok:'-'],
+    ['Near limit', sw.summary?sw.summary.near:'-'],['Exceeded', sw.summary?sw.summary.exceeded:'-']];
+  $('#ta-monitor-cards').innerHTML=cards.map(([k,v])=>`<div class="ta-card"><div class="k">${k}</div><div class="v">${v??'-'}</div></div>`).join('');
+  $('#ta-seat-warnings tbody').innerHTML=(sw.warnings||[]).map(w=>`<tr><td>${w.businessName}</td><td>${w.planId}</td>
+    <td>${w.activeSeats}/${w.seatLimit??'∞'}</td><td>${pill(w.level, w.level==='exceeded'?'bad':'warn')}</td>
+    <td>${w.upgradeRecommendation||'-'}</td></tr>`).join('')||'<tr><td colspan=5>No seat warnings</td></tr>';
+  const h=await api('/history?limit=50');
+  $('#ta-history tbody').innerHTML=(h.history||[]).map(e=>`<tr><td>${(e.at||'').slice(0,19).replace('T',' ')}</td>
+    <td>${e.roleId||'-'}</td><td>${e.permission||'-'}</td><td>${e.allowed?pill('yes','ok'):pill('no','bad')}</td>
+    <td>${e.approvalRequired?'required':'-'}</td></tr>`).join('')||'<tr><td colspan=5>No history yet</td></tr>';
+}
+(async function init(){ try{ await loadOverview(); await loadRolesIntoSelect(); await loadInvites(); await loadMonitor(); }catch(e){ console.error('[TeamAccess]',e); } })();

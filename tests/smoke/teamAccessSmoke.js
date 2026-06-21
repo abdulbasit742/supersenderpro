@@ -26,7 +26,10 @@ check('dryRun true',()=>{ assert(inv.invite.dryRun===true,'not dry-run'); return
 check('live invite disabled',()=>{ assert(T.flags.allowLiveInvites===false&&inv.liveInviteSent===false,'live invite enabled'); return 'disabled'; });
 check('auth write disabled',()=>{ assert(T.flags.allowAuthWrite===false&&inv.realUserCreated===false,'auth write enabled'); return 'disabled'; });
 check('risky action blocked (preview)',()=>{ const r=T.riskyActionGate.check({ actionType:'channel_live_publish', roleId:'sales_agent', workspaceId:ws.id }); assert(r.liveActionAllowed===false,'live action allowed'); return 'preview'; });
-check('no phone/email/token leaks',()=>{ const blob=JSON.stringify({ ws, mem, inv, dash:T.dashboard(), rep:T.report() }); assert(!T.privacyGuard.hasLeak(blob),'leak detected'); return 'clean'; });
+check('seat limit monitor summary',()=>{ const m=T.seatLimitMonitor.summary(); assert(typeof m.total==='number','no summary'); return `total=${m.total}`; });
+check('bulk access check',()=>{ const b=T.bulkAccess.checkMany([{ roleId:'viewer', permission:'dashboard.view' },{ roleId:'support_agent', permission:'billing.manage' }]); assert(b.allowed===1&&b.blocked===1,'bulk mismatch'); return `${b.allowed}/${b.blocked}`; });
+check('access history record + list',()=>{ T.accessHistory.record({ permission:'dashboard.view', roleId:'viewer', allowed:true, workspaceId:ws.id },{ kind:'smoke' }); assert(Array.isArray(T.accessHistory.list(5)),'no history'); return 'recorded'; });
+check('no phone/email/token leaks',()=>{ const blob=JSON.stringify({ ws, mem, inv, dash:T.dashboard(), rep:T.report(), mon:T.seatLimitMonitor.scan(), hist:T.accessHistory.list(20) }); assert(!T.privacyGuard.hasLeak(blob),'leak detected'); return 'clean'; });
 
 const passed=results.filter(r=>r.pass).length, failed=results.filter(r=>!r.pass).length;
 const out={generatedAt:new Date().toISOString(),passed,failed,total:results.length,results};

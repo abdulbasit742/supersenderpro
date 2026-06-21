@@ -6,7 +6,7 @@ const checks=[]; const add=(n,ok,d='')=>checks.push({name:n,ok:!!ok,detail:d}); 
 
 ['lib/teamAccess/index.js','lib/teamAccess/store.js','lib/teamAccess/workspaceRegistry.js','lib/teamAccess/teamMemberRegistry.js',
  'lib/teamAccess/roleRegistry.js','lib/teamAccess/permissionMatrix.js','lib/teamAccess/accessEvaluator.js','lib/teamAccess/seatLimits.js',
- 'lib/teamAccess/inviteDrafts.js','lib/teamAccess/riskyActionGate.js','routes/teamAccessRoutes.js',
+ 'lib/teamAccess/inviteDrafts.js','lib/teamAccess/riskyActionGate.js','lib/teamAccess/seatLimitMonitor.js','lib/teamAccess/accessHistory.js','lib/teamAccess/bulkAccess.js','routes/teamAccessRoutes.js',
  'public/team-access.html','public/js/team-access.js','public/css/team-access.css'].forEach(f=>add(`file ${f}`, exists(f)));
 
 add('server hook present', exists('server.js')&&fs.readFileSync(path.join(ROOT,'server.js'),'utf8').includes('TEAM ACCESS HOOK'));
@@ -39,6 +39,13 @@ try{
   add('risky action blocked (preview only)', risky.ok===true&&risky.liveActionAllowed===false);
   add('auth write disabled', T.flags.allowAuthWrite===false);
   add('live invites disabled', T.flags.allowLiveInvites===false);
+  const mon=T.seatLimitMonitor.summary(); add('seat monitor summary works', typeof mon.total==='number'&&typeof mon.near==='number');
+  const scan=T.seatLimitMonitor.scan(); add('seat monitor scan returns rows', Array.isArray(scan));
+  const bulk=T.bulkAccess.checkMany([{ roleId:'viewer', permission:'dashboard.view' },{ roleId:'support_agent', permission:'billing.manage' }]);
+  add('bulk access check (1 allow / 1 block)', bulk.ok===true&&bulk.allowed===1&&bulk.blocked===1);
+  const hist=T.accessHistory.record({ permission:'dashboard.view', roleId:'viewer', allowed:true, workspaceId:'ws_demo' },{ kind:'check' });
+  add('access history record (redacted)', hist.ok===true&&hist.recorded===true);
+  add('access history list', Array.isArray(T.accessHistory.list(10)));
   report=T.report(); add('report generated', report.ok===true&&Array.isArray(report.roles));
   add('no secret/PII/token leak in report', !T.privacyGuard.hasLeak(report));
 }catch(e){ add('functional pipeline', false, e.message); }

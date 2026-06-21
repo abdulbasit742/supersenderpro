@@ -1,8 +1,8 @@
 # Team Access Smoke Test
 
-Generated: 2026-06-20T12:47:16.864Z
+Generated: 2026-06-21T07:25:34.580Z
 
-**21/21 passed** — all passed ✅
+**24/24 passed** — all passed ✅
 
 | # | Check | Result | Detail |
 |---|---|---|---|
@@ -16,7 +16,7 @@ Generated: 2026-06-20T12:47:16.864Z
 | 8 | require risky action gate | ✅ | ok |
 | 9 | require route module | ✅ | loaded |
 | 10 | barrel loads | ✅ | ok |
-| 11 | create sample workspace | ✅ | ws_2w4twjrbll |
+| 11 | create sample workspace | ✅ | ws_51as8gpgiy |
 | 12 | create sample member (masked) | ✅ | masked |
 | 13 | evaluate dashboard.view allowed | ✅ | allowed |
 | 14 | billing.manage blocked for support agent | ✅ | blocked |
@@ -26,4 +26,7 @@ Generated: 2026-06-20T12:47:16.864Z
 | 18 | live invite disabled | ✅ | disabled |
 | 19 | auth write disabled | ✅ | disabled |
 | 20 | risky action blocked (preview) | ✅ | preview |
-| 21 | no phone/email/token leaks | ✅ | clean |
+| 21 | seat limit monitor summary | ✅ | total=1 |
+| 22 | bulk access check | ✅ | 1/1 |
+| 23 | access history record + list | ✅ | recorded |
+| 24 | no phone/email/token leaks | ✅ | clean |
