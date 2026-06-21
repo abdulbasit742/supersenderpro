@@ -270,3 +270,10 @@ $('#dp-lookup-form').addEventListener('submit', (e) => { e.preventDefault(); loa
   await loadAdvanced();
   await loadAdvanced2();
 })();
+
+// PWA: register the offline-safe service worker (same-origin static assets only; never caches API/preview responses).
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/dealer-portal-sw.js', { scope: '/dealer-portal.html' }).catch(() => { /* preview-safe: ignore */ });
+  });
+}

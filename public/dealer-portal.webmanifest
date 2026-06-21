@@ -1,0 +1,14 @@
+{
+  "name": "Dealer / Reseller / Distributor B2B Portal — SuperSender Pro",
+  "short_name": "Dealer Portal",
+  "description": "Safe preview-only B2B commerce operating system for dealers, resellers and distributors.",
+  "start_url": "/dealer-portal.html",
+  "scope": "/dealer-portal.html",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0b1220",
+  "theme_color": "#1d4ed8",
+  "icons": [
+    { "src": "/assets/dealer-portal-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

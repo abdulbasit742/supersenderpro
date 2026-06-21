@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-21T11:16:32.834Z",
-  "passed": 114,
+  "generatedAt": "2026-06-21T12:11:17.152Z",
+  "passed": 117,
   "failed": 0,
-  "total": 114,
+  "total": 117,
   "strict": "false",
   "checks": [
     {
@@ -367,6 +367,21 @@
     },
     {
       "name": "file public/css/dealer-portal.css",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/dealer-portal.webmanifest",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/dealer-portal-sw.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "file public/assets/dealer-portal-icon.svg",
       "ok": true,
       "detail": ""
     },

@@ -32,7 +32,8 @@ const LIB = [
   'dealerClaimPipelinePreview.js',
 ];
 LIB.forEach((f) => add(`file lib/dealerPortal/${f}`, exists(`lib/dealerPortal/${f}`)));
-['routes/dealerPortalRoutes.js', 'public/dealer-portal.html', 'public/js/dealer-portal.js', 'public/css/dealer-portal.css']
+['routes/dealerPortalRoutes.js', 'public/dealer-portal.html', 'public/js/dealer-portal.js', 'public/css/dealer-portal.css',
+  'public/dealer-portal.webmanifest', 'public/dealer-portal-sw.js', 'public/assets/dealer-portal-icon.svg']
   .forEach((f) => add(`file ${f}`, exists(f)));
 
 add('server hook present', exists('server.js') && fs.readFileSync(path.join(ROOT, 'server.js'), 'utf8').includes('DEALER PORTAL HOOK'));

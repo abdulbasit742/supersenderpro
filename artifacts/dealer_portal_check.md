@@ -1,8 +1,8 @@
 # Dealer Portal Check
 
-Generated: 2026-06-21T11:16:32.834Z
+Generated: 2026-06-21T12:11:17.152Z
 
-**114/114 passed**
+**117/117 passed**
 
 | Check | Result | Detail |
 |---|---|---|
@@ -79,6 +79,9 @@ Generated: 2026-06-21T11:16:32.834Z
 | file public/dealer-portal.html | PASS |  |
 | file public/js/dealer-portal.js | PASS |  |
 | file public/css/dealer-portal.css | PASS |  |
+| file public/dealer-portal.webmanifest | PASS |  |
+| file public/dealer-portal-sw.js | PASS |  |
+| file public/assets/dealer-portal-icon.svg | PASS |  |
 | server hook present | PASS |  |
 | route module loads | PASS |  |
 | all service functions exported | PASS | all present |
