@@ -1,0 +1,103 @@
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Loyalty — SuperSender Pro</title>
+    <link rel="stylesheet" href="/css/loyalty-center.css" />
+  </head>
+  <body>
+    <header class="lc-header">
+      <div><h1>Loyalty, Rewards & Referrals</h1><span class="lc-sub">preview center</span></div>
+      <div class="lc-header-right">
+        <span class="badge badge-dry">DRY-RUN</span>
+        <span class="badge badge-ok">no wallet mutation</span>
+        <span class="badge badge-ok">no coupon activation</span>
+        <span class="badge badge-ok">no live sends</span>
+      </div>
+    </header>
+
+    <section class="lc-stats">
+      <div class="card kpi"><span class="kpi-num" id="kCust">–</span><span>Members</span></div>
+      <div class="card kpi"><span class="kpi-num" id="kPts">–</span><span>Points liability</span></div>
+      <div class="card kpi"><span class="kpi-num" id="kCredit">–</span><span>Store credit</span></div>
+      <div class="card kpi"><span class="kpi-num good" id="kVip">–</span><span>VIP</span></div>
+      <div class="card kpi"><span class="kpi-num" id="kRef">–</span><span>Referrals</span></div>
+      <div class="card kpi"><span class="kpi-num" id="kRedeem">–</span><span>Redemptions</span></div>
+    </section>
+
+    <nav class="lc-tabs">
+      <button class="tab active" data-tab="members">Members</button>
+      <button class="tab" data-tab="rules">Reward rules</button>
+      <button class="tab" data-tab="tools">Points / credit / redeem</button>
+      <button class="tab" data-tab="referral">Referrals</button>
+      <button class="tab" data-tab="liability">Liability + accounting</button>
+    </nav>
+
+    <main>
+      <section class="panel active" id="tab-members">
+        <div class="card full"><div class="card-head"><h2>Loyalty members</h2><div><input id="custSearch"
+  placeholder="search" /> <select id="tierFilter"><option value="">all tiers</option></select> <button id="custRefresh"
+  class="mini">Refresh</button></div></div><table class="lc-table" id="custTable"><thead><tr><th>Customer</th>
+  <th>Phone</th><th>Tier</th><th>Points</th><th>Store credit</th><th>Lifetime</th><th>Referrals</th><th></th></tr></thead>
+  <tbody></tbody></table></div>
+        <pre id="custDetail" class="lc-pre"></pre>
+      </section>
+
+      <section class="panel" id="tab-rules">
+
+
+        <div class="card"><h2>Add reward rule</h2><form id="ruleForm" class="lc-form inline"><input name="name"
+  placeholder="rule name" /><select name="ruleType"><option>points_per_order_value</option>
+  <option>points_per_product</option><option>first_purchase_bonus</option><option>repeat_purchase_bonus</option>
+  <option>referral_signup_bonus</option><option>referral_purchase_bonus</option><option>birthday_reward</option>
+  <option>abandoned_customer_winback</option><option>vip_bonus</option><option>store_credit_reward</option></select><input
+  name="pointsValue" type="number" placeholder="points" /><input name="minimumSpend" type="number" placeholder="min spend"
+  /><button type="submit">Add</button></form></div>
+        <div class="card full"><h2>Reward rules</h2><table class="lc-table" id="ruleTable"><thead><tr><th>Name</th>
+  <th>Type</th><th>Points</th><th>Min spend</th><th>Status</th></tr></thead><tbody></tbody></table></div>
+      </section>
+
+      <section class="panel" id="tab-tools">
+        <div class="lc-grid">
+          <div class="card"><h2>Points preview</h2><form id="ptsForm" class="lc-form"><input name="customerId"
+  placeholder="customer id" /><input name="orderValue" type="number" placeholder="order value (PKR)" /><button
+  type="submit">Preview points</button></form><pre id="ptsResult" class="lc-pre"></pre></div>
+          <div class="card"><h2>Store credit preview</h2><form id="creditForm" class="lc-form"><input name="customerId"
+  placeholder="customer id" /><input name="creditAmount" type="number" placeholder="credit amount" /><button
+  type="submit">Preview credit</button></form><pre id="creditResult" class="lc-pre"></pre></div>
+          <div class="card"><h2>Redemption preview</h2><form id="redeemForm" class="lc-form"><input name="customerId"
+  placeholder="customer id" /><input name="pointsRequired" type="number" placeholder="points to redeem" /><button
+  type="submit">Preview redemption</button></form><pre id="redeemResult" class="lc-pre"></pre></div>
+          <div class="card"><h2>Tier preview</h2><form id="tierForm" class="lc-form"><input name="lifetimeSpend"
+  type="number" placeholder="lifetime spend" /><button type="submit">Preview tier</button></form><pre id="tierResult"
+  class="lc-pre"></pre></div>
+        </div>
+      </section>
+
+      <section class="panel" id="tab-referral">
+        <div class="card"><h2>Referral code preview</h2><form id="refForm" class="lc-form inline"><input name="customerId"
+  placeholder="customer id" /><button type="submit">Generate preview code</button></form><pre id="refResult" class="lc-
+  pre"></pre></div>
+        <div class="card full"><div class="card-head"><h2>Referrals</h2><button id="refRefresh"
+  class="mini">Refresh</button></div><table class="lc-table" id="refTable"><thead><tr><th>Customer</th><th>Tier</th>
+  <th>Referrals</th></tr></thead><tbody></tbody></table></div>
+      </section>
+
+
+      <section class="panel" id="tab-liability">
+        <div class="lc-grid">
+          <div class="card"><div class="card-head"><h2>Reward liability</h2><button id="liabBtn"
+  class="mini">Refresh</button></div><pre id="liabResult" class="lc-pre"></pre></div>
+          <div class="card"><div class="card-head"><h2>Accounting impact</h2><button id="accBtn"
+  class="mini">Preview</button></div><pre id="accResult" class="lc-pre"></pre></div>
+        </div>
+      </section>
+    </main>
+
+
+    <footer class="lc-footer">Loyalty Center · dry-run · no wallet mutation · no coupon activation · no live sends · PII
+  masked</footer>
+    <script src="/js/loyalty-center.js"></script>
+  </body>
+  </html>

@@ -1,0 +1,49 @@
+# Source: SuperSender Pro — Manufacturing + BOM + Production Costing Center (code files)-2026062109593022.pdf
+# Target: public/index.html
+# Apply manually as append-only hook if needed.
+
+  <!-- BEGIN MANUFACTURING CENTER HOOK -->
+  <a href="/manufacturing-center.html" class="nav-link" title="Manufacturing + BOM + production costing">Manufacturing</a>
+  <!-- END MANUFACTURING CENTER HOOK -->
+
+
+
+
+FILE: .env.example — add placeholders only. No secrets.
+
+
+  # BEGIN MANUFACTURING CENTER HOOK
+  MANUFACTURING_CENTER_ENABLED=true
+  MANUFACTURING_CENTER_DRY_RUN=true
+  MANUFACTURING_CENTER_ALLOW_STOCK_MUTATION=false
+  MANUFACTURING_CENTER_ALLOW_PRODUCTION_COMPLETE=false
+  MANUFACTURING_CENTER_ALLOW_LEDGER_WRITE=false
+  MANUFACTURING_CENTER_TARGET_MARGIN=35
+  MANUFACTURING_CENTER_REDACT_PII=true
+  # END MANUFACTURING CENTER HOOK
+
+
+
+
+FILE: package.json — add inside "scripts" (do not remove existing scripts).
+
+
+  {
+      "scripts": {
+        "_comment_manufacturing_center_begin": "BEGIN MANUFACTURING CENTER HOOK",
+          "manufacturing-center:check": "node scripts/manufacturing-center-check.js",
+          "manufacturing-center:smoke": "node tests/smoke/manufacturingCenterSmoke.js",
+          "_comment_manufacturing_center_end": "END MANUFACTURING CENTER HOOK"
+      }
+  }
+
+
+
+
+FILE: .gitignore — ensure the store + reports are not committed (append-only).
+
+
+  # BEGIN MANUFACTURING CENTER HOOK
+  data/manufacturing-center.json
+  artifacts/manufacturing_center_*
+  # END MANUFACTURING CENTER HOOK

@@ -1,0 +1,49 @@
+{
+    "generatedAt": "2026-06-20T05:39:00.000Z",
+    "note": "Seed report. Overwritten by scripts/group-commerce-check.js on local run.",
+    "groupCommercePresent": false,
+    "summary": {
+      "exists": 4,
+      "missing": 19,
+      "needs_wiring": 4,
+      "needs_docs": 3,
+      "duplicate_risk": 0,
+      "needs_safety_fix": 0
+    },
+    "files": [
+      { "path": "lib/groupCommerce/store.js", "kind": "lib", "status": "missing" },
+      { "path": "lib/groupCommerce/groupRegistry.js", "kind": "lib", "status": "missing" },
+      { "path": "lib/groupCommerce/commandRouter.js", "kind": "lib", "status": "missing" },
+      { "path": "lib/groupCommerce/moderation.js", "kind": "lib", "status": "missing" },
+      { "path": "lib/groupCommerce/messageAnalyzer.js", "kind": "lib", "status": "missing" },
+      { "path": "lib/groupCommerce/catalog.js", "kind": "lib", "status": "missing" },
+      { "path": "lib/groupCommerce/ecommerceBridge.js", "kind": "lib", "status": "missing" },
+      { "path": "lib/groupCommerce/relayPlanner.js", "kind": "lib", "status": "missing" },
+      { "path": "lib/groupCommerce/agentRegistry.js", "kind": "lib", "status": "missing" },
+      { "path": "lib/groupCommerce/flowNodes.js", "kind": "lib", "status": "missing" },
+      { "path": "lib/groupCommerce/pauseManager.js", "kind": "lib", "status": "missing" },
+      { "path": "routes/groupCommerceRoutes.js", "kind": "route", "status": "missing" },
+      { "path": "public/group-commerce.html", "kind": "page", "status": "missing" },
+      { "path": "public/js/group-commerce.js", "kind": "asset", "status": "missing" },
+      { "path": "public/css/group-commerce.css", "kind": "asset", "status": "missing" },
+      { "path": "docs/GROUP_COMMERCE_OS.md", "kind": "doc", "status": "needs_docs" },
+      { "path": "docs/GROUP_COMMERCE_COMMANDS.md", "kind": "doc", "status": "needs_docs" },
+      { "path": "docs/GROUP_COMMERCE_SAFETY.md", "kind": "doc", "status": "needs_docs" },
+      { "path": "docs/GROUP_COMMERCE_QA.md", "kind": "doc", "status": "exists" },
+      { "path": "scripts/group-commerce-check.js", "kind": "script", "status": "exists" },
+      { "path": "tests/smoke/groupCommerceSmoke.js", "kind": "test", "status": "exists" },
+      { "path": "tests/smoke/groupCommerceFixtures.js", "kind": "test", "status": "exists" }
+    ],
+    "wiring": {
+      "routeMounted": false,
+      "routeMountCount": 0,
+      "dashboardLink": false,
+      "dashboardLinkCount": 0,
+      "envPlaceholders": false,
+      "pkgCheckScript": false,
+      "pkgSmokeScript": false
+    },
+    "duplicateRisks": [],
+    "safetyIssues": [],
+    "recommendation": "Group Commerce OS not present. Build first, then re-run check + smoke to validate."
+}

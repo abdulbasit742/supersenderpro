@@ -1,0 +1,30 @@
+# Source text: SuperSender_Pro_No-Code_Flow_Builder_Campaign_Analytics_layer_dry-run_scan-first_-2026062110103025.txt
+# Target file: server.js
+# Apply manually as append-only hook; do not overwrite existing file.
+
+ // BEGIN NO CODE FLOWS HOOK
+ try {
+   const noCodeFlowsRoutes = require('./routes/noCodeFlowsRoutes');
+     app.use('/api/no-code-flows', noCodeFlowsRoutes);
+     app.get('/no-code-flows', (req, res) => res.sendFile(require('path').join(__dirname, 'public', 'no-code-flows.html')));
+ } catch (e) { console.error('[no-code-flows] mount skipped:', e && e.message); }
+ // END NO CODE FLOWS HOOK
+
+
+public/index.html (nav link)
+ <!-- BEGIN NO CODE FLOWS HOOK -->
+ <a href="/no-code-flows" class="nav-link" title="No-Code Flows (dry-run)">No-Code Flows <span style="font-
+ size:11px;color:#bc8cff">DRY-RUN</span></a>
+ <!-- END NO CODE FLOWS HOOK -->
+
+
+package.json (scripts; add only)
+ "no-code-flows:check": "node scripts/no-code-flows-check.js",
+ "no-code-flows:smoke": "node tests/smoke/noCodeFlowsSmoke.js"
+
+
+.gitignore (append-only)
+ data/no-code-flows.json
+ data/no-code-flows.smoke.json
+ data/no-code-flows.check.json
+ data/no-code-campaigns.json

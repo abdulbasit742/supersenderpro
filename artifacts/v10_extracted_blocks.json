@@ -1,0 +1,1432 @@
+[
+  {
+    "path": "lib/saasBilling/redactor.js",
+    "source": "SuperSender Pro \u2014 SaaS Billing + Usage Metering + Plan Limits Preview (layer, dry-run, scan-first)-2026062110105992.pdf",
+    "lines": 34
+  },
+  {
+    "path": "lib/saasBilling/store.js",
+    "source": "SuperSender Pro \u2014 SaaS Billing + Usage Metering + Plan Limits Preview (layer, dry-run, scan-first)-2026062110105992.pdf",
+    "lines": 18
+  },
+  {
+    "path": "lib/saasBilling/planCatalog.js",
+    "source": "SuperSender Pro \u2014 SaaS Billing + Usage Metering + Plan Limits Preview (layer, dry-run, scan-first)-2026062110105992.pdf",
+    "lines": 50
+  },
+  {
+    "path": "lib/saasBilling/subscriptionModel.js",
+    "source": "SuperSender Pro \u2014 SaaS Billing + Usage Metering + Plan Limits Preview (layer, dry-run, scan-first)-2026062110105992.pdf",
+    "lines": 86
+  },
+  {
+    "path": "lib/saasBilling/usageEvents.js",
+    "source": "SuperSender Pro \u2014 SaaS Billing + Usage Metering + Plan Limits Preview (layer, dry-run, scan-first)-2026062110105992.pdf",
+    "lines": 31
+  },
+  {
+    "path": "lib/saasBilling/usageMeter.js",
+    "source": "SuperSender Pro \u2014 SaaS Billing + Usage Metering + Plan Limits Preview (layer, dry-run, scan-first)-2026062110105992.pdf",
+    "lines": 38
+  },
+  {
+    "path": "lib/saasBilling/quotaChecker.js",
+    "source": "SuperSender Pro \u2014 SaaS Billing + Usage Metering + Plan Limits Preview (layer, dry-run, scan-first)-2026062110105992.pdf",
+    "lines": 34
+  },
+  {
+    "path": "lib/saasBilling/entitlementService.js",
+    "source": "SuperSender Pro \u2014 SaaS Billing + Usage Metering + Plan Limits Preview (layer, dry-run, scan-first)-2026062110105992.pdf",
+    "lines": 35
+  },
+  {
+    "path": "lib/saasBilling/billingSummary.js",
+    "source": "SuperSender Pro \u2014 SaaS Billing + Usage Metering + Plan Limits Preview (layer, dry-run, scan-first)-2026062110105992.pdf",
+    "lines": 51
+  },
+  {
+    "path": "lib/saasBilling/upgradePreview.js",
+    "source": "SuperSender Pro \u2014 SaaS Billing + Usage Metering + Plan Limits Preview (layer, dry-run, scan-first)-2026062110105992.pdf",
+    "lines": 45
+  },
+  {
+    "path": "routes/saasBillingRoutes.js",
+    "source": "SuperSender Pro \u2014 SaaS Billing + Usage Metering + Plan Limits Preview (layer, dry-run, scan-first)-2026062110105992.pdf",
+    "lines": 65
+  },
+  {
+    "path": "public/saas-billing.html",
+    "source": "SuperSender Pro \u2014 SaaS Billing + Usage Metering + Plan Limits Preview (layer, dry-run, scan-first)-2026062110105992.pdf",
+    "lines": 102
+  },
+  {
+    "path": "public/js/saas-billing.js",
+    "source": "SuperSender Pro \u2014 SaaS Billing + Usage Metering + Plan Limits Preview (layer, dry-run, scan-first)-2026062110105992.pdf",
+    "lines": 94
+  },
+  {
+    "path": "public/css/saas-billing.css",
+    "source": "SuperSender Pro \u2014 SaaS Billing + Usage Metering + Plan Limits Preview (layer, dry-run, scan-first)-2026062110105992.pdf",
+    "lines": 47
+  },
+  {
+    "path": "scripts/saas-billing-check.js",
+    "source": "SuperSender Pro \u2014 SaaS Billing + Usage Metering + Plan Limits Preview (layer, dry-run, scan-first)-2026062110105992.pdf",
+    "lines": 57
+  },
+  {
+    "path": "tests/smoke/saasBillingSmoke.js",
+    "source": "SuperSender Pro \u2014 SaaS Billing + Usage Metering + Plan Limits Preview (layer, dry-run, scan-first)-2026062110105992.pdf",
+    "lines": 77
+  },
+  {
+    "path": "artifacts/saas_billing_smoke.json",
+    "source": "SuperSender Pro \u2014 SaaS Billing + Usage Metering + Plan Limits Preview (layer, dry-run, scan-first)-2026062110105992.pdf",
+    "lines": 4
+  },
+  {
+    "path": "lib/privacyCenter/redactor.js",
+    "source": "SuperSender Pro \u2014 Privacy Requests + Data Retention + Audit Export Preview (layer, dry-run, scan-first)-2026062110104050.pdf",
+    "lines": 47
+  },
+  {
+    "path": "lib/privacyCenter/store.js",
+    "source": "SuperSender Pro \u2014 Privacy Requests + Data Retention + Audit Export Preview (layer, dry-run, scan-first)-2026062110104050.pdf",
+    "lines": 23
+  },
+  {
+    "path": "lib/privacyCenter/privacyRequestModel.js",
+    "source": "SuperSender Pro \u2014 Privacy Requests + Data Retention + Audit Export Preview (layer, dry-run, scan-first)-2026062110104050.pdf",
+    "lines": 47
+  },
+  {
+    "path": "lib/privacyCenter/privacyRequestService.js",
+    "source": "SuperSender Pro \u2014 Privacy Requests + Data Retention + Audit Export Preview (layer, dry-run, scan-first)-2026062110104050.pdf",
+    "lines": 42
+  },
+  {
+    "path": "lib/privacyCenter/dataExportPreview.js",
+    "source": "SuperSender Pro \u2014 Privacy Requests + Data Retention + Audit Export Preview (layer, dry-run, scan-first)-2026062110104050.pdf",
+    "lines": 54
+  },
+  {
+    "path": "lib/privacyCenter/dataDeletionPreview.js",
+    "source": "SuperSender Pro \u2014 Privacy Requests + Data Retention + Audit Export Preview (layer, dry-run, scan-first)-2026062110104050.pdf",
+    "lines": 57
+  },
+  {
+    "path": "lib/privacyCenter/retentionPolicies.js",
+    "source": "SuperSender Pro \u2014 Privacy Requests + Data Retention + Audit Export Preview (layer, dry-run, scan-first)-2026062110104050.pdf",
+    "lines": 69
+  },
+  {
+    "path": "lib/privacyCenter/consentRecords.js",
+    "source": "SuperSender Pro \u2014 Privacy Requests + Data Retention + Audit Export Preview (layer, dry-run, scan-first)-2026062110104050.pdf",
+    "lines": 41
+  },
+  {
+    "path": "lib/privacyCenter/auditExportPreview.js",
+    "source": "SuperSender Pro \u2014 Privacy Requests + Data Retention + Audit Export Preview (layer, dry-run, scan-first)-2026062110104050.pdf",
+    "lines": 43
+  },
+  {
+    "path": "routes/privacyCenterRoutes.js",
+    "source": "SuperSender Pro \u2014 Privacy Requests + Data Retention + Audit Export Preview (layer, dry-run, scan-first)-2026062110104050.pdf",
+    "lines": 81
+  },
+  {
+    "path": "public/privacy-center.html",
+    "source": "SuperSender Pro \u2014 Privacy Requests + Data Retention + Audit Export Preview (layer, dry-run, scan-first)-2026062110104050.pdf",
+    "lines": 75
+  },
+  {
+    "path": "public/js/privacy-center.js",
+    "source": "SuperSender Pro \u2014 Privacy Requests + Data Retention + Audit Export Preview (layer, dry-run, scan-first)-2026062110104050.pdf",
+    "lines": 96
+  },
+  {
+    "path": "public/css/privacy-center.css",
+    "source": "SuperSender Pro \u2014 Privacy Requests + Data Retention + Audit Export Preview (layer, dry-run, scan-first)-2026062110104050.pdf",
+    "lines": 41
+  },
+  {
+    "path": "scripts/privacy-center-check.js",
+    "source": "SuperSender Pro \u2014 Privacy Requests + Data Retention + Audit Export Preview (layer, dry-run, scan-first)-2026062110104050.pdf",
+    "lines": 57
+  },
+  {
+    "path": "tests/smoke/privacyCenterSmoke.js",
+    "source": "SuperSender Pro \u2014 Privacy Requests + Data Retention + Audit Export Preview (layer, dry-run, scan-first)-2026062110104050.pdf",
+    "lines": 82
+  },
+  {
+    "path": "artifacts/privacy_center_smoke.json",
+    "source": "SuperSender Pro \u2014 Privacy Requests + Data Retention + Audit Export Preview (layer, dry-run, scan-first)-2026062110104050.pdf",
+    "lines": 4
+  },
+  {
+    "path": "lib/noCodeFlows/store.js",
+    "source": "SuperSender Pro \u2014 No-Code Flow Builder + Campaign Analytics (layer, dry-run, scan-first)-2026062110103025.pdf",
+    "lines": 26
+  },
+  {
+    "path": "lib/noCodeFlows/flowModel.js",
+    "source": "SuperSender Pro \u2014 No-Code Flow Builder + Campaign Analytics (layer, dry-run, scan-first)-2026062110103025.pdf",
+    "lines": 78
+  },
+  {
+    "path": "lib/noCodeFlows/nodeRegistry.js",
+    "source": "SuperSender Pro \u2014 No-Code Flow Builder + Campaign Analytics (layer, dry-run, scan-first)-2026062110103025.pdf",
+    "lines": 39
+  },
+  {
+    "path": "lib/noCodeFlows/flowValidator.js",
+    "source": "SuperSender Pro \u2014 No-Code Flow Builder + Campaign Analytics (layer, dry-run, scan-first)-2026062110103025.pdf",
+    "lines": 58
+  },
+  {
+    "path": "lib/noCodeFlows/flowPreviewRunner.js",
+    "source": "SuperSender Pro \u2014 No-Code Flow Builder + Campaign Analytics (layer, dry-run, scan-first)-2026062110103025.pdf",
+    "lines": 86
+  },
+  {
+    "path": "lib/noCodeFlows/campaignAnalytics.js",
+    "source": "SuperSender Pro \u2014 No-Code Flow Builder + Campaign Analytics (layer, dry-run, scan-first)-2026062110103025.pdf",
+    "lines": 62
+  },
+  {
+    "path": "lib/noCodeFlows/campaignTimeline.js",
+    "source": "SuperSender Pro \u2014 No-Code Flow Builder + Campaign Analytics (layer, dry-run, scan-first)-2026062110103025.pdf",
+    "lines": 31
+  },
+  {
+    "path": "routes/noCodeFlowsRoutes.js",
+    "source": "SuperSender Pro \u2014 No-Code Flow Builder + Campaign Analytics (layer, dry-run, scan-first)-2026062110103025.pdf",
+    "lines": 66
+  },
+  {
+    "path": "public/no-code-flows.html",
+    "source": "SuperSender Pro \u2014 No-Code Flow Builder + Campaign Analytics (layer, dry-run, scan-first)-2026062110103025.pdf",
+    "lines": 69
+  },
+  {
+    "path": "public/js/no-code-flows.js",
+    "source": "SuperSender Pro \u2014 No-Code Flow Builder + Campaign Analytics (layer, dry-run, scan-first)-2026062110103025.pdf",
+    "lines": 106
+  },
+  {
+    "path": "public/css/no-code-flows.css",
+    "source": "SuperSender Pro \u2014 No-Code Flow Builder + Campaign Analytics (layer, dry-run, scan-first)-2026062110103025.pdf",
+    "lines": 43
+  },
+  {
+    "path": "scripts/no-code-flows-check.js",
+    "source": "SuperSender Pro \u2014 No-Code Flow Builder + Campaign Analytics (layer, dry-run, scan-first)-2026062110103025.pdf",
+    "lines": 49
+  },
+  {
+    "path": "tests/smoke/noCodeFlowsSmoke.js",
+    "source": "SuperSender Pro \u2014 No-Code Flow Builder + Campaign Analytics (layer, dry-run, scan-first)-2026062110103025.pdf",
+    "lines": 72
+  },
+  {
+    "path": "artifacts/no_code_flows_smoke.json",
+    "source": "SuperSender Pro \u2014 No-Code Flow Builder + Campaign Analytics (layer, dry-run, scan-first)-2026062110103025.pdf",
+    "lines": 4
+  },
+  {
+    "path": "artifacts/mock_gateway_inventory.json",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 52
+  },
+  {
+    "path": "artifacts/mock_gateway_inventory.md",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 17
+  },
+  {
+    "path": "docs/MOCK_GATEWAY_GAP_REPORT.md",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 31
+  },
+  {
+    "path": "lib/mockGateway/mockPIIPatterns.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 7
+  },
+  {
+    "path": "lib/mockGateway/mockSecretPatterns.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 8
+  },
+  {
+    "path": "lib/mockGateway/mockRedactor.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 51
+  },
+  {
+    "path": "lib/mockGateway/mockSafety.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 29
+  },
+  {
+    "path": "lib/mockGateway/mockConfig.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 25
+  },
+  {
+    "path": "lib/mockGateway/mockInputSanitizer.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 44
+  },
+  {
+    "path": "lib/mockGateway/mockEventStore.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 35
+  },
+  {
+    "path": "lib/mockGateway/mockResponse.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 28
+  },
+  {
+    "path": "lib/mockGateway/mockRequest.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 21
+  },
+  {
+    "path": "lib/mockGateway/mockRegistry.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 34
+  },
+  {
+    "path": "lib/mockGateway/mockScenarioRunner.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 42
+  },
+  {
+    "path": "lib/mockGateway/index.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 36
+  },
+  {
+    "path": "lib/mockGateway/mockScenarios.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 56
+  },
+  {
+    "path": "demo/mock-scenarios.json",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 28
+  },
+  {
+    "path": "lib/mockGateway/providers/_base.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 17
+  },
+  {
+    "path": "lib/mockGateway/providers/whatsappBaileysMock.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 12
+  },
+  {
+    "path": "lib/mockGateway/providers/whatsappCloudMock.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 11
+  },
+  {
+    "path": "lib/mockGateway/providers/channelPublisherMock.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 9
+  },
+  {
+    "path": "lib/mockGateway/providers/socialPublisherMock.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 9
+  },
+  {
+    "path": "lib/mockGateway/providers/ecommerceMock.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 10
+  },
+  {
+    "path": "lib/mockGateway/providers/paymentVerifierMock.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 15
+  },
+  {
+    "path": "lib/mockGateway/providers/webhookDeliveryMock.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 14
+  },
+  {
+    "path": "lib/mockGateway/providers/aiProviderMock.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 10
+  },
+  {
+    "path": "lib/mockGateway/providers/voiceAIMock.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 10
+  },
+  {
+    "path": "lib/mockGateway/providers/emailMock.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 9
+  },
+  {
+    "path": "lib/mockGateway/providers/billingMock.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 10
+  },
+  {
+    "path": "lib/mockGateway/providers/tenantMock.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 9
+  },
+  {
+    "path": "lib/mockGateway/providers/supportMock.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 10
+  },
+  {
+    "path": "lib/mockGateway/providers/developerPortalMock.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 15
+  },
+  {
+    "path": "lib/mockGateway/providers/auditSecurityMock.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 21
+  },
+  {
+    "path": "lib/mockGateway/adapters/_base.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 10
+  },
+  {
+    "path": "lib/mockGateway/adapters/localDemoAdapter.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 5
+  },
+  {
+    "path": "lib/mockGateway/adapters/demoSandboxAdapter.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 5
+  },
+  {
+    "path": "lib/mockGateway/adapters/approvalInboxAdapter.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 5
+  },
+  {
+    "path": "lib/mockGateway/adapters/auditLedgerAdapter.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 5
+  },
+  {
+    "path": "lib/mockGateway/adapters/securityGatewayAdapter.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 5
+  },
+  {
+    "path": "lib/mockGateway/adapters/featureFlagsAdapter.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 5
+  },
+  {
+    "path": "lib/mockGateway/adapters/teamAccessAdapter.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 5
+  },
+  {
+    "path": "lib/mockGateway/adapters/tenantIsolationAdapter.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 5
+  },
+  {
+    "path": "lib/mockGateway/adapters/developerPortalAdapter.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 5
+  },
+  {
+    "path": "lib/mockGateway/adapters/supportHelpdeskAdapter.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 6
+  },
+  {
+    "path": "lib/mockGateway/adapters/ecommerceAdapter.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 5
+  },
+  {
+    "path": "lib/mockGateway/adapters/socialAdapter.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 5
+  },
+  {
+    "path": "lib/mockGateway/adapters/voiceAIAdapter.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 5
+  },
+  {
+    "path": "lib/mockGateway/adapters/index.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 13
+  },
+  {
+    "path": "lib/mockGateway/mockReadinessScoring.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 15
+  },
+  {
+    "path": "lib/mockGateway/mockGatewayDoctor.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 91
+  },
+  {
+    "path": "routes/mockGatewayRoutes.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 69
+  },
+  {
+    "path": "public/mock-gateway.html",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 96
+  },
+  {
+    "path": "public/js/mock-gateway.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 92
+  },
+  {
+    "path": "public/css/mock-gateway.css",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 45
+  },
+  {
+    "path": "scripts/mock-gateway-check.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 73
+  },
+  {
+    "path": "tests/smoke/mockGatewaySmoke.js",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 82
+  },
+  {
+    "path": "docs/MOCK_GATEWAY.md",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 27
+  },
+  {
+    "path": "docs/OFFLINE_PROVIDER_SIMULATORS.md",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 13
+  },
+  {
+    "path": "docs/MOCK_SCENARIO_RUNNER.md",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 14
+  },
+  {
+    "path": "docs/LOCAL_DEMO_MOCKING_GUIDE.md",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 22
+  },
+  {
+    "path": "docs/MOCK_GATEWAY_DELIVERY_REPORT.md",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 109
+  },
+  {
+    "path": "artifacts/mock_gateway_smoke.md",
+    "source": "SuperSender Pro \u2014 Offline Mock API Gateway + Provider Simulator + Demo Interaction QA (offline-only, dry-run, scan-first)-2026062110101996.pdf",
+    "lines": 33
+  },
+  {
+    "path": "artifacts/reseller_portal_qa_inventory.json",
+    "source": "SuperSender Pro \u2014 Reseller Portal QA + Partner Onboarding Readiness Doctor (QA layer, dry-run, scan-first)-2026062110100727.pdf",
+    "lines": 65
+  },
+  {
+    "path": "docs/RESELLER_PORTAL_QA_GAP_REPORT.md",
+    "source": "SuperSender Pro \u2014 Reseller Portal QA + Partner Onboarding Readiness Doctor (QA layer, dry-run, scan-first)-2026062110100727.pdf",
+    "lines": 39
+  },
+  {
+    "path": "lib/resellerPortal/qa/qaGuard.js",
+    "source": "SuperSender Pro \u2014 Reseller Portal QA + Partner Onboarding Readiness Doctor (QA layer, dry-run, scan-first)-2026062110100727.pdf",
+    "lines": 59
+  },
+  {
+    "path": "lib/resellerPortal/qa/partnerOnboardingChecklist.js",
+    "source": "SuperSender Pro \u2014 Reseller Portal QA + Partner Onboarding Readiness Doctor (QA layer, dry-run, scan-first)-2026062110100727.pdf",
+    "lines": 73
+  },
+  {
+    "path": "lib/resellerPortal/qa/partnerReadinessScoring.js",
+    "source": "SuperSender Pro \u2014 Reseller Portal QA + Partner Onboarding Readiness Doctor (QA layer, dry-run, scan-first)-2026062110100727.pdf",
+    "lines": 29
+  },
+  {
+    "path": "lib/resellerPortal/qa/onboardingDoctor.js",
+    "source": "SuperSender Pro \u2014 Reseller Portal QA + Partner Onboarding Readiness Doctor (QA layer, dry-run, scan-first)-2026062110100727.pdf",
+    "lines": 27
+  },
+  {
+    "path": "lib/resellerPortal/qa/brandingQA.js",
+    "source": "SuperSender Pro \u2014 Reseller Portal QA + Partner Onboarding Readiness Doctor (QA layer, dry-run, scan-first)-2026062110100727.pdf",
+    "lines": 52
+  },
+  {
+    "path": "lib/resellerPortal/qa/domainQA.js",
+    "source": "SuperSender Pro \u2014 Reseller Portal QA + Partner Onboarding Readiness Doctor (QA layer, dry-run, scan-first)-2026062110100727.pdf",
+    "lines": 37
+  },
+  {
+    "path": "lib/resellerPortal/qa/referralCodeValidator.js",
+    "source": "SuperSender Pro \u2014 Reseller Portal QA + Partner Onboarding Readiness Doctor (QA layer, dry-run, scan-first)-2026062110100727.pdf",
+    "lines": 29
+  },
+  {
+    "path": "lib/resellerPortal/qa/referralQA.js",
+    "source": "SuperSender Pro \u2014 Reseller Portal QA + Partner Onboarding Readiness Doctor (QA layer, dry-run, scan-first)-2026062110100727.pdf",
+    "lines": 51
+  },
+  {
+    "path": "lib/resellerPortal/qa/payoutSafetyCheck.js",
+    "source": "SuperSender Pro \u2014 Reseller Portal QA + Partner Onboarding Readiness Doctor (QA layer, dry-run, scan-first)-2026062110100727.pdf",
+    "lines": 32
+  },
+  {
+    "path": "lib/resellerPortal/qa/commissionQA.js",
+    "source": "SuperSender Pro \u2014 Reseller Portal QA + Partner Onboarding Readiness Doctor (QA layer, dry-run, scan-first)-2026062110100727.pdf",
+    "lines": 56
+  },
+  {
+    "path": "lib/resellerPortal/qa/tenantPrivacyQA.js",
+    "source": "SuperSender Pro \u2014 Reseller Portal QA + Partner Onboarding Readiness Doctor (QA layer, dry-run, scan-first)-2026062110100727.pdf",
+    "lines": 65
+  },
+  {
+    "path": "lib/resellerPortal/qa/clientPreviewQA.js",
+    "source": "SuperSender Pro \u2014 Reseller Portal QA + Partner Onboarding Readiness Doctor (QA layer, dry-run, scan-first)-2026062110100727.pdf",
+    "lines": 44
+  },
+  {
+    "path": "lib/resellerPortal/qa/publicPartnerPageQA.js",
+    "source": "SuperSender Pro \u2014 Reseller Portal QA + Partner Onboarding Readiness Doctor (QA layer, dry-run, scan-first)-2026062110100727.pdf",
+    "lines": 62
+  },
+  {
+    "path": "lib/resellerPortal/qa/assetQA.js",
+    "source": "SuperSender Pro \u2014 Reseller Portal QA + Partner Onboarding Readiness Doctor (QA layer, dry-run, scan-first)-2026062110100727.pdf",
+    "lines": 58
+  },
+  {
+    "path": "lib/resellerPortal/qa/resellerReadinessDoctor.js",
+    "source": "SuperSender Pro \u2014 Reseller Portal QA + Partner Onboarding Readiness Doctor (QA layer, dry-run, scan-first)-2026062110100727.pdf",
+    "lines": 118
+  },
+  {
+    "path": "routes/resellerPortalQARoutes.js",
+    "source": "SuperSender Pro \u2014 Reseller Portal QA + Partner Onboarding Readiness Doctor (QA layer, dry-run, scan-first)-2026062110100727.pdf",
+    "lines": 95
+  },
+  {
+    "path": "public/reseller-portal-qa.html",
+    "source": "SuperSender Pro \u2014 Reseller Portal QA + Partner Onboarding Readiness Doctor (QA layer, dry-run, scan-first)-2026062110100727.pdf",
+    "lines": 87
+  },
+  {
+    "path": "public/js/reseller-portal-qa.js",
+    "source": "SuperSender Pro \u2014 Reseller Portal QA + Partner Onboarding Readiness Doctor (QA layer, dry-run, scan-first)-2026062110100727.pdf",
+    "lines": 82
+  },
+  {
+    "path": "public/css/reseller-portal-qa.css",
+    "source": "SuperSender Pro \u2014 Reseller Portal QA + Partner Onboarding Readiness Doctor (QA layer, dry-run, scan-first)-2026062110100727.pdf",
+    "lines": 44
+  },
+  {
+    "path": "scripts/reseller-portal-readiness.js",
+    "source": "SuperSender Pro \u2014 Reseller Portal QA + Partner Onboarding Readiness Doctor (QA layer, dry-run, scan-first)-2026062110100727.pdf",
+    "lines": 60
+  },
+  {
+    "path": "tests/smoke/resellerPortalQASmoke.js",
+    "source": "SuperSender Pro \u2014 Reseller Portal QA + Partner Onboarding Readiness Doctor (QA layer, dry-run, scan-first)-2026062110100727.pdf",
+    "lines": 96
+  },
+  {
+    "path": "docs/RESELLER_PORTAL_QA.md",
+    "source": "SuperSender Pro \u2014 Reseller Portal QA + Partner Onboarding Readiness Doctor (QA layer, dry-run, scan-first)-2026062110100727.pdf",
+    "lines": 24
+  },
+  {
+    "path": "docs/PARTNER_ONBOARDING_READINESS.md",
+    "source": "SuperSender Pro \u2014 Reseller Portal QA + Partner Onboarding Readiness Doctor (QA layer, dry-run, scan-first)-2026062110100727.pdf",
+    "lines": 14
+  },
+  {
+    "path": "docs/WHITE_LABEL_QA.md",
+    "source": "SuperSender Pro \u2014 Reseller Portal QA + Partner Onboarding Readiness Doctor (QA layer, dry-run, scan-first)-2026062110100727.pdf",
+    "lines": 8
+  },
+  {
+    "path": "docs/REFERRAL_LINK_QA.md",
+    "source": "SuperSender Pro \u2014 Reseller Portal QA + Partner Onboarding Readiness Doctor (QA layer, dry-run, scan-first)-2026062110100727.pdf",
+    "lines": 5
+  },
+  {
+    "path": "docs/COMMISSION_PREVIEW_QA.md",
+    "source": "SuperSender Pro \u2014 Reseller Portal QA + Partner Onboarding Readiness Doctor (QA layer, dry-run, scan-first)-2026062110100727.pdf",
+    "lines": 9
+  },
+  {
+    "path": "docs/RESELLER_PRIVACY_ISOLATION.md",
+    "source": "SuperSender Pro \u2014 Reseller Portal QA + Partner Onboarding Readiness Doctor (QA layer, dry-run, scan-first)-2026062110100727.pdf",
+    "lines": 9
+  },
+  {
+    "path": "docs/PARTNER_LAUNCH_CHECKLIST.md",
+    "source": "SuperSender Pro \u2014 Reseller Portal QA + Partner Onboarding Readiness Doctor (QA layer, dry-run, scan-first)-2026062110100727.pdf",
+    "lines": 83
+  },
+  {
+    "path": "artifacts/reseller_portal_qa_smoke.md",
+    "source": "SuperSender Pro \u2014 Reseller Portal QA + Partner Onboarding Readiness Doctor (QA layer, dry-run, scan-first)-2026062110100727.pdf",
+    "lines": 28
+  },
+  {
+    "path": "artifacts/pilot_ops_inventory.json",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 59
+  },
+  {
+    "path": "docs/PILOT_OPS_GAP_REPORT.md",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 40
+  },
+  {
+    "path": "lib/pilotOps/safetyGuard.js",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 33
+  },
+  {
+    "path": "lib/pilotOps/privacyGuard.js",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 56
+  },
+  {
+    "path": "lib/pilotOps/store.js",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 36
+  },
+  {
+    "path": "lib/pilotOps/pilotRegistry.js",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 80
+  },
+  {
+    "path": "lib/pilotOps/trialManager.js",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 65
+  },
+  {
+    "path": "lib/pilotOps/onboardingChecklist.js",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 77
+  },
+  {
+    "path": "lib/pilotOps/setupProgress.js",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 30
+  },
+  {
+    "path": "lib/pilotOps/blockerTracker.js",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 24
+  },
+  {
+    "path": "lib/pilotOps/successScoring.js",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 50
+  },
+  {
+    "path": "lib/pilotOps/riskScoring.js",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 50
+  },
+  {
+    "path": "lib/pilotOps/conversionAdvisor.js",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 54
+  },
+  {
+    "path": "lib/pilotOps/feedbackStore.js",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 60
+  },
+  {
+    "path": "lib/pilotOps/feedbackClassifier.js",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 40
+  },
+  {
+    "path": "lib/pilotOps/bugTriage.js",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 26
+  },
+  {
+    "path": "lib/pilotOps/messageTemplates.js",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 70
+  },
+  {
+    "path": "lib/pilotOps/followupDrafts.js",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 76
+  },
+  {
+    "path": "lib/pilotOps/adapters/_base.js",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 8
+  },
+  {
+    "path": "lib/pilotOps/adapters/publicFunnelAdapter.js",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 8
+  },
+  {
+    "path": "lib/pilotOps/adapters/businessSetupAdapter.js",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 8
+  },
+  {
+    "path": "lib/pilotOps/adapters/saasBillingAdapter.js",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 9
+  },
+  {
+    "path": "lib/pilotOps/adapters/tenantPortalAdapter.js",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 8
+  },
+  {
+    "path": "lib/pilotOps/adapters/customer360Adapter.js",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 8
+  },
+  {
+    "path": "lib/pilotOps/adapters/demoSandboxAdapter.js",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 7
+  },
+  {
+    "path": "lib/pilotOps/adapters/kpiCommandAdapter.js",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 7
+  },
+  {
+    "path": "lib/pilotOps/adapters/incidentCommandAdapter.js",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 14
+  },
+  {
+    "path": "lib/pilotOps/adapters/complianceAdapter.js",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 14
+  },
+  {
+    "path": "lib/pilotOps/adapters/ownerCommandAdapter.js",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 5
+  },
+  {
+    "path": "lib/pilotOps/adapters/ownerCommandSummary.js",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 36
+  },
+  {
+    "path": "lib/pilotOps/adapters/kpiExportAdapter.js",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 38
+  },
+  {
+    "path": "lib/pilotOps/adminCommands.js",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 60
+  },
+  {
+    "path": "routes/pilotOpsRoutes.js",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 148
+  },
+  {
+    "path": "public/pilot-ops.html",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 120
+  },
+  {
+    "path": "public/js/pilot-ops.js",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 153
+  },
+  {
+    "path": "public/css/pilot-ops.css",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 49
+  },
+  {
+    "path": "scripts/pilot-ops-check.js",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 80
+  },
+  {
+    "path": "tests/smoke/pilotOpsSmoke.js",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 116
+  },
+  {
+    "path": "docs/PILOT_OPS_COMMAND_CENTER.md",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 31
+  },
+  {
+    "path": "docs/PILOT_ONBOARDING_CHECKLIST.md",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 14
+  },
+  {
+    "path": "docs/PILOT_SUCCESS_SCORING.md",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 16
+  },
+  {
+    "path": "docs/PILOT_FEEDBACK_TRACKING.md",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 8
+  },
+  {
+    "path": "docs/PILOT_CONVERSION_PLAYBOOK.md",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 15
+  },
+  {
+    "path": "docs/PILOT_OPS_ADMIN_COMMANDS.md",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 79
+  },
+  {
+    "path": "artifacts/pilot_ops_smoke.md",
+    "source": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062110095623.pdf",
+    "lines": 46
+  },
+  {
+    "path": "artifacts/incident_command_inventory.json",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 54
+  },
+  {
+    "path": "docs/INCIDENT_COMMAND_GAP_REPORT.md",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 36
+  },
+  {
+    "path": "lib/incidentCommand/safetyGuard.js",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 85
+  },
+  {
+    "path": "lib/incidentCommand/store.js",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 45
+  },
+  {
+    "path": "lib/incidentCommand/severityEngine.js",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 65
+  },
+  {
+    "path": "lib/incidentCommand/incidentStore.js",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 112
+  },
+  {
+    "path": "lib/incidentCommand/moduleRegistry.js",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 36
+  },
+  {
+    "path": "lib/incidentCommand/healthAggregator.js",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 69
+  },
+  {
+    "path": "lib/incidentCommand/adapters/_base.js",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 24
+  },
+  {
+    "path": "lib/incidentCommand/adapters/whatsappHealthAdapter.js",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 28
+  },
+  {
+    "path": "lib/incidentCommand/adapters/channelAutomationHealthAdapter.js",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 10
+  },
+  {
+    "path": "lib/incidentCommand/adapters/socialHealthAdapter.js",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 13
+  },
+  {
+    "path": "lib/incidentCommand/adapters/ecommerceHealthAdapter.js",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 9
+  },
+  {
+    "path": "lib/incidentCommand/adapters/paymentHealthAdapter.js",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 11
+  },
+  {
+    "path": "lib/incidentCommand/adapters/saasBillingHealthAdapter.js",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 12
+  },
+  {
+    "path": "lib/incidentCommand/adapters/voiceAIHealthAdapter.js",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 14
+  },
+  {
+    "path": "lib/incidentCommand/adapters/customer360HealthAdapter.js",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 10
+  },
+  {
+    "path": "lib/incidentCommand/adapters/marketplaceHealthAdapter.js",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 13
+  },
+  {
+    "path": "lib/incidentCommand/adapters/groupCommerceHealthAdapter.js",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 17
+  },
+  {
+    "path": "lib/incidentCommand/adapters/agentDeploymentHealthAdapter.js",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 12
+  },
+  {
+    "path": "lib/incidentCommand/adapters/flowStudioHealthAdapter.js",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 8
+  },
+  {
+    "path": "lib/incidentCommand/adapters/backupRestoreHealthAdapter.js",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 12
+  },
+  {
+    "path": "lib/incidentCommand/adapters/securityHealthAdapter.js",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 22
+  },
+  {
+    "path": "lib/incidentCommand/adapters/launchHealthAdapter.js",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 24
+  },
+  {
+    "path": "lib/incidentCommand/rules.js",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 72
+  },
+  {
+    "path": "lib/incidentCommand/incidentDetector.js",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 57
+  },
+  {
+    "path": "lib/incidentCommand/runbooks.js",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 88
+  },
+  {
+    "path": "lib/incidentCommand/recoverySteps.js",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 42
+  },
+  {
+    "path": "lib/incidentCommand/alertRules.js",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 61
+  },
+  {
+    "path": "lib/incidentCommand/alertFormatter.js",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 65
+  },
+  {
+    "path": "lib/incidentCommand/adapters/ownerCommandAdapter.js",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 44
+  },
+  {
+    "path": "lib/incidentCommand/adminCommands.js",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 85
+  },
+  {
+    "path": "routes/incidentCommandRoutes.js",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 121
+  },
+  {
+    "path": "public/incident-command.html",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 111
+  },
+  {
+    "path": "public/js/incident-command.js",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 152
+  },
+  {
+    "path": "public/css/incident-command.css",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 84
+  },
+  {
+    "path": "scripts/incident-command-check.js",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 69
+  },
+  {
+    "path": "tests/smoke/incidentCommandSmoke.js",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 115
+  },
+  {
+    "path": "docs/INCIDENT_COMMAND_CENTER.md",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 35
+  },
+  {
+    "path": "docs/PRODUCTION_MONITORING.md",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 14
+  },
+  {
+    "path": "docs/INCIDENT_RUNBOOKS.md",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 12
+  },
+  {
+    "path": "docs/INCIDENT_ALERT_RULES.md",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 14
+  },
+  {
+    "path": "docs/INCIDENT_SAFETY.md",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 95
+  },
+  {
+    "path": "artifacts/incident_command_smoke.md",
+    "source": "SuperSender Pro \u2014 Production Monitoring + Incident Command Center (coordination layer, dry-run, scan-first)-2026062110094010.pdf",
+    "lines": 42
+  },
+  {
+    "path": "artifacts/group_commerce_inbox_inventory.json",
+    "source": "SuperSender Pro \u2014 Group Commerce Inbox + Market Intelligence (layer, dry-run, scan-first)-2026062110092727.pdf",
+    "lines": 60
+  },
+  {
+    "path": "docs/GROUP_COMMERCE_INBOX_GAP_REPORT.md",
+    "source": "SuperSender Pro \u2014 Group Commerce Inbox + Market Intelligence (layer, dry-run, scan-first)-2026062110092727.pdf",
+    "lines": 42
+  },
+  {
+    "path": "lib/groupCommerce/inbox/store.js",
+    "source": "SuperSender Pro \u2014 Group Commerce Inbox + Market Intelligence (layer, dry-run, scan-first)-2026062110092727.pdf",
+    "lines": 200
+  },
+  {
+    "path": "lib/groupCommerce/inbox/aggregator.js",
+    "source": "SuperSender Pro \u2014 Group Commerce Inbox + Market Intelligence (layer, dry-run, scan-first)-2026062110092727.pdf",
+    "lines": 89
+  },
+  {
+    "path": "lib/groupCommerce/inbox/filters.js",
+    "source": "SuperSender Pro \u2014 Group Commerce Inbox + Market Intelligence (layer, dry-run, scan-first)-2026062110092727.pdf",
+    "lines": 93
+  },
+  {
+    "path": "lib/groupCommerce/inbox/marketSummary.js",
+    "source": "SuperSender Pro \u2014 Group Commerce Inbox + Market Intelligence (layer, dry-run, scan-first)-2026062110092727.pdf",
+    "lines": 97
+  },
+  {
+    "path": "lib/groupCommerce/inbox/actionSuggestions.js",
+    "source": "SuperSender Pro \u2014 Group Commerce Inbox + Market Intelligence (layer, dry-run, scan-first)-2026062110092727.pdf",
+    "lines": 70
+  },
+  {
+    "path": "routes/groupCommerceInboxRoutes.js",
+    "source": "SuperSender Pro \u2014 Group Commerce Inbox + Market Intelligence (layer, dry-run, scan-first)-2026062110092727.pdf",
+    "lines": 148
+  },
+  {
+    "path": "public/group-commerce-inbox.html",
+    "source": "SuperSender Pro \u2014 Group Commerce Inbox + Market Intelligence (layer, dry-run, scan-first)-2026062110092727.pdf",
+    "lines": 119
+  },
+  {
+    "path": "public/js/group-commerce-inbox.js",
+    "source": "SuperSender Pro \u2014 Group Commerce Inbox + Market Intelligence (layer, dry-run, scan-first)-2026062110092727.pdf",
+    "lines": 157
+  },
+  {
+    "path": "public/css/group-commerce-inbox.css",
+    "source": "SuperSender Pro \u2014 Group Commerce Inbox + Market Intelligence (layer, dry-run, scan-first)-2026062110092727.pdf",
+    "lines": 102
+  },
+  {
+    "path": "docs/GROUP_COMMERCE_INBOX.md",
+    "source": "SuperSender Pro \u2014 Group Commerce Inbox + Market Intelligence (layer, dry-run, scan-first)-2026062110092727.pdf",
+    "lines": 85
+  },
+  {
+    "path": "tests/smoke/groupCommerceInboxSmoke.js",
+    "source": "SuperSender Pro \u2014 Group Commerce Inbox + Market Intelligence (layer, dry-run, scan-first)-2026062110092727.pdf",
+    "lines": 258
+  },
+  {
+    "path": "artifacts/group_commerce_inbox_smoke.md",
+    "source": "SuperSender Pro \u2014 Group Commerce Inbox + Market Intelligence (layer, dry-run, scan-first)-2026062110092727.pdf",
+    "lines": 15
+  },
+  {
+    "path": "docs/WHATSAPP_CLOUD_PRODUCTION_CHECKLIST.md",
+    "source": "SuperSender Pro \u2014 WhatsApp Cloud API Production Setup Wizard (isolated, dry-run-first)-2026062110073581.pdf",
+    "lines": 142
+  },
+  {
+    "path": "lib/whatsappCloudSetup/configInspector.js",
+    "source": "SuperSender Pro \u2014 WhatsApp Cloud API Production Setup Wizard (isolated, dry-run-first)-2026062110073581.pdf",
+    "lines": 148
+  },
+  {
+    "path": "lib/whatsappCloudSetup/templateRegistry.js",
+    "source": "SuperSender Pro \u2014 WhatsApp Cloud API Production Setup Wizard (isolated, dry-run-first)-2026062110073581.pdf",
+    "lines": 100
+  },
+  {
+    "path": "lib/whatsappCloudSetup/payloadBuilder.js",
+    "source": "SuperSender Pro \u2014 WhatsApp Cloud API Production Setup Wizard (isolated, dry-run-first)-2026062110073581.pdf",
+    "lines": 101
+  },
+  {
+    "path": "lib/whatsappCloudSetup/webhookDiagnostics.js",
+    "source": "SuperSender Pro \u2014 WhatsApp Cloud API Production Setup Wizard (isolated, dry-run-first)-2026062110073581.pdf",
+    "lines": 61
+  },
+  {
+    "path": "lib/whatsappCloudSetup/historyStore.js",
+    "source": "SuperSender Pro \u2014 WhatsApp Cloud API Production Setup Wizard (isolated, dry-run-first)-2026062110073581.pdf",
+    "lines": 109
+  },
+  {
+    "path": "routes/whatsappCloudSetupRoutes.js",
+    "source": "SuperSender Pro \u2014 WhatsApp Cloud API Production Setup Wizard (isolated, dry-run-first)-2026062110073581.pdf",
+    "lines": 200
+  },
+  {
+    "path": "scripts/whatsapp-cloud-check.js",
+    "source": "SuperSender Pro \u2014 WhatsApp Cloud API Production Setup Wizard (isolated, dry-run-first)-2026062110073581.pdf",
+    "lines": 65
+  },
+  {
+    "path": "public/whatsapp-cloud-setup.html",
+    "source": "SuperSender Pro \u2014 WhatsApp Cloud API Production Setup Wizard (isolated, dry-run-first)-2026062110073581.pdf",
+    "lines": 104
+  },
+  {
+    "path": "public/js/whatsapp-cloud-setup.js",
+    "source": "SuperSender Pro \u2014 WhatsApp Cloud API Production Setup Wizard (isolated, dry-run-first)-2026062110073581.pdf",
+    "lines": 176
+  },
+  {
+    "path": "public/css/whatsapp-cloud-setup.css",
+    "source": "SuperSender Pro \u2014 WhatsApp Cloud API Production Setup Wizard (isolated, dry-run-first)-2026062110073581.pdf",
+    "lines": 106
+  },
+  {
+    "path": "docs/WHATSAPP_CLOUD_SETUP_WIZARD.md",
+    "source": "SuperSender Pro \u2014 WhatsApp Cloud API Production Setup Wizard (isolated, dry-run-first)-2026062110073581.pdf",
+    "lines": 91
+  },
+  {
+    "path": "lib/gumloopHandoff/pathSafety.js",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110021315.pdf",
+    "lines": 37
+  },
+  {
+    "path": "lib/gumloopHandoff/safeCopyRules.js",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110021315.pdf",
+    "lines": 56
+  },
+  {
+    "path": "lib/gumloopHandoff/redactor.js",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110021315.pdf",
+    "lines": 40
+  },
+  {
+    "path": "lib/gumloopHandoff/fileClassifier.js",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110021315.pdf",
+    "lines": 83
+  },
+  {
+    "path": "lib/gumloopHandoff/index.js",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110021315.pdf",
+    "lines": 54
+  },
+  {
+    "path": "lib/gumloopHandoff/mergeRiskScanner.js",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110021315.pdf",
+    "lines": 41
+  },
+  {
+    "path": "lib/gumloopHandoff/routeMountMap.js",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110021315.pdf",
+    "lines": 44
+  },
+  {
+    "path": "lib/gumloopHandoff/dashboardLinkMap.js",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110021315.pdf",
+    "lines": 40
+  },
+  {
+    "path": "lib/gumloopHandoff/packageScriptMap.js",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110021315.pdf",
+    "lines": 42
+  },
+  {
+    "path": "lib/gumloopHandoff/copySafetyScanner.js",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110021315.pdf",
+    "lines": 45
+  },
+  {
+    "path": "lib/gumloopHandoff/handoffManifest.js",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110021315.pdf",
+    "lines": 31
+  },
+  {
+    "path": "lib/gumloopHandoff/manifestBuilder.js",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110021315.pdf",
+    "lines": 147
+  },
+  {
+    "path": "routes/gumloopHandoffRoutes.js",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110021315.pdf",
+    "lines": 113
+  },
+  {
+    "path": "public/gumloop-handoff.html",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110021315.pdf",
+    "lines": 33
+  },
+  {
+    "path": "public/js/gumloop-handoff.js",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110021315.pdf",
+    "lines": 59
+  },
+  {
+    "path": "public/css/gumloop-handoff.css",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110021315.pdf",
+    "lines": 25
+  },
+  {
+    "path": "scripts/gumloop-handoff-check.js",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110021315.pdf",
+    "lines": 163
+  },
+  {
+    "path": "tests/smoke/gumloopHandoffSmoke.js",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110021315.pdf",
+    "lines": 89
+  },
+  {
+    "path": "docs/GUMLOOP_IMPORT_PLAN.md",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110021315.pdf",
+    "lines": 44
+  },
+  {
+    "path": "docs/GUMLOOP_PUSH_LATER_RUNBOOK.md",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110021315.pdf",
+    "lines": 26
+  },
+  {
+    "path": "docs/CLICKUP_TO_GUMLOOP_HANDOFF.md",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110021315.pdf",
+    "lines": 26
+  },
+  {
+    "path": "docs/MANUAL_ZIP_TO_VSCODE_TO_GUMLOOP.md",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110021315.pdf",
+    "lines": 39
+  },
+  {
+    "path": "artifacts/gumloop_handoff_inventory.json",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110021315.pdf",
+    "lines": 45
+  },
+  {
+    "path": "artifacts/gumloop_handoff_inventory.md",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110021315.pdf",
+    "lines": 22
+  },
+  {
+    "path": "docs/GUMLOOP_HANDOFF_GAP_REPORT.md",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110021315.pdf",
+    "lines": 35
+  },
+  {
+    "path": "artifacts/gumloop_merge_risk_report.md",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110021315.pdf",
+    "lines": 13
+  },
+  {
+    "path": "artifacts/gumloop_route_mount_map.md",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110021315.pdf",
+    "lines": 20
+  },
+  {
+    "path": "artifacts/gumloop_dashboard_link_map.md",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110021315.pdf",
+    "lines": 14
+  },
+  {
+    "path": "artifacts/gumloop_package_script_map.md",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110021315.pdf",
+    "lines": 15
+  },
+  {
+    "path": "artifacts/gumloop_copy_safety_scan.md",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110021315.pdf",
+    "lines": 33
+  },
+  {
+    "path": "docs/GUMLOOP_HANDOFF_DELIVERY_REPORT.md",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110021315.pdf",
+    "lines": 48
+  }
+]

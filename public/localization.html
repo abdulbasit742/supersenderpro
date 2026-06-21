@@ -1,0 +1,61 @@
+  <html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SuperSender Pro — Localization & Business Config</title>
+  <style>
+  :root{--bg:#0e1116;--card:#171c24;--line:#232a35;--fg:#e6edf3;--mut:#8b97a7;--accent:#6aa6ff;}
+  *{box-sizing:border-box}body{margin:0;font-family:system-ui,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--
+  fg)}
+  header{padding:24px 32px;border-bottom:1px solid var(--line)}h1{font-size:22px;margin:0}
+  main{padding:32px;max-width:900px;margin:0 auto;display:grid;gap:24px}.card{background:var(--card);border:1px solid var(-
+  -line);border-radius:12px;padding:20px}
+  .card h2{font-size:14px;margin:0 0 14px;color:var(--mut);text-transform:uppercase}
+
+
+  label{display:block;color:var(--mut);font-size:13px;margin-top:10px}
+  input,select{width:100%;background:#0b0f14;border:1px solid var(--line);color:var(--fg);border-
+  radius:8px;padding:9px;font-size:14px;margin-top:4px}
+  button{background:var(--accent);color:#0b0f14;border:none;border-radius:8px;padding:10px 18px;font-
+  weight:700;cursor:pointer;margin-top:14px}
+  pre{background:#0b0f14;border:1px solid var(--line);border-radius:8px;padding:14px;font-size:13px;color:var(--mut);white-
+  space:pre-wrap}
+
+              🌍
+  </style></head><body>
+  <header><h1>   Localization & Business Config</h1></header>
+  <main>
+    <div class="card"><h2>Configure a business</h2>
+      <label>Business ID</label><input id="id" placeholder="e.g. my-shop" />
+      <label>Business name</label><input id="name" placeholder="My Shop" />
+      <label>Country</label><select id="country"></select>
+      <label>Business type</label><input id="type" placeholder="ecommerce_store / education / real_estate ..." />
+      <label>Language override (optional)</label><select id="locale"><option value="">(use country default)</option>
+  </select>
+      <button id="save">Save & resolve config</button>
+    </div>
+    <div class="card"><h2>Resolved config</h2><pre id="out">Save a business to preview its resolved settings.</pre></div>
+  </main>
+  <script>(function(){
+    function esc(v){return String(v==null?'':v);}
+    fetch('/api/localization/countries').then(function(r){return r.json();}).then(function(d){
+      document.getElementById('country').innerHTML=(d.countries||[]).map(function(c){return '<option
+  value="'+c.code+'">'+esc(c.name)+' ('+c.currency+')</option>';}).join('');
+    });
+    fetch('/api/localization/status').then(function(r){return r.json();}).then(function(d){
+      var ls=(d&&d.locales)||[]; var sel=document.getElementById('locale');
+      ls.forEach(function(l){var o=document.createElement('option');o.value=l;o.textContent=l;sel.appendChild(o);});
+    });
+    document.getElementById('save').addEventListener('click',function(){
+      fetch('/api/localization/config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+        id:document.getElementById('id').value,name:document.getElementById('name').value,
+        country:document.getElementById('country').value,type:document.getElementById('type').value,
+        locale:document.getElementById('locale').value||undefined
+      })}).then(function(r){return r.json();}).then(function(d)
+  {document.getElementById('out').textContent=JSON.stringify(d.config||d,null,2);});
+    });
+  })();</script></body></html>
+
+
+
+
+Hooks (append-only)
+In lib/integrations/registerAll.js :
+  results.localization = safeMount(app, 'Localization', '/api/localization', '../../routes/localizationRoutes');

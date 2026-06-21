@@ -1,0 +1,40 @@
+  <!DOCTYPE html>
+  <html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cashbook</title><link rel="stylesheet" href="/css/cashbook-center.css" /></head>
+  <body>
+    <header class="cb-header"><h1>Cashbook + Reconciliation</h1><span id="cb-badge" class="cb-badge">loading…</span>
+  </header>
+    <section class="cb-cards" id="cb-kpis"></section>
+    <nav class="cb-tabs">
+      <button data-tab="txns" class="active">Transactions</button>
+      <button data-tab="unmatched">Unmatched</button>
+      <button data-tab="match">Match</button>
+      <button data-tab="dupes">Duplicates</button>
+      <button data-tab="recon">Reconcile</button>
+      <button data-tab="ledger">Ledger Link</button>
+    </nav>
+    <div class="cb-controls">
+      <input id="cb-search" placeholder="Search ref/party…" />
+      <select id="cb-method"><option value="">All methods</option><option>cash</option><option>bank_transfer</option>
+  <option>jazzcash</option><option>easypaisa</option><option>card_preview</option><option>wallet_preview</option></select>
+      <select id="cb-status"><option value="">All match status</option><option>unmatched</option>
+  <option>matched_preview</option><option>partial_match_preview</option><option>duplicate_risk</option>
+  <option>needs_review</option><option>reconciled_preview</option></select>
+      <select id="cb-risk"><option value="">All risk</option><option>low</option><option>medium</option>
+  <option>high</option><option>critical</option></select>
+    </div>
+    <main class="cb-main">
+      <section id="tab-txns" class="cb-tab"><table class="cb-table"><thead><tr><th>Date</th><th>Dir</th><th>Amount</th>
+  <th>Method</th><th>Ref</th><th>Match</th></tr></thead><tbody id="cb-rows"></tbody></table></section>
+      <section id="tab-unmatched" class="cb-tab" hidden><div id="unmatched-list"></div></section>
+      <section id="tab-match" class="cb-tab" hidden><input id="match-id" placeholder="transaction id" /><button id="match-
+  run">Match preview</button><pre id="match-result"></pre></section>
+      <section id="tab-dupes" class="cb-tab" hidden><button id="dupe-run">Run duplicate check</button><div id="dupe-list">
+  </div></section>
+      <section id="tab-recon" class="cb-tab" hidden><button id="recon-run">Run reconciliation preview</button><pre
+  id="recon-result"></pre></section>
+      <section id="tab-ledger" class="cb-tab" hidden><input id="ledger-id" placeholder="transaction id" /><button
+  id="ledger-run">Ledger link preview</button><pre id="ledger-result"></pre></section>
+    </main>
+    <script src="/js/cashbook-center.js"></script>
+  </body></html>

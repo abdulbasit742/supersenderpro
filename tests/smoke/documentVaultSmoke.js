@@ -1,0 +1,11 @@
+'use strict';
+const assert = require('assert');
+const model = require('../../lib/documentVault/documentModel');
+const expiryTracker = require('../../lib/documentVault/expiryTracker');
+const missingDocumentChecker = require('../../lib/documentVault/missingDocumentChecker');
+const complianceEvidence = require('../../lib/documentVault/complianceEvidence');
+assert.strictEqual(model.newDocument({ expiryDate: model.daysFromNow(-1) }).status, 'expired');
+assert.ok(expiryTracker.alerts(model.seeds()).expiredPreview.length >= 1);
+assert.ok(missingDocumentChecker.check('payables_center', ['payment_proof_preview']).missingDocumentsPreview.length >= 1);
+assert.strictEqual(complianceEvidence.build(model.seeds()).liveExport, false);
+console.log(JSON.stringify({ ok: true, dryRun: true, smoke: 'document-vault' }, null, 2));

@@ -1,0 +1,119 @@
+ <!DOCTYPE html>
+ <html lang="en">
+ <head>
+   <meta charset="UTF-8" />
+   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+   <title>Group Commerce Inbox + Market Intelligence</title>
+   <link rel="stylesheet" href="/css/group-commerce-inbox.css" />
+ </head>
+ <body class="gci-body">
+   <header class="gci-header">
+     <div>
+       <h1>Group Commerce Inbox <span class="gci-muted">+ Market Intelligence</span></h1>
+       <p class="gci-subtitle">Seller offers, buyer demand, SKU/price/stock signals, moderation flags. Preview-only.</p>
+     </div>
+     <div class="gci-badges">
+       <span id="badge-enabled" class="gci-badge">enabled: ?</span>
+       <span id="badge-dryrun" class="gci-badge">dry-run: ?</span>
+       <span id="badge-auto" class="gci-badge">auto-actions: ?</span>
+     </div>
+   </header>
+
+   <div class="gci-warn-banner">
+     Everything here is <strong>dry-run</strong>. No WhatsApp sends, channel/social posts, ecommerce writes, deletes, or
+ removals. PII is masked; raw messages are not stored.
+   </div>
+
+
+   <section class="gci-summary" id="summary-cards">
+     <div class="gci-stat"><div class="gci-stat-num" id="stat-items">--</div><div class="gci-stat-label">Items</div></div>
+     <div class="gci-stat"><div class="gci-stat-num" id="stat-groups">--</div><div class="gci-stat-label">Groups</div>
+ </div>
+     <div class="gci-stat"><div class="gci-stat-num" id="stat-demand">--</div><div class="gci-stat-label">Buyer
+ demand</div></div>
+     <div class="gci-stat"><div class="gci-stat-num" id="stat-instock">--</div><div class="gci-stat-label">In stock</div>
+ </div>
+     <div class="gci-stat"><div class="gci-stat-num" id="stat-suspicious">--</div><div class="gci-stat-
+ label">Suspicious</div></div>
+   </section>
+
+
+   <main class="gci-grid">
+     <section class="gci-card gci-filters">
+       <h2>Filters</h2>
+       <div class="gci-form">
+         <label>Group <input id="f-group" type="text" placeholder="groupId" /></label>
+         <label>Type
+           <select id="f-type">
+               <option value="">any</option>
+               <option>seller_offer</option><option>buyer_request</option><option>price_update</option>
+
+           <option>stock_update</option><option>catalog_update</option><option>moderation_flag</option>
+           <option>suspicious_post</option><option>admin_command</option><option>ai_suggestion</option>
+           <option>relay_opportunity</option><option>ecommerce_opportunity</option>
+         </select>
+       </label>
+       <label>Risk
+         <select id="f-risk"><option value="">any</option><option>low</option><option>medium</option>
+<option>high</option></select>
+       </label>
+       <label>SKU / product <input id="f-query" type="text" placeholder="search" /></label>
+       <label>Min confidence <input id="f-conf" type="number" min="0" max="1" step="0.1" placeholder="0.0" /></label>
+       <label class="gci-check"><input id="f-unresolved" type="checkbox" /> Unresolved only</label>
+       <label class="gci-check"><input id="f-suspicious" type="checkbox" /> Suspicious only</label>
+       <label class="gci-check"><input id="f-highvalue" type="checkbox" /> High-value only</label>
+       <label>Sort
+         <select id="f-sort">
+           <option value="newest">newest</option><option value="oldest">oldest</option>
+           <option value="highest_price">highest price</option><option value="lowest_price">lowest price</option>
+           <option value="highest_confidence">highest confidence</option><option value="highest_risk">highest
+risk</option>
+         </select>
+       </label>
+       <div class="gci-actions"><button id="btn-apply" class="gci-btn">Apply</button><button id="btn-reset" class="gci-
+btn gci-btn-ghost">Reset</button></div>
+     </div>
+   </section>
+
+
+   <section class="gci-card gci-span2">
+     <h2>Inbox <span class="gci-muted" id="inbox-count"></span></h2>
+     <table class="gci-table" id="inbox-table">
+       <thead><tr><th>Type</th><th>Group</th><th>Product / SKU</th><th>Price</th><th>Conf</th><th>Risk</th>
+<th>Status</th></tr></thead>
+       <tbody><tr><td class="gci-muted" colspan="7">Loading...</td></tr></tbody>
+     </table>
+   </section>
+
+   <section class="gci-card" id="detail-card">
+     <h2>Item Detail</h2>
+     <div id="detail-body" class="gci-muted">Select an item.</div>
+     <div id="detail-actions"></div>
+   </section>
+
+   <section class="gci-card">
+     <h2>Market Summary</h2>
+     <div id="market-body" class="gci-muted">Loading...</div>
+   </section>
+
+
+   <section class="gci-card gci-span2">
+     <h2>Ingest / Analyze Sample <span class="gci-pill">dry-run</span></h2>
+     <p class="gci-muted">Paste analyzed group commerce output (JSON) or a sample message to normalize + store.</p>
+     <textarea id="ingest-input" class="gci-textarea"
+placeholder='{"groupId":"grp_001","groupName":"Demo","message":"ChatGPT available Rs 1500 in stock Lahore"}'></textarea>
+     <div class="gci-actions"><button id="btn-ingest" class="gci-btn">Ingest sample</button></div>
+     <pre class="gci-pre" id="ingest-output">Result appears here.</pre>
+   </section>
+
+   <section class="gci-card gci-span2">
+
+     <h2>Docs</h2><ul class="gci-list"><li><a href="/docs/GROUP_COMMERCE_INBOX.md">Group Commerce Inbox Guide</a></li>
+</ul>
+   </section>
+ </main>
+
+
+ <script src="/js/group-commerce-inbox.js"></script>
+</body>
+</html>

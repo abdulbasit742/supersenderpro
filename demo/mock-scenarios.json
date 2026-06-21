@@ -1,0 +1,28 @@
+{
+     "note": "Fake demo scenarios. example.com emails, masked phones, DEMO-* refs only. No real data, no secrets.",
+     "scenarios": [
+         { "id": "wa_order_confirmation", "title": "WhatsApp order confirmation preview", "provider": "whatsappBaileysMock" },
+         { "id": "wa_payment_reminder", "title": "WhatsApp payment reminder preview", "provider": "whatsappBaileysMock" },
+         { "id": "wa_support_reply", "title": "WhatsApp support reply preview", "provider": "whatsappBaileysMock" },
+         { "id": "wa_channel_post", "title": "WhatsApp Channel post preview", "provider": "channelPublisherMock" },
+         { "id": "social_post", "title": "Facebook/Instagram post preview", "provider": "socialPublisherMock" },
+         { "id": "ecom_order_received", "title": "Ecommerce order received preview", "provider": "ecommerceMock" },
+         { "id": "pay_approved", "title": "Payment verification approved preview", "provider": "paymentVerifierMock" },
+         { "id": "pay_rejected", "title": "Payment verification rejected preview", "provider": "paymentVerifierMock" },
+         { "id": "webhook_success", "title": "Webhook delivery success preview", "provider": "webhookDeliveryMock" },
+         { "id": "webhook_failed", "title": "Webhook delivery failed preview", "provider": "webhookDeliveryMock" },
+         { "id": "ai_reply", "title": "AI reply generation preview", "provider": "aiProviderMock" },
+         { "id": "voice_transcript", "title": "Voice AI transcript preview", "provider": "voiceAIMock" },
+         { "id": "support_reply", "title": "Support ticket reply preview", "provider": "supportMock" },
+         { "id": "dev_api_event", "title": "Developer API event preview", "provider": "developerPortalMock" },
+         { "id": "audit_warning", "title": "Audit/security warning event preview", "provider": "auditSecurityMock" },
+         { "id": "tenant_billing_upgrade", "title": "Tenant billing upgrade preview", "provider": "billingMock" },
+         { "id": "approval_required", "title": "Approval required action preview", "provider": "auditSecurityMock" },
+         { "id": "feature_flag_blocked", "title": "Feature flag blocked action preview", "provider": "developerPortalMock" }
+     ]
+}
+
+lib/mockGateway/providers/*.js (15 provider simulators)
+
+Every provider exports getStatus() , runPreview(input) , getSampleScenarios() , validateInput(input) . All offline, dry-
+run, redacted. None call external APIs or send anything.

@@ -1,0 +1,31 @@
+  <!DOCTYPE html>
+  <html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Agent Monitor</title><link rel="stylesheet" href="/css/ai-agent-monitor.css" /></head>
+  <body>
+    <header class="am-header"><h1>AI Agent Monitor + Human Handoff</h1><span id="am-badge" class="am-badge">loading…
+  </span></header>
+    <section class="am-cards" id="am-analytics"></section>
+    <nav class="am-tabs">
+      <button data-tab="replies" class="active">Replies</button>
+      <button data-tab="quality">Quality / Risk</button>
+      <button data-tab="queue">Handoff Queue</button>
+      <button data-tab="rules">Rule Tester</button>
+      <button data-tab="gap">Knowledge Gap</button>
+      <button data-tab="override">Override Draft</button>
+    </nav>
+    <main>
+      <section id="tab-replies" class="am-tab"><div id="reply-list"></div></section>
+      <section id="tab-quality" class="am-tab" hidden><h3 id="q-title">Pick a reply</h3><div id="quality-panel"></div>
+  </section>
+      <section id="tab-queue" class="am-tab" hidden><div id="queue-list"></div></section>
+      <section id="tab-rules" class="am-tab" hidden><textarea id="rule-msg" placeholder="customer message"></textarea>
+  <textarea id="rule-reply" placeholder="ai reply"></textarea><input id="rule-conf" type="number" step="0.1" min="0"
+  max="1" placeholder="confidence 0-1" /><button id="rule-run">Test handoff rules</button><pre id="rule-result"></pre>
+  </section>
+      <section id="tab-gap" class="am-tab" hidden><textarea id="gap-msg" placeholder="customer question"></textarea><button
+  id="gap-run">Detect knowledge gap</button><pre id="gap-result"></pre></section>
+      <section id="tab-override" class="am-tab" hidden><textarea id="ov-text" placeholder="human override draft">
+  </textarea><button id="ov-run">Build override draft</button><pre id="ov-result"></pre></section>
+    </main>
+    <script src="/js/ai-agent-monitor.js"></script>
+  </body></html>

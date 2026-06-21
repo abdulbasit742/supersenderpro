@@ -1,0 +1,13 @@
+# Source: SuperSender Pro — Compliance Routes Auth-Gate Patch (append-only, secure the consent endpoints)-2026062109585951.pdf
+# Target: package.json
+# Extracted PATCH section. Apply manually as append-only hook if needed.
+
+PATCH — package.json (append-only, inside "scripts" )
+  {
+       "scripts": {
+           "_comment_compliance_gate_begin": "BEGIN COMPLIANCE AUTH GATE HOOK",
+           "compliance-gate:check": "node scripts/compliance-gate-check.js",
+           "compliance-gate:smoke": "node tests/smoke/complianceGateSmoke.js",
+           "_comment_compliance_gate_end": "END COMPLIANCE AUTH GATE HOOK"
+       }
+  }

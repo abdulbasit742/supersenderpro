@@ -1,0 +1,16 @@
+# BEGIN V13 PACKAGE SCRIPTS
+"pilot-ops:check": "node scripts/pilot-ops-check.js",
+"pilot-ops:smoke": "node tests/smoke/pilotOpsSmoke.js",
+"support-helpdesk:check": "node scripts/support-helpdesk-check.js",
+"support-helpdesk:smoke": "node tests/smoke/supportHelpdeskSmoke.js",
+"reseller-portal:check": "node scripts/reseller-portal-check.js",
+"reseller-portal:smoke": "node tests/smoke/resellerPortalSmoke.js",
+"guided-demo:check": "node scripts/guided-demo-check.js",
+"guided-demo:smoke": "node tests/smoke/guidedDemoSmoke.js",
+"demo-sandbox:check": "node scripts/demo-sandbox-check.js",
+"demo-sandbox:smoke": "node tests/smoke/demoSandboxSmoke.js",
+"public-funnel:check": "node scripts/public-funnel-check.js",
+"public-funnel:smoke": "node tests/smoke/publicFunnelSmoke.js",
+"shared-inbox:check": "node scripts/shared-inbox-check.js",
+"shared-inbox:smoke": "node tests/smoke/sharedInboxSmoke.js"
+# END V13 PACKAGE SCRIPTS

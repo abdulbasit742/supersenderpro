@@ -1,0 +1,77 @@
+ <html lang="en">
+ <head>
+   <meta charset="UTF-8" />
+   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+   <title>SuperSender Pro — Owner & Incident Command</title>
+   <style>
+     :root{--bg:#0e1116;--card:#171c24;--line:#232a35;--fg:#e6edf3;--mut:#8b97a7;--accent:#6aa6ff;--red:#d23f3f;--
+ amber:#d29922;}
+     *{box-sizing:border-box}body{margin:0;font-family:system-ui,Segoe UI,Roboto,sans-serif;background:var(--
+ bg);color:var(--fg)}
+     header{padding:24px 32px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-
+ items:center}
+     header h1{font-size:22px;margin:0}.badge{font-size:13px;font-weight:600;padding:4px 12px;border-
+ radius:999px;background:rgba(106,166,255,.15);color:var(--accent)}
+     main{padding:32px;max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:24px}
+     .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px}
+     .card h2{font-size:14px;margin:0 0 14px;color:var(--mut);text-transform:uppercase;letter-spacing:.05em}
+     pre{background:#0b0f14;border:1px solid var(--line);border-radius:8px;padding:14px;overflow:auto;font-
+ size:13px;color:var(--mut);white-space:pre-wrap}
+     button{background:var(--accent);color:#0b0f14;border:none;border-radius:8px;padding:9px 16px;font-
+ weight:700;cursor:pointer;margin-top:10px}
+     .inc{padding:10px 0;border-bottom:1px solid var(--line)}.inc:last-child{border-bottom:none}
+     .sev{font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;text-transform:uppercase}
+     .sev.high,.sev.critical{background:rgba(210,63,63,.15);color:var(--red)}
+     .sev.medium{background:rgba(210,153,34,.15);color:var(--amber)}
+     .sev.low{background:rgba(139,151,167,.15);color:var(--mut)}
+   </style>
+ </head>
+
+                  🧭 Owner & Incident Command</h1><span class="badge">DRY-RUN</span></header>
+ <body>
+   <header><h1>
+   <main>
+     <div class="card">
+       <h2>Daily Owner Digest (draft)</h2>
+       <button id="gen">Generate digest</button>
+       <pre id="digest">Click generate…</pre>
+     </div>
+     <div class="card">
+       <h2>Incidents</h2>
+       <button id="open">Open sample incident</button>
+       <div id="incidents" style="margin-top:12px">Loading…</div>
+     </div>
+   </main>
+   <script>
+   (function(){
+     function esc(v){return String(v==null?'':v).replace(/&/g,'&').replace(/</g,'<');}
+     document.getElementById('gen').addEventListener('click',function(){
+
+
+          fetch('/api/owner-command/digest').then(function(r){return r.json();}).then(function(d){
+            document.getElementById('digest').textContent=(d&&d.digest&&d.digest.text)||'unavailable';
+          }).catch(function(){document.getElementById('digest').textContent='offline';});
+      });
+      function loadIncidents(){
+          fetch('/api/incident-command/incidents').then(function(r){return r.json();}).then(function(d){
+            var inc=(d&&d.incidents)||[];
+            document.getElementById('incidents').innerHTML=inc.length?inc.map(function(i){
+              return '<div class="inc"><span class="sev '+esc(i.severity)+'">'+esc(i.severity)+'</span> '+
+                esc(i.title)+' <span style="color:#8b97a7;font-size:12px">('+esc(i.status)+')</span></div>';
+            }).join(''):'No incidents logged.';
+          }).catch(function(){document.getElementById('incidents').textContent='offline';});
+      }
+      document.getElementById('open').addEventListener('click',function(){
+        fetch('/api/incident-command/open',{method:'POST',headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({title:'Sample incident',severity:'high',notes:'Created from dashboard'})
+          }).then(function(){loadIncidents();});
+      });
+      loadIncidents();
+    })();
+    </script>
+  </body>
+  </html>
+
+
+
+Apply only if missing. Append-only, marked. No rewrites, no commit/push.

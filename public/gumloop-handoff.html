@@ -1,0 +1,33 @@
+  <!DOCTYPE html>
+  <html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gumloop Handoff</title><link rel="stylesheet" href="/css/gumloop-handoff.css" /></head>
+  <body>
+    <header class="gh-header"><h1>Gumloop Push-Later Handoff</h1><span id="gh-mode" class="gh-badge">loading…</span>
+  </header>
+    <section class="gh-overview">
+      <div class="gh-card"><span class="gh-label">Safe to copy</span><span id="ov-safe">–</span></div>
+      <div class="gh-card"><span class="gh-label">Must exclude</span><span id="ov-never">–</span></div>
+      <div class="gh-card"><span class="gh-label">Unknown review</span><span id="ov-unknown">–</span></div>
+      <div class="gh-card"><span class="gh-label">Blockers</span><span id="ov-blockers">–</span></div>
+      <div class="gh-card"><span class="gh-label">Warnings</span><span id="ov-warnings">–</span></div>
+    </section>
+    <nav class="gh-tabs">
+      <button data-tab="manifest" class="active">Safe Manifest</button>
+      <button data-tab="never">Never Copy</button>
+      <button data-tab="merge">Merge Risks</button>
+      <button data-tab="maps">Route / Dashboard</button>
+      <button data-tab="runbook">Gumloop Runbook</button>
+      <button data-tab="safety">Safety</button>
+    </nav>
+    <main>
+      <section id="tab-manifest" class="gh-tab"><h3>Files safe to copy</h3><div id="safe-list"></div><h3>Created files</h3>
+  <div id="created-list"></div><h3>Modified (hook-only)</h3><div id="modified-list"></div></section>
+      <section id="tab-never" class="gh-tab" hidden><h3>Never copy</h3><ul id="never-list"></ul></section>
+      <section id="tab-merge" class="gh-tab" hidden><div id="merge-list"></div></section>
+      <section id="tab-maps" class="gh-tab" hidden><h3>Route mounts</h3><div id="route-list"></div><h3>Dashboard links</h3>
+  <div id="dash-list"></div><h3>Package scripts</h3><div id="script-list"></div></section>
+      <section id="tab-runbook" class="gh-tab" hidden><ol id="runbook-list"></ol></section>
+      <section id="tab-safety" class="gh-tab" hidden><pre id="safety-result"></pre></section>
+    </main>
+    <script src="/js/gumloop-handoff.js"></script>
+  </body></html>

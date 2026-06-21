@@ -1,0 +1,4 @@
+Validation (run locally, do not fake)
+  git status --short --branch
+  node --check server.js
+  node --check routes/privacyCenterRoutes.js

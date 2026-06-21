@@ -1,0 +1,79 @@
+  <!-- BEGIN SUPPLIER PORTAL HOOK -->
+  <a href="/supplier-portal.html" class="nav-link" title="Vendor self-service status center">Supplier Portal</a>
+  <!-- END SUPPLIER PORTAL HOOK -->
+
+
+
+FILE: .env.example
+
+
+  # BEGIN SUPPLIER PORTAL HOOK
+  SUPPLIER_PORTAL_ENABLED=true
+  SUPPLIER_PORTAL_DRY_RUN=true
+  SUPPLIER_PORTAL_PUBLIC_LIVE=false
+  SUPPLIER_PORTAL_ALLOW_LIVE_QUOTE=false
+  SUPPLIER_PORTAL_ALLOW_LIVE_PO=false
+  SUPPLIER_PORTAL_ALLOW_LIVE_PAYMENT=false
+  SUPPLIER_PORTAL_ALLOW_LIVE_SEND=false
+  SUPPLIER_PORTAL_ALLOW_DOCUMENT_DOWNLOAD=false
+  SUPPLIER_PORTAL_REDACT_PII=true
+  # END SUPPLIER PORTAL HOOK
+
+
+
+FILE: package.json (inside "scripts" )
+
+
+  {
+      "scripts": {
+       "_comment_supplier_portal_begin": "BEGIN SUPPLIER PORTAL HOOK",
+       "supplier-portal:check": "node scripts/supplier-portal-check.js",
+
+
+          "supplier-portal:smoke": "node tests/smoke/supplierPortalSmoke.js",
+          "_comment_supplier_portal_end": "END SUPPLIER PORTAL HOOK"
+      }
+  }
+
+
+
+FILE: .gitignore
+
+
+  # BEGIN SUPPLIER PORTAL HOOK
+  data/supplier-portal.json
+  artifacts/supplier_portal_*
+  # END SUPPLIER PORTAL HOOK
+
+
+
+
+Route / nav dedup verification (run locally before mounting)
+  # Each should print 0 (clean repo, before paste) or 1 (after paste). Never 2+.
+  grep -c "require('./routes/supplierPortalRoutes')" server.js
+  grep -c "app.use('/api/supplier-portal'" server.js
+  grep -c "/supplier-portal.html" public/index.html
+
+
+Validation (run locally; never faked)
+  git status --short --branch
+  node --check server.js
+  node --check routes/supplierPortalRoutes.js
+  node --check lib/supplierPortal/supplierPortalService.js
+  node --check lib/supplierPortal/statusSummaryPreview.js
+  node --check lib/supplierPortal/rfqStatusPreview.js
+  node --check lib/supplierPortal/quoteStatusPreview.js
+  node --check lib/supplierPortal/purchaseOrderStatusPreview.js
+  node --check lib/supplierPortal/billPaymentStatusPreview.js
+  node --check lib/supplierPortal/deliveryStatusPreview.js
+  node --check lib/supplierPortal/qualityScorePreview.js
+  node --check lib/supplierPortal/contractStatusPreview.js
+  node --check lib/supplierPortal/documentRequestPreview.js
+  node --check lib/supplierPortal/supportRequestPreview.js
+  node --check lib/supplierPortal/messageDrafts.js
+  node --check lib/supplierPortal/auditPreview.js
+  node --check lib/supplierPortal/redactor.js
+  node --check scripts/supplier-portal-check.js
+  node --check tests/smoke/supplierPortalSmoke.js
+  npm run supplier-portal:check
+  npm run supplier-portal:smoke

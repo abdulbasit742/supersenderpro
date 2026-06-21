@@ -1,0 +1,7 @@
+// BEGIN BOOTSTRAP V8 MODULE CHECKLIST
+// Growth/payment recovery modules now present and ready for bootstrap wiring:
+// fraudGuard, paymentOCR, pause, abtest, sendTime, referral, nextOffer,
+// dropRecovery, winback, renewals.
+// Keep server.js/.env/.gitignore direct edits out of this overlay; apply this
+// checklist in your real repo bootstrap/registerAll layer.
+// END BOOTSTRAP V8 MODULE CHECKLIST

@@ -1,0 +1,43 @@
+  {
+       "generatedAt": "2026-06-20",
+       "note": "Seed inventory from workspace scan. Re-run scripts/business-setup-check.js locally to refresh.",
+       "existingSystems": [
+         { "area": "WhatsApp Cloud API Setup Wizard", "status": ["exists", "safe_to_extend"], "reuse": "linked from
+  whatsapp_connection checklist" },
+      { "area": "Integration setup wizard (lib/integrationSetup)", "status": ["exists", "safe_to_extend"], "reuse":
+  "ecommerce/social/sheets connections" },
+      { "area": "Owner Command Center", "status": ["exists", "safe_to_extend"], "reuse": "owner_command checklist + digest"
+  },
+        { "area": "Launch center", "status": ["exists", "safe_to_extend"], "reuse": "readiness factor" },
+        { "area": "Security scan", "status": ["exists", "safe_to_extend"], "reuse": "readiness factor" },
+        { "area": "Customer 360 / CRM", "status": ["partially_exists", "needs_wiring"] },
+        { "area": "Marketplace Intelligence", "status": ["exists", "safe_to_extend"] },
+        { "area": "Group Commerce OS", "status": ["partially_exists", "safe_to_extend"] },
+        { "area": "Channel Automation", "status": ["partially_exists", "safe_to_extend"] },
+        { "area": "AI Agent Deployment Center", "status": ["exists", "safe_to_extend"], "reuse": "recommended agents" },
+        { "area": "Flow Studio", "status": ["exists", "safe_to_extend"], "reuse": "recommended flows" },
+        { "area": "Voice AI", "status": ["missing", "needs_wiring"], "note": "checklist item present, consent-gated" },
+        { "area": "ecommerce / catalog / orders", "status": ["exists", "live_action_risk"] },
+        { "area": "payments", "status": ["exists", "live_action_risk"] },
+        { "area": "admin auth / RBAC", "status": ["unknown", "needs_wiring"] },
+        { "area": "backup / export", "status": ["exists", "safe_to_extend"] }
+       ],
+       "newCoordinationLayer": {
+        "area": "Business Setup Wizard + Industry Preset Launcher",
+        "status": "missing_before_this_pack",
+        "files": [
+          "lib/businessSetup/store.js", "lib/businessSetup/profileManager.js",
+            "lib/businessSetup/presetRegistry.js", "lib/businessSetup/industryPresets.js",
+            "lib/businessSetup/presetApplier.js", "lib/businessSetup/recommendedPlaybooks.js",
+            "lib/businessSetup/recommendedAgents.js", "lib/businessSetup/recommendedFlows.js",
+            "lib/businessSetup/setupChecklist.js", "lib/businessSetup/readinessScoring.js",
+            "lib/businessSetup/safetyGuard.js", "routes/businessSetupRoutes.js",
+            "public/business-setup.html", "public/js/business-setup.js", "public/css/business-setup.css",
+            "scripts/business-setup-check.js", "tests/smoke/businessSetupSmoke.js",
+            "docs/BUSINESS_SETUP_WIZARD.md", "docs/BUSINESS_PRESETS.md",
+            "docs/BUSINESS_SETUP_READINESS.md", "docs/BUSINESS_SETUP_SAFETY.md"
+        ]
+       },
+       "duplicateRisk": [],
+       "liveActionRisk": "none_by_default_all_dry_run"
+  }

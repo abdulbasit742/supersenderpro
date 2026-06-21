@@ -1,0 +1,120 @@
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pilot Ops Command Center</title>
+    <link rel="stylesheet" href="/css/pilot-ops.css" />
+  </head>
+  <body class="po-body">
+    <header class="po-header">
+      <div>
+         <h1>Pilot Ops <span class="po-muted">Onboarding + Trial Operations</span></h1>
+         <p class="po-subtitle">Track pilots, onboarding, scores, feedback, and follow-up drafts. Dry-run + privacy-safe.
+  </p>
+      </div>
+      <div class="po-badges">
+        <span id="badge-dryrun" class="po-badge">dry-run: ?</span>
+         <span id="badge-consent" class="po-badge">consent-required: ?</span>
+         <span id="badge-live" class="po-badge">live-messages: ?</span>
+      </div>
+    </header>
+
+    <div class="po-warn-banner">
+      Tenant creation, billing activation, and live messaging are <strong>disabled</strong>. PII masked. All follow-ups are
+  <strong>drafts</strong>.
+    </div>
+
+
+    <section class="po-overview" id="overview">
+      <div class="po-stat"><div class="po-stat-num" id="ov-pilots">--</div><div class="po-stat-label">Pilots</div></div>
+      <div class="po-stat"><div class="po-stat-num" id="ov-trials">--</div><div class="po-stat-label">Active trials</div>
+  </div>
+      <div class="po-stat"><div class="po-stat-num" id="ov-stuck">--</div><div class="po-stat-label">Onboarding stuck</div>
+  </div>
+      <div class="po-stat"><div class="po-stat-num po-ok" id="ov-upgrade">--</div><div class="po-stat-label">Upgrade
+  ready</div></div>
+      <div class="po-stat"><div class="po-stat-num po-bad" id="ov-risk">--</div><div class="po-stat-label">High risk</div>
+  </div>
+      <div class="po-stat"><div class="po-stat-num" id="ov-feedback">--</div><div class="po-stat-label">Feedback open</div>
+  </div>
+      <div class="po-stat"><div class="po-stat-num po-warn" id="ov-expiring">--</div><div class="po-stat-label">Trial
+  expiring</div></div>
+    </section>
+
+    <div class="po-toolbar">
+      <button id="btn-new-pilot" class="po-btn">New pilot</button>
+      <button id="btn-refresh" class="po-btn po-btn-ghost">Refresh</button>
+    </div>
+
+ <main class="po-grid">
+   <section class="po-card po-span2">
+    <h2>Pilots</h2>
+    <table class="po-table" id="pilot-table">
+       <thead><tr><th>Business</th><th>Type</th><th>Plan</th><th>Onboarding</th><th>Trial</th><th>Success</th>
+<th>Risk</th><th>Next action</th></tr></thead>
+      <tbody><tr><td class="po-muted" colspan="8">Loading...</td></tr></tbody>
+    </table>
+   </section>
+
+   <section class="po-card">
+     <h2>Pilot Detail</h2>
+    <div id="detail-body" class="po-muted">Select a pilot.</div>
+    <div id="detail-actions"></div>
+   </section>
+
+   <section class="po-card">
+     <h2>Onboarding Checklist</h2>
+     <div id="checklist-body" class="po-muted">Select a pilot.</div>
+   </section>
+
+   <section class="po-card">
+    <h2>Success / Risk</h2>
+    <div id="scores-body" class="po-muted">Select a pilot.</div>
+   </section>
+
+
+   <section class="po-card">
+     <h2>Follow-up Draft <span class="po-pill">dry-run</span></h2>
+    <div class="po-form">
+      <select id="fu-type">
+         <option>setup_reminder</option><option>checklist_reminder</option><option>trial_expiring</option>
+         <option>upgrade_recommendation</option><option>feedback_request</option><option>bug_resolved</option>
+         <option>thank_you_success</option><option>cancellation_save</option><option>demo_confirmation</option>
+<option>trial_approved</option>
+       </select>
+       <select id="fu-lang"><option value="roman_urdu">Roman Urdu</option><option value="english">English</option>
+<option value="mixed">Mixed</option></select>
+       <button id="btn-followup" class="po-btn po-btn-tiny">Generate</button>
+    </div>
+    <pre class="po-pre" id="fu-output">Draft appears here.</pre>
+   </section>
+
+
+   <section class="po-card po-span2">
+     <h2>Feedback / Bugs</h2>
+    <table class="po-table" id="fb-table">
+      <thead><tr><th>Type</th><th>Title</th><th>Severity</th><th>Module</th><th>Status</th></tr></thead>
+      <tbody><tr><td class="po-muted" colspan="5">Loading...</td></tr></tbody>
+    </table>
+   </section>
+
+
+   <section class="po-card po-span2">
+     <h2>Docs</h2><ul class="po-list">
+       <li><a href="/docs/PILOT_OPS_COMMAND_CENTER.md">Pilot Ops Command Center</a></li>
+       <li><a href="/docs/PILOT_ONBOARDING_CHECKLIST.md">Onboarding Checklist</a></li>
+       <li><a href="/docs/PILOT_SUCCESS_SCORING.md">Success Scoring</a></li>
+       <li><a href="/docs/PILOT_FEEDBACK_TRACKING.md">Feedback Tracking</a></li>
+
+         <li><a href="/docs/PILOT_CONVERSION_PLAYBOOK.md">Conversion Playbook</a></li>
+       <li><a href="/docs/PILOT_OPS_ADMIN_COMMANDS.md">Admin Commands</a></li>
+     </ul>
+   </section>
+ </main>
+
+ <script src="/js/pilot-ops.js"></script>
+</body>
+</html>
+
+public/js/pilot-ops.js + public/css/pilot-ops.css

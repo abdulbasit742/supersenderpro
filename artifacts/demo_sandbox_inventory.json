@@ -1,0 +1,34 @@
+{
+    "generatedAt": "2026-06-20",
+    "note": "Seed inventory from workspace scan. An existing Demo Mode module is REUSED, not rebuilt. Re-run scripts/demo-sandbox-check.js locally to refresh.",
+  "existingSystems": [
+    { "area": "Demo Mode (src/modules/demoMode.js)", "status": ["exists", "duplicate_risk", "safe_to_extend"], "note":
+"seeds demo customers/orders/social/queue/channel/dealer/health to data/demo_*.json with seed/reset/status + /demo-
+control + !demo commands. REUSED by the data factory; NOT rebuilt." },
+    { "area": "Public SaaS Funnel", "status": ["missing"], "note": "confirmed missing by prior gap reports; funnel CTA
+adapter returns unavailable until built." },
+    { "area": "Business Setup Wizard", "status": ["exists", "safe_to_extend"], "note": "sample setup CTA target" },
+    { "area": "Owner Command / KPI Command", "status": ["exists", "safe_to_extend"], "note": "demo adapters preview fake
+data" },
+    { "area": "Marketplace Intelligence / Group Commerce / Growth Campaigns / Flow Studio", "status": ["exists",
+"safe_to_extend"] },
+      { "area": "Compliance Center", "status": ["exists", "safe_to_extend"] },
+      { "area": "Voice AI", "status": ["missing", "needs_wiring"], "note": "demo transcript only, no audio" },
+      { "area": "Channel Automation", "status": ["partially_exists", "safe_to_extend"] },
+      { "area": "SaaS Billing / Tenant Portal", "status": ["missing"], "note": "fake billing demo data only" },
+    { "area": "ecommerce / payments / customers", "status": ["exists", "demo_data_risk"], "note": "demo adapters never
+touch real storage" }
+    ],
+    "newCoordinationLayer": {
+      "area": "Demo Sandbox + Guided Product Tour Command Center",
+      "status": "missing_before_this_pack",
+      "fileCount": 27
+    },
+    "duplicatesSkipped": [
+      "Did NOT rebuild src/modules/demoMode (data factory reuses its status/seed).",
+      "Did NOT build a second /demo-control (kept existing; added /demo-sandbox).",
+      "Did NOT build a public funnel (adapter returns unavailable)."
+    ],
+    "demoDataRisk": "mitigated_all_fake_reserved_patterns",
+    "liveActionRisk": "none_demo_guard_blocks_all_live"
+}

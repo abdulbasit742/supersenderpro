@@ -1,0 +1,10 @@
+ // BEGIN GROUP COMMERCE OS HOOK
+ try {
+   const groupCommerceRoutes = require('./routes/groupCommerceRoutes');
+     app.use('/api/group-commerce', groupCommerceRoutes);
+     app.get('/group-commerce', (req, res) => res.sendFile(require('path').join(__dirname, 'public', 'group-\n commerce.html')));
+   console.log('[group-commerce] mounted at /api/group-commerce (dry-run)');
+ } catch (e) {
+   console.error('[group-commerce] mount skipped:', e && e.message);
+ }
+ // END GROUP COMMERCE OS HOOK

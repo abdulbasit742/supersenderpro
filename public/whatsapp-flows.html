@@ -1,0 +1,27 @@
+  <!DOCTYPE html>
+  <html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WhatsApp Flows</title><link rel="stylesheet" href="/css/whatsapp-flows.css" /></head>
+  <body>
+    <header class="wf-header"><h1>WhatsApp Flows (Native Forms)</h1><span id="wf-badge" class="wf-badge">loading…</span>
+  </header>
+    <section class="wf-cards" id="wf-kpis"></section>
+    <nav class="wf-tabs">
+      <button data-tab="flows" class="active">Flows</button>
+      <button data-tab="preview">In-Chat Preview</button>
+      <button data-tab="builder">Builder (JSON)</button>
+      <button data-tab="responses">Responses</button>
+      <button data-tab="analytics">Analytics</button>
+    </nav>
+    <main class="wf-main">
+      <section id="tab-flows" class="wf-tab"><div id="flow-list" class="wf-grid"></div></section>
+      <section id="tab-preview" class="wf-tab" hidden><div class="wf-preview-wrap"><div class="wf-phone"><div class="wf-
+  phone-top" id="wf-phone-title">Pick a flow</div><div id="wf-screen" class="wf-screen"></div><button id="wf-next"
+  class="wf-next" hidden>Continue</button></div><div class="wf-preview-side"><select id="wf-flow-select"></select><button
+  id="wf-start">Start preview</button><pre id="wf-state"></pre></div></div></section>
+      <section id="tab-builder" class="wf-tab" hidden><select id="wf-builder-select"></select><button id="wf-
+  validate">Validate</button><pre id="wf-builder"></pre></section>
+      <section id="tab-responses" class="wf-tab" hidden><div id="resp-list"></div></section>
+      <section id="tab-analytics" class="wf-tab" hidden><pre id="analytics-result"></pre></section>
+    </main>
+    <script src="/js/whatsapp-flows.js"></script>
+  </body></html>

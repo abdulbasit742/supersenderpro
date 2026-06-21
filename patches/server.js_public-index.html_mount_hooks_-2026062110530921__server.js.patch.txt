@@ -1,0 +1,19 @@
+  // BEGIN SUPERFLOW STUDIO HOOK
+  // Mounts SuperFlow Studio (visual automation builder). Dry-run only.
+  try {
+    const superflowRoutes = require('./routes/superflowRoutes');
+    app.use('/api/superflow', superflowRoutes);
+    // Serve the studio page (public/ is typically already static-served; this is
+    // an explicit fallback so the page works regardless of static config).
+    app.get('/superflow-studio', (req, res) => {
+      res.sendFile(require('path').join(__dirname, 'public', 'superflow-studio.html'));
+    });
+    console.log('[superflow] mounted at /api/superflow and /superflow-studio (dry-run)');
+  } catch (e) {
+    console.error('[superflow] mount skipped:', e && e.message);
+  }
+  // END SUPERFLOW STUDIO HOOK
+
+ Place this AFTER app and your JSON body parser exist (e.g. after app.use(express.json()) ) and alongside your
+ other app.use('/api/...', ...) mounts. The try/catch guarantees a load failure can never crash your live
+ server.

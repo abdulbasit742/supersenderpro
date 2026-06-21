@@ -1,0 +1,54 @@
+{
+    "generatedBy": "incident-command-scan",
+    "note": "Scan of the SuperSender Pro workspace repo. Health/launch/security/backup checks already exist. Incident
+Command only aggregates them via read-only adapters. No duplicates created.",
+  "existing": {
+    "launch_center": { "files": ["lib/launchCenter/checks.js", "lib/launchCenter/runner.js",
+"lib/launchCenter/reportWriter.js", "routes/launchCenterRoutes.js"], "status": "exists" },
+    "security_scan": { "files": ["lib/securityScan/scanner.js", "lib/securityScan/patterns.js",
+"lib/securityScan/reportWriter.js", "routes/securityScanRoutes.js"], "status": "exists" },
+    "group_commerce": { "files": ["lib/groupCommerce/*", "lib/groupCommerce/adapters/*", "lib/groupCommerce/inbox/*"],
+"status": "exists" },
+      "local_worker_bridge": { "files": ["lib/localWorkerBridge/*"], "status": "exists" },
+      "payment_validation": { "files": ["lib/paymentValidation/*"], "status": "exists" },
+      "integration_setup": { "files": ["lib/integrationSetup/*"], "status": "exists" },
+      "superflow": { "files": ["lib/superflow/*"], "status": "exists" },
+      "whatsapp_cloud_setup": { "files": ["lib/whatsappCloudSetup/*"], "status": "exists" }
+    },
+    "areas": {
+      "whatsapp": "partially_exists", "channel_automation": "partially_exists", "social": "partially_exists",
+      "ecommerce": "partially_exists", "payments": "exists", "billing": "partially_exists",
+      "voice_ai": "partially_exists", "customer_360": "partially_exists", "marketplace": "partially_exists",
+      "group_commerce": "exists", "ai_agents": "partially_exists", "flow_studio": "exists",
+      "backup_restore": "partially_exists", "security": "exists", "launch": "exists",
+      "env_config": "safe_to_extend", "routes": "safe_to_extend", "dashboard": "safe_to_extend",
+      "storage": "missing", "queues": "partially_exists", "auth": "partially_exists", "docs": "needs_docs"
+    },
+    "incidentCommandLayer": {
+      "lib/incidentCommand/store.js": "missing -> create",
+      "lib/incidentCommand/healthAggregator.js": "missing -> create",
+      "lib/incidentCommand/moduleRegistry.js": "missing -> create",
+      "lib/incidentCommand/incidentStore.js": "missing -> create",
+      "lib/incidentCommand/severityEngine.js": "missing -> create",
+      "lib/incidentCommand/safetyGuard.js": "missing -> create",
+      "lib/incidentCommand/incidentDetector.js": "missing -> create",
+      "lib/incidentCommand/rules.js": "missing -> create",
+      "lib/incidentCommand/runbooks.js": "missing -> create",
+      "lib/incidentCommand/recoverySteps.js": "missing -> create",
+      "lib/incidentCommand/alertRules.js": "missing -> create",
+      "lib/incidentCommand/alertFormatter.js": "missing -> create",
+      "lib/incidentCommand/adapters/*": "missing -> create (15 + ownerCommand)",
+      "routes/incidentCommandRoutes.js": "missing -> needs_route",
+      "public/incident-command.*": "missing -> needs_ui",
+      "scripts/incident-command-check.js": "missing -> create",
+      "tests/smoke/incidentCommandSmoke.js": "missing -> needs_test"
+    },
+
+    "duplicatesSkipped": [
+     "Did NOT rebuild launch center / security scan / backup doctor",
+     "Did NOT rebuild any module (whatsapp/social/ecommerce/payments/billing/voice/etc)",
+     "Did NOT build a second monitoring or alert system",
+     "Adapters read existing status only; no new health-check engines"
+    ],
+    "safety": { "dryRunDefault": true, "liveAlerts": false, "autoFix": false, "piiMasking": true, "destructive": false }
+}

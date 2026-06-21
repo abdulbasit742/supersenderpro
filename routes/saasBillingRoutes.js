@@ -1,91 +1,63 @@
-'use strict';
-/**
- * routes/saasBillingRoutes.js — SaaS Billing + Tenant License + Usage Metering API.
- * Mounted in server.js at /api/saas-billing (see SAAS BILLING HOOK).
- *
- * Safety:
- *  - Read endpoints are open (no secrets in responses; all output sanitized).
- *  - Write endpoints require an admin secret (x-admin-secret header / ?secret=) matching
- *    SAAS_BILLING_ADMIN_SECRET / ADMIN_TOKEN / CHANNEL_ADMIN_SECRET when configured.
- *    If none configured, allowed in dev with a warning (matches repo convention).
- *  - No real payment capture. No live suspension by default. Warn-only enforcement.
- */
-const express = require('express');
-const S = require('../lib/saasBilling');
-const { sanitize } = require('../lib/saasBilling/privacy');
+ 'use strict';
 
-const router = express.Router();
+ /**
+  * SaaS Billing — Express router. Dry-run / preview only. No real charge, no payment
+  * gateway call, no invoice send, no external calls, no secrets/full PII.
+  *
+  * Mount (inside marked hook):
+  *     const saasBillingRoutes = require('./routes/saasBillingRoutes');
+  *     app.use('/api/saas-billing', saasBillingRoutes);
+  */
 
-function adminGuard(req, res, next) {
-  if (!S.config.requireAdmin) return next();
-  const configured = process.env.SAAS_BILLING_ADMIN_SECRET || process.env.ADMIN_TOKEN || process.env.CHANNEL_ADMIN_SECRET || '';
-  if (!configured) { console.warn('[SaaSBilling] no admin secret set — write allowed in dev mode'); return next(); }
-  const provided = req.get('x-admin-secret') || req.query.secret || (req.body && req.body.secret);
-  if (provided && provided === configured) return next();
-  return res.status(401).json({ success: false, error: 'Unauthorized', fix: 'Send x-admin-secret matching SAAS_BILLING_ADMIN_SECRET' });
-}
+ const express = require('express');
+ const router = express.Router();
 
-const ok = (res, d) => res.json({ success: true, ...sanitizeWrap(d) });
-const fail = (res, e, c = 500) => res.status(c).json({ success: false, error: e && e.message ? e.message : String(e) });
-function sanitizeWrap(d) { try { return sanitize(d); } catch { return d; } }
-const tid = (req) => req.params.tenantId || (req.body && req.body.tenantId) || req.query.tenantId || 'default';
+ const catalog = require('../lib/saasBilling/planCatalog');
+ const subscription = require('../lib/saasBilling/subscriptionModel');
+ const usageMeter = require('../lib/saasBilling/usageMeter');
+ const usageEvents = require('../lib/saasBilling/usageEvents');
+ const quota = require('../lib/saasBilling/quotaChecker');
+ const entitlements = require('../lib/saasBilling/entitlementService');
+ const summary = require('../lib/saasBilling/billingSummary');
+ const upgrade = require('../lib/saasBilling/upgradePreview');
 
-/* ---------------- Status / Doctor ---------------- */
-router.get('/status', (req, res) => { try { ok(res, { status: S.billingStatus.overview() }); } catch (e) { fail(res, e); } });
-router.get('/doctor', (req, res) => { try { ok(res, { doctor: S.doctor.run() }); } catch (e) { fail(res, e); } });
 
-/* ---------------- Plans ---------------- */
-router.get('/plans', (req, res) => { try { ok(res, { plans: S.planRegistry.getPlans() }); } catch (e) { fail(res, e); } });
-router.get('/plans/:id', (req, res) => { try { const p = S.planRegistry.getPlan(req.params.id); return p ? ok(res, { plan: p }) : fail(res, new Error('plan not found'), 404); } catch (e) { fail(res, e); } });
-router.post('/plans', adminGuard, (req, res) => {
-  try { if (!S.safetyGuard.canWritePlans()) return res.status(403).json({ success: false, error: 'Plan write disabled', fix: 'Set SAAS_BILLING_ALLOW_PLAN_WRITE=true' }); ok(res, { plan: S.planRegistry.upsertPlan(req.body || {}) }); } catch (e) { fail(res, e); }
-});
-router.put('/plans/:id', adminGuard, (req, res) => {
-  try { if (!S.safetyGuard.canWritePlans()) return res.status(403).json({ success: false, error: 'Plan write disabled', fix: 'Set SAAS_BILLING_ALLOW_PLAN_WRITE=true' }); ok(res, { plan: S.planRegistry.upsertPlan({ ...req.body, id: req.params.id }) }); } catch (e) { fail(res, e); }
-});
-router.delete('/plans/:id', adminGuard, (req, res) => {
-  try { if (!S.safetyGuard.canWritePlans()) return res.status(403).json({ success: false, error: 'Plan write disabled', fix: 'Set SAAS_BILLING_ALLOW_PLAN_WRITE=true' }); const p = S.planRegistry.deactivatePlan(req.params.id); return p ? ok(res, { plan: p, note: 'soft-deactivated (not hard-deleted)' }) : fail(res, new Error('plan not found'), 404); } catch (e) { fail(res, e); }
-});
+ function enabled() { return String(process.env.SAAS_BILLING_ENABLED || 'true').toLowerCase() !== 'false'; }
+ router.use(function (req, res, next) { if (!enabled()) return res.status(404).json({ ok: false, error:
+ 'saas_billing_disabled' }); next(); });
+ function wrap(h) { return function (req, res) { try { h(req, res); } catch (e) { res.status(500).json({ ok: false, error:
+ 'internal_error' }); } }; }
+ function tenant(req) { return (req.query && req.query.tenantId) || (req.body && req.body.tenantId) || 'preview'; }
 
-/* ---------------- Tenants / Licenses ---------------- */
-router.get('/tenants', (req, res) => { try { ok(res, { tenants: S.tenantPlans.listTenants() }); } catch (e) { fail(res, e); } });
-router.get('/tenants/:tenantId/billing', (req, res) => { try { ok(res, { billing: S.billingStatus.tenantStatus(req.params.tenantId) }); } catch (e) { fail(res, e); } });
-router.get('/tenants/:tenantId/license', (req, res) => { try { ok(res, { license: S.licenseEngine.getLicense(req.params.tenantId) }); } catch (e) { fail(res, e); } });
-router.post('/tenants/:tenantId/license', adminGuard, (req, res) => { try { ok(res, { license: S.licenseEngine.issueLicense(req.params.tenantId, (req.body && req.body.planId) || S.tenantPlans.getTenantPlanId(req.params.tenantId), req.body || {}) }); } catch (e) { fail(res, e); } });
-router.put('/tenants/:tenantId/license', adminGuard, (req, res) => { try { ok(res, { license: S.licenseEngine.updateLicense(req.params.tenantId, req.body || {}) }); } catch (e) { fail(res, e); } });
+ router.get('/status', wrap(function (req, res) {
+   res.json({ ok: true, feature: 'saas-billing', dryRun: true, liveActionsEnabled: false, livePayment: false, store:
+ subscription.statusInfo(), meters: catalog.METERS, plans: catalog.order() });
+ }));
 
-/* ---------------- Usage ---------------- */
-router.get('/usage', (req, res) => { try { ok(res, { usage: S.usageMeter.summaryByTenant(req.query.period || 'monthly') }); } catch (e) { fail(res, e); } });
-router.post('/usage/record', adminGuard, (req, res) => { try { ok(res, { event: S.usageMeter.record(req.body || {}) }); } catch (e) { fail(res, e); } });
-router.get('/usage/:tenantId', (req, res) => { try { ok(res, { usage: S.usageMeter.getUsage(req.params.tenantId, req.query.period || 'monthly'), periods: S.usageMeter.getAllPeriods(req.params.tenantId) }); } catch (e) { fail(res, e); } });
-router.post('/quota/check', (req, res) => { try { const b = req.body || {}; ok(res, { quota: b.metric ? S.quotaChecker.check(b) : S.quotaChecker.checkTenant(tid(req)) }); } catch (e) { fail(res, e); } });
+ // plans
+ router.get('/plans', wrap(function (req, res) { res.json({ ok: true, plans: catalog.list() }); }));
+ router.get('/plans/:id', wrap(function (req, res) { const p = catalog.get(req.params.id); return p ? res.json({ ok: true,
+ plan: p }) : res.status(404).json({ ok: false, error: 'not_found' }); }));
 
-/* ---------------- Invoices ---------------- */
-router.get('/invoices', (req, res) => { try { const all = S.invoiceStore.all(); ok(res, { invoices: req.query.tenantId ? all.filter((i) => String(i.tenantId) === String(req.query.tenantId)) : all }); } catch (e) { fail(res, e); } });
-router.post('/invoices', adminGuard, (req, res) => { try { ok(res, { invoice: S.invoiceBuilder.createDraft(req.body || {}) }); } catch (e) { fail(res, e); } });
-router.get('/invoices/:id', (req, res) => { try { const i = S.invoiceStore.getById(req.params.id); return i ? ok(res, { invoice: i }) : fail(res, new Error('invoice not found'), 404); } catch (e) { fail(res, e); } });
-router.put('/invoices/:id', adminGuard, (req, res) => { try { const i = S.invoiceStore.getById(req.params.id); if (!i) return fail(res, new Error('invoice not found'), 404); if ((req.body || {}).status === 'issued') return ok(res, { invoice: S.invoiceBuilder.issue(req.params.id) }); Object.assign(i, { notes: (req.body && req.body.notes) || i.notes }); S.invoiceStore.upsert(i); ok(res, { invoice: i }); } catch (e) { fail(res, e); } });
-router.post('/invoices/:id/mark-paid-review', adminGuard, (req, res) => { try { ok(res, S.invoiceBuilder.markPaidForReview(req.params.id, req.body || {})); } catch (e) { fail(res, e); } });
-router.post('/invoices/:id/cancel', adminGuard, (req, res) => { try { ok(res, { invoice: S.invoiceBuilder.cancel(req.params.id, (req.body && req.body.reason) || '') }); } catch (e) { fail(res, e); } });
+ // subscription + usage
+ router.get('/subscription', wrap(function (req, res) { res.json({ ok: true, subscription:
+ subscription.getForTenant(tenant(req)) }); }));
+ router.get('/usage', wrap(function (req, res) { res.json(usageMeter.usage(tenant(req))); }));
+ router.post('/usage/record-preview', wrap(function (req, res) { const b = req.body || {};
+ res.json(usageMeter.recordPreview(tenant(req), b.meter, b.amount)); }));
 
-/* ---------------- Feature gate ---------------- */
-router.post('/feature/check', (req, res) => { try { ok(res, { decision: S.featureGate.check(req.body || {}) }); } catch (e) { fail(res, e); } });
-router.post('/feature/preview-enforcement', (req, res) => { try { ok(res, { preview: S.featureGate.previewEnforcement(req.body || {}) }); } catch (e) { fail(res, e); } });
+// quota + entitlements
+router.post('/quota/check-preview', wrap(function (req, res) { const b = req.body || {};
+res.json(quota.checkPreview(tenant(req), b.meter, b.requested)); }));
+router.post('/entitlements/check-preview', wrap(function (req, res) { const b = req.body || {};
+res.json(entitlements.checkPreview(tenant(req), b.feature, b.planId)); }));
 
-/* ---------------- Reseller ---------------- */
-router.get('/resellers', (req, res) => { try { ok(res, S.resellerManager.listResellers()); } catch (e) { fail(res, e); } });
-router.post('/resellers', adminGuard, (req, res) => { try { ok(res, { reseller: S.resellerManager.registerReseller(req.body || {}) }); } catch (e) { fail(res, e); } });
-router.get('/resellers/:id', (req, res) => { try { const r = S.resellerStore.getReseller(req.params.id); return r ? ok(res, { reseller: r }) : fail(res, new Error('reseller not found'), 404); } catch (e) { fail(res, e); } });
-router.post('/resellers/:id/assign-tenant', adminGuard, (req, res) => { try { ok(res, { reseller: S.resellerManager.assignTenant(req.params.id, (req.body && req.body.tenantId) || 'default') }); } catch (e) { fail(res, e); } });
-router.get('/resellers/:id/commissions', (req, res) => { try { ok(res, { commissions: S.resellerManager.commissions(req.params.id) }); } catch (e) { fail(res, e); } });
-
-/* ---------------- Plan change ---------------- */
-router.post('/upgrade/preview', (req, res) => { try { ok(res, { preview: S.planChange.preview(req.body || {}) }); } catch (e) { fail(res, e); } });
-router.post('/upgrade/request', adminGuard, (req, res) => { try { ok(res, { request: S.planChange.requestChange(req.body || {}) }); } catch (e) { fail(res, e); } });
-router.post('/upgrade/apply', adminGuard, (req, res) => { try { ok(res, { result: S.planChange.apply(req.body || {}) }); } catch (e) { fail(res, e); } });
-
-/* ---------------- Reports / History ---------------- */
-router.get('/reports/monthly', (req, res) => { try { ok(res, { report: S.reportBuilder.all() }); } catch (e) { fail(res, e); } });
-router.get('/history', (req, res) => { try { const h = S.store.readJSON(S.config.paths.history, { history: [] }); ok(res, { history: (h.history || []).slice(-Number(req.query.limit || 100)) }); } catch (e) { fail(res, e); } });
+// events + summary + upgrade
+router.get('/usage-events', wrap(function (req, res) { const limit = parseInt(req.query.limit, 10); res.json({ ok: true,
+events: usageEvents.list(Number.isFinite(limit) ? limit : 50), status: usageEvents.status() }); }));
+router.get('/summary', wrap(function (req, res) { const admin = (req.query && req.query.admin) === 'true'; res.json(admin
+? summary.adminOverview() : summary.tenantSummary(tenant(req))); }));
+router.post('/upgrade-preview', wrap(function (req, res) { const b = req.body || {};
+res.json(upgrade.preview(tenant(req), b.targetPlan || b.targetPlanId)); }));
 
 module.exports = router;

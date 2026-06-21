@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Demo Sandbox</title>
+  <link rel="stylesheet" href="/css/demo-sandbox.css" />
+  <link rel="stylesheet" href="/css/demo-tour.css" />
+</head>
+<body>
+  <header class="ds-header">
+    <h1>Demo Sandbox & Guided Tours</h1>
+    <span id="ds-mode" class="ds-badge">loading…</span>
+  </header>
+
+  <section class="ds-overview">
+    <div class="ds-card"><span class="ds-label">Demo mode</span><span id="ov-mode">–</span></div>
+    <div class="ds-card"><span class="ds-label">Active scenario</span><span id="ov-scenario">–</span></div>
+    <div class="ds-card"><span class="ds-label">Demo tenant</span><span id="ov-tenant">–</span></div>
+    <div class="ds-card"><span class="ds-label">Live actions</span><span id="ov-live">blocked</span></div>
+  </section>
+
+  <nav class="ds-tabs">
+    <button data-tab="scenarios" class="active">Scenarios</button>
+    <button data-tab="tours">Guided tours</button>
+    <button data-tab="data">Demo data</button>
+    <button data-tab="safety">Safety</button>
+    <button data-tab="links">Demo links</button>
+  </nav>
+
+  <main>
+    <section id="tab-scenarios" class="ds-tab"><div id="scenario-cards" class="ds-cards"></div><button id="reset-
+demo">Reset demo</button><pre id="scenario-result"></pre></section>
+    <section id="tab-tours" class="ds-tab" hidden><div id="tour-cards" class="ds-cards"></div></section>
+    <section id="tab-data" class="ds-tab" hidden><button id="load-data">Load demo data</button><pre id="data-result">
+</pre></section>
+    <section id="tab-safety" class="ds-tab" hidden><pre id="safety-result"></pre></section>
+    <section id="tab-links" class="ds-tab" hidden><div class="ds-links">
+      <a href="/owner-command.html">Owner Command</a><a href="/kpi-command.html">KPI Command</a>
+      <a href="/growth-campaigns.html">Growth Campaigns</a><a href="/business-setup.html">Business Setup</a>
+      <a href="/backup-restore.html">Backup & Restore</a>
+    </div></section>
+  </main>
+  <script src="/js/demo-sandbox.js"></script>
+  <script src="/js/demo-tour.js"></script>
+</body>
+</html>

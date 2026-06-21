@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Guided Demo</title><link rel="stylesheet" href="/css/guided-demo.css" /></head>
+
+<body>
+  <header class="gd-header"><h1>Guided Demo Journey</h1><span id="gd-mode" class="gd-badge">loading…</span></header>
+  <section class="gd-overview">
+    <div class="gd-card"><span class="gd-label">Readiness</span><span id="ov-score">–</span></div>
+    <div class="gd-card"><span class="gd-label">Journeys</span><span id="ov-journeys">–</span></div>
+    <div class="gd-card"><span class="gd-label">Blockers</span><span id="ov-blockers">–</span></div>
+    <div class="gd-card"><span class="gd-label">Live actions</span><span id="ov-live">blocked</span></div>
+  </section>
+  <nav class="gd-tabs">
+    <button data-tab="journeys" class="active">Journeys</button>
+    <button data-tab="walkthrough">Walkthrough</button>
+    <button data-tab="checklist">Acceptance</button>
+    <button data-tab="script">Script</button>
+    <button data-tab="safety">Safety</button>
+  </nav>
+  <main>
+    <section id="tab-journeys" class="gd-tab"><div id="journey-cards" class="gd-cards"></div></section>
+    <section id="tab-walkthrough" class="gd-tab" hidden><h3 id="wt-title">Pick a journey</h3><div id="walkthrough"></div>
+</section>
+    <section id="tab-checklist" class="gd-tab" hidden><button id="cl-run">Run acceptance checklist</button><div
+id="checklist"></div></section>
+    <section id="tab-script" class="gd-tab" hidden><select id="sc-aud"><option value="investor">Investor</option><option
+value="business_owner">Business owner</option><option value="agency">Agency</option><option
+value="developer">Developer</option><option value="qa">QA</option></select><button id="sc-load">Load script</button><pre
+id="script-result"></pre></section>
+    <section id="tab-safety" class="gd-tab" hidden><pre id="safety-result"></pre></section>
+  </main>
+  <script src="/js/guided-demo.js"></script>
+</body></html>

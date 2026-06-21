@@ -1,0 +1,932 @@
+[
+  {
+    "path": "routes/approvalCenterRoutes.js",
+    "source": "SuperSender Pro \u2014 Approval Workflow + Maker-Checker Control Center (preview, code files)-2026062110322545.txt",
+    "lines": 92
+  },
+  {
+    "path": "lib/approvalCenter/redactor.js",
+    "source": "SuperSender Pro \u2014 Approval Workflow + Maker-Checker Control Center (preview, code files)-2026062110322545.txt",
+    "lines": 32
+  },
+  {
+    "path": "lib/approvalCenter/store.js",
+    "source": "SuperSender Pro \u2014 Approval Workflow + Maker-Checker Control Center (preview, code files)-2026062110322545.txt",
+    "lines": 35
+  },
+  {
+    "path": "lib/approvalCenter/approvalRequestModel.js",
+    "source": "SuperSender Pro \u2014 Approval Workflow + Maker-Checker Control Center (preview, code files)-2026062110322545.txt",
+    "lines": 46
+  },
+  {
+    "path": "lib/approvalCenter/approvalPolicyModel.js",
+    "source": "SuperSender Pro \u2014 Approval Workflow + Maker-Checker Control Center (preview, code files)-2026062110322545.txt",
+    "lines": 76
+  },
+  {
+    "path": "lib/approvalCenter/moduleAdapters.js",
+    "source": "SuperSender Pro \u2014 Approval Workflow + Maker-Checker Control Center (preview, code files)-2026062110322545.txt",
+    "lines": 43
+  },
+  {
+    "path": "lib/approvalCenter/riskClassifier.js",
+    "source": "SuperSender Pro \u2014 Approval Workflow + Maker-Checker Control Center (preview, code files)-2026062110322545.txt",
+    "lines": 33
+  },
+  {
+    "path": "lib/approvalCenter/policyEvaluator.js",
+    "source": "SuperSender Pro \u2014 Approval Workflow + Maker-Checker Control Center (preview, code files)-2026062110322545.txt",
+    "lines": 81
+  },
+  {
+    "path": "lib/approvalCenter/approvalAuditPreview.js",
+    "source": "SuperSender Pro \u2014 Approval Workflow + Maker-Checker Control Center (preview, code files)-2026062110322545.txt",
+    "lines": 21
+  },
+  {
+    "path": "lib/approvalCenter/makerChecker.js",
+    "source": "SuperSender Pro \u2014 Approval Workflow + Maker-Checker Control Center (preview, code files)-2026062110322545.txt",
+    "lines": 42
+  },
+  {
+    "path": "lib/approvalCenter/changeRequestPreview.js",
+    "source": "SuperSender Pro \u2014 Approval Workflow + Maker-Checker Control Center (preview, code files)-2026062110322545.txt",
+    "lines": 44
+  },
+  {
+    "path": "lib/approvalCenter/approvalService.js",
+    "source": "SuperSender Pro \u2014 Approval Workflow + Maker-Checker Control Center (preview, code files)-2026062110322545.txt",
+    "lines": 107
+  },
+  {
+    "path": "lib/approvalCenter/notificationDrafts.js",
+    "source": "SuperSender Pro \u2014 Approval Workflow + Maker-Checker Control Center (preview, code files)-2026062110322545.txt",
+    "lines": 21
+  },
+  {
+    "path": "public/approval-center.html",
+    "source": "SuperSender Pro \u2014 Approval Workflow + Maker-Checker Control Center (preview, code files)-2026062110322545.txt",
+    "lines": 95
+  },
+  {
+    "path": "public/js/approval-center.js",
+    "source": "SuperSender Pro \u2014 Approval Workflow + Maker-Checker Control Center (preview, code files)-2026062110322545.txt",
+    "lines": 91
+  },
+  {
+    "path": "public/css/approval-center.css",
+    "source": "SuperSender Pro \u2014 Approval Workflow + Maker-Checker Control Center (preview, code files)-2026062110322545.txt",
+    "lines": 54
+  },
+  {
+    "path": "scripts/approval-center-check.js",
+    "source": "SuperSender Pro \u2014 Approval Workflow + Maker-Checker Control Center (preview, code files)-2026062110322545.txt",
+    "lines": 53
+  },
+  {
+    "path": "tests/smoke/approvalCenterSmoke.js",
+    "source": "SuperSender Pro \u2014 Approval Workflow + Maker-Checker Control Center (preview, code files)-2026062110322545.txt",
+    "lines": 84
+  },
+  {
+    "path": "routes/businessAlertsRoutes.js",
+    "source": "SuperSender Pro \u2014 Business Anomaly Detector + Alert Center (preview, code files)-2026062110312593.txt",
+    "lines": 110
+  },
+  {
+    "path": "lib/businessAlerts/redactor.js",
+    "source": "SuperSender Pro \u2014 Business Anomaly Detector + Alert Center (preview, code files)-2026062110312593.txt",
+    "lines": 31
+  },
+  {
+    "path": "lib/businessAlerts/store.js",
+    "source": "SuperSender Pro \u2014 Business Anomaly Detector + Alert Center (preview, code files)-2026062110312593.txt",
+    "lines": 30
+  },
+  {
+    "path": "lib/businessAlerts/alertModel.js",
+    "source": "SuperSender Pro \u2014 Business Anomaly Detector + Alert Center (preview, code files)-2026062110312593.txt",
+    "lines": 37
+  },
+  {
+    "path": "lib/businessAlerts/anomalyRuleModel.js",
+    "source": "SuperSender Pro \u2014 Business Anomaly Detector + Alert Center (preview, code files)-2026062110312593.txt",
+    "lines": 78
+  },
+  {
+    "path": "lib/businessAlerts/moduleSignalAdapter.js",
+    "source": "SuperSender Pro \u2014 Business Anomaly Detector + Alert Center (preview, code files)-2026062110312593.txt",
+    "lines": 77
+  },
+  {
+    "path": "lib/businessAlerts/ruleEvaluator.js",
+    "source": "SuperSender Pro \u2014 Business Anomaly Detector + Alert Center (preview, code files)-2026062110312593.txt",
+    "lines": 34
+  },
+  {
+    "path": "lib/businessAlerts/anomalyDetector.js",
+    "source": "SuperSender Pro \u2014 Business Anomaly Detector + Alert Center (preview, code files)-2026062110312593.txt",
+    "lines": 76
+  },
+  {
+    "path": "lib/businessAlerts/alertPriority.js",
+    "source": "SuperSender Pro \u2014 Business Anomaly Detector + Alert Center (preview, code files)-2026062110312593.txt",
+    "lines": 24
+  },
+  {
+    "path": "lib/businessAlerts/actionRecommendation.js",
+    "source": "SuperSender Pro \u2014 Business Anomaly Detector + Alert Center (preview, code files)-2026062110312593.txt",
+    "lines": 34
+  },
+  {
+    "path": "lib/businessAlerts/notificationDrafts.js",
+    "source": "SuperSender Pro \u2014 Business Anomaly Detector + Alert Center (preview, code files)-2026062110312593.txt",
+    "lines": 24
+  },
+  {
+    "path": "lib/businessAlerts/alertDigest.js",
+    "source": "SuperSender Pro \u2014 Business Anomaly Detector + Alert Center (preview, code files)-2026062110312593.txt",
+    "lines": 37
+  },
+  {
+    "path": "public/business-alerts.html",
+    "source": "SuperSender Pro \u2014 Business Anomaly Detector + Alert Center (preview, code files)-2026062110312593.txt",
+    "lines": 75
+  },
+  {
+    "path": "public/js/business-alerts.js",
+    "source": "SuperSender Pro \u2014 Business Anomaly Detector + Alert Center (preview, code files)-2026062110312593.txt",
+    "lines": 70
+  },
+  {
+    "path": "public/css/business-alerts.css",
+    "source": "SuperSender Pro \u2014 Business Anomaly Detector + Alert Center (preview, code files)-2026062110312593.txt",
+    "lines": 54
+  },
+  {
+    "path": "scripts/business-alerts-check.js",
+    "source": "SuperSender Pro \u2014 Business Anomaly Detector + Alert Center (preview, code files)-2026062110312593.txt",
+    "lines": 52
+  },
+  {
+    "path": "tests/smoke/businessAlertsSmoke.js",
+    "source": "SuperSender Pro \u2014 Business Anomaly Detector + Alert Center (preview, code files)-2026062110312593.txt",
+    "lines": 67
+  },
+  {
+    "path": "routes/loyaltyCenterRoutes.js",
+    "source": "SuperSender Pro \u2014 Customer Loyalty + Rewards + Referral + Store Credit Center (preview, code files)-2026062110293127.txt",
+    "lines": 102
+  },
+  {
+    "path": "lib/loyaltyCenter/redactor.js",
+    "source": "SuperSender Pro \u2014 Customer Loyalty + Rewards + Referral + Store Credit Center (preview, code files)-2026062110293127.txt",
+    "lines": 34
+  },
+  {
+    "path": "lib/loyaltyCenter/store.js",
+    "source": "SuperSender Pro \u2014 Customer Loyalty + Rewards + Referral + Store Credit Center (preview, code files)-2026062110293127.txt",
+    "lines": 37
+  },
+  {
+    "path": "lib/loyaltyCenter/loyaltyCustomerModel.js",
+    "source": "SuperSender Pro \u2014 Customer Loyalty + Rewards + Referral + Store Credit Center (preview, code files)-2026062110293127.txt",
+    "lines": 56
+  },
+  {
+    "path": "lib/loyaltyCenter/pointsLedger.js",
+    "source": "SuperSender Pro \u2014 Customer Loyalty + Rewards + Referral + Store Credit Center (preview, code files)-2026062110293127.txt",
+    "lines": 67
+  },
+  {
+    "path": "lib/loyaltyCenter/rewardTierService.js",
+    "source": "SuperSender Pro \u2014 Customer Loyalty + Rewards + Referral + Store Credit Center (preview, code files)-2026062110293127.txt",
+    "lines": 44
+  },
+  {
+    "path": "lib/loyaltyCenter/rewardRules.js",
+    "source": "SuperSender Pro \u2014 Customer Loyalty + Rewards + Referral + Store Credit Center (preview, code files)-2026062110293127.txt",
+    "lines": 52
+  },
+  {
+    "path": "lib/loyaltyCenter/storeCreditPreview.js",
+    "source": "SuperSender Pro \u2014 Customer Loyalty + Rewards + Referral + Store Credit Center (preview, code files)-2026062110293127.txt",
+    "lines": 20
+  },
+  {
+    "path": "lib/loyaltyCenter/referralProgram.js",
+    "source": "SuperSender Pro \u2014 Customer Loyalty + Rewards + Referral + Store Credit Center (preview, code files)-2026062110293127.txt",
+    "lines": 49
+  },
+  {
+    "path": "lib/loyaltyCenter/redemptionPreview.js",
+    "source": "SuperSender Pro \u2014 Customer Loyalty + Rewards + Referral + Store Credit Center (preview, code files)-2026062110293127.txt",
+    "lines": 40
+  },
+  {
+    "path": "lib/loyaltyCenter/vipSegmentPreview.js",
+    "source": "SuperSender Pro \u2014 Customer Loyalty + Rewards + Referral + Store Credit Center (preview, code files)-2026062110293127.txt",
+    "lines": 19
+  },
+  {
+    "path": "lib/loyaltyCenter/rewardLiability.js",
+    "source": "SuperSender Pro \u2014 Customer Loyalty + Rewards + Referral + Store Credit Center (preview, code files)-2026062110293127.txt",
+    "lines": 34
+  },
+  {
+    "path": "lib/loyaltyCenter/messageDrafts.js",
+    "source": "SuperSender Pro \u2014 Customer Loyalty + Rewards + Referral + Store Credit Center (preview, code files)-2026062110293127.txt",
+    "lines": 35
+  },
+  {
+    "path": "lib/loyaltyCenter/accountingImpactPreview.js",
+    "source": "SuperSender Pro \u2014 Customer Loyalty + Rewards + Referral + Store Credit Center (preview, code files)-2026062110293127.txt",
+    "lines": 42
+  },
+  {
+    "path": "public/loyalty-center.html",
+    "source": "SuperSender Pro \u2014 Customer Loyalty + Rewards + Referral + Store Credit Center (preview, code files)-2026062110293127.txt",
+    "lines": 103
+  },
+  {
+    "path": "public/js/loyalty-center.js",
+    "source": "SuperSender Pro \u2014 Customer Loyalty + Rewards + Referral + Store Credit Center (preview, code files)-2026062110293127.txt",
+    "lines": 73
+  },
+  {
+    "path": "public/css/loyalty-center.css",
+    "source": "SuperSender Pro \u2014 Customer Loyalty + Rewards + Referral + Store Credit Center (preview, code files)-2026062110293127.txt",
+    "lines": 49
+  },
+  {
+    "path": "scripts/loyalty-center-check.js",
+    "source": "SuperSender Pro \u2014 Customer Loyalty + Rewards + Referral + Store Credit Center (preview, code files)-2026062110293127.txt",
+    "lines": 56
+  },
+  {
+    "path": "tests/smoke/loyaltyCenterSmoke.js",
+    "source": "SuperSender Pro \u2014 Customer Loyalty + Rewards + Referral + Store Credit Center (preview, code files)-2026062110293127.txt",
+    "lines": 78
+  },
+  {
+    "path": "public/data-quality-center.css",
+    "source": "SuperSender Pro \u2014 Data Quality Center + Duplicate Detection + Master Data Cleanup (preview, code files)-2026062110330574.txt",
+    "lines": 60
+  },
+  {
+    "path": "lib/dataQualityCenter/store.js",
+    "source": "SuperSender Pro \u2014 Data Quality Center + Duplicate Detection + Master Data Cleanup (preview, code files)-2026062110330574.txt",
+    "lines": 82
+  },
+  {
+    "path": "lib/dataQualityCenter/redactor.js",
+    "source": "SuperSender Pro \u2014 Data Quality Center + Duplicate Detection + Master Data Cleanup (preview, code files)-2026062110330574.txt",
+    "lines": 61
+  },
+  {
+    "path": "lib/dataQualityCenter/qualityRuleModel.js",
+    "source": "SuperSender Pro \u2014 Data Quality Center + Duplicate Detection + Master Data Cleanup (preview, code files)-2026062110330574.txt",
+    "lines": 72
+  },
+  {
+    "path": "lib/dataQualityCenter/duplicateDetector.js",
+    "source": "SuperSender Pro \u2014 Data Quality Center + Duplicate Detection + Master Data Cleanup (preview, code files)-2026062110330574.txt",
+    "lines": 74
+  },
+  {
+    "path": "lib/dataQualityCenter/dataQualityScanner.js",
+    "source": "SuperSender Pro \u2014 Data Quality Center + Duplicate Detection + Master Data Cleanup (preview, code files)-2026062110330574.txt",
+    "lines": 66
+  },
+  {
+    "path": "lib/dataQualityCenter/productQualityChecks.js",
+    "source": "SuperSender Pro \u2014 Data Quality Center + Duplicate Detection + Master Data Cleanup (preview, code files)-2026062110330574.txt",
+    "lines": 61
+  },
+  {
+    "path": "lib/dataQualityCenter/customerQualityChecks.js",
+    "source": "SuperSender Pro \u2014 Data Quality Center + Duplicate Detection + Master Data Cleanup (preview, code files)-2026062110330574.txt",
+    "lines": 69
+  },
+  {
+    "path": "lib/dataQualityCenter/supplierQualityChecks.js",
+    "source": "SuperSender Pro \u2014 Data Quality Center + Duplicate Detection + Master Data Cleanup (preview, code files)-2026062110330574.txt",
+    "lines": 53
+  },
+  {
+    "path": "lib/dataQualityCenter/financeQualityChecks.js",
+    "source": "SuperSender Pro \u2014 Data Quality Center + Duplicate Detection + Master Data Cleanup (preview, code files)-2026062110330574.txt",
+    "lines": 59
+  },
+  {
+    "path": "lib/dataQualityCenter/inventoryConsistencyChecks.js",
+    "source": "SuperSender Pro \u2014 Data Quality Center + Duplicate Detection + Master Data Cleanup (preview, code files)-2026062110330574.txt",
+    "lines": 61
+  },
+  {
+    "path": "lib/dataQualityCenter/cleanupRecommendation.js",
+    "source": "SuperSender Pro \u2014 Data Quality Center + Duplicate Detection + Master Data Cleanup (preview, code files)-2026062110330574.txt",
+    "lines": 56
+  },
+  {
+    "path": "lib/dataQualityCenter/mergePreview.js",
+    "source": "SuperSender Pro \u2014 Data Quality Center + Duplicate Detection + Master Data Cleanup (preview, code files)-2026062110330574.txt",
+    "lines": 62
+  },
+  {
+    "path": "lib/dataQualityCenter/qualityScore.js",
+    "source": "SuperSender Pro \u2014 Data Quality Center + Duplicate Detection + Master Data Cleanup (preview, code files)-2026062110330574.txt",
+    "lines": 42
+  },
+  {
+    "path": "routes/dataQualityCenterRoutes.js",
+    "source": "SuperSender Pro \u2014 Data Quality Center + Duplicate Detection + Master Data Cleanup (preview, code files)-2026062110330574.txt",
+    "lines": 126
+  },
+  {
+    "path": "public/data-quality-center.html",
+    "source": "SuperSender Pro \u2014 Data Quality Center + Duplicate Detection + Master Data Cleanup (preview, code files)-2026062110330574.txt",
+    "lines": 49
+  },
+  {
+    "path": "public/data-quality-center.js",
+    "source": "SuperSender Pro \u2014 Data Quality Center + Duplicate Detection + Master Data Cleanup (preview, code files)-2026062110330574.txt",
+    "lines": 59
+  },
+  {
+    "path": "scripts/data-quality-center-check.js",
+    "source": "SuperSender Pro \u2014 Data Quality Center + Duplicate Detection + Master Data Cleanup (preview, code files)-2026062110330574.txt",
+    "lines": 33
+  },
+  {
+    "path": "tests/smoke/dataQualityCenterSmoke.js",
+    "source": "SuperSender Pro \u2014 Data Quality Center + Duplicate Detection + Master Data Cleanup (preview, code files)-2026062110330574.txt",
+    "lines": 53
+  },
+  {
+    "path": "lib/dealerPortal/redactor.js",
+    "source": "SuperSender Pro \u2014 Dealer - Reseller Portal + B2B Order Self-Service Center (Part 1-3_ Foundation)-2026062110350315.txt",
+    "lines": 84
+  },
+  {
+    "path": "lib/dealerPortal/store.js",
+    "source": "SuperSender Pro \u2014 Dealer - Reseller Portal + B2B Order Self-Service Center (Part 1-3_ Foundation)-2026062110350315.txt",
+    "lines": 64
+  },
+  {
+    "path": "lib/dealerPortal/dealerPortalModel.js",
+    "source": "SuperSender Pro \u2014 Dealer - Reseller Portal + B2B Order Self-Service Center (Part 1-3_ Foundation)-2026062110350315.txt",
+    "lines": 76
+  },
+  {
+    "path": "lib/dealerPortal/dealerPortalService.js",
+    "source": "SuperSender Pro \u2014 Dealer - Reseller Portal + B2B Order Self-Service Center (Part 1-3_ Foundation)-2026062110350315.txt",
+    "lines": 118
+  },
+  {
+    "path": "lib/dealerPortal/statusSummaryPreview.js",
+    "source": "SuperSender Pro \u2014 Dealer - Reseller Portal + B2B Order Self-Service Center (Part 1-3_ Foundation)-2026062110350315.txt",
+    "lines": 87
+  },
+  {
+    "path": "scripts/dealer-portal-check.js",
+    "source": "SuperSender Pro \u2014 Dealer - Reseller Portal + B2B Order Self-Service Center (Part 1-3_ Foundation)-2026062110350315.txt",
+    "lines": 127
+  },
+  {
+    "path": "tests/smoke/dealerPortalSmoke.js",
+    "source": "SuperSender Pro \u2014 Dealer - Reseller Portal + B2B Order Self-Service Center (Part 1-3_ Foundation)-2026062110350315.txt",
+    "lines": 88
+  },
+  {
+    "path": "routes/receivablesCenterRoutes.js",
+    "source": "SuperSender Pro \u2014 Invoice + Quotation + Receivables Center (preview, code files)-2026062110250622.txt",
+    "lines": 96
+  },
+  {
+    "path": "lib/receivablesCenter/redactor.js",
+    "source": "SuperSender Pro \u2014 Invoice + Quotation + Receivables Center (preview, code files)-2026062110250622.txt",
+    "lines": 35
+  },
+  {
+    "path": "lib/receivablesCenter/store.js",
+    "source": "SuperSender Pro \u2014 Invoice + Quotation + Receivables Center (preview, code files)-2026062110250622.txt",
+    "lines": 41
+  },
+  {
+    "path": "lib/receivablesCenter/invoiceModel.js",
+    "source": "SuperSender Pro \u2014 Invoice + Quotation + Receivables Center (preview, code files)-2026062110250622.txt",
+    "lines": 51
+  },
+  {
+    "path": "lib/receivablesCenter/quotationModel.js",
+    "source": "SuperSender Pro \u2014 Invoice + Quotation + Receivables Center (preview, code files)-2026062110250622.txt",
+    "lines": 47
+  },
+  {
+    "path": "lib/receivablesCenter/taxDiscountCalculator.js",
+    "source": "SuperSender Pro \u2014 Invoice + Quotation + Receivables Center (preview, code files)-2026062110250622.txt",
+    "lines": 58
+  },
+  {
+    "path": "lib/receivablesCenter/invoiceService.js",
+    "source": "SuperSender Pro \u2014 Invoice + Quotation + Receivables Center (preview, code files)-2026062110250622.txt",
+    "lines": 103
+  },
+  {
+    "path": "lib/receivablesCenter/quotationService.js",
+    "source": "SuperSender Pro \u2014 Invoice + Quotation + Receivables Center (preview, code files)-2026062110250622.txt",
+    "lines": 84
+  },
+  {
+    "path": "lib/receivablesCenter/paymentStatusPreview.js",
+    "source": "SuperSender Pro \u2014 Invoice + Quotation + Receivables Center (preview, code files)-2026062110250622.txt",
+    "lines": 23
+  },
+  {
+    "path": "lib/receivablesCenter/receivablesAging.js",
+    "source": "SuperSender Pro \u2014 Invoice + Quotation + Receivables Center (preview, code files)-2026062110250622.txt",
+    "lines": 40
+  },
+  {
+    "path": "lib/receivablesCenter/customerBalance.js",
+    "source": "SuperSender Pro \u2014 Invoice + Quotation + Receivables Center (preview, code files)-2026062110250622.txt",
+    "lines": 24
+  },
+  {
+    "path": "lib/receivablesCenter/reminderDrafts.js",
+    "source": "SuperSender Pro \u2014 Invoice + Quotation + Receivables Center (preview, code files)-2026062110250622.txt",
+    "lines": 40
+  },
+  {
+    "path": "lib/receivablesCenter/accountingLinkPreview.js",
+    "source": "SuperSender Pro \u2014 Invoice + Quotation + Receivables Center (preview, code files)-2026062110250622.txt",
+    "lines": 64
+  },
+  {
+    "path": "public/receivables-center.html",
+    "source": "SuperSender Pro \u2014 Invoice + Quotation + Receivables Center (preview, code files)-2026062110250622.txt",
+    "lines": 96
+  },
+  {
+    "path": "public/js/receivables-center.js",
+    "source": "SuperSender Pro \u2014 Invoice + Quotation + Receivables Center (preview, code files)-2026062110250622.txt",
+    "lines": 96
+  },
+  {
+    "path": "public/css/receivables-center.css",
+    "source": "SuperSender Pro \u2014 Invoice + Quotation + Receivables Center (preview, code files)-2026062110250622.txt",
+    "lines": 57
+  },
+  {
+    "path": "scripts/receivables-center-check.js",
+    "source": "SuperSender Pro \u2014 Invoice + Quotation + Receivables Center (preview, code files)-2026062110250622.txt",
+    "lines": 56
+  },
+  {
+    "path": "tests/smoke/receivablesCenterSmoke.js",
+    "source": "SuperSender Pro \u2014 Invoice + Quotation + Receivables Center (preview, code files)-2026062110250622.txt",
+    "lines": 77
+  },
+  {
+    "path": "routes/fulfillmentCenterRoutes.js",
+    "source": "SuperSender Pro \u2014 Order Fulfillment + Delivery + Returns-RMA Center (preview, code files)-2026062110254995.txt",
+    "lines": 102
+  },
+  {
+    "path": "lib/fulfillmentCenter/redactor.js",
+    "source": "SuperSender Pro \u2014 Order Fulfillment + Delivery + Returns-RMA Center (preview, code files)-2026062110254995.txt",
+    "lines": 36
+  },
+  {
+    "path": "lib/fulfillmentCenter/store.js",
+    "source": "SuperSender Pro \u2014 Order Fulfillment + Delivery + Returns-RMA Center (preview, code files)-2026062110254995.txt",
+    "lines": 33
+  },
+  {
+    "path": "lib/fulfillmentCenter/orderFulfillmentModel.js",
+    "source": "SuperSender Pro \u2014 Order Fulfillment + Delivery + Returns-RMA Center (preview, code files)-2026062110254995.txt",
+    "lines": 53
+  },
+  {
+    "path": "lib/fulfillmentCenter/returnRequestModel.js",
+    "source": "SuperSender Pro \u2014 Order Fulfillment + Delivery + Returns-RMA Center (preview, code files)-2026062110254995.txt",
+    "lines": 46
+  },
+  {
+    "path": "lib/fulfillmentCenter/fulfillmentService.js",
+    "source": "SuperSender Pro \u2014 Order Fulfillment + Delivery + Returns-RMA Center (preview, code files)-2026062110254995.txt",
+    "lines": 64
+  },
+  {
+    "path": "lib/fulfillmentCenter/pickPackShipPreview.js",
+    "source": "SuperSender Pro \u2014 Order Fulfillment + Delivery + Returns-RMA Center (preview, code files)-2026062110254995.txt",
+    "lines": 37
+  },
+  {
+    "path": "lib/fulfillmentCenter/courierAssignmentPreview.js",
+    "source": "SuperSender Pro \u2014 Order Fulfillment + Delivery + Returns-RMA Center (preview, code files)-2026062110254995.txt",
+    "lines": 29
+  },
+  {
+    "path": "lib/fulfillmentCenter/deliveryTracker.js",
+    "source": "SuperSender Pro \u2014 Order Fulfillment + Delivery + Returns-RMA Center (preview, code files)-2026062110254995.txt",
+    "lines": 46
+  },
+  {
+    "path": "lib/fulfillmentCenter/failedDelivery.js",
+    "source": "SuperSender Pro \u2014 Order Fulfillment + Delivery + Returns-RMA Center (preview, code files)-2026062110254995.txt",
+    "lines": 23
+  },
+  {
+    "path": "lib/fulfillmentCenter/returnsService.js",
+    "source": "SuperSender Pro \u2014 Order Fulfillment + Delivery + Returns-RMA Center (preview, code files)-2026062110254995.txt",
+    "lines": 63
+  },
+  {
+    "path": "lib/fulfillmentCenter/refundImpactPreview.js",
+    "source": "SuperSender Pro \u2014 Order Fulfillment + Delivery + Returns-RMA Center (preview, code files)-2026062110254995.txt",
+    "lines": 28
+  },
+  {
+    "path": "lib/fulfillmentCenter/inventoryRestockPreview.js",
+    "source": "SuperSender Pro \u2014 Order Fulfillment + Delivery + Returns-RMA Center (preview, code files)-2026062110254995.txt",
+    "lines": 29
+  },
+  {
+    "path": "lib/fulfillmentCenter/accountingImpactPreview.js",
+    "source": "SuperSender Pro \u2014 Order Fulfillment + Delivery + Returns-RMA Center (preview, code files)-2026062110254995.txt",
+    "lines": 46
+  },
+  {
+    "path": "lib/fulfillmentCenter/messageDrafts.js",
+    "source": "SuperSender Pro \u2014 Order Fulfillment + Delivery + Returns-RMA Center (preview, code files)-2026062110254995.txt",
+    "lines": 37
+  },
+  {
+    "path": "public/fulfillment-center.html",
+    "source": "SuperSender Pro \u2014 Order Fulfillment + Delivery + Returns-RMA Center (preview, code files)-2026062110254995.txt",
+    "lines": 85
+  },
+  {
+    "path": "public/js/fulfillment-center.js",
+    "source": "SuperSender Pro \u2014 Order Fulfillment + Delivery + Returns-RMA Center (preview, code files)-2026062110254995.txt",
+    "lines": 100
+  },
+  {
+    "path": "public/css/fulfillment-center.css",
+    "source": "SuperSender Pro \u2014 Order Fulfillment + Delivery + Returns-RMA Center (preview, code files)-2026062110254995.txt",
+    "lines": 51
+  },
+  {
+    "path": "scripts/fulfillment-center-check.js",
+    "source": "SuperSender Pro \u2014 Order Fulfillment + Delivery + Returns-RMA Center (preview, code files)-2026062110254995.txt",
+    "lines": 56
+  },
+  {
+    "path": "tests/smoke/fulfillmentCenterSmoke.js",
+    "source": "SuperSender Pro \u2014 Order Fulfillment + Delivery + Returns-RMA Center (preview, code files)-2026062110254995.txt",
+    "lines": 79
+  },
+  {
+    "path": "lib/localWorkerBridge/config.js",
+    "source": "SuperSender Pro \u2014 Public Cloud Dashboard + Local WhatsApp Worker (code files)-2026062110353057.txt",
+    "lines": 80
+  },
+  {
+    "path": "lib/localWorkerBridge/token.js",
+    "source": "SuperSender Pro \u2014 Public Cloud Dashboard + Local WhatsApp Worker (code files)-2026062110353057.txt",
+    "lines": 63
+  },
+  {
+    "path": "lib/localWorkerBridge/payloads.js",
+    "source": "SuperSender Pro \u2014 Public Cloud Dashboard + Local WhatsApp Worker (code files)-2026062110353057.txt",
+    "lines": 121
+  },
+  {
+    "path": "lib/localWorkerBridge/store.js",
+    "source": "SuperSender Pro \u2014 Public Cloud Dashboard + Local WhatsApp Worker (code files)-2026062110353057.txt",
+    "lines": 130
+  },
+  {
+    "path": "lib/localWorkerBridge/heartbeat.js",
+    "source": "SuperSender Pro \u2014 Public Cloud Dashboard + Local WhatsApp Worker (code files)-2026062110353057.txt",
+    "lines": 74
+  },
+  {
+    "path": "lib/localWorkerBridge/jobQueue.js",
+    "source": "SuperSender Pro \u2014 Public Cloud Dashboard + Local WhatsApp Worker (code files)-2026062110353057.txt",
+    "lines": 222
+  },
+  {
+    "path": "routes/localWorkerBridgeRoutes.js",
+    "source": "SuperSender Pro \u2014 Public Cloud Dashboard + Local WhatsApp Worker (code files)-2026062110353057.txt",
+    "lines": 276
+  },
+  {
+    "path": "workers/local-whatsapp-worker.example.js",
+    "source": "SuperSender Pro \u2014 Public Cloud Dashboard + Local WhatsApp Worker (code files)-2026062110353057.txt",
+    "lines": 171
+  },
+  {
+    "path": "scripts/local-worker-dev.js",
+    "source": "SuperSender Pro \u2014 Public Cloud Dashboard + Local WhatsApp Worker (code files)-2026062110353057.txt",
+    "lines": 66
+  },
+  {
+    "path": "public/local-worker-bridge.html",
+    "source": "SuperSender Pro \u2014 Public Cloud Dashboard + Local WhatsApp Worker (code files)-2026062110353057.txt",
+    "lines": 128
+  },
+  {
+    "path": "public/js/local-worker-bridge.js",
+    "source": "SuperSender Pro \u2014 Public Cloud Dashboard + Local WhatsApp Worker (code files)-2026062110353057.txt",
+    "lines": 179
+  },
+  {
+    "path": "public/css/local-worker-bridge.css",
+    "source": "SuperSender Pro \u2014 Public Cloud Dashboard + Local WhatsApp Worker (code files)-2026062110353057.txt",
+    "lines": 106
+  },
+  {
+    "path": "docs/LOCAL_WORKER_BRIDGE.md",
+    "source": "SuperSender Pro \u2014 Public Cloud Dashboard + Local WhatsApp Worker (code files)-2026062110353057.txt",
+    "lines": 134
+  },
+  {
+    "path": "workers/local-whatsapp-worker.js",
+    "source": "SuperSender Pro \u2014 Public Cloud Dashboard + Local WhatsApp Worker (code files)-2026062110353057.txt",
+    "lines": 33
+  },
+  {
+    "path": "docs/CLOUD_DASHBOARD_LOCAL_WORKER.md",
+    "source": "SuperSender Pro \u2014 Public Cloud Dashboard + Local WhatsApp Worker (code files)-2026062110353057.txt",
+    "lines": 124
+  },
+  {
+    "path": "public/index.html",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-20260.txt",
+    "lines": 79
+  },
+  {
+    "path": "lib/localWorkerBridge/rateLimiter.js",
+    "source": "SuperSender Pro \u2014 Public Cloud Dashboard + Local WhatsApp Worker (code files)-2026062110353057.txt",
+    "lines": 75
+  },
+  {
+    "path": "lib/localWorkerBridge/idempotency.js",
+    "source": "SuperSender Pro \u2014 Public Cloud Dashboard + Local WhatsApp Worker (code files)-2026062110353057.txt",
+    "lines": 66
+  },
+  {
+    "path": "workers/lib/baileysSendAdapter.example.js",
+    "source": "SuperSender Pro \u2014 Public Cloud Dashboard + Local WhatsApp Worker (code files)-2026062110353057.txt",
+    "lines": 96
+  },
+  {
+    "path": "lib/localWorkerBridge/autoReplyRouter.js",
+    "source": "SuperSender Pro \u2014 Public Cloud Dashboard + Local WhatsApp Worker (code files)-2026062110353057.txt",
+    "lines": 77
+  },
+  {
+    "path": "docs/LOCAL_WORKER_PHASE2.md",
+    "source": "SuperSender Pro \u2014 Public Cloud Dashboard + Local WhatsApp Worker (code files)-2026062110353057.txt",
+    "lines": 130
+  },
+  {
+    "path": "workers/lib/baileysSendAdapter.js",
+    "source": "SuperSender Pro \u2014 Public Cloud Dashboard + Local WhatsApp Worker (code files)-2026062110353057.txt",
+    "lines": 17
+  },
+  {
+    "path": "tests/smoke/serviceCenterSmoke.js",
+    "source": "SuperSender Pro \u2014 Service Work Order + Job Card + Technician Dispatch Center (preview, code files)-2026062110334813.txt",
+    "lines": 52
+  },
+  {
+    "path": "lib/serviceCenter/store.js",
+    "source": "SuperSender Pro \u2014 Service Work Order + Job Card + Technician Dispatch Center (preview, code files)-2026062110334813.txt",
+    "lines": 91
+  },
+  {
+    "path": "lib/serviceCenter/redactor.js",
+    "source": "SuperSender Pro \u2014 Service Work Order + Job Card + Technician Dispatch Center (preview, code files)-2026062110334813.txt",
+    "lines": 69
+  },
+  {
+    "path": "lib/serviceCenter/workOrderModel.js",
+    "source": "SuperSender Pro \u2014 Service Work Order + Job Card + Technician Dispatch Center (preview, code files)-2026062110334813.txt",
+    "lines": 62
+  },
+  {
+    "path": "lib/serviceCenter/jobCardModel.js",
+    "source": "SuperSender Pro \u2014 Service Work Order + Job Card + Technician Dispatch Center (preview, code files)-2026062110334813.txt",
+    "lines": 56
+  },
+  {
+    "path": "lib/serviceCenter/workOrderService.js",
+    "source": "SuperSender Pro \u2014 Service Work Order + Job Card + Technician Dispatch Center (preview, code files)-2026062110334813.txt",
+    "lines": 75
+  },
+  {
+    "path": "lib/serviceCenter/jobCardService.js",
+    "source": "SuperSender Pro \u2014 Service Work Order + Job Card + Technician Dispatch Center (preview, code files)-2026062110334813.txt",
+    "lines": 59
+  },
+  {
+    "path": "lib/serviceCenter/technicianDispatchPreview.js",
+    "source": "SuperSender Pro \u2014 Service Work Order + Job Card + Technician Dispatch Center (preview, code files)-2026062110334813.txt",
+    "lines": 61
+  },
+  {
+    "path": "lib/serviceCenter/diagnosisPreview.js",
+    "source": "SuperSender Pro \u2014 Service Work Order + Job Card + Technician Dispatch Center (preview, code files)-2026062110334813.txt",
+    "lines": 45
+  },
+  {
+    "path": "lib/serviceCenter/partsRequirementPreview.js",
+    "source": "SuperSender Pro \u2014 Service Work Order + Job Card + Technician Dispatch Center (preview, code files)-2026062110334813.txt",
+    "lines": 64
+  },
+  {
+    "path": "lib/serviceCenter/laborCostPreview.js",
+    "source": "SuperSender Pro \u2014 Service Work Order + Job Card + Technician Dispatch Center (preview, code files)-2026062110334813.txt",
+    "lines": 39
+  },
+  {
+    "path": "lib/serviceCenter/serviceProfitability.js",
+    "source": "SuperSender Pro \u2014 Service Work Order + Job Card + Technician Dispatch Center (preview, code files)-2026062110334813.txt",
+    "lines": 58
+  },
+  {
+    "path": "lib/serviceCenter/customerApprovalPreview.js",
+    "source": "SuperSender Pro \u2014 Service Work Order + Job Card + Technician Dispatch Center (preview, code files)-2026062110334813.txt",
+    "lines": 44
+  },
+  {
+    "path": "lib/serviceCenter/inventoryImpactPreview.js",
+    "source": "SuperSender Pro \u2014 Service Work Order + Job Card + Technician Dispatch Center (preview, code files)-2026062110334813.txt",
+    "lines": 34
+  },
+  {
+    "path": "lib/serviceCenter/accountingImpactPreview.js",
+    "source": "SuperSender Pro \u2014 Service Work Order + Job Card + Technician Dispatch Center (preview, code files)-2026062110334813.txt",
+    "lines": 57
+  },
+  {
+    "path": "lib/serviceCenter/messageDrafts.js",
+    "source": "SuperSender Pro \u2014 Service Work Order + Job Card + Technician Dispatch Center (preview, code files)-2026062110334813.txt",
+    "lines": 42
+  },
+  {
+    "path": "routes/serviceCenterRoutes.js",
+    "source": "SuperSender Pro \u2014 Service Work Order + Job Card + Technician Dispatch Center (preview, code files)-2026062110334813.txt",
+    "lines": 83
+  },
+  {
+    "path": "public/service-center.html",
+    "source": "SuperSender Pro \u2014 Service Work Order + Job Card + Technician Dispatch Center (preview, code files)-2026062110334813.txt",
+    "lines": 49
+  },
+  {
+    "path": "public/service-center.css",
+    "source": "SuperSender Pro \u2014 Service Work Order + Job Card + Technician Dispatch Center (preview, code files)-2026062110334813.txt",
+    "lines": 54
+  },
+  {
+    "path": "public/service-center.js",
+    "source": "SuperSender Pro \u2014 Service Work Order + Job Card + Technician Dispatch Center (preview, code files)-2026062110334813.txt",
+    "lines": 134
+  },
+  {
+    "path": "scripts/service-center-check.js",
+    "source": "SuperSender Pro \u2014 Service Work Order + Job Card + Technician Dispatch Center (preview, code files)-2026062110334813.txt",
+    "lines": 58
+  },
+  {
+    "path": "lib/supplierPortal/redactor.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-20260.txt",
+    "lines": 25
+  },
+  {
+    "path": "lib/supplierPortal/store.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-20260.txt",
+    "lines": 20
+  },
+  {
+    "path": "lib/supplierPortal/supplierPortalModel.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-20260.txt",
+    "lines": 59
+  },
+  {
+    "path": "lib/supplierPortal/supplierPortalService.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-20260.txt",
+    "lines": 16
+  },
+  {
+    "path": "lib/supplierPortal/statusSummaryPreview.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-20260.txt",
+    "lines": 55
+  },
+  {
+    "path": "lib/supplierPortal/moduleLinker.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-20260.txt",
+    "lines": 12
+  },
+  {
+    "path": "lib/supplierPortal/_statusPreviewFactory.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-20260.txt",
+    "lines": 21
+  },
+  {
+    "path": "lib/supplierPortal/rfqStatusPreview.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-20260.txt",
+    "lines": 4
+  },
+  {
+    "path": "lib/supplierPortal/quoteStatusPreview.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-20260.txt",
+    "lines": 4
+  },
+  {
+    "path": "lib/supplierPortal/purchaseOrderStatusPreview.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-20260.txt",
+    "lines": 4
+  },
+  {
+    "path": "lib/supplierPortal/billPaymentStatusPreview.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-20260.txt",
+    "lines": 4
+  },
+  {
+    "path": "lib/supplierPortal/deliveryStatusPreview.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-20260.txt",
+    "lines": 4
+  },
+  {
+    "path": "lib/supplierPortal/qualityScorePreview.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-20260.txt",
+    "lines": 7
+  },
+  {
+    "path": "lib/supplierPortal/contractStatusPreview.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-20260.txt",
+    "lines": 4
+  },
+  {
+    "path": "lib/supplierPortal/documentRequestPreview.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-20260.txt",
+    "lines": 10
+  },
+  {
+    "path": "lib/supplierPortal/supportRequestPreview.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-20260.txt",
+    "lines": 25
+  },
+  {
+    "path": "lib/supplierPortal/messageDrafts.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-20260.txt",
+    "lines": 23
+  },
+  {
+    "path": "lib/supplierPortal/auditPreview.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-20260.txt",
+    "lines": 25
+  },
+  {
+    "path": "routes/supplierPortalRoutes.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-20260.txt",
+    "lines": 91
+  },
+  {
+    "path": "public/css/supplier-portal.css",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-20260.txt",
+    "lines": 41
+  },
+  {
+    "path": "public/supplier-portal.html",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-20260.txt",
+    "lines": 28
+  },
+  {
+    "path": "public/js/supplier-portal.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-20260.txt",
+    "lines": 59
+  },
+  {
+    "path": "scripts/supplier-portal-check.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-20260.txt",
+    "lines": 47
+  },
+  {
+    "path": "tests/smoke/supplierPortalSmoke.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-20260.txt",
+    "lines": 62
+  },
+  {
+    "path": "src/modules/supplierPortal/previews/areaPreviews.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-20260.txt",
+    "lines": 302
+  }
+]

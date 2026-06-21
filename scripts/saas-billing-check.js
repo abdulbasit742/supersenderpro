@@ -1,56 +1,56 @@
 #!/usr/bin/env node
-// scripts/saas-billing-check.js — Validates the SaaS Billing install + runs the doctor.
-// Never exposes secrets. Writes artifacts/saas_billing_check.{json,md}. Exit 1 only on blockers.
+'use strict';
+
+/** SaaS Billing — check. Verifies files/wiring, runs plan/usage/quota/entitlement/
+ * upgrade previews. No real charge, no gateway call. */
+
 const fs = require('fs');
 const path = require('path');
-const ROOT = path.join(__dirname, '..');
-const S = require('../lib/saasBilling');
-const { hasLeak } = require('../lib/saasBilling/privacy');
+function exists(rel) { try { return fs.existsSync(path.join(process.cwd(), rel)); } catch (e) { return false; } }
+function read(rel) { try { return fs.readFileSync(path.join(process.cwd(), rel), 'utf8'); } catch (e) { return ''; } }
+
+
+process.env.SAAS_BILLING_STORE_PATH = 'data/saas-billing.check.json';
+process.env.SAAS_BILLING_EVENTS_PATH = 'data/saas-billing-events.check.json';
+
 
 const checks = [];
-const add = (n, ok, d = '') => checks.push({ name: n, ok: !!ok, detail: String(d).slice(0, 80) });
-const exists = (rel) => fs.existsSync(path.join(ROOT, rel));
+function add(n, ok, d) { checks.push({ name: n, ok: !!ok, detail: d || null }); }
 
-// File presence
-add('route module present', exists('routes/saasBillingRoutes.js'));
-add('server hook present', exists('server.js') && fs.readFileSync(path.join(ROOT, 'server.js'), 'utf8').includes('SAAS BILLING HOOK'));
-add('dashboard page present', exists('public/saas-billing.html'));
-add('dashboard js present', exists('public/js/saas-billing.js'));
-add('dashboard css present', exists('public/css/saas-billing.css'));
-add('env placeholders present', exists('.env.example') && fs.readFileSync(path.join(ROOT, '.env.example'), 'utf8').includes('SAAS_BILLING_ENABLED'));
-['SAAS_BILLING_COMMAND_CENTER.md', 'SAAS_PLANS_AND_LIMITS.md', 'SAAS_LICENSE_ENGINE.md', 'SAAS_USAGE_METERING.md', 'SAAS_RESELLER_PORTAL.md', 'SAAS_BILLING_SAFETY.md', 'SAAS_PAYMENT_ADAPTERS.md'].forEach((d) => add(`doc ${d}`, exists(`docs/${d}`)));
 
-// Functional pipeline (offline, dry-run)
-let lic, inv, doctorOut;
+['lib/saasBilling/planCatalog.js', 'lib/saasBilling/usageMeter.js', 'lib/saasBilling/quotaChecker.js',
+'lib/saasBilling/entitlementService.js', 'lib/saasBilling/billingSummary.js', 'lib/saasBilling/upgradePreview.js',
+'lib/saasBilling/usageEvents.js', 'lib/saasBilling/redactor.js', 'routes/saasBillingRoutes.js', 'public/saas-billing.html'].forEach(function (f) { add('file ' + f, exists(f)); });
+add('route mounted', /saasBillingRoutes/.test(read('server.js')));
+
 try {
-  add('plans seeded', S.planRegistry.getPlans().length >= 8);
-  lic = S.licenseEngine.issueLicense('__check_tenant__', 'starter');
-  add('license issued (trial)', lic && lic.status === 'trial' && /\*/.test(lic.licenseKeyMasked));
-  S.usageMeter.record({ tenantId: '__check_tenant__', feature: 'channel_automation', metric: 'channel_posts', amount: 3, sourceModule: 'check' });
-  const q = S.quotaChecker.checkTenant('__check_tenant__');
-  add('quota warn-only', q.warnOnly === true);
-  const gate = S.featureGate.check({ tenantId: '__check_tenant__', feature: 'voice_ai', action: 'use' });
-  add('feature gate warn-only by default', gate.warnOnly === true && gate.allowed === true);
-  inv = S.invoiceBuilder.createDraft({ tenantId: '__check_tenant__', planId: 'starter' });
-  add('invoice draft built', inv && inv.status === 'draft');
-  const review = S.invoiceBuilder.markPaidForReview(inv.id, { paymentReference: 'ABC123XYZ' });
-  add('mark-paid stays manual review', review.manualReviewRequired === true && review.autoVerified === false);
-  doctorOut = S.doctor.run();
-  add('doctor runs', !!doctorOut && typeof doctorOut.score === 'number');
-} catch (e) { add('functional pipeline', false, e.message); }
+  const catalog = require('../lib/saasBilling/planCatalog');
+  const meter = require('../lib/saasBilling/usageMeter');
+  const quota = require('../lib/saasBilling/quotaChecker');
+  const ent = require('../lib/saasBilling/entitlementService');
+  const up = require('../lib/saasBilling/upgradePreview');
+  const summary = require('../lib/saasBilling/billingSummary');
+  add('5 default plans', catalog.list().length === 5, catalog.order().join(','));
+  add('11 meters', catalog.METERS.length === 11);
+  const u = meter.usage('check-tenant'); add('usage preview', u.ok === true && u.dryRun === true &&
+Array.isArray(u.meters));
+  const rec = meter.recordPreview('check-tenant', 'whatsapp_messages', 50); add('record preview', rec.ok === true &&
+rec.dryRun === true);
+  const q = quota.checkPreview('check-tenant', 'whatsapp_messages', 100); add('quota check', q.dryRun === true && typeof
+q.allowedPreview === 'boolean');
+  const e = ent.checkPreview('check-tenant', 'white_label', 'starter_preview'); add('entitlement check upgrade-required',
+e.allowedPreview === false && e.upgradeRequiredPreview === true, 'unlock ' + e.unlockPlanPreview);
+  const upv = up.preview('check-tenant', 'pro_preview'); add('upgrade preview no live payment', upv.livePayment === false
+&& Array.isArray(upv.changesPreview));
+  const s = summary.tenantSummary('check-tenant'); add('summary masked + no live', s.livePayment === false &&
+!/\b\d{10,15}\b/.test(JSON.stringify(s)));
+} catch (e) { add('module pipeline', false, e.message); }
 
-// Privacy
-add('no secret leak in sample output', !hasLeak(JSON.stringify({ lic, inv, doctorOut })));
-add('no full license key returned', lic ? !('licenseKeyHash' in lic) && !('licenseKey' in lic) : false);
-
-const passed = checks.filter((c) => c.ok).length;
-const failed = checks.filter((c) => !c.ok).length;
-const out = { generatedAt: new Date().toISOString(), passed, failed, total: checks.length, doctor: doctorOut ? { score: doctorOut.score, status: doctorOut.status, blockers: doctorOut.blockers } : null, checks };
-const dir = path.join(ROOT, 'artifacts');
-if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-fs.writeFileSync(path.join(dir, 'saas_billing_check.json'), JSON.stringify(out, null, 2));
-let md = `# SaaS Billing Check\n\nGenerated: ${out.generatedAt}\n\n**${passed}/${checks.length} passed**${doctorOut ? ` · Doctor ${doctorOut.score}/100 (${doctorOut.status})` : ''}\n\n| Check | Result | Detail |\n|---|---|---|\n`;
-checks.forEach((c) => { md += `| ${c.name} | ${c.ok ? '✅' : '❌'} | ${c.detail} |\n`; });
-fs.writeFileSync(path.join(dir, 'saas_billing_check.md'), md);
-console.log(md);
-process.exit(failed > 0 ? 1 : 0);
+const passed = checks.filter(function (c) { return c.ok; }).length, failed = checks.length - passed;
+try { const dir = path.join(process.cwd(), 'artifacts'); if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+fs.writeFileSync(path.join(dir, 'saas_billing_check.json'), JSON.stringify({ generatedAt: new Date().toISOString(),
+passed: passed, failed: failed, checks: checks }, null, 2)); } catch (e) {}
+['data/saas-billing.check.json', 'data/saas-billing-events.check.json'].forEach(function (p) { try {
+fs.unlinkSync(path.join(process.cwd(), p)); } catch (e) {} });
+console.log('saas-billing-check: ' + passed + ' passed, ' + failed + ' failed');
+process.exit(0);

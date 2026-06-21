@@ -1,0 +1,28 @@
+  <!DOCTYPE html>
+  <html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Supplier Portal</title><link rel="stylesheet" href="/css/supplier-portal.css" /></head>
+  <body>
+    <header class="sp-header"><h1>Vendor Self-Service Status Center</h1><span id="sp-badge" class="sp-badge">loading…
+  </span></header>
+    <section class="sp-pick"><label>Supplier (demo preview token)</label><select id="sp-supplier"></select><button id="sp-
+  load">Preview status</button></section>
+    <main class="sp-main">
+      <div id="sp-loading" class="sp-state" hidden>Loading status preview…</div>
+      <div id="sp-empty" class="sp-state" hidden>Pick a supplier to preview their status.</div>
+      <div id="sp-error" class="sp-state sp-err" hidden>Couldn't load status. Try again.</div>
+      <section id="sp-summary" class="sp-summary" hidden></section>
+      <section id="sp-areas" class="sp-areas" hidden></section>
+      <section class="sp-actions" id="sp-actions" hidden>
+        <div class="sp-card"><h3>Submit quote</h3><textarea id="q-text" placeholder="quote notes"></textarea><button id="q-
+  preview">Preview quote</button><pre id="q-out"></pre></div>
+        <div class="sp-card"><h3>Payment query</h3><button id="pay-preview">Preview payment status</button><pre id="pay-
+  out"></pre></div>
+        <div class="sp-card"><h3>Support request</h3><input id="sr-subject" placeholder="subject" /><textarea id="sr-body"
+  placeholder="describe your issue"></textarea><button id="sr-preview">Preview request</button><pre id="sr-out"></pre>
+  </div>
+        <div class="sp-card"><h3>Message</h3><textarea id="msg-text" placeholder="message text"></textarea><button id="msg-
+  draft">Draft message</button><pre id="msg-out"></pre></div>
+      </section>
+    </main>
+    <script src="/js/supplier-portal.js"></script>
+  </body></html>

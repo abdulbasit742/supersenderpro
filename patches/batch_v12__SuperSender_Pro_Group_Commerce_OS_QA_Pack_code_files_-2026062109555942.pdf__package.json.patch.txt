@@ -1,0 +1,77 @@
+# Source: SuperSender Pro — Group Commerce OS QA Pack (code files)-2026062109555942.pdf
+# Target: package.json
+# Apply manually as append-only hook if needed.
+
+Append-only hooks and additions for existing files. Only paste a block if that mount/link/env/script is missing.
+Run git status --short --branch first; don't overwrite staged work. Don't commit, push, rebase, or reset.
+
+
+
+
+server.js    — route mount (only if /api/group-commerce not already mounted)
+Paste after const app = express(); and app.use(express.json()); :
+
+
+  // BEGIN GROUP COMMERCE QA HOOK
+  try {
+    const groupCommerceRoutes = require('./routes/groupCommerceRoutes');
+    app.use('/api/group-commerce', groupCommerceRoutes);
+  } catch (e) {
+      console.warn('[group-commerce] route not mounted:', e.message);
+  }
+  // END GROUP COMMERCE QA HOOK
+
+
+
+The try/catch means the server won't crash if the route file doesn't exist yet.
+
+
+
+
+public/index.html     — dashboard link (only if not already present)
+Paste inside your existing nav block:
+
+
+  <!-- BEGIN GROUP COMMERCE QA HOOK -->
+  <a href="/group-commerce.html" class="nav-link">Group Commerce OS</a>
+  <!-- END GROUP COMMERCE QA HOOK -->
+
+
+
+
+.env.example    — placeholders (ensure each exists exactly once, no real
+secrets)
+  # BEGIN GROUP COMMERCE QA HOOK
+  GROUP_COMMERCE_ENABLED=true
+  GROUP_COMMERCE_DRY_RUN=true
+  GROUP_COMMERCE_STORE_PATH=data/group-commerce.json
+  GROUP_COMMERCE_HISTORY_PATH=data/group-commerce-history.json
+  GROUP_COMMERCE_DEFAULT_PAUSE_MINUTES=5
+  GROUP_COMMERCE_MAX_PAUSE_MINUTES=10
+  GROUP_COMMERCE_LINK_MODERATION_DRY_RUN=true
+  GROUP_COMMERCE_AI_AUTO_REPLY=false
+  GROUP_COMMERCE_LIVE_GROUP_ACTIONS=false
+
+  GROUP_COMMERCE_LIVE_RELAY=false
+  GROUP_COMMERCE_ECOMMERCE_WRITE=false
+  GROUP_COMMERCE_SMOKE_STRICT=false
+  # END GROUP COMMERCE QA HOOK
+
+
+
+
+package.json    — scripts (add inside "scripts": { ... } , don't remove existing)
+  "group-commerce:check": "node scripts/group-commerce-check.js",
+  "group-commerce:smoke": "node tests/smoke/groupCommerceSmoke.js"
+
+
+
+
+.gitignore   — keep reports out of git (add if not present)
+  artifacts/
+  !artifacts/.gitkeep
+
+
+
+
+Local validation (run after pasting, all read-only)

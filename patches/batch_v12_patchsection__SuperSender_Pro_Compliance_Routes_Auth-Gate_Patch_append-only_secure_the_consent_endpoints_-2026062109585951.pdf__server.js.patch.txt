@@ -1,0 +1,36 @@
+# Source: SuperSender Pro — Compliance Routes Auth-Gate Patch (append-only, secure the consent endpoints)-2026062109585951.pdf
+# Target: server.js
+# Extracted PATCH section. Apply manually as append-only hook if needed.
+
+PATCH — server.js (append-only). Mount the guard BEFORE
+compliance.register(app) .
+Find where the compliance module is registered (e.g. compliance.register(app) or
+require('./src/modules/compliance').register(app) ). Insert this block immediately before that line. If
+adminAuth.attach() is already mounted app-wide (from the Admin Auth patch), the guard reuses req.adminAuth ; if
+not, this block attaches it scoped to compliance.
+
+
+  // BEGIN COMPLIANCE AUTH GATE HOOK
+  try {
+    const complianceRouteGuard = require('./lib/adminAuth/complianceRouteGuard');
+      // Ensure req.adminAuth is populated for the compliance paths (no-op if already attached app-wide).
+      if (complianceRouteGuard.attach) {
+       app.use('/api/compliance', complianceRouteGuard.attach());
+       app.use('/compliance', complianceRouteGuard.attach());
+      }
+      // Gate sensitive compliance API operations (mutations + PII reads); leaves /inbound + /status open.
+      app.use('/api/compliance', complianceRouteGuard.apiGuard());
+      // Gate the /compliance dashboard page (toggle via COMPLIANCE_GATE_DASHBOARD).
+    app.use('/compliance', complianceRouteGuard.dashboardGuard());
+  } catch (e) {
+      console.error('[complianceAuthGate] not mounted:', e && e.message);
+  }
+  // END COMPLIANCE AUTH GATE HOOK
+
+  // ... existing: compliance.register(app) <-- this line stays AFTER the block above
+
+
+
+That's the whole wiring. Express runs the guard middleware before the inline routes register(app) defined, so
+the protected endpoints now require admin auth. Order matters: the hook block must come before
+compliance.register(app) .

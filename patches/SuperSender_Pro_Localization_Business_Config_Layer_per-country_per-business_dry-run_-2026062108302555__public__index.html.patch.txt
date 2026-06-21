@@ -1,0 +1,3 @@
+  <!-- BEGIN LOCALIZATION HOOK -->
+  <a href="/localization.html" class="nav-link">Localization</a>
+  <!-- END LOCALIZATION HOOK -->

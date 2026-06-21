@@ -1,0 +1,178 @@
+[
+  [
+    "public/gumloop-handoff.html",
+    "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf",
+    2233,
+    "kept_existing_longer",
+    "public-gumloop-handoff.html + public-js-gumloop-handoff.js + public-css-gumloop-handoff.css-2026062110020066.pdf",
+    2233
+  ],
+  [
+    "public/js/gumloop-handoff.js",
+    "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf",
+    3341,
+    "kept_existing_longer",
+    "public-gumloop-handoff.html + public-js-gumloop-handoff.js + public-css-gumloop-handoff.css-2026062110020066.pdf",
+    3341
+  ],
+  [
+    "public/css/gumloop-handoff.css",
+    "public-gumloop-handoff.html + public-js-gumloop-handoff.js + public-css-gumloop-handoff.css-2026062110020066.pdf",
+    2192,
+    "replaced_by_longer",
+    "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf",
+    2228
+  ],
+  [
+    "routes/whatsappFlowsRoutes.js",
+    "SuperSender Pro \u2014 WhatsApp Flows (Native In-Chat Forms) (code files)-2026062110014320.pdf",
+    148,
+    "replaced_by_longer",
+    "SuperSender Pro \u2014 WhatsApp Flows (Native In-Chat Forms) (code files)-2026062110014320.pdf",
+    5339
+  ],
+  [
+    "public/index.html",
+    "SuperSender Pro \u2014 WhatsApp Flows (Native In-Chat Forms) (code files)-2026062110014320.pdf",
+    1163,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf",
+    2014
+  ],
+  [
+    "routes/aiAgentMonitorRoutes.js",
+    "SuperSender Pro \u2014 AI Agent Monitoring + Human Handoff + Reply Quality QA (code files)-2026062110013389.pdf",
+    112,
+    "replaced_by_longer",
+    "SuperSender Pro \u2014 AI Agent Monitoring + Human Handoff + Reply Quality QA (code files)-2026062110013389.pdf",
+    5535
+  ],
+  [
+    "public/index.html",
+    "SuperSender Pro \u2014 AI Agent Monitoring + Human Handoff + Reply Quality QA (code files)-2026062110013389.pdf",
+    1143,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf",
+    2014
+  ],
+  [
+    "routes/marketingJourneysRoutes.js",
+    "SuperSender Pro \u2014 Email + SMS Marketing Journey Builder (code files)-2026062110012320.pdf",
+    114,
+    "replaced_by_longer",
+    "SuperSender Pro \u2014 Email + SMS Marketing Journey Builder (code files)-2026062110012320.pdf",
+    4680
+  ],
+  [
+    "public/index.html",
+    "SuperSender Pro \u2014 Email + SMS Marketing Journey Builder (code files)-2026062110012320.pdf",
+    1269,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf",
+    2014
+  ],
+  [
+    "routes/supplierPortalRoutes.js",
+    "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf",
+    257,
+    "replaced_by_longer",
+    "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf",
+    4947
+  ],
+  [
+    "public/index.html",
+    "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf",
+    187,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf",
+    2014
+  ],
+  [
+    "public/supplier-portal.html",
+    "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf",
+    1126,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf",
+    1897
+  ],
+  [
+    "public/js/supplier-portal.js",
+    "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf",
+    2797,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf",
+    3951
+  ],
+  [
+    "public/css/supplier-portal.css",
+    "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf",
+    1780,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf",
+    3163
+  ],
+  [
+    "scripts/supplier-portal-check.js",
+    "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf",
+    2380,
+    "replaced_by_longer",
+    "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf",
+    2433
+  ],
+  [
+    "tests/smoke/supplierPortalSmoke.js",
+    "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf",
+    2826,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf",
+    3553
+  ],
+  [
+    "routes/customerPortalRoutes.js",
+    "SuperSender Pro \u2014 Customer Portal + Self-Service Status Center (Part 2+3_ Routes, Previews, Checks)-2026062110001495.pdf",
+    218,
+    "replaced_by_longer",
+    "SuperSender Pro \u2014 Customer Portal + Self-Service Status Center (Part 2+3_ Routes, Previews, Checks)-2026062110001495.pdf",
+    4855
+  ],
+  [
+    "public/index.html",
+    "SuperSender Pro \u2014 Customer Portal + Self-Service Status Center (Part 2+3_ Routes, Previews, Checks)-2026062110001495.pdf",
+    1626,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf",
+    2014
+  ],
+  [
+    "routes/documentVaultRoutes.js",
+    "SuperSender Pro \u2014 Document Vault + File Attachment + Compliance Evidence Center (code files)-2026062109595372.pdf",
+    158,
+    "replaced_by_longer",
+    "SuperSender Pro \u2014 Document Vault + File Attachment + Compliance Evidence Center (code files)-2026062109595372.pdf",
+    5718
+  ],
+  [
+    "public/index.html",
+    "SuperSender Pro \u2014 Document Vault + File Attachment + Compliance Evidence Center (code files)-2026062109595372.pdf",
+    1173,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf",
+    2014
+  ],
+  [
+    "routes/productBusinessIntelligenceRoutes.js",
+    "SuperSender Pro \u2014 Product Business Intelligence Engine (code files)-2026062109594393.pdf",
+    146,
+    "replaced_by_longer",
+    "SuperSender Pro \u2014 Product Business Intelligence Engine (code files)-2026062109594393.pdf",
+    8795
+  ],
+  [
+    "public/index.html",
+    "SuperSender Pro \u2014 Product Business Intelligence Engine (code files)-2026062109594393.pdf",
+    1372,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf",
+    2014
+  ]
+]

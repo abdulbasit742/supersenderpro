@@ -1,0 +1,114 @@
+[
+  {
+    "path": "public/gumloop-handoff.html",
+    "source": "public-gumloop-handoff.html + public-js-gumloop-handoff.js + public-css-gumloop-handoff.css-2026062110020066.pdf"
+  },
+  {
+    "path": "public/css/gumloop-handoff.css",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf"
+  },
+  {
+    "path": "lib/gumloopHandoff/safeCopyRules.js",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf"
+  },
+  {
+    "path": "docs/GUMLOOP_IMPORT_PLAN.md",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf"
+  },
+  {
+    "path": "docs/GUMLOOP_PUSH_LATER_RUNBOOK.md",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf"
+  },
+  {
+    "path": "docs/CLICKUP_TO_GUMLOOP_HANDOFF.md",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf"
+  },
+  {
+    "path": "docs/MANUAL_ZIP_TO_VSCODE_TO_GUMLOOP.md",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf"
+  },
+  {
+    "path": "artifacts/gumloop_handoff_inventory.json",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf"
+  },
+  {
+    "path": "artifacts/gumloop_handoff_inventory.md",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf"
+  },
+  {
+    "path": "docs/GUMLOOP_HANDOFF_GAP_REPORT.md",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf"
+  },
+  {
+    "path": "artifacts/gumloop_merge_risk_report.md",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf"
+  },
+  {
+    "path": "artifacts/gumloop_route_mount_map.md",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf"
+  },
+  {
+    "path": "artifacts/gumloop_dashboard_link_map.md",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf"
+  },
+  {
+    "path": "artifacts/gumloop_package_script_map.md",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf"
+  },
+  {
+    "path": "artifacts/gumloop_copy_safety_scan.md",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf"
+  },
+  {
+    "path": "docs/GUMLOOP_HANDOFF_DELIVERY_REPORT.md",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf"
+  },
+  {
+    "path": "lib/supplierPortal/redactor.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf"
+  },
+  {
+    "path": "lib/supplierPortal/supplierPortalService.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf"
+  },
+  {
+    "path": "lib/supplierPortal/moduleLinker.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf"
+  },
+  {
+    "path": "lib/supplierPortal/_statusPreviewFactory.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf"
+  },
+  {
+    "path": "lib/supplierPortal/rfqStatusPreview.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf"
+  },
+  {
+    "path": "lib/supplierPortal/quoteStatusPreview.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf"
+  },
+  {
+    "path": "lib/supplierPortal/purchaseOrderStatusPreview.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf"
+  },
+  {
+    "path": "lib/supplierPortal/billPaymentStatusPreview.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf"
+  },
+  {
+    "path": "lib/supplierPortal/contractStatusPreview.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf"
+  },
+  {
+    "path": "lib/supplierPortal/supportRequestPreview.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf"
+  },
+  {
+    "path": "lib/supplierPortal/auditPreview.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf"
+  },
+  {
+    "path": "public/supplier-portal.html",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf"
+  }
+]

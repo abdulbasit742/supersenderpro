@@ -1,0 +1,17 @@
+  :root { --bg:#0d1117; --card:#161b22; --line:#30363d; --txt:#e6edf3; --muted:#8b949e; --accent:#2f81f7; --warn:#d29922; }
+  * { box-sizing:border-box; } body { margin:0; background:var(--bg); color:var(--txt); font:14px/1.5 system-ui, sans-
+  serif; }
+  .al-wrap { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }
+  .al-card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:28px; width:100%; max-
+  width:380px; }
+  .al-card h1 { font-size:18px; margin:0 0 12px; }
+  .al-status { font-size:12px; color:var(--muted); margin-bottom:16px; word-break:break-word; }
+  .al-form { display:flex; flex-direction:column; gap:12px; } .al-form label { display:flex; flex-direction:column;
+  gap:4px; font-size:12px; color:var(--muted); }
+  .al-form input { background:#0d1117; border:1px solid var(--line); border-radius:6px; padding:8px 10px; color:var(--txt);
+  }
+  button { background:var(--accent); color:#fff; border:none; border-radius:6px; padding:9px 12px; cursor:pointer; font-
+  size:14px; } .al-secondary { background:#21262d; margin-top:12px; }
+  .al-warn { margin-top:14px; padding:10px; border:1px solid var(--warn); border-radius:6px; color:var(--warn); font-
+  size:12px; }
+  .al-note { margin-top:16px; font-size:11px; color:var(--muted); }

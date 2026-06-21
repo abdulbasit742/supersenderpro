@@ -1,0 +1,42 @@
+  <!DOCTYPE html>
+  <html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Product BI</title><link rel="stylesheet" href="/css/product-business-intelligence.css" /></head>
+  <body>
+    <header class="pbi-header"><h1>Product Business Intelligence</h1><span id="pbi-badge" class="pbi-badge">loading…
+  </span></header>
+    <section class="pbi-cards" id="pbi-kpis"></section>
+    <nav class="pbi-tabs">
+      <button data-tab="products" class="active">Products</button>
+      <button data-tab="inventory">Inventory</button>
+      <button data-tab="profit">Profit / Loss</button>
+      <button data-tab="dead">Dead Stock</button>
+      <button data-tab="fast">Fast Movers</button>
+      <button data-tab="leakage">Loss Leakage</button>
+      <button data-tab="risk">Risk Engine</button>
+      <button data-tab="signals">Signal Registry</button>
+    </nav>
+    <div class="pbi-controls">
+      <input id="pbi-search" placeholder="Search products…" />
+      <select id="pbi-filter-status"><option value="">All status</option><option>in_stock</option>
+  <option>low_stock</option><option>out_of_stock</option><option>overstock</option><option>dead_stock</option></select>
+      <select id="pbi-filter-risk"><option value="">All risk</option><option>low</option><option>medium</option>
+  <option>high</option><option>critical</option></select>
+      <select id="pbi-filter-cat"><option value="">All categories</option></select>
+    </div>
+    <main class="pbi-main">
+      <section id="tab-products" class="pbi-tab"><div class="pbi-split"><table class="pbi-table"><thead><tr>
+  <th>Product</th><th>Cat</th><th>Stock</th><th>Margin</th><th>Score</th><th>Risk</th></tr></thead><tbody id="pbi-rows">
+  </tbody></table><aside id="pbi-detail" class="pbi-detail"><p class="muted">Select a product to see analysis.</p></aside>
+  </div></section>
+      <section id="tab-inventory" class="pbi-tab" hidden><div id="inv-list"></div></section>
+      <section id="tab-profit" class="pbi-tab" hidden><div id="profit-list"></div></section>
+      <section id="tab-dead" class="pbi-tab" hidden><div id="dead-list"></div></section>
+      <section id="tab-fast" class="pbi-tab" hidden><div id="fast-list"></div></section>
+      <section id="tab-leakage" class="pbi-tab" hidden><div id="leakage-list"></div></section>
+      <section id="tab-risk" class="pbi-tab" hidden><div id="risk-list"></div></section>
+      <section id="tab-signals" class="pbi-tab" hidden><p class="muted" id="sig-count"></p><div id="sig-list"></div>
+  </section>
+    </main>
+
+      <script src="/js/product-business-intelligence.js"></script>
+  </body></html>

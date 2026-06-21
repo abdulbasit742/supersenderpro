@@ -1,127 +1,175 @@
-// public/js/whatsapp-cloud-setup.js — Dashboard client. Read/preview only; never triggers a live send or live API call.
-const API = '/api/whatsapp-cloud-setup';
-const $ = (s, r = document) => r.querySelector(s);
-const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+ 'use strict';
 
-async function api(path, method = 'GET', body) {
-  const opt = { method, headers: { 'Content-Type': 'application/json' } };
-  if (body) opt.body = JSON.stringify(body);
-  const r = await fetch(API + path, opt);
-  return r.json();
-}
-const pill = (text, cls = '') => `<span class="pill ${cls}">${text}</span>`;
-const esc = (s) => String(s == null ? '' : s).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+ /* WhatsApp Cloud Setup Wizard — front-end. Read-only + dry-run UI. No secrets handled client-side. */
 
-// Tabs
-$$('.wcs-tab').forEach((t) => t.addEventListener('click', () => {
-  $$('.wcs-tab').forEach((x) => x.classList.remove('active'));
-  t.classList.add('active');
-  $$('.wcs-panel').forEach((p) => p.classList.remove('active'));
-  $('#' + t.dataset.tab).classList.add('active');
-}));
 
-function renderBadges(safety) {
-  const items = [
-    ['Dry-run', safety.dryRunEnabled, true],
-    ['Live send OFF', safety.liveSendDisabled, true],
-    ['Sync live OFF', safety.templateSyncLiveDisabled, true],
-    ['Token hidden', safety.tokenHidden, true],
-    ['PII redacted', safety.piiRedacted, true],
-  ];
-  $('#wcs-safety-badges').innerHTML = items.map(([k, ok]) => `<span class="wcs-badge ${ok ? 'ok' : 'bad'}">${ok ? '✓' : '✗'} ${k}</span>`).join('');
-  $('#wcs-safety-cards').innerHTML = Object.entries(safety).map(([k, v]) =>
-    `<div class="wcs-card"><div class="k">${esc(k)}</div><div class="v">${v ? 'YES' : 'NO'}</div></div>`).join('');
-}
+ (function () {
+   var API = '/api/whatsapp-cloud-setup';
 
-async function loadReadiness() {
-  const { readiness } = await api('/readiness');
-  if (!readiness) return;
-  $('#wcs-score').textContent = readiness.score;
-  $('#wcs-status').textContent = readiness.status.replace(/_/g, ' ');
-  const c = readiness.counts || {};
-  $('#wcs-readiness-cards').innerHTML = [
-    ['Checklist', `${c.checklistDone}/${c.checklistTotal}`],
-    ['Templates', c.templates], ['Approved', c.approvedTemplates],
-  ].map(([k, v]) => `<div class="wcs-card"><div class="k">${k}</div><div class="v">${v ?? '-'}</div></div>`).join('');
-  $('#wcs-blockers').innerHTML = (readiness.blockers || []).map((b) => `<li>${esc(b)}</li>`).join('') || '<li class="wcs-muted">none</li>';
-  $('#wcs-warnings').innerHTML = (readiness.warnings || []).map((w) => `<li>${esc(w)}</li>`).join('') || '<li class="wcs-muted">none</li>';
-  $('#wcs-nextsteps').innerHTML = (readiness.nextSteps || []).map((n) => `<li>${esc(n)}</li>`).join('');
-}
 
-async function loadChecklist() {
-  const { checklist } = await api('/checklist');
-  $('#wcs-checklist').innerHTML = (checklist || []).map((i) =>
-    `<label class="wcs-check"><input type="checkbox" data-key="${i.key}" ${i.done ? 'checked' : ''}/> ${esc(i.label)} <span class="grp">${i.group}</span></label>`).join('');
-  $$('#wcs-checklist input').forEach((cb) => cb.addEventListener('change', async () => {
-    await api('/checklist/update', 'POST', { key: cb.dataset.key, done: cb.checked });
-    loadReadiness();
-  }));
+   function $(id) { return document.getElementById(id); }
+   function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null)
+ e.textContent = text; return e; }
+
+   function getJSON(path) {
+     return fetch(API + path, { headers: { 'Accept': 'application/json' } }).then(function (r) { return r.json(); });
+   }
+   function postJSON(path, body) {
+       return fetch(API + path, {
+         method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(body || {}),
+       }).then(function (r) { return r.json(); });
+   }
+   function del(path) {
+     return fetch(API + path, { method: 'DELETE' }).then(function (r) { return r.json(); });
+   }
+
+   function setBadge(node, label, on) {
+     node.textContent = label;
+       node.classList.remove('wcs-badge-on', 'wcs-badge-off');
+       node.classList.add(on ? 'wcs-badge-on' : 'wcs-badge-off');
+   }
+
+   function loadStatus() {
+     return getJSON('/status').then(function (s) {
+        if (!s || !s.ok) return;
+        setBadge($('badge-enabled'), 'enabled: ' + (s.enabled ? 'yes' : 'no'), s.enabled);
+        setBadge($('badge-dryrun'), 'dry-run: ' + (s.mode.dryRun ? 'on' : 'off'), s.mode.dryRun);
+        setBadge($('badge-livetest'), 'live-test: ' + (s.mode.liveTest ? 'on' : 'off'), !s.mode.liveTest);
+
+
+        var total = 5; var have = total - (s.missing ? s.missing.length : total);
+        var pct = Math.round((have / total) * 100);
+        $('setup-score').textContent = pct + '%';
+       $('setup-score-note').textContent = s.configured ? 'Core config complete.' : (have + ' of ' + total + ' required values set.');
+
+        var ml = $('missing-list'); ml.innerHTML = '';
+        if (!s.missing || s.missing.length === 0) { ml.appendChild(el('li', 'wcs-ok', 'Nothing missing.')); }
+        else { s.missing.forEach(function (m) { ml.appendChild(el('li', 'wcs-bad', m)); }); }
+
+      var rl = $('readiness-list'); rl.innerHTML = '';
+      (s.warnings || []).forEach(function (w) { rl.appendChild(el('li', null, w)); });
+    });
 }
 
-async function loadWebhook() {
-  const info = await api('/webhook-info');
-  $('#wcs-webhook-info').innerHTML = `
-    <div class="wcs-card"><div class="k">Expected webhook URL</div><div class="v" style="font-size:14px">${esc(info.expectedWebhookUrl)}</div></div>
-    <p class="wcs-muted">Verify token env var: <code>${esc(info.verifyTokenEnvVar)}</code> — configured: ${info.verifyTokenConfigured ? '✓' : '✗'}</p>
-    <ol class="wcs-list">${(info.flow || []).map((f) => `<li>${esc(f)}</li>`).join('')}</ol>`;
+function loadConfig() {
+    return getJSON('/config').then(function (c) {
+      if (!c || !c.ok) return;
+      var rows = c.safeMaskedPreview;
+      var tbody = $('config-table').querySelector('tbody'); tbody.innerHTML = '';
+      Object.keys(rows).forEach(function (k) {
+        var tr = el('tr');
+          tr.appendChild(el('td', 'wcs-key', k));
+          var v = rows[k];
+          var td = el('td', null, String(v));
+          if (String(v).indexOf('missing') !== -1) td.classList.add('wcs-bad');
+          else td.classList.add('wcs-ok');
+          tr.appendChild(td);
+        tbody.appendChild(tr);
+      });
+    });
 }
 
-async function loadTemplates() {
-  const { templates } = await api('/templates');
-  const tbody = $('#wcs-templates tbody');
-  tbody.innerHTML = (templates || []).map((t) =>
-    `<tr><td>${esc(t.name)}</td><td>${esc(t.category)}</td><td>${pill(t.status, t.status)}</td>
-     <td>${pill(t.qualityRating || 'unknown', t.qualityRating)}</td><td>${(t.variables || []).length}</td>
-     <td><button class="linkbtn" data-act="preview" data-id="${t.id}">preview</button>
-         <button class="linkbtn" data-act="validate" data-id="${t.id}">validate</button>
-         <button class="linkbtn" data-act="copyid" data-id="${t.id}">id</button></td></tr>`).join('');
-  $$('#wcs-templates .linkbtn').forEach((b) => b.addEventListener('click', async () => {
-    const id = b.dataset.id;
-    if (b.dataset.act === 'preview') show('#wcs-template-result', await api(`/templates/${id}/preview`, 'POST', { values: {} }));
-    else if (b.dataset.act === 'validate') show('#wcs-template-result', await api(`/templates/${id}/validate`, 'POST', {}));
-    else { $('#send-templateId').value = id; show('#wcs-template-result', { templateId: id }); }
-  }));
+
+function loadTemplates() {
+    return getJSON('/templates').then(function (t) {
+      if (!t || !t.ok) return;
+      $('tpl-count').textContent = '(' + t.summary.total + ')';
+      var tbody = $('templates-table').querySelector('tbody'); tbody.innerHTML = '';
+      var sel = $('preview-template'); sel.innerHTML = '';
+      t.templates.forEach(function (tpl) {
+          var tr = el('tr');
+          tr.appendChild(el('td', null, tpl.name));
+          tr.appendChild(el('td', null, tpl.category));
+          tr.appendChild(el('td', null, tpl.language));
+          tr.appendChild(el('td', null, (tpl.placeholders || []).join(', ')));
+          tr.appendChild(el('td', 'wcs-status', tpl.status));
+          tbody.appendChild(tr);
+          var opt = el('option', null, tpl.name); opt.value = tpl.name; sel.appendChild(opt);
+      });
+    });
 }
 
-function show(sel, obj) { $(sel).textContent = JSON.stringify(obj, null, 2); }
 
-// Forms
-$('#wcs-config-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const body = {
-    businessName: $('#cfg-businessName').value, wabaId: $('#cfg-wabaId').value,
-    phoneNumberId: $('#cfg-phoneNumberId').value, appId: $('#cfg-appId').value,
-    webhookUrl: $('#cfg-webhookUrl').value,
-  };
-  show('#wcs-config-result', await api('/validate-config', 'POST', body));
-  loadReadiness();
-});
-$('#wcs-webhook-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  show('#wcs-webhook-result', await api('/webhook-test-preview', 'POST', {
-    'hub.mode': 'subscribe', 'hub.verify_token': $('#wh-token').value, 'hub.challenge': $('#wh-challenge').value,
-  }));
-});
-$('#wcs-template-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const body = {
-    name: $('#tpl-name').value, language: $('#tpl-language').value, category: $('#tpl-category').value,
-    body: $('#tpl-body').value, footer: $('#tpl-footer').value,
-  };
-  show('#wcs-template-result', await api('/templates', 'POST', body));
-  loadTemplates();
-});
-$('#wcs-send-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  show('#wcs-send-result', await api('/send-preview', 'POST', {
-    templateId: $('#send-templateId').value, recipient: $('#send-recipient').value,
-  }));
-});
-$('#wcs-sync-preview').addEventListener('click', async () => show('#wcs-template-result', await api('/templates/sync-preview', 'POST', {})));
-$('#wcs-template-report').addEventListener('click', async () => show('#wcs-template-result', await api('/templates/report')));
+function loadWebhook() {
+  return getJSON('/webhook-diagnostics').then(function (d) {
+      if (!d || !d.ok) return;
+      var box = $('webhook-output'); box.innerHTML = '';
+    box.appendChild(el('p', null, 'Verify token: ' + d.verifyTokenStatus + ' | Webhook secret: ' +
+d.webhookSecretStatus));
+      (d.issues || []).forEach(function (i) { box.appendChild(el('p', 'wcs-bad', i)); });
+      var ul = el('ul', 'wcs-list');
+      (d.recommendedPublicUrlChecklist || []).forEach(function (c) { ul.appendChild(el('li', null, c)); });
+      (d.eventSubscriptionChecklist || []).forEach(function (c) { ul.appendChild(el('li', null, c)); });
+      box.appendChild(ul);
+      box.appendChild(el('p', 'wcs-muted', d.signatureVerificationRecommendation));
+    });
+}
 
-(async function init() {
-  const status = await api('/status');
-  if (status && status.safety) renderBadges(status.safety);
-  await Promise.all([loadReadiness(), loadChecklist(), loadWebhook(), loadTemplates()]);
+function loadHistory() {
+  return getJSON('/history?limit=50').then(function (h) {
+      if (!h || !h.ok) return;
+      var tbody = $('history-table').querySelector('tbody'); tbody.innerHTML = '';
+    if (!h.entries.length) { var tr0 = el('tr'); var td0 = el('td', 'wcs-muted', 'No history yet.'); td0.colSpan = 7;
+tr0.appendChild(td0); tbody.appendChild(tr0); return; }
+      h.entries.forEach(function (e) {
+        var tr = el('tr');
+          tr.appendChild(el('td', null, new Date(e.timestamp).toLocaleString()));
+          tr.appendChild(el('td', null, e.action));
+          tr.appendChild(el('td', null, e.dryRun ? 'dry-run' : 'live'));
+          tr.appendChild(el('td', null, e.templateName || '-'));
+          tr.appendChild(el('td', null, e.maskedTarget || '-'));
+          tr.appendChild(el('td', null, e.status));
+          var tdBtn = el('td');
+          var b = el('button', 'wcs-btn wcs-btn-tiny', 'delete');
+          b.onclick = function () { del('/history/' + e.id).then(loadHistory); };
+          tdBtn.appendChild(b); tr.appendChild(tdBtn);
+        tbody.appendChild(tr);
+      });
+    });
+}
+
+function parseParams(s) {
+    if (!s) return [];
+    return s.split(',').map(function (x) { return x.trim(); }).filter(Boolean);
+}
+
+
+function bindActions() {
+  $('btn-preview').onclick = function () {
+      postJSON('/templates/preview', {
+        templateName: $('preview-template').value,
+          to: $('preview-to').value,
+          params: parseParams($('preview-params').value),
+      }).then(function (r) {
+        $('preview-output').textContent = JSON.stringify(r, null, 2);
+        loadHistory();
+      });
+    };
+    $('btn-test').onclick = function () {
+      postJSON('/templates/test', {
+        templateName: $('preview-template').value,
+          to: $('preview-to').value,
+          params: parseParams($('preview-params').value),
+      }).then(function (r) {
+        $('preview-output').textContent = JSON.stringify(r, null, 2);
+        loadHistory();
+      });
+    };
+}
+
+
+function init() {
+    bindActions();
+    loadStatus();
+    loadConfig();
+    loadTemplates();
+
+    loadWebhook();
+    loadHistory();
+}
+
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+else init();
 })();

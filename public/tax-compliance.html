@@ -1,0 +1,35 @@
+  <!DOCTYPE html>
+  <html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tax Compliance</title><link rel="stylesheet" href="/css/tax-compliance.css" /></head>
+  <body>
+    <header class="tx-header"><h1>Tax / GST / VAT + Compliance</h1><span id="tx-badge" class="tx-badge">loading…</span>
+  </header>
+    <section class="tx-cards" id="tx-kpis"></section>
+    <nav class="tx-tabs">
+      <button data-tab="rules" class="active">Tax Rules</button>
+      <button data-tab="calc">Calculator</button>
+      <button data-tab="invoice">Invoice Tax</button>
+      <button data-tab="expense">Expense Tax</button>
+      <button data-tab="reports">Reports</button>
+      <button data-tab="checklist">Checklist</button>
+      <button data-tab="risk">Risk</button>
+      <button data-tab="audit">Audit Export</button>
+    </nav>
+    <main class="tx-main">
+      <section id="tab-rules" class="tx-tab"><div id="rules-list"></div></section>
+      <section id="tab-calc" class="tx-tab" hidden><input id="calc-sub" type="number" placeholder="subtotal" /><input
+  id="calc-rate" type="number" placeholder="rate %" /><label class="chk"><input id="calc-exempt" type="checkbox" />
+  exempt</label><button id="calc-run">Calculate preview</button><pre id="calc-result"></pre></section>
+      <section id="tab-invoice" class="tx-tab" hidden><button id="inv-run">Preview invoice tax</button><div id="inv-
+  result"></div></section>
+      <section id="tab-expense" class="tx-tab" hidden><button id="exp-run">Preview expense tax</button><div id="exp-
+  result"></div></section>
+      <section id="tab-reports" class="tx-tab" hidden><div class="tx-report-grid"><div><h3>Monthly</h3><pre id="rep-
+  monthly"></pre></div><div><h3>Quarterly</h3><pre id="rep-quarterly"></pre></div></div></section>
+      <section id="tab-checklist" class="tx-tab" hidden><div id="checklist-list"></div></section>
+      <section id="tab-risk" class="tx-tab" hidden><pre id="risk-result"></pre></section>
+      <section id="tab-audit" class="tx-tab" hidden><button id="audit-run">Build audit export preview</button><pre
+  id="audit-result"></pre></section>
+    </main>
+    <script src="/js/tax-compliance.js"></script>
+  </body></html>

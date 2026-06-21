@@ -1,0 +1,21 @@
+  <!DOCTYPE html>
+  <html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login</title><link rel="stylesheet" href="/css/admin-login.css" /></head>
+  <body>
+    <main class="al-wrap">
+      <section class="al-card">
+        <h1>Admin Login</h1>
+        <div id="al-status" class="al-status">loading…</div>
+        <form id="al-form" class="al-form" autocomplete="off">
+          <label>Email<input type="email" id="al-email" name="email" required /></label>
+          <label>Password<input type="password" id="al-password" name="password" required /></label>
+          <button type="submit" id="al-submit">Log in</button>
+        </form>
+        <button id="al-logout" class="al-secondary" hidden>Log out</button>
+        <div id="al-warn" class="al-warn" hidden></div>
+        <p class="al-note">Demo-safe: if login is not required, the dashboard stays open. No credentials are stored in
+  code.</p>
+      </section>
+    </main>
+    <script src="/js/admin-login.js"></script>
+  </body></html>

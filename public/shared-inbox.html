@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Shared Inbox</title><link rel="stylesheet" href="/css/shared-inbox.css" /></head>
+<body>
+  <header class="si-header"><h1>Shared Inbox</h1><span id="si-mode" class="si-badge">loading…</span></header>
+  <div class="si-layout">
+    <aside class="si-list"><div class="si-list-head">Conversations</div><div id="conv-list"></div></aside>
+    <main class="si-detail">
+      <div id="conv-empty" class="si-empty">Select a conversation</div>
+      <div id="conv-detail" hidden>
+        <div class="si-detail-head"><h2 id="d-name">–</h2><span id="d-collision" class="si-collision" hidden></span>
+</div>
+         <div class="si-row">
+          <label>Assign <select id="d-assign"><option value="">unassigned</option><option>agent_a</option>
+<option>agent_b</option></select></label>
+          <label>Status <select id="d-status"><option>open</option><option>pending</option>
+<option>waiting_customer</option><option>waiting_team</option><option>resolved</option><option>archived</option></select>
+</label>
+           <label>Priority <select id="d-priority"><option>low</option><option>normal</option><option>high</option>
+<option>urgent</option></select></label>
+          <span id="d-sla" class="si-sla"></span>
+         </div>
+         <div class="si-panel"><strong>Contact (safe)</strong><div id="d-contact" class="muted"></div></div>
+        <div class="si-panel"><strong>Internal notes</strong><div id="d-notes"></div><div class="si-row"><input id="note-
+text" placeholder="Add internal note (private)" /><button id="note-add">Add</button></div></div>
+        <div class="si-panel"><strong>Saved replies</strong><select id="d-saved"></select><button id="use-
+saved">Insert</button></div>
+       <div class="si-panel"><strong>Reply (preview only)</strong><textarea id="reply-text" placeholder="Type a
+reply…"></textarea><button id="reply-preview">Preview send</button><pre id="reply-result"></pre></div>
+      </div>
+    </main>
+  </div>
+  <script src="/js/safe-fetch.js"></script>
+  <script src="/js/shared-inbox.js"></script>
+</body></html>

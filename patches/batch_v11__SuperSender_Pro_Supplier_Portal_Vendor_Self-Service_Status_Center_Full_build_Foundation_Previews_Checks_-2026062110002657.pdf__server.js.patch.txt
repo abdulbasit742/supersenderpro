@@ -1,0 +1,10 @@
+# Source: SuperSender Pro — Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf
+# Target: server.js
+# Apply manually as append-only hook if needed.
+
+  // BEGIN SUPPLIER PORTAL HOOK
+  const supplierPortalRoutes = require('./routes/supplierPortalRoutes');
+  app.use('/api/supplier-portal', supplierPortalRoutes);
+  app.get('/supplier-portal', (req, res) => res.sendFile(require('path').join(__dirname, 'public', 'supplier-
+  portal.html')));
+  // END SUPPLIER PORTAL HOOK

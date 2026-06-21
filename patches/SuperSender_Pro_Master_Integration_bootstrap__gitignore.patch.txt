@@ -1,0 +1,12 @@
+# Secrets & runtime state - NEVER commit
+.env
+.env.*
+!.env.example
+data/
+backups/
+*.session
+sessions/
+baileys_auth*/
+lovable-app/.env
+n8n-workflows/*.secret.json
+node_modules/

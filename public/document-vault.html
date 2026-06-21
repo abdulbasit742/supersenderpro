@@ -1,0 +1,44 @@
+  <!DOCTYPE html>
+  <html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document Vault</title><link rel="stylesheet" href="/css/document-vault.css" /></head>
+  <body>
+    <header class="dv-header"><h1>Document Vault + Compliance Evidence</h1><span id="dv-badge" class="dv-badge">loading…
+  </span></header>
+    <section class="dv-cards" id="dv-kpis"></section>
+    <nav class="dv-tabs">
+      <button data-tab="docs" class="active">Documents</button>
+      <button data-tab="expiry">Expiry Alerts</button>
+      <button data-tab="missing">Missing Check</button>
+      <button data-tab="evidence">Compliance Evidence</button>
+      <button data-tab="access">Access Check</button>
+      <button data-tab="share">Share Draft</button>
+      <button data-tab="audit">Audit Trail</button>
+    </nav>
+    <div class="dv-controls">
+      <input id="dv-search" placeholder="Search documents…" />
+      <select id="dv-category"><option value="">All categories</option></select>
+      <select id="dv-status"><option value="">All status</option><option>attached_preview</option>
+  <option>verified_preview</option><option>needs_review</option><option>expiring_soon</option><option>expired</option>
+  </select>
+      <select id="dv-risk"><option value="">All risk</option><option>low</option><option>medium</option>
+  <option>high</option><option>critical</option></select>
+    </div>
+    <main class="dv-main">
+      <section id="tab-docs" class="dv-tab"><div class="dv-split"><table class="dv-table"><thead><tr><th>Title</th>
+  <th>Type</th><th>Module</th><th>Expiry</th><th>Status</th></tr></thead><tbody id="dv-rows"></tbody></table><aside id="dv-
+  detail" class="dv-detail"><p class="muted">Select a document.</p></aside></div></section>
+      <section id="tab-expiry" class="dv-tab" hidden><div id="expiry-list"></div></section>
+      <section id="tab-missing" class="dv-tab" hidden><select id="miss-module"></select><button id="miss-run">Check
+  missing</button><pre id="miss-result"></pre></section>
+      <section id="tab-evidence" class="dv-tab" hidden><button id="ev-run">Build evidence preview</button><div id="ev-
+  result"></div></section>
+      <section id="tab-access" class="dv-tab" hidden><input id="acc-doc" placeholder="document id" /><select id="acc-role">
+  <option>owner</option><option>admin</option><option>manager</option><option>finance</option><option>support</option>
+  <option>viewer</option></select><button id="acc-run">Access check</button><pre id="acc-result"></pre></section>
+      <section id="tab-share" class="dv-tab" hidden><input id="sh-doc" placeholder="document id" /><input id="sh-to"
+  placeholder="recipient" /><button id="sh-run">Draft share</button><pre id="sh-result"></pre></section>
+
+       <section id="tab-audit" class="dv-tab" hidden><pre id="audit-result"></pre></section>
+      </main>
+      <script src="/js/document-vault.js"></script>
+  </body></html>

@@ -1,104 +1,40 @@
-// public/js/customer-portal.js — Customer Portal client. Preview-only: never pays, sends, downloads, or mutates.
-const API = '/api/customer-portal';
-const $ = (s, r = document) => r.querySelector(s);
-const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+ 'use strict';
+ const API = '/api/customer-portal';
+ const $ = (s) => document.querySelector(s);
+ async function j(u, o) { try { const r = await fetch(u, o); return await r.json(); } catch (e) { return { ok: false,
+ error: 'unavailable' }; } }
+ function esc(s) { return String(s == null ? '' : s).replace(/[&<>]/g, (c) => ({ '&': '&', '<': '<', '>': '>' }[c])); }
+ const JH = { method: 'POST', headers: { 'Content-Type': 'application/json' } };
+ let TOKEN = null;
+ function show(id, on) { const el = $(id); if (el) el.hidden = !on; }
 
-async function api(path, method = 'GET', body) {
-  try {
-    const opt = { method, headers: { 'Content-Type': 'application/json' } };
-    if (body) opt.body = JSON.stringify(body);
-    const r = await fetch(API + path, opt);
-    return await r.json();
-  } catch (e) {
-    return { ok: false, error: 'network_error', warnings: [], blockers: [] };
-  }
-}
-const esc = (s) => String(s == null ? '' : s).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
-const badge = (text, cls = '') => `<span class="badge ${cls}">${esc(text)}</span>`;
-function statusClass(s) {
-  s = String(s || '');
-  if (/paid|active|confirmed|approved|resolved|available/.test(s)) return 'ok';
-  if (/delay|overdue|unpaid|open|expiring|unresolved|missing|pending/.test(s)) return 'warn';
-  if (/block|expired|reject|cancel/.test(s)) return 'bad';
-  return '';
-}
-function rows(el, items, fn) {
-  const node = $(el);
-  if (!items || !items.length) { node.innerHTML = '<div class="cp-empty">Nothing to show in this preview.</div>'; return; }
-  node.innerHTML = items.map(fn).join('');
-}
+ async function loadStatus() { const s = await j(API + '/status'); const dry = !s || s.dryRun !== false; $('#cp-badge').textContent = dry ? 'DRY-RUN · preview only · no payment · no send · PII masked' : 'CHECK CONFIG'; $('#cp-badge').className = 'cp-badge ' + (dry ? 'safe' : 'warn'); }
 
-function renderSafetyBadges(status) {
-  const items = [
-    ['Safe preview', true], ['No live payment', !status.livePayment !== false], ['No live sends', true],
-    ['No mutation', !status.liveActionsEnabled], ['PII masked', status.piiMasked], ['External calls off', !status.externalCallsEnabled],
-  ];
-  $('#cp-safety-badges').innerHTML = items.map(([k]) => `<span class="cp-badge">✓ ${esc(k)}</span>`).join('');
-}
+ async function loadCustomers() { const r = await j(API + '/customers'); $('#cp-customer').innerHTML = (r.customers ||
+ []).map((c) => '<option value="' + esc(c.previewToken) + '">' + esc(c.displayNameSafe) + ' (' + esc(c.previewToken) + ')</option>').join(''); show('#cp-empty', true); }
 
-async function loadStatus() {
-  const status = await api('/status');
-  if (status && status.ok) renderSafetyBadges(status);
-}
 
-async function loadAll() {
-  // Profile + KPIs
-  const lookup = await api('/lookup-preview', 'POST', { mode: $('#cp-mode').value, reference: $('#cp-ref').value });
-  if (lookup && lookup.ok) {
-    $('#cp-error').hidden = true;
-    $('#cp-profile').innerHTML = `<div class="row"><b>${esc(lookup.customerNameSafe)}</b> · ${esc(lookup.phoneMasked)} · ${esc(lookup.emailMasked)} · token ${esc(lookup.portalTokenPreview)}</div>`;
-  } else {
-    $('#cp-error').hidden = false;
-    $('#cp-error').textContent = 'We could not load this preview right now. Please try again or contact support.';
-  }
+ async function loadSummary() {
+   TOKEN = $('#cp-customer').value; if (!TOKEN) return;
+   show('#cp-empty', false); show('#cp-error', false); show('#cp-summary', false); show('#cp-areas', false); show('#cp-actions', false); show('#cp-loading', true);
+     const r = await j(API + '/customers/' + TOKEN + '/summary-preview');
+     show('#cp-loading', false);
+     if (!r || r.ok === false) { show('#cp-error', true); return; }
+     const sp = r.summaryPreview || {};
+   $('#cp-summary').innerHTML = '<div class="cp-cust"><strong>' + esc(sp.customer && sp.customer.displayNameSafe) +
+ '</strong> <span class="muted">' + esc((sp.customer && sp.customer.phoneMasked) || '') + ' · ' + esc((sp.customer &&
+ sp.customer.emailMasked) || '') + '</span></div><div class="muted">Loyalty points: ' + esc(sp.loyaltyPointsPreview) + ' · Attention: ' + esc((sp.attentionAreas || []).join(', ') || 'none') + '</div>';
+   $('#cp-areas').innerHTML = Object.entries(sp.statuses || {}).map(([area, st]) => '<div class="cp-area"><span class="cp-area-name">' + esc(area.replace(/_/g, ' ')) + '</span><span class="badge st-' + esc(st) + '">' + esc(st) + '</span></div>').join('');
+   show('#cp-summary', true); show('#cp-areas', true); show('#cp-actions', true);
+ }
 
-  const sum = await api('/summary');
-  if (sum && sum.ok) {
-    const kpis = [
-      ['Open orders', sum.openOrdersPreview], ['Unpaid invoices', sum.unpaidInvoicesPreview],
-      ['Upcoming bookings', sum.upcomingAppointmentsPreview], ['Open tickets', sum.openTicketsPreview],
-      ['Loyalty points', sum.loyaltyPointsPreview],
-    ];
-    $('#cp-kpis').innerHTML = kpis.map(([k, v]) => `<div class="cp-kpi"><div class="k">${esc(k)}</div><div class="v">${v ?? '-'}</div></div>`).join('');
-  }
+ document.addEventListener('click', async (e) => {
+   if (e.target.id === 'cp-load') loadSummary();
+   if (e.target.id === 'sr-preview') { if (!TOKEN) return; const r = await j(API + '/customers/' + TOKEN + '/support-request-preview', Object.assign({ body: JSON.stringify({ subject: $('#sr-subject').value, body: $('#sr-body').value }) },
+ JH)); $('#sr-out').textContent = 'Preview only (no ticket created): ' + JSON.stringify(r.requestPreview || r, null, 2); }
+   if (e.target.id === 'msg-draft') { if (!TOKEN) return; const r = await j(API + '/customers/' + TOKEN + '/message-draft-preview', Object.assign({ body: JSON.stringify({ text: $('#msg-text').value, channel: 'whatsapp_preview' }) }, JH));
+ $('#msg-out').textContent = 'Draft only (not sent): ' + esc(r.messagePreview || '') + ' → ' + esc(r.recipientMasked ||
+ ''); }
+ });
 
-  const [orders, invoices, bookings, service, maintenance, tickets, warranty, loyalty, documents] = await Promise.all([
-    api('/orders'), api('/invoices'), api('/bookings'), api('/service-jobs'),
-    api('/maintenance-plans'), api('/tickets'), api('/warranty'), api('/loyalty'), api('/documents'),
-  ]);
-
-  rows('#cp-orders', orders.ordersPreview, (o) => `<div class="cp-row"><span class="id">${esc(o.orderIdPreview)}</span>${badge(o.statusPreview, statusClass(o.statusPreview))} ${badge(o.paymentStatusPreview, statusClass(o.paymentStatusPreview))}</div>`);
-  rows('#cp-invoices', invoices.invoicesPreview, (i) => `<div class="cp-row"><span class="id">${esc(i.invoiceIdPreview)}</span><span>Bal: ${esc(i.balancePreview)}</span>${badge(i.statusPreview, statusClass(i.statusPreview))}</div>`);
-  rows('#cp-bookings', bookings.bookingsPreview, (b) => `<div class="cp-row"><span class="id">${esc(b.bookingIdPreview)}</span><span>${esc((b.scheduledTimePreview || '').slice(0, 16).replace('T', ' '))}</span>${badge(b.statusPreview, statusClass(b.statusPreview))}</div>`);
-  rows('#cp-service', service.serviceJobsPreview, (j) => `<div class="cp-row"><span class="id">${esc(j.workOrderIdPreview)}</span><span>${esc(j.technicianSafe)}</span>${badge(j.statusPreview, statusClass(j.statusPreview))}</div>`);
-  rows('#cp-maintenance', maintenance.maintenancePlansPreview, (p) => `<div class="cp-row"><span>${esc(p.planSafe)}</span>${badge(p.statusPreview, statusClass(p.statusPreview))}</div>`);
-  rows('#cp-tickets', tickets.ticketsPreview, (t) => `<div class="cp-row"><span class="id">${esc(t.ticketIdPreview)}</span><span>${esc(t.subjectSafe)}</span>${badge(t.statusPreview, statusClass(t.statusPreview))}</div>`);
-  rows('#cp-warranty', warranty.warrantyPreview, (w) => `<div class="cp-row"><span>${esc(w.productSafe)}</span>${badge(w.statusPreview, statusClass(w.statusPreview))}</div>`);
-  $('#cp-loyalty').innerHTML = loyalty && loyalty.ok
-    ? `<div class="cp-row"><span>Points: <b>${esc(loyalty.loyaltyPointsPreview)}</b> · Tier: ${esc(loyalty.tierSafe)}</span>${badge('expiring: ' + loyalty.expiringPointsPreview, 'warn')}</div>`
-    : '<div class="cp-empty">No loyalty preview.</div>';
-  rows('#cp-documents', documents.documentsPreview, (d) => `<div class="cp-row"><span class="id">${esc(d.documentIdPreview)}</span><span>${esc(d.nameSafe)}</span>${badge(d.statusPreview, statusClass(d.statusPreview))}</div>`);
-}
-
-// Draft preview actions
-const DRAFTS = {
-  support: () => api('/support-request-preview', 'POST', { subject: 'Need help', message: 'I have a question about my order.' }),
-  reschedule: () => api('/reschedule-request-preview', 'POST', { requestedTime: 'Next week' }),
-  reminder: () => api('/payment-reminder-preview', 'POST', {}),
-  message: () => api('/message-draft-preview', 'POST', { message: 'Hello, this is a preview message.' }),
-  document: () => api('/document-request-preview', 'POST', { documentId: 'doc_1101' }),
-};
-$$('[data-draft]').forEach((b) => b.addEventListener('click', async () => {
-  const out = $('#cp-draft-out');
-  out.classList.add('show');
-  out.textContent = 'Preparing safe preview…';
-  const res = await DRAFTS[b.dataset.draft]();
-  out.textContent = 'Safe preview (nothing was sent or charged):\n\n' + JSON.stringify(res, null, 2);
-}));
-
-$('#cp-lookup-form').addEventListener('submit', (e) => { e.preventDefault(); loadAll(); });
-
-(async function init() {
-  await loadStatus();
-  await loadAll();
-})();
+ (async function () { await loadStatus(); await loadCustomers(); })();

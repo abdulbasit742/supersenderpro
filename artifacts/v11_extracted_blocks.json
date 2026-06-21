@@ -1,0 +1,702 @@
+[
+  {
+    "path": "public/js/gumloop-handoff.js",
+    "source": "public-gumloop-handoff.html + public-js-gumloop-handoff.js + public-css-gumloop-handoff.css-2026062110020066.pdf",
+    "lines": 59
+  },
+  {
+    "path": "lib/gumloopHandoff/pathSafety.js",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf",
+    "lines": 37
+  },
+  {
+    "path": "lib/gumloopHandoff/redactor.js",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf",
+    "lines": 40
+  },
+  {
+    "path": "lib/gumloopHandoff/fileClassifier.js",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf",
+    "lines": 83
+  },
+  {
+    "path": "lib/gumloopHandoff/index.js",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf",
+    "lines": 54
+  },
+  {
+    "path": "lib/gumloopHandoff/mergeRiskScanner.js",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf",
+    "lines": 41
+  },
+  {
+    "path": "lib/gumloopHandoff/routeMountMap.js",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf",
+    "lines": 44
+  },
+  {
+    "path": "lib/gumloopHandoff/dashboardLinkMap.js",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf",
+    "lines": 40
+  },
+  {
+    "path": "lib/gumloopHandoff/packageScriptMap.js",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf",
+    "lines": 42
+  },
+  {
+    "path": "lib/gumloopHandoff/copySafetyScanner.js",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf",
+    "lines": 45
+  },
+  {
+    "path": "lib/gumloopHandoff/handoffManifest.js",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf",
+    "lines": 31
+  },
+  {
+    "path": "lib/gumloopHandoff/manifestBuilder.js",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf",
+    "lines": 147
+  },
+  {
+    "path": "routes/gumloopHandoffRoutes.js",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf",
+    "lines": 113
+  },
+  {
+    "path": "scripts/gumloop-handoff-check.js",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf",
+    "lines": 163
+  },
+  {
+    "path": "tests/smoke/gumloopHandoffSmoke.js",
+    "source": "SuperSender Pro \u2014 Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110015561.pdf",
+    "lines": 89
+  },
+  {
+    "path": "lib/whatsappFlows/redactor.js",
+    "source": "SuperSender Pro \u2014 WhatsApp Flows (Native In-Chat Forms) (code files)-2026062110014320.pdf",
+    "lines": 20
+  },
+  {
+    "path": "lib/whatsappFlows/componentTypes.js",
+    "source": "SuperSender Pro \u2014 WhatsApp Flows (Native In-Chat Forms) (code files)-2026062110014320.pdf",
+    "lines": 42
+  },
+  {
+    "path": "lib/whatsappFlows/store.js",
+    "source": "SuperSender Pro \u2014 WhatsApp Flows (Native In-Chat Forms) (code files)-2026062110014320.pdf",
+    "lines": 20
+  },
+  {
+    "path": "lib/whatsappFlows/flowModel.js",
+    "source": "SuperSender Pro \u2014 WhatsApp Flows (Native In-Chat Forms) (code files)-2026062110014320.pdf",
+    "lines": 67
+  },
+  {
+    "path": "lib/whatsappFlows/flowValidator.js",
+    "source": "SuperSender Pro \u2014 WhatsApp Flows (Native In-Chat Forms) (code files)-2026062110014320.pdf",
+    "lines": 39
+  },
+  {
+    "path": "lib/whatsappFlows/flowService.js",
+    "source": "SuperSender Pro \u2014 WhatsApp Flows (Native In-Chat Forms) (code files)-2026062110014320.pdf",
+    "lines": 30
+  },
+  {
+    "path": "lib/whatsappFlows/flowRunnerPreview.js",
+    "source": "SuperSender Pro \u2014 WhatsApp Flows (Native In-Chat Forms) (code files)-2026062110014320.pdf",
+    "lines": 89
+  },
+  {
+    "path": "lib/whatsappFlows/responseStore.js",
+    "source": "SuperSender Pro \u2014 WhatsApp Flows (Native In-Chat Forms) (code files)-2026062110014320.pdf",
+    "lines": 34
+  },
+  {
+    "path": "lib/whatsappFlows/responsePreview.js",
+    "source": "SuperSender Pro \u2014 WhatsApp Flows (Native In-Chat Forms) (code files)-2026062110014320.pdf",
+    "lines": 20
+  },
+  {
+    "path": "lib/whatsappFlows/defaultFlows.js",
+    "source": "SuperSender Pro \u2014 WhatsApp Flows (Native In-Chat Forms) (code files)-2026062110014320.pdf",
+    "lines": 68
+  },
+  {
+    "path": "routes/whatsappFlowsRoutes.js",
+    "source": "SuperSender Pro \u2014 WhatsApp Flows (Native In-Chat Forms) (code files)-2026062110014320.pdf",
+    "lines": 104
+  },
+  {
+    "path": "public/whatsapp-flows.html",
+    "source": "SuperSender Pro \u2014 WhatsApp Flows (Native In-Chat Forms) (code files)-2026062110014320.pdf",
+    "lines": 27
+  },
+  {
+    "path": "public/js/whatsapp-flows.js",
+    "source": "SuperSender Pro \u2014 WhatsApp Flows (Native In-Chat Forms) (code files)-2026062110014320.pdf",
+    "lines": 113
+  },
+  {
+    "path": "public/css/whatsapp-flows.css",
+    "source": "SuperSender Pro \u2014 WhatsApp Flows (Native In-Chat Forms) (code files)-2026062110014320.pdf",
+    "lines": 42
+  },
+  {
+    "path": "scripts/whatsapp-flows-check.js",
+    "source": "SuperSender Pro \u2014 WhatsApp Flows (Native In-Chat Forms) (code files)-2026062110014320.pdf",
+    "lines": 67
+  },
+  {
+    "path": "tests/smoke/whatsappFlowsSmoke.js",
+    "source": "SuperSender Pro \u2014 WhatsApp Flows (Native In-Chat Forms) (code files)-2026062110014320.pdf",
+    "lines": 58
+  },
+  {
+    "path": "lib/aiAgentMonitor/store.js",
+    "source": "SuperSender Pro \u2014 AI Agent Monitoring + Human Handoff + Reply Quality QA (code files)-2026062110013389.pdf",
+    "lines": 39
+  },
+  {
+    "path": "lib/aiAgentMonitor/aiReplyModel.js",
+    "source": "SuperSender Pro \u2014 AI Agent Monitoring + Human Handoff + Reply Quality QA (code files)-2026062110013389.pdf",
+    "lines": 55
+  },
+  {
+    "path": "lib/aiAgentMonitor/replyQuality.js",
+    "source": "SuperSender Pro \u2014 AI Agent Monitoring + Human Handoff + Reply Quality QA (code files)-2026062110013389.pdf",
+    "lines": 48
+  },
+  {
+    "path": "lib/aiAgentMonitor/riskChecker.js",
+    "source": "SuperSender Pro \u2014 AI Agent Monitoring + Human Handoff + Reply Quality QA (code files)-2026062110013389.pdf",
+    "lines": 35
+  },
+  {
+    "path": "lib/aiAgentMonitor/handoffRules.js",
+    "source": "SuperSender Pro \u2014 AI Agent Monitoring + Human Handoff + Reply Quality QA (code files)-2026062110013389.pdf",
+    "lines": 43
+  },
+  {
+    "path": "lib/aiAgentMonitor/handoffQueue.js",
+    "source": "SuperSender Pro \u2014 AI Agent Monitoring + Human Handoff + Reply Quality QA (code files)-2026062110013389.pdf",
+    "lines": 45
+  },
+  {
+    "path": "lib/aiAgentMonitor/knowledgeGapDetector.js",
+    "source": "SuperSender Pro \u2014 AI Agent Monitoring + Human Handoff + Reply Quality QA (code files)-2026062110013389.pdf",
+    "lines": 38
+  },
+  {
+    "path": "lib/aiAgentMonitor/agentAnalytics.js",
+    "source": "SuperSender Pro \u2014 AI Agent Monitoring + Human Handoff + Reply Quality QA (code files)-2026062110013389.pdf",
+    "lines": 36
+  },
+  {
+    "path": "routes/aiAgentMonitorRoutes.js",
+    "source": "SuperSender Pro \u2014 AI Agent Monitoring + Human Handoff + Reply Quality QA (code files)-2026062110013389.pdf",
+    "lines": 121
+  },
+  {
+    "path": "public/ai-agent-monitor.html",
+    "source": "SuperSender Pro \u2014 AI Agent Monitoring + Human Handoff + Reply Quality QA (code files)-2026062110013389.pdf",
+    "lines": 31
+  },
+  {
+    "path": "public/js/ai-agent-monitor.js",
+    "source": "SuperSender Pro \u2014 AI Agent Monitoring + Human Handoff + Reply Quality QA (code files)-2026062110013389.pdf",
+    "lines": 74
+  },
+  {
+    "path": "public/css/ai-agent-monitor.css",
+    "source": "SuperSender Pro \u2014 AI Agent Monitoring + Human Handoff + Reply Quality QA (code files)-2026062110013389.pdf",
+    "lines": 35
+  },
+  {
+    "path": "scripts/ai-agent-monitor-check.js",
+    "source": "SuperSender Pro \u2014 AI Agent Monitoring + Human Handoff + Reply Quality QA (code files)-2026062110013389.pdf",
+    "lines": 60
+  },
+  {
+    "path": "tests/smoke/aiAgentMonitorSmoke.js",
+    "source": "SuperSender Pro \u2014 AI Agent Monitoring + Human Handoff + Reply Quality QA (code files)-2026062110013389.pdf",
+    "lines": 54
+  },
+  {
+    "path": "lib/marketingJourneys/store.js",
+    "source": "SuperSender Pro \u2014 Email + SMS Marketing Journey Builder (code files)-2026062110012320.pdf",
+    "lines": 36
+  },
+  {
+    "path": "lib/marketingJourneys/journeyModel.js",
+    "source": "SuperSender Pro \u2014 Email + SMS Marketing Journey Builder (code files)-2026062110012320.pdf",
+    "lines": 113
+  },
+  {
+    "path": "lib/marketingJourneys/journeyService.js",
+    "source": "SuperSender Pro \u2014 Email + SMS Marketing Journey Builder (code files)-2026062110012320.pdf",
+    "lines": 39
+  },
+  {
+    "path": "lib/marketingJourneys/segmentPreview.js",
+    "source": "SuperSender Pro \u2014 Email + SMS Marketing Journey Builder (code files)-2026062110012320.pdf",
+    "lines": 39
+  },
+  {
+    "path": "lib/marketingJourneys/consentGuard.js",
+    "source": "SuperSender Pro \u2014 Email + SMS Marketing Journey Builder (code files)-2026062110012320.pdf",
+    "lines": 35
+  },
+  {
+    "path": "lib/marketingJourneys/campaignAnalytics.js",
+    "source": "SuperSender Pro \u2014 Email + SMS Marketing Journey Builder (code files)-2026062110012320.pdf",
+    "lines": 32
+  },
+  {
+    "path": "lib/marketingJourneys/emailTemplates.js",
+    "source": "SuperSender Pro \u2014 Email + SMS Marketing Journey Builder (code files)-2026062110012320.pdf",
+    "lines": 50
+  },
+  {
+    "path": "lib/marketingJourneys/smsTemplates.js",
+    "source": "SuperSender Pro \u2014 Email + SMS Marketing Journey Builder (code files)-2026062110012320.pdf",
+    "lines": 29
+  },
+  {
+    "path": "lib/marketingJourneys/journeyPreviewRunner.js",
+    "source": "SuperSender Pro \u2014 Email + SMS Marketing Journey Builder (code files)-2026062110012320.pdf",
+    "lines": 69
+  },
+  {
+    "path": "routes/marketingJourneysRoutes.js",
+    "source": "SuperSender Pro \u2014 Email + SMS Marketing Journey Builder (code files)-2026062110012320.pdf",
+    "lines": 105
+  },
+  {
+    "path": "public/marketing-journeys.html",
+    "source": "SuperSender Pro \u2014 Email + SMS Marketing Journey Builder (code files)-2026062110012320.pdf",
+    "lines": 33
+  },
+  {
+    "path": "public/js/marketing-journeys.js",
+    "source": "SuperSender Pro \u2014 Email + SMS Marketing Journey Builder (code files)-2026062110012320.pdf",
+    "lines": 85
+  },
+  {
+    "path": "public/css/marketing-journeys.css",
+    "source": "SuperSender Pro \u2014 Email + SMS Marketing Journey Builder (code files)-2026062110012320.pdf",
+    "lines": 35
+  },
+  {
+    "path": "scripts/marketing-journeys-check.js",
+    "source": "SuperSender Pro \u2014 Email + SMS Marketing Journey Builder (code files)-2026062110012320.pdf",
+    "lines": 56
+  },
+  {
+    "path": "tests/smoke/marketingJourneysSmoke.js",
+    "source": "SuperSender Pro \u2014 Email + SMS Marketing Journey Builder (code files)-2026062110012320.pdf",
+    "lines": 51
+  },
+  {
+    "path": "lib/supplierPortal/store.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf",
+    "lines": 19
+  },
+  {
+    "path": "lib/supplierPortal/supplierPortalModel.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf",
+    "lines": 58
+  },
+  {
+    "path": "lib/supplierPortal/statusSummaryPreview.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf",
+    "lines": 53
+  },
+  {
+    "path": "lib/supplierPortal/deliveryStatusPreview.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf",
+    "lines": 4
+  },
+  {
+    "path": "lib/supplierPortal/qualityScorePreview.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf",
+    "lines": 6
+  },
+  {
+    "path": "lib/supplierPortal/documentRequestPreview.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf",
+    "lines": 9
+  },
+  {
+    "path": "lib/supplierPortal/messageDrafts.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf",
+    "lines": 22
+  },
+  {
+    "path": "routes/supplierPortalRoutes.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf",
+    "lines": 89
+  },
+  {
+    "path": "public/js/supplier-portal.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf",
+    "lines": 58
+  },
+  {
+    "path": "public/css/supplier-portal.css",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf",
+    "lines": 39
+  },
+  {
+    "path": "scripts/supplier-portal-check.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf",
+    "lines": 46
+  },
+  {
+    "path": "tests/smoke/supplierPortalSmoke.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf",
+    "lines": 61
+  },
+  {
+    "path": "src/modules/supplierPortal/previews/areaPreviews.js",
+    "source": "SuperSender Pro \u2014 Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf",
+    "lines": 295
+  },
+  {
+    "path": "lib/customerPortal/moduleLinker.js",
+    "source": "SuperSender Pro \u2014 Customer Portal + Self-Service Status Center (Part 2+3_ Routes, Previews, Checks)-2026062110001495.pdf",
+    "lines": 22
+  },
+  {
+    "path": "lib/customerPortal/_statusPreviewFactory.js",
+    "source": "SuperSender Pro \u2014 Customer Portal + Self-Service Status Center (Part 2+3_ Routes, Previews, Checks)-2026062110001495.pdf",
+    "lines": 22
+  },
+  {
+    "path": "lib/customerPortal/orderStatusPreview.js",
+    "source": "SuperSender Pro \u2014 Customer Portal + Self-Service Status Center (Part 2+3_ Routes, Previews, Checks)-2026062110001495.pdf",
+    "lines": 5
+  },
+  {
+    "path": "lib/customerPortal/invoiceStatusPreview.js",
+    "source": "SuperSender Pro \u2014 Customer Portal + Self-Service Status Center (Part 2+3_ Routes, Previews, Checks)-2026062110001495.pdf",
+    "lines": 4
+  },
+  {
+    "path": "lib/customerPortal/bookingStatusPreview.js",
+    "source": "SuperSender Pro \u2014 Customer Portal + Self-Service Status Center (Part 2+3_ Routes, Previews, Checks)-2026062110001495.pdf",
+    "lines": 4
+  },
+  {
+    "path": "lib/customerPortal/serviceStatusPreview.js",
+    "source": "SuperSender Pro \u2014 Customer Portal + Self-Service Status Center (Part 2+3_ Routes, Previews, Checks)-2026062110001495.pdf",
+    "lines": 4
+  },
+  {
+    "path": "lib/customerPortal/maintenanceStatusPreview.js",
+    "source": "SuperSender Pro \u2014 Customer Portal + Self-Service Status Center (Part 2+3_ Routes, Previews, Checks)-2026062110001495.pdf",
+    "lines": 5
+  },
+  {
+    "path": "lib/customerPortal/ticketStatusPreview.js",
+    "source": "SuperSender Pro \u2014 Customer Portal + Self-Service Status Center (Part 2+3_ Routes, Previews, Checks)-2026062110001495.pdf",
+    "lines": 4
+  },
+  {
+    "path": "lib/customerPortal/warrantyStatusPreview.js",
+    "source": "SuperSender Pro \u2014 Customer Portal + Self-Service Status Center (Part 2+3_ Routes, Previews, Checks)-2026062110001495.pdf",
+    "lines": 4
+  },
+  {
+    "path": "lib/customerPortal/loyaltyStatusPreview.js",
+    "source": "SuperSender Pro \u2014 Customer Portal + Self-Service Status Center (Part 2+3_ Routes, Previews, Checks)-2026062110001495.pdf",
+    "lines": 6
+  },
+  {
+    "path": "lib/customerPortal/contractStatusPreview.js",
+    "source": "SuperSender Pro \u2014 Customer Portal + Self-Service Status Center (Part 2+3_ Routes, Previews, Checks)-2026062110001495.pdf",
+    "lines": 4
+  },
+  {
+    "path": "lib/customerPortal/documentRequestPreview.js",
+    "source": "SuperSender Pro \u2014 Customer Portal + Self-Service Status Center (Part 2+3_ Routes, Previews, Checks)-2026062110001495.pdf",
+    "lines": 11
+  },
+  {
+    "path": "lib/customerPortal/supportRequestPreview.js",
+    "source": "SuperSender Pro \u2014 Customer Portal + Self-Service Status Center (Part 2+3_ Routes, Previews, Checks)-2026062110001495.pdf",
+    "lines": 29
+  },
+  {
+    "path": "lib/customerPortal/messageDrafts.js",
+    "source": "SuperSender Pro \u2014 Customer Portal + Self-Service Status Center (Part 2+3_ Routes, Previews, Checks)-2026062110001495.pdf",
+    "lines": 23
+  },
+  {
+    "path": "lib/customerPortal/auditPreview.js",
+    "source": "SuperSender Pro \u2014 Customer Portal + Self-Service Status Center (Part 2+3_ Routes, Previews, Checks)-2026062110001495.pdf",
+    "lines": 25
+  },
+  {
+    "path": "routes/customerPortalRoutes.js",
+    "source": "SuperSender Pro \u2014 Customer Portal + Self-Service Status Center (Part 2+3_ Routes, Previews, Checks)-2026062110001495.pdf",
+    "lines": 91
+  },
+  {
+    "path": "public/customer-portal.html",
+    "source": "SuperSender Pro \u2014 Customer Portal + Self-Service Status Center (Part 2+3_ Routes, Previews, Checks)-2026062110001495.pdf",
+    "lines": 24
+  },
+  {
+    "path": "public/js/customer-portal.js",
+    "source": "SuperSender Pro \u2014 Customer Portal + Self-Service Status Center (Part 2+3_ Routes, Previews, Checks)-2026062110001495.pdf",
+    "lines": 50
+  },
+  {
+    "path": "public/css/customer-portal.css",
+    "source": "SuperSender Pro \u2014 Customer Portal + Self-Service Status Center (Part 2+3_ Routes, Previews, Checks)-2026062110001495.pdf",
+    "lines": 36
+  },
+  {
+    "path": "scripts/customer-portal-check.js",
+    "source": "SuperSender Pro \u2014 Customer Portal + Self-Service Status Center (Part 2+3_ Routes, Previews, Checks)-2026062110001495.pdf",
+    "lines": 45
+  },
+  {
+    "path": "tests/smoke/customerPortalSmoke.js",
+    "source": "SuperSender Pro \u2014 Customer Portal + Self-Service Status Center (Part 2+3_ Routes, Previews, Checks)-2026062110001495.pdf",
+    "lines": 55
+  },
+  {
+    "path": "lib/customerPortal/redactor.js",
+    "source": "SuperSender Pro \u2014 Customer Portal + Self-Service Status Center (Part 1-3_ Foundation)-2026062110000311.pdf",
+    "lines": 24
+  },
+  {
+    "path": "lib/customerPortal/store.js",
+    "source": "SuperSender Pro \u2014 Customer Portal + Self-Service Status Center (Part 1-3_ Foundation)-2026062110000311.pdf",
+    "lines": 21
+  },
+  {
+    "path": "lib/customerPortal/customerPortalModel.js",
+    "source": "SuperSender Pro \u2014 Customer Portal + Self-Service Status Center (Part 1-3_ Foundation)-2026062110000311.pdf",
+    "lines": 71
+  },
+  {
+    "path": "lib/customerPortal/customerPortalService.js",
+    "source": "SuperSender Pro \u2014 Customer Portal + Self-Service Status Center (Part 1-3_ Foundation)-2026062110000311.pdf",
+    "lines": 21
+  },
+  {
+    "path": "lib/customerPortal/statusSummaryPreview.js",
+    "source": "SuperSender Pro \u2014 Customer Portal + Self-Service Status Center (Part 1-3_ Foundation)-2026062110000311.pdf",
+    "lines": 57
+  },
+  {
+    "path": "lib/documentVault/metadataRedactor.js",
+    "source": "SuperSender Pro \u2014 Document Vault + File Attachment + Compliance Evidence Center (code files)-2026062109595372.pdf",
+    "lines": 35
+  },
+  {
+    "path": "lib/documentVault/store.js",
+    "source": "SuperSender Pro \u2014 Document Vault + File Attachment + Compliance Evidence Center (code files)-2026062109595372.pdf",
+    "lines": 31
+  },
+  {
+    "path": "lib/documentVault/documentCategoryCatalog.js",
+    "source": "SuperSender Pro \u2014 Document Vault + File Attachment + Compliance Evidence Center (code files)-2026062109595372.pdf",
+    "lines": 45
+  },
+  {
+    "path": "lib/documentVault/documentModel.js",
+    "source": "SuperSender Pro \u2014 Document Vault + File Attachment + Compliance Evidence Center (code files)-2026062109595372.pdf",
+    "lines": 76
+  },
+  {
+    "path": "lib/documentVault/documentService.js",
+    "source": "SuperSender Pro \u2014 Document Vault + File Attachment + Compliance Evidence Center (code files)-2026062109595372.pdf",
+    "lines": 37
+  },
+  {
+    "path": "lib/documentVault/moduleLinker.js",
+    "source": "SuperSender Pro \u2014 Document Vault + File Attachment + Compliance Evidence Center (code files)-2026062109595372.pdf",
+    "lines": 39
+  },
+  {
+    "path": "lib/documentVault/expiryTracker.js",
+    "source": "SuperSender Pro \u2014 Document Vault + File Attachment + Compliance Evidence Center (code files)-2026062109595372.pdf",
+    "lines": 22
+  },
+  {
+    "path": "lib/documentVault/missingDocumentChecker.js",
+    "source": "SuperSender Pro \u2014 Document Vault + File Attachment + Compliance Evidence Center (code files)-2026062109595372.pdf",
+    "lines": 35
+  },
+  {
+    "path": "lib/documentVault/complianceEvidence.js",
+    "source": "SuperSender Pro \u2014 Document Vault + File Attachment + Compliance Evidence Center (code files)-2026062109595372.pdf",
+    "lines": 42
+  },
+  {
+    "path": "lib/documentVault/accessGuardPreview.js",
+    "source": "SuperSender Pro \u2014 Document Vault + File Attachment + Compliance Evidence Center (code files)-2026062109595372.pdf",
+    "lines": 43
+  },
+  {
+    "path": "lib/documentVault/shareDraftPreview.js",
+    "source": "SuperSender Pro \u2014 Document Vault + File Attachment + Compliance Evidence Center (code files)-2026062109595372.pdf",
+    "lines": 22
+  },
+  {
+    "path": "lib/documentVault/auditTrailPreview.js",
+    "source": "SuperSender Pro \u2014 Document Vault + File Attachment + Compliance Evidence Center (code files)-2026062109595372.pdf",
+    "lines": 28
+  },
+  {
+    "path": "routes/documentVaultRoutes.js",
+    "source": "SuperSender Pro \u2014 Document Vault + File Attachment + Compliance Evidence Center (code files)-2026062109595372.pdf",
+    "lines": 107
+  },
+  {
+    "path": "public/document-vault.html",
+    "source": "SuperSender Pro \u2014 Document Vault + File Attachment + Compliance Evidence Center (code files)-2026062109595372.pdf",
+    "lines": 44
+  },
+  {
+    "path": "public/js/document-vault.js",
+    "source": "SuperSender Pro \u2014 Document Vault + File Attachment + Compliance Evidence Center (code files)-2026062109595372.pdf",
+    "lines": 93
+  },
+  {
+    "path": "public/css/document-vault.css",
+    "source": "SuperSender Pro \u2014 Document Vault + File Attachment + Compliance Evidence Center (code files)-2026062109595372.pdf",
+    "lines": 43
+  },
+  {
+    "path": "scripts/document-vault-check.js",
+    "source": "SuperSender Pro \u2014 Document Vault + File Attachment + Compliance Evidence Center (code files)-2026062109595372.pdf",
+    "lines": 68
+  },
+  {
+    "path": "tests/smoke/documentVaultSmoke.js",
+    "source": "SuperSender Pro \u2014 Document Vault + File Attachment + Compliance Evidence Center (code files)-2026062109595372.pdf",
+    "lines": 60
+  },
+  {
+    "path": "lib/productBusinessIntelligence/redactor.js",
+    "source": "SuperSender Pro \u2014 Product Business Intelligence Engine (code files)-2026062109594393.pdf",
+    "lines": 18
+  },
+  {
+    "path": "lib/productBusinessIntelligence/store.js",
+    "source": "SuperSender Pro \u2014 Product Business Intelligence Engine (code files)-2026062109594393.pdf",
+    "lines": 23
+  },
+  {
+    "path": "lib/productBusinessIntelligence/productModel.js",
+    "source": "SuperSender Pro \u2014 Product Business Intelligence Engine (code files)-2026062109594393.pdf",
+    "lines": 74
+  },
+  {
+    "path": "lib/productBusinessIntelligence/marginCalculator.js",
+    "source": "SuperSender Pro \u2014 Product Business Intelligence Engine (code files)-2026062109594393.pdf",
+    "lines": 21
+  },
+  {
+    "path": "lib/productBusinessIntelligence/inventoryAnalyzer.js",
+    "source": "SuperSender Pro \u2014 Product Business Intelligence Engine (code files)-2026062109594393.pdf",
+    "lines": 46
+  },
+  {
+    "path": "lib/productBusinessIntelligence/profitLossAnalyzer.js",
+    "source": "SuperSender Pro \u2014 Product Business Intelligence Engine (code files)-2026062109594393.pdf",
+    "lines": 40
+  },
+  {
+    "path": "lib/productBusinessIntelligence/revenueAnalyzer.js",
+    "source": "SuperSender Pro \u2014 Product Business Intelligence Engine (code files)-2026062109594393.pdf",
+    "lines": 32
+  },
+  {
+    "path": "lib/productBusinessIntelligence/stockHealth.js",
+    "source": "SuperSender Pro \u2014 Product Business Intelligence Engine (code files)-2026062109594393.pdf",
+    "lines": 17
+  },
+  {
+    "path": "lib/productBusinessIntelligence/reorderAdvisor.js",
+    "source": "SuperSender Pro \u2014 Product Business Intelligence Engine (code files)-2026062109594393.pdf",
+    "lines": 25
+  },
+  {
+    "path": "lib/productBusinessIntelligence/deadStockDetector.js",
+    "source": "SuperSender Pro \u2014 Product Business Intelligence Engine (code files)-2026062109594393.pdf",
+    "lines": 9
+  },
+  {
+    "path": "lib/productBusinessIntelligence/fastMoverDetector.js",
+    "source": "SuperSender Pro \u2014 Product Business Intelligence Engine (code files)-2026062109594393.pdf",
+    "lines": 10
+  },
+  {
+    "path": "lib/productBusinessIntelligence/lossLeakageDetector.js",
+    "source": "SuperSender Pro \u2014 Product Business Intelligence Engine (code files)-2026062109594393.pdf",
+    "lines": 25
+  },
+  {
+    "path": "lib/productBusinessIntelligence/expenseImpact.js",
+    "source": "SuperSender Pro \u2014 Product Business Intelligence Engine (code files)-2026062109594393.pdf",
+    "lines": 29
+  },
+  {
+    "path": "lib/productBusinessIntelligence/featureSignalRegistry.js",
+    "source": "SuperSender Pro \u2014 Product Business Intelligence Engine (code files)-2026062109594393.pdf",
+    "lines": 101
+  },
+  {
+    "path": "lib/productBusinessIntelligence/productScore.js",
+    "source": "SuperSender Pro \u2014 Product Business Intelligence Engine (code files)-2026062109594393.pdf",
+    "lines": 23
+  },
+  {
+    "path": "lib/productBusinessIntelligence/businessRiskEngine.js",
+    "source": "SuperSender Pro \u2014 Product Business Intelligence Engine (code files)-2026062109594393.pdf",
+    "lines": 22
+  },
+  {
+    "path": "lib/productBusinessIntelligence/insightGenerator.js",
+    "source": "SuperSender Pro \u2014 Product Business Intelligence Engine (code files)-2026062109594393.pdf",
+    "lines": 24
+  },
+  {
+    "path": "routes/productBusinessIntelligenceRoutes.js",
+    "source": "SuperSender Pro \u2014 Product Business Intelligence Engine (code files)-2026062109594393.pdf",
+    "lines": 153
+  },
+  {
+    "path": "public/product-business-intelligence.html",
+    "source": "SuperSender Pro \u2014 Product Business Intelligence Engine (code files)-2026062109594393.pdf",
+    "lines": 42
+  },
+  {
+    "path": "public/js/product-business-intelligence.js",
+    "source": "SuperSender Pro \u2014 Product Business Intelligence Engine (code files)-2026062109594393.pdf",
+    "lines": 104
+  },
+  {
+    "path": "public/css/product-business-intelligence.css",
+    "source": "SuperSender Pro \u2014 Product Business Intelligence Engine (code files)-2026062109594393.pdf",
+    "lines": 37
+  },
+  {
+    "path": "scripts/product-bi-check.js",
+    "source": "SuperSender Pro \u2014 Product Business Intelligence Engine (code files)-2026062109594393.pdf",
+    "lines": 69
+  },
+  {
+    "path": "tests/smoke/productBusinessIntelligenceSmoke.js",
+    "source": "SuperSender Pro \u2014 Product Business Intelligence Engine (code files)-2026062109594393.pdf",
+    "lines": 57
+  }
+]

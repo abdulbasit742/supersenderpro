@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Support Helpdesk</title><link rel="stylesheet" href="/css/support-helpdesk.css" /></head>
+<body>
+  <header class="sh-header"><h1>Support Helpdesk & Knowledge Base</h1><span id="sh-mode" class="sh-badge">loading…
+</span></header>
+  <section class="sh-overview">
+    <div class="sh-card"><span class="sh-label">Open</span><span id="ov-open">–</span></div>
+    <div class="sh-card"><span class="sh-label">Urgent</span><span id="ov-urgent">–</span></div>
+    <div class="sh-card"><span class="sh-label">Waiting customer</span><span id="ov-wc">–</span></div>
+    <div class="sh-card"><span class="sh-label">Escalated</span><span id="ov-esc">–</span></div>
+    <div class="sh-card"><span class="sh-label">KB articles</span><span id="ov-kb">–</span></div>
+  </section>
+  <nav class="sh-tabs">
+    <button data-tab="inbox" class="active">Ticket inbox</button>
+    <button data-tab="assistant">AI assistant</button>
+    <button data-tab="kb">Knowledge base</button>
+    <button data-tab="escalation">Escalation</button>
+    <button data-tab="reports">Reports</button>
+  </nav>
+  <main>
+    <section id="tab-inbox" class="sh-tab">
+      <div class="sh-row"><select id="f-status"><option value="">all status</option><option>new</option>
+<option>open</option><option>waiting_customer</option><option>escalated</option><option>resolved</option></select>
+      <form id="ticket-form" style="display:flex;gap:8px;flex:1"><input id="t-title" placeholder="New ticket title" />
+<button type="submit">Create</button></form></div>
+      <div id="ticket-list"></div><pre id="ticket-detail"></pre>
+    </section>
+    <section id="tab-assistant" class="sh-tab" hidden><input id="a-ticket" placeholder="ticket id" /><button id="a-
+draft">Generate reply draft</button><pre id="assistant-result"></pre></section>
+    <section id="tab-kb" class="sh-tab" hidden><input id="kb-q" placeholder="search KB" /><button id="kb-
+search">Search</button><div id="kb-list"></div></section>
+    <section id="tab-escalation" class="sh-tab" hidden><pre id="esc-result"></pre></section>
+    <section id="tab-reports" class="sh-tab" hidden><button id="rep-gen">Generate report</button><pre id="rep-result">
+</pre></section>
+  </main>
+  <script src="/js/support-helpdesk.js"></script>
+</body></html>

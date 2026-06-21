@@ -1,0 +1,4 @@
+  // BEGIN PHYSIXPLORE HOOK
+  const physixploreRoutes = require('./routes/physixploreRoutes');
+  app.use('/api/physixplore', physixploreRoutes);
+  // END PHYSIXPLORE HOOK

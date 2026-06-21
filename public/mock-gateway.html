@@ -1,0 +1,96 @@
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mock Gateway</title>
+    <link rel="stylesheet" href="/css/mock-gateway.css" />
+  </head>
+  <body class="mg-body">
+    <header class="mg-header">
+      <div>
+        <h1>Mock Gateway <span class="mg-muted">Offline Provider Simulator</span></h1>
+        <p class="mg-subtitle">Run demo interactions with no real WhatsApp, payments, AI, webhooks, or external calls.</p>
+      </div>
+      <div class="mg-badges">
+        <span id="badge-offline" class="mg-badge">offline-only: ?</span>
+        <span id="badge-dryrun" class="mg-badge">dry-run: ?</span>
+        <span id="badge-external" class="mg-badge">external-calls: ?</span>
+        <span id="badge-live" class="mg-badge">live-actions: ?</span>
+      </div>
+    </header>
+
+    <div class="mg-warn-banner">
+      No real API calls, no live sends, no live payments, no webhook delivery, no secrets. PII redacted. Sample data only.
+    </div>
+
+
+    <div class="mg-toolbar">
+      <button id="btn-doctor" class="mg-btn">Run doctor</button>
+      <button id="btn-refresh" class="mg-btn mg-btn-ghost">Refresh providers</button>
+    </div>
+
+    <main class="mg-grid">
+      <section class="mg-card mg-span2">
+        <h2>Provider Cards</h2>
+        <div id="provider-grid" class="mg-provgrid"><div class="mg-muted">Loading...</div></div>
+      </section>
+
+      <section class="mg-card">
+        <h2>Scenario Runner</h2>
+        <div class="mg-form">
+          <select id="scenario-select"></select>
+          <button id="btn-run-scenario" class="mg-btn mg-btn-tiny">Run preview</button>
+        </div>
+        <pre class="mg-pre" id="scenario-out">Select a scenario and run.</pre>
+      </section>
+
+      <section class="mg-card">
+
+     <h2>Input Sanitizer</h2>
+     <textarea id="sanitize-input" class="mg-textarea" placeholder='{"to":"+1 555
+0100","email":"x@example.com","token":"sk-abcd1234abcd1234"}'></textarea>
+     <button id="btn-sanitize" class="mg-btn mg-btn-tiny">Redact + scan</button>
+     <pre class="mg-pre" id="sanitize-out">Findings + redacted preview appear here.</pre>
+   </section>
+
+
+   <section class="mg-card mg-span2">
+     <h2>Event Preview</h2>
+     <table class="mg-table" id="events-table">
+       <thead><tr><th>Time</th><th>Provider</th><th>Action</th><th>Status</th><th>Warnings</th></tr></thead>
+       <tbody><tr><td class="mg-muted" colspan="5">No events yet.</td></tr></tbody>
+     </table>
+   </section>
+
+
+   <section class="mg-card mg-span2">
+     <h2>Safety Panel</h2><ul class="mg-list">
+         <li class="mg-ok">No real API calls</li>
+         <li class="mg-ok">No live sends</li>
+         <li class="mg-ok">No live payments</li>
+         <li class="mg-ok">No webhook delivery</li>
+         <li class="mg-ok">No secrets exposed</li>
+         <li class="mg-ok">PII redacted</li>
+     </ul>
+     <pre class="mg-pre" id="doctor-out">Run doctor to see readiness.</pre>
+   </section>
+
+
+   <section class="mg-card mg-span2">
+     <h2>Docs</h2><ul class="mg-list">
+         <li><a href="/docs/MOCK_GATEWAY.md">Mock Gateway</a></li>
+         <li><a href="/docs/OFFLINE_PROVIDER_SIMULATORS.md">Offline Provider Simulators</a></li>
+         <li><a href="/docs/MOCK_SCENARIO_RUNNER.md">Mock Scenario Runner</a></li>
+         <li><a href="/docs/LOCAL_DEMO_MOCKING_GUIDE.md">Local Demo Mocking Guide</a></li>
+       <li><a href="/docs/MOCK_GATEWAY_DELIVERY_REPORT.md">Delivery Report</a></li>
+     </ul>
+   </section>
+ </main>
+
+
+ <script src="/js/mock-gateway.js"></script>
+</body>
+</html>
+
+public/js/mock-gateway.js + public/css/mock-gateway.css

@@ -1,0 +1,5 @@
+// BEGIN BOOTSTRAP V6 MODULE CHECKLIST
+// These modules are now present as code files and can be wired through src/bootstrap.js safe requires:
+// rbac, backup, briefing, dedupe, spintax, templates, rotation, banRisk
+// Existing src/bootstrap.js from previous batch already references most of these modules where applicable.
+// END BOOTSTRAP V6 MODULE CHECKLIST

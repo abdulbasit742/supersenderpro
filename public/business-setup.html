@@ -1,0 +1,59 @@
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Business Setup Wizard</title>
+    <link rel="stylesheet" href="/css/business-setup.css" />
+  </head>
+  <body>
+    <header class="bs-header">
+      <h1>Business Setup Wizard</h1>
+      <span id="bs-dry" class="bs-badge">loading…</span>
+    </header>
+
+    <section class="bs-overview" id="bs-overview">
+      <div class="bs-card"><span class="bs-label">Business</span><span id="ov-name">–</span></div>
+      <div class="bs-card"><span class="bs-label">Type</span><span id="ov-type">–</span></div>
+      <div class="bs-card"><span class="bs-label">Preset</span><span id="ov-preset">–</span></div>
+      <div class="bs-card"><span class="bs-label">Readiness</span><span id="ov-score">–</span></div>
+      <div class="bs-card"><span class="bs-label">Blockers</span><span id="ov-blockers">–</span></div>
+    </section>
+
+    <nav class="bs-tabs">
+      <button data-tab="profile" class="active">Profile</button>
+      <button data-tab="presets">Preset launcher</button>
+      <button data-tab="checklist">Checklist</button>
+      <button data-tab="doctor">Readiness doctor</button>
+      <button data-tab="export">Export / import</button>
+    </nav>
+
+    <main>
+      <section id="tab-profile" class="bs-tab">
+        <form id="profile-form">
+            <label>Business name <input id="p-name" /></label>
+            <label>Business type <select id="p-type"></select></label>
+            <label>Country <input id="p-country" value="PK" /></label>
+            <label>Language <input id="p-lang" value="roman_urdu" /></label>
+            <label>Currency <input id="p-currency" value="PKR" /></label>
+            <button type="submit">Save profile</button>
+        </form>
+        <pre id="profile-result"></pre>
+      </section>
+
+      <section id="tab-presets" class="bs-tab" hidden><div id="preset-cards" class="bs-cards"></div><pre id="preset-
+  result"></pre></section>
+      <section id="tab-checklist" class="bs-tab" hidden><div id="checklist-list"></div></section>
+      <section id="tab-doctor" class="bs-tab" hidden>
+
+         <button id="run-readiness">Run readiness check</button>
+         <div id="doctor-result"></div>
+       </section>
+       <section id="tab-export" class="bs-tab" hidden>
+         <button id="do-export">Export setup</button>
+         <pre id="export-result"></pre>
+       </section>
+      </main>
+      <script src="/js/business-setup.js"></script>
+  </body>
+  </html>

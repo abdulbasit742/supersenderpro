@@ -1,0 +1,46 @@
+  <!DOCTYPE html>
+  <html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manufacturing</title><link rel="stylesheet" href="/css/manufacturing-center.css" /></head>
+  <body>
+    <header class="mc-header"><h1>Manufacturing + BOM + Production Costing</h1><span id="mc-badge" class="mc-
+  badge">loading…</span></header>
+    <section class="mc-cards" id="mc-kpis"></section>
+    <nav class="mc-tabs">
+      <button data-tab="boms" class="active">BOMs</button>
+      <button data-tab="orders">Production Orders</button>
+      <button data-tab="material">Material Check</button>
+      <button data-tab="cost">Cost / Margin</button>
+      <button data-tab="batch">Batch</button>
+      <button data-tab="inventory">Inventory Impact</button>
+      <button data-tab="risk">Risk</button>
+      <button data-tab="accounting">Accounting</button>
+    </nav>
+    <div class="mc-controls">
+      <input id="mc-search" placeholder="Search BOM/SKU…" />
+      <select id="mc-status"><option value="">All order status</option><option>draft</option>
+  <option>material_check_preview</option><option>ready_preview</option><option>shortage_preview</option>
+  <option>completed_preview</option></select>
+      <select id="mc-risk"><option value="">All risk</option><option>low</option><option>medium</option>
+  <option>high</option><option>critical</option></select>
+    </div>
+    <main class="mc-main">
+      <section id="tab-boms" class="mc-tab"><div id="bom-list"></div></section>
+      <section id="tab-orders" class="mc-tab" hidden><div id="order-list"></div></section>
+      <section id="tab-material" class="mc-tab" hidden><input id="mat-bom" placeholder="bom id" /><input id="mat-qty"
+  type="number" placeholder="qty" /><button id="mat-run">Material check</button><pre id="mat-result"></pre></section>
+      <section id="tab-cost" class="mc-tab" hidden><input id="cost-bom" placeholder="bom id" /><input id="cost-qty"
+  type="number" placeholder="qty" /><input id="cost-price" type="number" placeholder="sale price/unit" /><button id="cost-
+  run">Cost + margin preview</button><pre id="cost-result"></pre></section>
+      <section id="tab-batch" class="mc-tab" hidden><input id="batch-bom" placeholder="bom id" /><input id="batch-qty"
+  type="number" placeholder="qty" /><input id="batch-size" type="number" placeholder="batch size" /><button id="batch-
+  run">Batch preview</button><pre id="batch-result"></pre></section>
+      <section id="tab-inventory" class="mc-tab" hidden><input id="inv-bom" placeholder="bom id" /><input id="inv-qty"
+  type="number" placeholder="qty" /><button id="inv-run">Inventory impact</button><pre id="inv-result"></pre></section>
+
+       <section id="tab-risk" class="mc-tab" hidden><button id="risk-run">Load production risks</button><div id="risk-list">
+  </div></section>
+      <section id="tab-accounting" class="mc-tab" hidden><input id="acc-bom" placeholder="bom id" /><input id="acc-qty"
+  type="number" placeholder="qty" /><button id="acc-run">Accounting impact</button><pre id="acc-result"></pre></section>
+    </main>
+    <script src="/js/manufacturing-center.js"></script>
+  </body></html>

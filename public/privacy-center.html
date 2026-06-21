@@ -1,0 +1,75 @@
+ <!DOCTYPE html>
+ <html lang="en">
+ <head>
+   <meta charset="UTF-8" />
+   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+   <title>Privacy Center</title>
+   <link rel="stylesheet" href="/css/privacy-center.css" />
+ </head>
+ <body class="pc-body">
+   <header class="pc-header">
+     <div>
+       <h1>Privacy Center <span class="pc-muted">Requests + Data Retention</span></h1>
+       <p class="pc-subtitle">Handle access/export/deletion requests. Preview only.</p>
+     </div>
+     <span class="pc-badge pc-badge-on" id="safety-badge">dry-run · no real delete · no raw export · PII redacted</span>
+   </header>
+
+
+   <section class="pc-overview" id="overview">
+     <div class="pc-stat"><div class="pc-stat-num" id="ov-total">--</div><div class="pc-stat-label">Requests</div></div>
+     <div class="pc-stat"><div class="pc-stat-num" id="ov-new">--</div><div class="pc-stat-label">New</div></div>
+     <div class="pc-stat"><div class="pc-stat-num" id="ov-review">--</div><div class="pc-stat-label">In review</div></div>
+     <div class="pc-stat"><div class="pc-stat-num" id="ov-policies">--</div><div class="pc-stat-label">Retention
+ policies</div></div>
+   </section>
+
+
+   <div class="pc-toolbar">
+     <button id="btn-new-request" class="pc-btn">New request</button>
+     <button id="btn-refresh" class="pc-btn pc-btn-ghost">Refresh</button>
+     <button id="btn-audit" class="pc-btn pc-btn-ghost">Audit export preview</button>
+     <button id="btn-checklist" class="pc-btn pc-btn-ghost">Compliance checklist</button>
+   </div>
+
+
+   <main class="pc-grid">
+     <section class="pc-card">
+       <h2>Requests</h2>
+       <table class="pc-table" id="req-table"><thead><tr><th>Type</th><th>Requester</th><th>Status</th><th>Due</th></tr>
+ </thead><tbody><tr><td class="pc-muted" colspan="4">Loading...</td></tr></tbody></table>
+     </section>
+
+     <section class="pc-card">
+       <h2>Request Detail</h2>
+       <div id="detail-body" class="pc-muted">Select a request.</div>
+       <div id="detail-actions"></div>
+     </section>
+
+     <section class="pc-card"><h2>Export Preview <span class="pc-pill">redacted</span></h2><pre class="pc-pre" id="export-
+ out">Run export preview from a request.</pre></section>
+
+     <section class="pc-card"><h2>Deletion Preview <span class="pc-pill">plan only</span></h2><pre class="pc-pre"
+ id="delete-out">Run deletion preview from a request.</pre></section>
+
+     <section class="pc-card">
+       <h2>Retention Policies</h2>
+       <div id="retention-body" class="pc-muted">Loading...</div>
+     </section>
+
+     <section class="pc-card"><h2>Consent Records <span class="pc-pill">masked</span></h2><pre class="pc-pre" id="consent-
+ out">Loading...</pre></section>
+
+     <section class="pc-card pc-span2"><h2>Audit Export / Checklist</h2><pre class="pc-pre" id="audit-out">Run audit
+ export preview or compliance checklist.</pre></section>
+
+     <section class="pc-card pc-span2"><h2>Safety</h2><ul class="pc-list"><li class="pc-ok">Dry-run only</li><li
+ class="pc-ok">No real deletion</li><li class="pc-ok">No raw private export</li><li class="pc-ok">PII redacted
+ (phone/email/payment refs)</li><li class="pc-ok">No external API calls</li></ul>
+     </section>
+   </main>
+
+
+   <script src="/js/privacy-center.js"></script>
+ </body>
+ </html>
