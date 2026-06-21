@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Revenue Operations + Sales Pipeline Command Center · SuperSender Pro</title>
+  <link rel="stylesheet" href="/css/revenue-ops.css" />
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <h1>Revenue Operations + Sales Pipeline Command Center</h1>
+      <p>Preview pipeline health, deal scores, sales forecast, follow-up readiness, and revenue risk safely.
+         Read-only, dry-run, PII-masked human-review tool — no live sends, Meta/AI/payment calls, or CRM mutation.</p>
+      <div class="badges" id="safety-badges"></div>
+    </section>
+
+    <div class="toolbar">
+      <button class="primary" id="btn-refresh">Refresh Preview</button>
+      <button id="btn-pipeline">Scan Pipeline Preview</button>
+      <button id="btn-leads">Scan Leads Preview</button>
+      <button id="btn-analyze">Run Analysis Preview</button>
+      <button id="btn-compare">Compare Opportunities Preview</button>
+      <button id="btn-recs">View Recommendations</button>
+    </div>
+
+    <div class="card-grid">
+      <div class="card"><h3>Status</h3><div id="status-card"></div></div>
+      <div class="card"><h3>System Summary</h3><div id="summary-card"></div></div>
+      <div class="card"><h3>Pipeline Health</h3><div class="score"><div class="gauge" id="health-gauge"><span>0</span></div><div id="health-meta" style="flex:1"></div></div></div>
+      <div class="card"><h3>Revenue Risk</h3><div class="score"><div class="gauge" id="risk-gauge"><span>0</span></div><div id="risk-meta" style="flex:1"></div></div></div>
+      <div class="card"><h3>Forecast Preview</h3><div id="forecast-card"></div></div>
+    </div>
+
+    <div class="sec-title">Recommended Next Actions</div>
+    <div class="card full"><h3>Recommendations</h3><div id="recs-card"></div></div>
+
+    <div class="sec-title">Pipeline &amp; Opportunities</div>
+    <div class="card-grid">
+      <div class="card full"><h3>Opportunity Registry Preview</h3><div id="opps-card"></div></div>
+      <div class="card"><h3>Lead Registry Preview</h3><div id="leads-card"></div></div>
+      <div class="card"><h3>Conversion Analytics</h3><div id="conv-card"></div></div>
+      <div class="card"><h3>Follow-up Readiness</h3><div id="fu-card"></div></div>
+      <div class="card"><h3>Rep Performance Preview</h3><div id="reps-card"></div></div>
+      <div class="card"><h3>Opportunity Comparison</h3><div id="compare-card"></div></div>
+      <div class="card"><h3>Audit Preview (masked)</h3><div id="audit-card"></div></div>
+    </div>
+
+    <p class="muted" style="margin-top:24px">
+      This command center is preview-only and deterministic. It does not mutate CRM/deal/customer data, assign reps,
+      create invoices or payments, send messages, or call Meta/AI APIs. All values are masked or banded.
+    </p>
+  </div>
+  <script src="/js/revenue-ops.js"></script>
+</body>
+</html>
