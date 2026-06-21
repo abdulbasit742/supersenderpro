@@ -52,7 +52,10 @@
     "franchise-portal:check": "node scripts/franchise-portal-check.js",
     "franchise-portal:smoke": "node tests/smoke/franchisePortalSmoke.js",
     "personality-disc:check": "node scripts/personality-disc-check.js",
-    "personality-disc:smoke": "node tests/smoke/personalityDiscSmoke.js"
+    "personality-disc:smoke": "node tests/smoke/personalityDiscSmoke.js",
+    "platform-control:check": "node scripts/checkPlatformControl.js",
+    "workflow-orchestrator:check": "node scripts/checkWorkflowOrchestrator.js",
+    "campaign-intelligence:check": "node scripts/checkCampaignIntelligence.js"
   },
   "dependencies": {
     "@whiskeysockets/baileys": "^7.0.0-rc.9",

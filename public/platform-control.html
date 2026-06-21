@@ -1,0 +1,44 @@
+<!doctype html>
+  <html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Platform Control - Observability & Safety OS</title>
+    <link rel="stylesheet" href="/css/platform-control.css" />
+  </head>
+  <body>
+    <header class="pc-hero">
+      <h1>Advanced Platform Control</h1>
+      <p class="pc-sub">Observability & Safety OS - read-only, dry-run preview</p>
+      <div id="pc-badges" class="pc-badges"><span class="pc-badge">loading...</span></div>
+    </header>
+
+
+    <main class="pc-main">
+      <section class="pc-toolbar">
+        <button data-action="status">Refresh Status Preview</button>
+        <button data-action="modules">Scan Modules Preview</button>
+        <button data-action="routes">Scan Routes Preview</button>
+        <button data-action="dashboard">Scan Dashboard Preview</button>
+        <button data-action="readiness">Scan Readiness Preview</button>
+        <button data-action="safety">Scan Safety Preview</button>
+        <button data-action="recommendations">View Recommendations</button>
+        <button data-action="checkPlan">Preview Check Plan</button>
+        <button data-action="smokePlan">Preview Smoke Plan</button>
+      </section>
+
+
+      <section class="pc-grid">
+        <article class="pc-card" id="card-summary"><h2>System Summary</h2><div class="pc-body">-</div></article>
+        <article class="pc-card" id="card-architecture"><h2>Architecture</h2><div class="pc-body">-</div></article>
+        <article class="pc-card" id="card-release"><h2>Release Readiness</h2><div class="pc-body">-</div></article>
+        <article class="pc-card" id="card-risk"><h2>Risk Score</h2><div class="pc-body">-</div></article>
+        <article class="pc-card pc-wide" id="card-output"><h2>Scan Output</h2><div class="pc-body"><em>Pick a preview
+  action above.</em></div></article>
+      </section>
+    </main>
+
+
+    <script src="/js/platform-control.js"></script>
+  </body>
+  </html>

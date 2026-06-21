@@ -1,0 +1,45 @@
+<!doctype html>
+ <html lang="en">
+ <head>
+   <meta charset="utf-8" />
+   <meta name="viewport" content="width=device-width, initial-scale=1" />
+   <title>Campaign Intelligence - Attribution & A/B Studio</title>
+   <link rel="stylesheet" href="/css/campaign-intelligence.css" />
+ </head>
+ <body>
+   <header class="ci-hero">
+     <h1>Campaign Intelligence</h1>
+     <p class="ci-sub">Revenue Attribution & A/B Testing Studio - analytics & preview only</p>
+     <div id="ci-badges" class="ci-badges"><span class="ci-badge">loading...</span></div>
+   </header>
+
+
+   <main class="ci-main">
+     <section class="ci-toolbar">
+       <button data-action="status">Refresh Analytics Preview</button>
+       <button data-action="campaign">Analyze Campaign Preview</button>
+       <button data-action="funnel">Preview Funnel</button>
+       <button data-action="roi">Preview ROI</button>
+       <button data-action="attribution">Preview Revenue Attribution</button>
+       <button data-action="sendtime">Preview Send-Time Optimization</button>
+       <button data-action="abDesign">Design A/B Test Preview</button>
+       <button data-action="abResult">Preview A/B Result</button>
+       <button data-action="templates">Analyze Template Performance</button>
+       <button data-action="recommendations">View Recommendations</button>
+     </section>
+
+
+     <section class="ci-grid">
+       <article class="ci-card" id="card-summary"><h2>Summary</h2><div class="ci-body">-</div></article>
+       <article class="ci-card" id="card-health"><h2>Broadcast Health</h2><div class="ci-body">-</div></article>
+       <article class="ci-card" id="card-roi"><h2>Avg ROI</h2><div class="ci-body">-</div></article>
+       <article class="ci-card" id="card-architecture"><h2>Architecture</h2><div class="ci-body">-</div></article>
+       <article class="ci-card ci-wide" id="card-output"><h2>Analytics Output</h2><div class="ci-body"><em>Pick a
+ Preview/Analyze action above.</em></div></article>
+     </section>
+   </main>
+
+
+   <script src="/js/campaign-intelligence.js"></script>
+ </body>
+ </html>

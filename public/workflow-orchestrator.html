@@ -1,0 +1,49 @@
+<!doctype html>
+ <html lang="en">
+ <head>
+   <meta charset="utf-8" />
+   <meta name="viewport" content="width=device-width, initial-scale=1" />
+   <title>Workflow Orchestrator - Automation Playbook Studio</title>
+   <link rel="stylesheet" href="/css/workflow-orchestrator.css" />
+ </head>
+ <body>
+   <header class="wo-hero">
+     <h1>AI Workflow Orchestrator</h1>
+     <p class="wo-sub">Automation Playbook Studio - preview & simulation only</p>
+
+      <div id="wo-badges" class="wo-badges"><span class="wo-badge">loading...</span></div>
+    </header>
+
+
+    <main class="wo-main">
+      <section class="wo-toolbar">
+        <button data-action="status">Refresh Status Preview</button>
+        <button data-action="draft">Draft Workflow Preview</button>
+        <button data-action="validate">Validate Workflow Preview</button>
+        <button data-action="simulate">Simulate Workflow</button>
+        <button data-action="simulatePlaybook">Simulate Playbook</button>
+        <button data-action="ai">Preview AI Decision</button>
+        <button data-action="whatsapp">Preview WhatsApp Reply</button>
+        <button data-action="campaign">Preview Campaign Follow-up</button>
+        <button data-action="handoff">Preview Handoff</button>
+        <button data-action="payment">Preview Payment Reminder</button>
+        <button data-action="ecommerce">Preview Ecommerce Action</button>
+        <button data-action="guards">Preview Safety Guards</button>
+        <button data-action="recommended">View Recommended Playbooks</button>
+      </section>
+
+
+      <section class="wo-grid">
+        <article class="wo-card" id="card-summary"><h2>System Summary</h2><div class="wo-body">-</div></article>
+        <article class="wo-card" id="card-architecture"><h2>Architecture</h2><div class="wo-body">-</div></article>
+        <article class="wo-card" id="card-readiness"><h2>Avg Readiness</h2><div class="wo-body">-</div></article>
+        <article class="wo-card" id="card-risk"><h2>Avg Risk</h2><div class="wo-body">-</div></article>
+        <article class="wo-card wo-wide" id="card-output"><h2>Preview Output</h2><div class="wo-body"><em>Pick a
+  Preview/Simulate action above.</em></div></article>
+      </section>
+    </main>
+
+
+    <script src="/js/workflow-orchestrator.js"></script>
+  </body>
+  </html>

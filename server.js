@@ -3156,6 +3156,42 @@ try {
 }
 // END PERSONALITY DISC HOOK
 
+// BEGIN PLATFORM CONTROL HOOK
+// Advanced Platform Control + Observability + Safety OS (preview-only, no live execution).
+try {
+  const platformControlRoutes = require('./routes/platformControlRoutes');
+  app.use('/api/platform-control', platformControlRoutes);
+  app.get('/platform-control.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'platform-control.html')));
+  console.log('[PlatformControl] mounted at /api/platform-control (preview-only, no live execution)');
+} catch (e) {
+  console.error('[PlatformControl] failed to initialise (non-fatal):', e.message);
+}
+// END PLATFORM CONTROL HOOK
+
+// BEGIN WORKFLOW ORCHESTRATOR HOOK
+// Advanced AI Workflow Orchestrator + Automation Playbook Studio (preview-only, no live automation).
+try {
+  const workflowOrchestratorRoutes = require('./routes/workflowOrchestratorRoutes');
+  app.use('/api/workflow-orchestrator', workflowOrchestratorRoutes);
+  app.get('/workflow-orchestrator.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'workflow-orchestrator.html')));
+  console.log('[WorkflowOrchestrator] mounted at /api/workflow-orchestrator (preview-only, no live automation)');
+} catch (e) {
+  console.error('[WorkflowOrchestrator] failed to initialise (non-fatal):', e.message);
+}
+// END WORKFLOW ORCHESTRATOR HOOK
+
+// BEGIN CAMPAIGN INTELLIGENCE HOOK
+// Advanced Campaign Intelligence + Revenue Attribution + A/B Testing Studio (analytics-only, no live campaign mutation).
+try {
+  const campaignIntelligenceRoutes = require('./routes/campaignIntelligenceRoutes');
+  app.use('/api/campaign-intelligence', campaignIntelligenceRoutes);
+  app.get('/campaign-intelligence.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'campaign-intelligence.html')));
+  console.log('[CampaignIntelligence] mounted at /api/campaign-intelligence (analytics-only, no live mutation)');
+} catch (e) {
+  console.error('[CampaignIntelligence] failed to initialise (non-fatal):', e.message);
+}
+// END CAMPAIGN INTELLIGENCE HOOK
+
 
 let searchIndexRebuildTimer = null;
 function scheduleSearchIndexRebuild(reason = 'data-change', delayMs = Number(process.env.SEARCH_REBUILD_DEBOUNCE_MS || 30000)) {

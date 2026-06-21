@@ -1,0 +1,33 @@
+/* public/css/workflow-orchestrator.css — lightweight, dependency-free. */
+  :root { --wo-bg:#0e1622; --wo-card:#17202e; --wo-line:#283543; --wo-text:#e8eef6; --wo-mut:#8a99ab; --wo-ok:#27ae60; --
+  wo-warn:#f1c40f; --wo-bad:#e74c3c; --wo-accent:#5b8cff; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: var(--wo-bg); color:
+  var(--wo-text); }
+  .wo-hero { padding: 28px 24px 18px; border-bottom: 1px solid var(--wo-line); }
+  .wo-hero h1 { margin:0; font-size: 22px; }
+  .wo-sub { margin: 4px 0 14px; color: var(--wo-mut); }
+  .wo-badges { display:flex; flex-wrap:wrap; gap:8px; }
+  .wo-badge { font-size:12px; padding:4px 10px; border-radius:999px; background:#101a26; border:1px solid var(--wo-line);
+  color:var(--wo-mut); }
+  .wo-badge.ok { color:var(--wo-ok); border-color:rgba(39,174,96,.4); }
+  .wo-badge.bad { color:var(--wo-bad); border-color:rgba(231,76,60,.4); }
+  .wo-main { padding: 20px 24px 60px; }
+  .wo-toolbar { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px; }
+  .wo-toolbar button { background:var(--wo-card); color:var(--wo-text); border:1px solid var(--wo-line); padding:9px 14px;
+  border-radius:8px; cursor:pointer; font-size:13px; }
+
+  .wo-toolbar button:hover { border-color: var(--wo-accent); }
+  .wo-toolbar button[aria-busy="true"] { opacity:.6; cursor:progress; }
+  .wo-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap:16px; }
+  .wo-card { background:var(--wo-card); border:1px solid var(--wo-line); border-radius:12px; padding:16px; }
+  .wo-card h2 { margin:0 0 10px; font-size:14px; color:var(--wo-mut); text-transform:uppercase; letter-spacing:.04em; }
+  .wo-card.wo-wide { grid-column: 1 / -1; }
+  .wo-body { font-size:14px; line-height:1.5; }
+  .wo-score { font-size:34px; font-weight:700; }
+  .wo-kv { display:flex; justify-content:space-between; border-bottom:1px solid var(--wo-line); padding:6px 0; }
+  .wo-kv:last-child { border-bottom:none; }
+  pre.wo-json { background:#0a121c; border:1px solid var(--wo-line); border-radius:8px; padding:12px; overflow:auto; font-
+  size:12px; max-height:440px; }
+  .wo-empty { color:var(--wo-mut); font-style:italic; }
+  .wo-error { color:var(--wo-bad); }

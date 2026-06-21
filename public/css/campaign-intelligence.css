@@ -1,0 +1,32 @@
+/* public/css/campaign-intelligence.css — lightweight, dependency-free. */
+  :root { --ci-bg:#0f1411; --ci-card:#18211c; --ci-line:#28342d; --ci-text:#e8f2ec; --ci-mut:#8aa898; --ci-ok:#27ae60; --
+  ci-warn:#f1c40f; --ci-bad:#e74c3c; --ci-accent:#3ddc84; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: var(--ci-bg); color:
+  var(--ci-text); }
+  .ci-hero { padding: 28px 24px 18px; border-bottom: 1px solid var(--ci-line); }
+  .ci-hero h1 { margin:0; font-size: 22px; }
+  .ci-sub { margin: 4px 0 14px; color: var(--ci-mut); }
+  .ci-badges { display:flex; flex-wrap:wrap; gap:8px; }
+  .ci-badge { font-size:12px; padding:4px 10px; border-radius:999px; background:#111a15; border:1px solid var(--ci-line);
+  color:var(--ci-mut); }
+  .ci-badge.ok { color:var(--ci-ok); border-color:rgba(39,174,96,.4); }
+  .ci-badge.bad { color:var(--ci-bad); border-color:rgba(231,76,60,.4); }
+  .ci-main { padding: 20px 24px 60px; }
+  .ci-toolbar { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px; }
+  .ci-toolbar button { background:var(--ci-card); color:var(--ci-text); border:1px solid var(--ci-line); padding:9px 14px;
+  border-radius:8px; cursor:pointer; font-size:13px; }
+  .ci-toolbar button:hover { border-color: var(--ci-accent); }
+  .ci-toolbar button[aria-busy="true"] { opacity:.6; cursor:progress; }
+  .ci-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap:16px; }
+  .ci-card { background:var(--ci-card); border:1px solid var(--ci-line); border-radius:12px; padding:16px; }
+  .ci-card h2 { margin:0 0 10px; font-size:14px; color:var(--ci-mut); text-transform:uppercase; letter-spacing:.04em; }
+  .ci-card.ci-wide { grid-column: 1 / -1; }
+  .ci-body { font-size:14px; line-height:1.5; }
+  .ci-score { font-size:34px; font-weight:700; }
+  .ci-kv { display:flex; justify-content:space-between; border-bottom:1px solid var(--ci-line); padding:6px 0; }
+  .ci-kv:last-child { border-bottom:none; }
+  pre.ci-json { background:#0a120d; border:1px solid var(--ci-line); border-radius:8px; padding:12px; overflow:auto; font-
+  size:12px; max-height:440px; }
+  .ci-empty { color:var(--ci-mut); font-style:italic; }
+  .ci-error { color:var(--ci-bad); }

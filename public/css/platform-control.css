@@ -1,0 +1,35 @@
+/* public/css/platform-control.css — lightweight, dependency-free. */
+  :root { --pc-bg:#0f1419; --pc-card:#1a212b; --pc-line:#2a3340; --pc-text:#e6edf3; --pc-mut:#8b97a7; --pc-ok:#2ecc71; --
+  pc-warn:#f1c40f; --pc-bad:#e74c3c; --pc-accent:#6c8cff; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: var(--pc-bg); color:
+  var(--pc-text); }
+  .pc-hero { padding: 28px 24px 18px; border-bottom: 1px solid var(--pc-line); }
+  .pc-hero h1 { margin:0; font-size: 22px; }
+
+  .pc-sub { margin: 4px 0 14px; color: var(--pc-mut); }
+  .pc-badges { display:flex; flex-wrap:wrap; gap:8px; }
+  .pc-badge { font-size:12px; padding:4px 10px; border-radius:999px; background:#16202b; border:1px solid var(--pc-line);
+  color:var(--pc-mut); }
+  .pc-badge.ok { color:var(--pc-ok); border-color:rgba(46,204,113,.4); }
+  .pc-badge.bad { color:var(--pc-bad); border-color:rgba(231,76,60,.4); }
+  .pc-main { padding: 20px 24px 60px; }
+  .pc-toolbar { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px; }
+  .pc-toolbar button { background:var(--pc-card); color:var(--pc-text); border:1px solid var(--pc-line); padding:9px 14px;
+  border-radius:8px; cursor:pointer; font-size:13px; }
+  .pc-toolbar button:hover { border-color: var(--pc-accent); }
+  .pc-toolbar button[aria-busy="true"] { opacity:.6; cursor:progress; }
+  .pc-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap:16px; }
+  .pc-card { background:var(--pc-card); border:1px solid var(--pc-line); border-radius:12px; padding:16px; }
+  .pc-card h2 { margin:0 0 10px; font-size:14px; color:var(--pc-mut); text-transform:uppercase; letter-spacing:.04em; }
+  .pc-card.pc-wide { grid-column: 1 / -1; }
+  .pc-body { font-size:14px; line-height:1.5; }
+  .pc-score { font-size:34px; font-weight:700; }
+  .pc-kv { display:flex; justify-content:space-between; border-bottom:1px solid var(--pc-line); padding:6px 0; }
+  .pc-kv:last-child { border-bottom:none; }
+  .pc-pill { font-size:11px; padding:2px 8px; border-radius:999px; background:#16202b; color:var(--pc-mut); }
+  .pc-pill.ok { color:var(--pc-ok); } .pc-pill.warn { color:var(--pc-warn); } .pc-pill.bad { color:var(--pc-bad); }
+  pre.pc-json { background:#0b1016; border:1px solid var(--pc-line); border-radius:8px; padding:12px; overflow:auto; font-
+  size:12px; max-height:420px; }
+  .pc-empty { color:var(--pc-mut); font-style:italic; }
+  .pc-error { color:var(--pc-bad); }
