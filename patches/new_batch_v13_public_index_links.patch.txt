@@ -1,0 +1,15 @@
+# BEGIN V13 DASHBOARD LINKS
+# Add these links to public/index.html navigation/cards if missing:
+/landing.html - Public SaaS Funnel
+/pricing.html - Pricing
+/start.html - Trial Start
+/demo-sandbox.html - Demo Sandbox
+/guided-demo.html - Guided Demo Journey
+/support-helpdesk.html - Support Helpdesk
+/help.html - Public Help Center
+/reseller-portal.html - Reseller Portal
+/partners.html - Partner Inquiry
+/shared-inbox.html - Shared Inbox 2.0
+/inbox - Omnichannel Inbox v1
+/pilot-ops.html - Pilot Ops
+# END V13 DASHBOARD LINKS

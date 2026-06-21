@@ -1,0 +1,81 @@
+SuperSender Pro v9 portal/ops batch - append-only integration hooks
+
+Paste these into your real repo only after checking for existing markers.
+Do not replace whole files.
+
+server.js mounts:
+// BEGIN LOCAL WORKER BRIDGE HOOK
+app.use('/api/local-worker', require('./routes/localWorkerBridgeRoutes'));
+// END LOCAL WORKER BRIDGE HOOK
+
+// BEGIN DEALER PORTAL HOOK
+app.use('/api/dealer-portal', require('./routes/dealerPortalRoutes'));
+// END DEALER PORTAL HOOK
+
+// BEGIN SUPPLIER PORTAL HOOK
+app.use('/api/supplier-portal', require('./routes/supplierPortalRoutes'));
+// END SUPPLIER PORTAL HOOK
+
+// BEGIN SERVICE CENTER HOOK
+app.use('/api/service-center', require('./routes/serviceCenterRoutes'));
+// END SERVICE CENTER HOOK
+
+// BEGIN DATA QUALITY CENTER HOOK
+app.use('/api/data-quality-center', require('./routes/dataQualityCenterRoutes'));
+// END DATA QUALITY CENTER HOOK
+
+// BEGIN APPROVAL CENTER HOOK
+app.use('/api/approval-center', require('./routes/approvalCenterRoutes'));
+// END APPROVAL CENTER HOOK
+
+// BEGIN BUSINESS ALERTS HOOK
+app.use('/api/business-alerts', require('./routes/businessAlertsRoutes'));
+// END BUSINESS ALERTS HOOK
+
+// BEGIN LOYALTY CENTER HOOK
+app.use('/api/loyalty-center', require('./routes/loyaltyCenterRoutes'));
+// END LOYALTY CENTER HOOK
+
+// BEGIN FULFILLMENT CENTER HOOK
+app.use('/api/fulfillment-center', require('./routes/fulfillmentCenterRoutes'));
+// END FULFILLMENT CENTER HOOK
+
+// BEGIN RECEIVABLES CENTER HOOK
+app.use('/api/receivables-center', require('./routes/receivablesCenterRoutes'));
+// END RECEIVABLES CENTER HOOK
+
+public/index.html nav links:
+<a href="/local-worker-bridge.html">Local Worker Bridge</a>
+<a href="/dealer-portal.html">Dealer Portal</a>
+<a href="/supplier-portal.html">Supplier Portal</a>
+<a href="/service-center.html">Service Center</a>
+<a href="/data-quality-center.html">Data Quality Center</a>
+<a href="/approval-center.html">Approval Center</a>
+<a href="/business-alerts.html">Business Alerts</a>
+<a href="/loyalty-center.html">Loyalty Center</a>
+<a href="/fulfillment-center.html">Fulfillment Center</a>
+<a href="/receivables-center.html">Receivables Center</a>
+
+.env.example additions:
+LOCAL_WORKER_BRIDGE_ENABLED=true
+LOCAL_WORKER_BRIDGE_DRY_RUN=true
+DEALER_PORTAL_DRY_RUN=true
+SUPPLIER_PORTAL_DRY_RUN=true
+SERVICE_CENTER_DRY_RUN=true
+DATA_QUALITY_DRY_RUN=true
+APPROVAL_CENTER_DRY_RUN=true
+BUSINESS_ALERTS_DRY_RUN=true
+LOYALTY_CENTER_DRY_RUN=true
+FULFILLMENT_CENTER_DRY_RUN=true
+RECEIVABLES_CENTER_DRY_RUN=true
+
+.gitignore additions:
+data/local-worker-*.json
+data/dealer-portal-preview.json
+data/supplier-portal.json
+data/dataQuality/
+data/approval-*.json
+data/business-alert*.json
+data/loyalty-*.json
+data/fulfillment-*.json
+data/receivables-*.json

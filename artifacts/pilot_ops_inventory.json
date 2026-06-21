@@ -1,0 +1,59 @@
+ {
+     "generatedBy": "pilot-ops-scan",
+     "note": "Scan of SuperSender Pro workspace repo. Pilot Ops is a coordination layer on top of existing
+ funnel/setup/billing/tenant/CRM/customer-success systems. No duplicates created. Adapters degrade to 'unavailable' when a
+ target module is absent.",
+     "detected": {
+       "incident_command": "exists",
+       "group_commerce": "exists",
+       "payment_validation": "exists",
+       "launch_center": "exists",
+       "security_scan": "exists",
+       "integration_setup": "exists",
+       "superflow": "exists",
+       "whatsapp_cloud_setup": "exists"
+     },
+     "areas": {
+       "public_funnel": "partially_exists", "public_funnel_qa": "partially_exists", "demo_sandbox": "partially_exists",
+       "business_setup_wizard": "partially_exists", "saas_billing": "partially_exists", "tenant_portal": "partially_exists",
+       "customer_360": "partially_exists", "owner_command": "partially_exists", "kpi_command": "partially_exists",
+       "compliance_center": "partially_exists", "incident_command": "exists", "deployment_command": "partially_exists",
+       "master_integration_qa": "partially_exists", "playbook_builder": "partially_exists", "crm_customer":
+ "partially_exists",
+     "lead_capture": "partially_exists", "trial_request": "missing", "onboarding": "missing",
+       "support_feedback": "missing", "pilot_ops": "missing"
+     },
+     "pilotOpsLayer": {
+       "lib/pilotOps/store.js": "missing -> create",
+       "lib/pilotOps/pilotRegistry.js": "missing -> create",
+       "lib/pilotOps/trialManager.js": "missing -> create",
+       "lib/pilotOps/privacyGuard.js": "missing -> create",
+       "lib/pilotOps/safetyGuard.js": "missing -> create",
+       "lib/pilotOps/onboardingChecklist.js": "missing -> create",
+       "lib/pilotOps/setupProgress.js": "missing -> create",
+       "lib/pilotOps/blockerTracker.js": "missing -> create",
+       "lib/pilotOps/successScoring.js": "missing -> create",
+       "lib/pilotOps/riskScoring.js": "missing -> create",
+       "lib/pilotOps/conversionAdvisor.js": "missing -> create",
+       "lib/pilotOps/feedbackStore.js": "missing -> create",
+       "lib/pilotOps/feedbackClassifier.js": "missing -> create",
+       "lib/pilotOps/bugTriage.js": "missing -> create",
+       "lib/pilotOps/followupDrafts.js": "missing -> create",
+       "lib/pilotOps/messageTemplates.js": "missing -> create",
+       "lib/pilotOps/adapters/*": "missing -> create (10 + ownerCommandSummary + kpiExportAdapter)",
+       "routes/pilotOpsRoutes.js": "missing -> needs_route",
+       "public/pilot-ops.*": "missing -> needs_ui",
+
+    "scripts/pilot-ops-check.js": "missing -> create",
+    "tests/smoke/pilotOpsSmoke.js": "missing -> needs_test"
+  },
+  "duplicatesSkipped": [
+    "Did NOT rebuild public funnel / demo sandbox / business setup wizard",
+    "Did NOT rebuild SaaS billing / tenant portal / Customer 360 / CRM",
+    "Did NOT rebuild Owner Command / KPI Command / Compliance / Incident Command",
+    "Did NOT build a second onboarding/trial/customer-success engine",
+    "Adapters read existing status only; no tenant/billing writes"
+  ],
+  "safety": { "dryRunDefault": true, "requireConsent": true, "tenantWrite": false, "billingWrite": false, "liveMessages":
+false, "piiMasking": true }
+}

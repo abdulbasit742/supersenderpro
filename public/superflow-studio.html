@@ -1,0 +1,65 @@
+  <!doctype html>
+  <html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SuperFlow Studio</title>
+    <link rel="stylesheet" href="/css/superflow-studio.css" />
+  </head>
+  <body class="sf-wrap">
+    <div class="sf-head">
+      <h1>SuperFlow Studio <span class="sf-badge">DRY-RUN</span></h1>
+      <div>
+        <button class="sf-btn secondary" id="sf-refresh">Refresh</button>
+      </div>
+    </div>
+
+    <div class="sf-grid">
+      <!-- Left: flow list + templates -->
+      <div>
+        <div class="sf-card" style="margin-bottom:16px">
+          <h2>Flows</h2><ul class="sf-flow-list" id="sf-flows"></ul>
+          <button class="sf-btn" id="sf-new">+ New empty flow</button>
+        </div>
+        <div class="sf-card">
+          <h2>Create from template</h2>
+          <div id="sf-templates"></div>
+        </div>
+      </div>
+
+      <!-- Middle: editor -->
+      <div class="sf-card">
+        <h2>Flow editor (JSON)</h2>
+        <div class="sf-row">
+          <input id="sf-name" class="sf-editor" style="min-height:auto;height:38px;flex:1" placeholder="Flow name" />
+          <span class="sf-toggle" id="sf-toggle" title="Enable/disable"><span class="sf-dot off"></span><span id="sf-
+  toggle-label">disabled</span></span>
+        </div>
+        <textarea id="sf-json" class="sf-editor" spellcheck="false" placeholder='{ "nodes": [], "edges": [] }'></textarea>
+
+
+       <div class="sf-row" style="margin-top:10px">
+           <button class="sf-btn" id="sf-save">Save</button>
+           <button class="sf-btn secondary" id="sf-simulate">Simulate (dry-run)</button>
+           <button class="sf-btn secondary" id="sf-duplicate">Duplicate</button>
+           <button class="sf-btn danger" id="sf-delete">Delete</button>
+       </div>
+       <div id="sf-msg" class="sf-muted" style="margin-top:8px"></div>
+     </div>
+
+     <!-- Right: palette + simulation -->
+     <div>
+       <div class="sf-card" style="margin-bottom:16px">
+         <h2>Node palette</h2>
+         <div class="sf-palette" id="sf-palette"></div>
+       </div>
+       <div class="sf-card">
+         <h2>Simulation <span id="sf-sim-status"></span></h2>
+         <div class="sf-sim" id="sf-sim">Run a simulation to see the would-do actions.</div>
+       </div>
+     </div>
+   </div>
+
+   <script src="/js/superflow-studio.js"></script>
+ </body>
+ </html>

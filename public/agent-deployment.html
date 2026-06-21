@@ -1,0 +1,69 @@
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Agent Deployment Center</title>
+    <link rel="stylesheet" href="/css/agent-deployment.css" />
+  </head>
+  <body>
+    <header class="ad-header">
+      <h1>AI Agent Deployment Center</h1>
+      <span id="ad-mode" class="ad-badge">loading…</span>
+    </header>
+
+    <section class="ad-grid" id="ad-overview">
+      <div class="ad-card"><span class="ad-num" id="ov-agents">–</span><span>Agents</span></div>
+      <div class="ad-card"><span class="ad-num" id="ov-deploys">–</span><span>Active deployments</span></div>
+      <div class="ad-card"><span class="ad-num" id="ov-approval">–</span><span>Approval pending</span></div>
+      <div class="ad-card"><span class="ad-num" id="ov-blocks">–</span><span>Safety blocks</span></div>
+      <div class="ad-card"><span class="ad-num" id="ov-dry">–</span><span>Dry-run</span></div>
+      <div class="ad-card"><span class="ad-num" id="ov-live-off">–</span><span>Live disabled</span></div>
+    </section>
+
+
+    <nav class="ad-tabs">
+      <button data-tab="registry" class="active">Agents</button>
+      <button data-tab="matrix">Deployment matrix</button>
+      <button data-tab="editor">Deployment editor</button>
+      <button data-tab="tester">Action tester</button>
+      <button data-tab="flow">Flow Studio hooks</button>
+      <button data-tab="safety">Safety / audit</button>
+    </nav>
+
+    <main>
+      <section id="tab-registry" class="ad-tab"><table id="agents-table"><thead><tr><th>Name</th><th>Type</th><th>Mode</th>
+  <th>Targets</th><th>Approval</th><th></th></tr></thead><tbody></tbody></table></section>
+      <section id="tab-matrix" class="ad-tab" hidden><div id="matrix"></div></section>
+      <section id="tab-editor" class="ad-tab" hidden>
+        <form id="editor-form">
+          <label>Agent <select id="f-agent"></select></label>
+            <label>Target type <select id="f-target"></select></label>
+            <label>Mode <select id="f-mode"></select></label>
+            <label>Schedule window <input id="f-window" placeholder="e.g. 09:00-18:00" /></label>
+            <label>Rate limit/hr <input id="f-rate" type="number" min="0" value="20" /></label>
+            <label class="ad-check"><input id="f-approval" type="checkbox" checked /> Approval required</label>
+            <label class="ad-check"><input id="f-dry" type="checkbox" checked disabled /> Dry-run (locked on)</label>
+          <button type="submit">Create deployment</button>
+        </form>
+
+         <pre id="editor-result"></pre>
+       </section>
+       <section id="tab-tester" class="ad-tab" hidden>
+         <form id="tester-form">
+           <label>Agent <select id="t-agent"></select></label>
+            <label>Target type <select id="t-target"></select></label>
+            <label>Action <select id="t-action"></select></label>
+            <label>Sample input <textarea id="t-input" placeholder="rate kya hai?"></textarea></label>
+            <button type="submit">Generate draft</button>
+         </form>
+         <pre id="tester-result"></pre>
+       </section>
+       <section id="tab-flow" class="ad-tab" hidden><div class="ad-cols"><div><h3>Triggers</h3><ul id="flow-triggers"></ul>
+  </div><div><h3>Actions</h3><ul id="flow-actions"></ul></div></div></section>
+      <section id="tab-safety" class="ad-tab" hidden><h3>Audit log</h3><pre id="audit-log"></pre></section>
+      </main>
+
+    <script src="/js/agent-deployment.js"></script>
+  </body>
+  </html>

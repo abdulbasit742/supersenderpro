@@ -1,0 +1,49 @@
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Data Quality Center — SuperSender Pro</title>
+    <link rel="stylesheet" href="/data-quality-center.css" />
+  </head>
+  <body>
+    <header class="dqc-header">
+      <h1>Data Quality Center</h1>
+      <span class="dqc-badge" id="dryRunBadge">DRY-RUN</span>
+    </header>
+
+    <main class="dqc-grid">
+      <section class="card" id="sec-score"><h2>1. Overall Score</h2><div id="scoreBox">--</div></section>
+      <section class="card" id="sec-summary"><h2>2. Summary</h2><div id="summaryBox">--</div></section>
+      <section class="card" id="sec-severity"><h2>3. Issues by Severity</h2><div id="severityBox">--</div></section>
+      <section class="card" id="sec-entity"><h2>4. Score by Entity</h2><div id="entityBox">--</div></section>
+      <section class="card" id="sec-scan"><h2>5. Run Scan (preview)</h2><button data-act="scan">Scan now</button><pre
+  id="scanOut"></pre></section>
+      <section class="card" id="sec-products"><h2>6. Product Checks</h2><button data-act="products">Preview</button><pre
+  id="productsOut"></pre></section>
+      <section class="card" id="sec-customers"><h2>7. Customer Checks</h2><button data-act="customers">Preview</button><pre
+  id="customersOut"></pre></section>
+      <section class="card" id="sec-suppliers"><h2>8. Supplier Checks</h2><button data-act="suppliers">Preview</button><pre
+  id="suppliersOut"></pre></section>
+      <section class="card" id="sec-finance"><h2>9. Finance Checks</h2><button data-act="finance">Preview</button><pre
+  id="financeOut"></pre></section>
+      <section class="card" id="sec-inventory"><h2>10. Inventory Consistency</h2><button data-
+  act="inventory">Preview</button><pre id="inventoryOut"></pre></section>
+      <section class="card" id="sec-dups"><h2>11. Duplicate Detection</h2>
+        <select id="dupEntity"><option>product</option><option>customer</option><option>supplier</option>
+  <option>finance</option></select>
+        <button data-act="dups">Detect</button><pre id="dupsOut"></pre></section>
+      <section class="card" id="sec-cleanup"><h2>12. Cleanup Plan (preview)</h2><button data-act="cleanup">Build
+  plan</button><pre id="cleanupOut"></pre></section>
+      <section class="card" id="sec-merge"><h2>13. Merge Preview</h2>
+        <input id="mergeEntity" placeholder="entity (e.g. customer)" />
+        <input id="mergeIds" placeholder="ids comma-separated" />
+        <button data-act="merge">Preview merge</button><pre id="mergeOut"></pre></section>
+    </main>
+
+    <footer class="dqc-footer">Preview-only. No record is ever merged, deleted, or modified.</footer>
+    <script src="/data-quality-center.js"></script>
+
+
+</body>
+</html>

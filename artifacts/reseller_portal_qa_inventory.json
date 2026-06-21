@@ -1,0 +1,65 @@
+ {
+     "generatedBy": "reseller-portal-qa-scan",
+     "note": "QA/readiness layer on top of the EXISTING Reseller Portal. No rebuild. QA modules read existing reseller
+ modules read-only and degrade to 'unavailable' if absent.",
+   "existingResellerPortal": {
+      "lib/resellerPortal/store.js": "exists",
+      "lib/resellerPortal/privacyGuard.js": "exists",
+      "lib/resellerPortal/safetyGuard.js": "exists",
+      "lib/resellerPortal/resellerRegistry.js": "exists",
+      "lib/resellerPortal/whiteLabelSettings.js": "exists",
+      "lib/resellerPortal/referralTracker.js": "exists",
+      "lib/resellerPortal/commissionPreview.js": "exists",
+      "lib/resellerPortal/clientPreview.js": "exists",
+      "lib/resellerPortal/assetLibrary.js": "exists",
+      "lib/resellerPortal/adapters/*": "exists",
+      "routes/resellerPortalRoutes.js": "exists",
+      "public/reseller-portal.*": "exists",
+      "public/partners.*": "exists",
+      "docs/RESELLER_* + WHITE_LABEL_* + PARTNER_*": "exists (7)",
+      "scripts/reseller-portal-check.js": "exists",
+      "tests/smoke/resellerPortalSmoke.js": "exists"
+     },
+     "relatedSystems": {
+      "saas_billing": "unknown -> adapter unavailable-safe",
+      "tenant_portal": "unknown -> read-only fallback",
+      "public_funnel": "missing",
+      "pilot_ops": "exists",
+      "support_helpdesk": "exists",
+      "customer_360": "partially_exists",
+      "business_setup": "exists",
+      "kpi_command": "partially_exists",
+      "compliance_center": "partially_exists",
+      "auth_rbac": "unknown -> needs_wiring"
+     },
+     "qaLayer": {
+      "lib/resellerPortal/qa/qaGuard.js": "missing -> create",
+      "lib/resellerPortal/qa/partnerOnboardingChecklist.js": "missing -> create",
+      "lib/resellerPortal/qa/partnerReadinessScoring.js": "missing -> create",
+      "lib/resellerPortal/qa/onboardingDoctor.js": "missing -> create",
+      "lib/resellerPortal/qa/brandingQA.js": "missing -> needs_branding_check",
+      "lib/resellerPortal/qa/domainQA.js": "missing -> create",
+      "lib/resellerPortal/qa/referralQA.js": "missing -> create",
+      "lib/resellerPortal/qa/referralCodeValidator.js": "missing -> create",
+      "lib/resellerPortal/qa/commissionQA.js": "missing -> needs_commission_check",
+      "lib/resellerPortal/qa/payoutSafetyCheck.js": "missing -> create (payout_risk)",
+
+    "lib/resellerPortal/qa/tenantPrivacyQA.js": "missing -> needs_privacy_check (tenant_isolation_risk)",
+    "lib/resellerPortal/qa/clientPreviewQA.js": "missing -> create",
+    "lib/resellerPortal/qa/publicPartnerPageQA.js": "missing -> create",
+    "lib/resellerPortal/qa/assetQA.js": "missing -> create",
+    "lib/resellerPortal/qa/resellerReadinessDoctor.js": "missing -> create",
+    "routes/resellerPortalQARoutes.js": "missing -> needs_route",
+    "public/reseller-portal-qa.*": "missing -> needs_ui",
+    "scripts/reseller-portal-readiness.js": "missing -> create",
+    "tests/smoke/resellerPortalQASmoke.js": "missing -> needs_test"
+  },
+  "duplicatesSkipped": [
+    "Did NOT rebuild Reseller Portal (QA reads it read-only)",
+    "Did NOT rebuild SaaS Billing / Tenant Portal / Public Funnel / partner page",
+    "Did NOT rebuild Pilot Ops / Support / Customer 360 / KPI / Compliance",
+    "Did NOT create a second reseller/commission/branding system"
+  ],
+  "riskFlags": { "tenant_isolation_risk": "checked", "payout_risk": "checked", "live_action_risk": "checked",
+"branding_check": true, "commission_check": true, "privacy_check": true }
+}

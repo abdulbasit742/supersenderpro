@@ -1,0 +1,20 @@
+  {
+    "note": "Which ClickUp docs to pull code from. docId is the doc's id (the part after /docs/ in the URL, e.g. 2kzmbjjk-
+  XXXXX). Update these to your real doc IDs from each module doc's URL.",
+      "docs": [
+        { "name": "Voice AI",           "docId": "REPLACE_WITH_VOICE_AI_DOC_ID" },
+        { "name": "Public Funnel",      "docId": "REPLACE_WITH_PUBLIC_FUNNEL_DOC_ID" },
+        { "name": "Customer 360",       "docId": "REPLACE_WITH_CUSTOMER360_DOC_ID" },
+        { "name": "Owner+Incident",     "docId": "REPLACE_WITH_OWNER_INCIDENT_DOC_ID" },
+        { "name": "PhysiXplore",        "docId": "REPLACE_WITH_PHYSIXPLORE_DOC_ID" },
+        { "name": "Ecommerce Hub",      "docId": "REPLACE_WITH_ECOMMERCE_HUB_DOC_ID" }
+      ],
+      "skipTitlePatterns": ["hook", "hooks", "patches", "runbook", "gap report", "readme", "existing-file"],
+      "allowedExtensions": [".js", ".html", ".css", ".json", ".md"],
+      "writeRoot": "."
+  }
+
+
+
+How to get each docId : open the module doc in ClickUp, look at the URL .../docs/<docId>/... , copy the <docId>
+part. Paste it in place of each REPLACE_WITH_* . (You can also paste the full doc URL; the script extracts the id.)

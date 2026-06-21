@@ -1,0 +1,44 @@
+ /* Reseller Portal QA — dark theme, scoped with rq- prefix. */
+ :root { --rq-bg:#0d1117; --rq-panel:#161b22; --rq-panel-2:#1c232d; --rq-border:#30363d; --rq-text:#e6edf3; --rq-
+ muted:#8b949e; --rq-accent:#3fb950; --rq-accent-dim:#2ea043; --rq-bad:#f85149; --rq-warn:#d29922; }
+ * { box-sizing:border-box; }
+ .rq-body { margin:0; background:var(--rq-bg); color:var(--rq-text); font-family:-apple-system,BlinkMacSystemFont,'Segoe
+ UI',Roboto,Helvetica,Arial,sans-serif; line-height:1.5; }
+ .rq-header { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; padding:24px 28px; border-
+ bottom:1px solid var(--rq-border); background:var(--rq-panel); }
+ .rq-header h1 { margin:0; font-size:22px; } .rq-subtitle { margin:6px 0 0; color:var(--rq-muted); font-size:13px; } .rq-
+ muted { color:var(--rq-muted); }
+ .rq-badges { display:flex; gap:8px; flex-wrap:wrap; }
+ .rq-badge { font-size:12px; padding:4px 10px; border-radius:999px; border:1px solid var(--rq-border); background:var(--
+ rq-panel-2); }
+ .rq-badge-on { border-color:var(--rq-accent-dim); color:var(--rq-accent); } .rq-badge-off { border-color:#5a2b2b;
+ color:var(--rq-bad); }
+ .rq-warn-banner { margin:16px 28px 0; padding:10px 14px; border-radius:8px; background:rgba(63,185,80,0.10); border:1px
+ solid rgba(63,185,80,0.35); color:var(--rq-accent); font-size:13px; }
+ .rq-overview { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; padding:16px 28px 0; }
+ .rq-stat { background:var(--rq-panel); border:1px solid var(--rq-border); border-radius:10px; padding:14px; text-
+ align:center; }
+
+.rq-score { font-size:34px; font-weight:700; color:var(--rq-accent); } .rq-stat-num { font-size:22px; font-weight:700; }
+.rq-stat-label { font-size:12px; color:var(--rq-muted); margin-top:4px; }
+.rq-bad { color:var(--rq-bad); } .rq-warn { color:var(--rq-warn); } .rq-ok { color:var(--rq-accent); }
+.rq-badges-row { display:flex; gap:10px; flex-wrap:wrap; padding:14px 28px 0; }
+.rq-rbadge { font-size:12px; padding:5px 12px; border-radius:8px; border:1px solid var(--rq-border); }
+.rq-rbadge-on { border-color:var(--rq-accent-dim); color:var(--rq-accent); background:rgba(63,185,80,0.10); } .rq-rbadge-
+off { border-color:#5a2b2b; color:var(--rq-bad); }
+.rq-toolbar { display:flex; gap:8px; flex-wrap:wrap; padding:16px 28px 0; }
+.rq-btn { background:var(--rq-accent); color:#04210f; border:none; border-radius:8px; padding:9px 14px; font-size:13px;
+font-weight:600; cursor:pointer; }
+.rq-btn:hover { background:var(--rq-accent-dim); } .rq-btn-ghost { background:transparent; color:var(--rq-text);
+border:1px solid var(--rq-border); }
+.rq-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; padding:20px 28px 40px; } .rq-span2 { grid-
+column:1 / -1; }
+.rq-card { background:var(--rq-panel); border:1px solid var(--rq-border); border-radius:12px; padding:18px 20px; } .rq-
+card h2 { margin:0 0 12px; font-size:15px; font-weight:600; }
+.rq-list { margin:0; padding-left:18px; } .rq-list li { margin:4px 0; font-size:13px; } .rq-key { color:var(--rq-muted);
+}
+.rq-pre { background:var(--rq-panel-2); border:1px solid var(--rq-border); border-radius:8px; padding:14px; font-
+size:12px; overflow:auto; max-height:300px; font-family:ui-monospace,Menlo,monospace; }
+@media (max-width:1000px){ .rq-grid{ grid-template-columns:1fr; } .rq-overview{ grid-template-columns:repeat(2,1fr); } }
+
+scripts/reseller-portal-readiness.js +

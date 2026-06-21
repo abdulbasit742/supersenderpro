@@ -1,0 +1,35 @@
+  :root { --bg:#0d1117; --card:#161b22; --line:#30363d; --txt:#e6edf3; --muted:#8b949e; --accent:#2f81f7; }
+  * { box-sizing:border-box; } body { margin:0; background:var(--bg); color:var(--txt); font:14px/1.5 system-ui, sans-
+  serif; }
+  .mc-header { display:flex; align-items:center; gap:12px; padding:16px 24px; border-bottom:1px solid var(--line); flex-
+  wrap:wrap; } .mc-header h1 { font-size:18px; margin:0; }
+  .mc-badge { font-size:12px; padding:3px 10px; border-radius:999px; border:1px solid var(--line); } .mc-badge.safe {
+  background:rgba(35,134,54,.15); color:#3fb950; border-color:#238636; } .mc-badge.warn { background:rgba(210,153,34,.15);
+  color:#d29922; }
+  .mc-cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:12px; padding:20px 24px; } .mc-
+  card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px; display:flex; flex-
+  direction:column; gap:4px; } .mc-label { color:var(--muted); font-size:12px; } .mc-value { font-size:18px; }
+  .mc-tabs { display:flex; gap:4px; padding:0 24px; border-bottom:1px solid var(--line); flex-wrap:wrap; } .mc-tabs button
+  { background:none; border:none; color:var(--muted); padding:10px 14px; cursor:pointer; border-bottom:2px solid
+  transparent; } .mc-tabs button.active { color:var(--txt); border-bottom-color:var(--accent); }
+  .mc-controls { display:flex; gap:8px; padding:14px 24px; flex-wrap:wrap; } .mc-controls input, .mc-controls select {
+  background:#0d1117; border:1px solid var(--line); color:var(--txt); border-radius:6px; padding:7px 10px; }
+  .mc-main { padding:20px 24px; }
+  .line { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:10px 12px; margin-bottom:6px;
+  font-size:13px; } .muted { color:var(--muted); font-size:12px; }
+  .badge { font-size:11px; padding:2px 8px; border-radius:999px; background:#21262d; color:var(--muted); } .badge.risk-
+  high, .badge.risk-critical { color:#ff7b72; } .badge.risk-medium { color:#d29922; } .badge.risk-low { color:#3fb950; }
+
+input { background:#0d1117; border:1px solid var(--line); color:var(--txt); border-radius:6px; padding:7px 10px; margin:0
+8px 8px 0; font-size:13px; }
+button { background:var(--accent); color:#fff; border:none; border-radius:6px; padding:7px 12px; cursor:pointer;
+margin:8px 0; }
+pre { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:14px; overflow:auto; white-
+space:pre-wrap; font-size:12px; }
+@media (max-width:820px){ .mc-cards{ grid-template-columns:repeat(2,1fr);} }
+
+scripts/manufacturing-center-check.js +
+tests/smoke/manufacturingCenterSmoke.js + PATCHES
+(append-only)
+
+Check + smoke + append-only hooks. No commit/push. Only writes under artifacts/ .

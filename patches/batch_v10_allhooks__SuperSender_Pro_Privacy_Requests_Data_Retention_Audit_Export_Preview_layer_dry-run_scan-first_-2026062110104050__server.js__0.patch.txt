@@ -1,0 +1,34 @@
+# Source text: SuperSender_Pro_Privacy_Requests_Data_Retention_Audit_Export_Preview_layer_dry-run_scan-first_-2026062110104050.txt
+# Target file: server.js
+# Apply manually as append-only hook; do not overwrite existing file.
+
+ // BEGIN PRIVACY CENTER HOOK
+ try {
+   const privacyCenterRoutes = require('./routes/privacyCenterRoutes');
+   app.use('/api/privacy-center', privacyCenterRoutes);
+   app.get('/privacy-center', (req, res) => res.sendFile(require('path').join(__dirname, 'public', 'privacy-
+ center.html')));
+ } catch (e) { console.error('[privacy-center] mount skipped:', e && e.message); }
+ // END PRIVACY CENTER HOOK
+
+
+public/index.html (nav link)
+ <!-- BEGIN PRIVACY CENTER HOOK -->
+ <a href="/privacy-center" class="nav-link" title="Privacy Center (dry-run)">Privacy Center <span style="font-
+ size:11px;color:#39c5cf">DRY-RUN</span></a>
+ <!-- END PRIVACY CENTER HOOK -->
+
+
+package.json (scripts; add only)
+ "privacy-center:check": "node scripts/privacy-center-check.js",
+ "privacy-center:smoke": "node tests/smoke/privacyCenterSmoke.js"
+
+
+.gitignore (append-only)
+
+  data/privacy-center.json
+  data/privacy-center.smoke.json
+  data/privacy-center.check.json
+  data/privacy-retention.json
+  data/privacy-retention.smoke.json
+  data/privacy-retention.check.json

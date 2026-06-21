@@ -1,0 +1,12 @@
+# BEGIN NEW MODULE GITIGNORE ADDITIONS (v8)
+data/fraudGuard.json
+data/paymentOCR.json
+data/pause.json
+data/abtest.json
+data/sendTime.json
+data/referral.json
+data/nextOffer.json
+data/dropRecovery.json
+data/winback.json
+data/renewals.json
+# END NEW MODULE GITIGNORE ADDITIONS

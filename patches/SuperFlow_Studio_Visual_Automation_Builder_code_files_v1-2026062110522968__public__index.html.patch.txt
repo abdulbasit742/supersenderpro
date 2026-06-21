@@ -1,0 +1,5 @@
+  <!-- BEGIN SUPERFLOW STUDIO HOOK -->
+  <a href="/superflow-studio" class="nav-link" title="Visual automation builder (dry-run)">
+    SuperFlow Studio <span style="font-size:11px;color:#f0c674">DRY-RUN</span>
+  </a>
+  <!-- END SUPERFLOW STUDIO HOOK -->

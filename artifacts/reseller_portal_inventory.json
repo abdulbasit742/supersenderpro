@@ -1,0 +1,30 @@
+{
+    "generatedAt": "2026-06-20",
+    "note": "Seed inventory from workspace scan. No reseller/white-label portal existed. Re-run scripts/reseller-portal-
+check.js locally to refresh.",
+  "existingSystems": [
+    { "area": "SaaS Billing", "status": ["unknown", "billing_risk"], "note": "commission preview reads it read-only if
+present; never rebuilt, no payouts" },
+    { "area": "Tenant Portal", "status": ["unknown"], "note": "tenantAdapter falls back to Business Setup if absent;
+never writes tenants" },
+     { "area": "Pilot Ops", "status": ["exists", "safe_to_extend"], "note": "pilotOps adapter read-only" },
+     { "area": "Support Helpdesk", "status": ["exists", "safe_to_extend"], "note": "support summary adapter read-only" },
+     { "area": "Business Setup Wizard", "status": ["exists", "safe_to_extend"], "note": "client preview fallback" },
+     { "area": "KPI Command / Compliance Center", "status": ["exists", "safe_to_extend"] },
+    { "area": "Public SaaS Funnel", "status": ["missing"], "note": "partners page links to demo sandbox; funnel link
+added when built" },
+    { "area": "admin auth / RBAC", "status": ["unknown", "needs_wiring"], "note": "bind portal access + admin endpoints
+to existing guard when available" }
+    ],
+    "newCoordinationLayer": { "area": "White Label + Reseller Partner Portal", "status": "missing_before_this_pack",
+"fileCount": 30 },
+  "duplicatesSkipped": [
+     "Did NOT rebuild SaaS Billing (commission reads read-only / estimates).",
+     "Did NOT rebuild Tenant Portal (read-only tenant adapter, no writes).",
+     "Did NOT build a second CRM or customer store.",
+     "Did NOT create a duplicate admin bot (command hooks only)."
+    ],
+    "privacyRisk": "mitigated_masking_plus_tenant_isolation",
+    "billingRisk": "mitigated_preview_only_no_payouts",
+    "liveActionRisk": "none_by_default_all_gated"
+}

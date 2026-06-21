@@ -1,0 +1,12 @@
+   :root { --bg:#0d1117; --card:#161b22; --line:#30363d; --txt:#e6edf3; --muted:#8b949e; --accent:#2f81f7; }
+   body { margin:0; background:var(--bg); color:var(--txt); font:15px/1.6 system-ui, sans-serif; }
+   .help-header { padding:24px; border-bottom:1px solid var(--line); } .help-header h1 { margin:0; font-size:20px; }
+   main { max-width:760px; margin:0 auto; padding:24px; } h2 { font-size:16px; margin-top:28px; }
+   details { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:12px 14px; margin-bottom:8px;
+   } summary { cursor:pointer; font-weight:600; } details p { color:var(--muted); }
+   form { display:grid; gap:10px; max-width:520px; } input, textarea { background:var(--card); border:1px solid var(--line);
+   color:var(--txt); border-radius:6px; padding:10px; } textarea { min-height:100px; }
+   .consent { display:flex; gap:8px; align-items:center; color:var(--muted); font-size:13px; } button { background:var(--accent); color:#fff; border:none; border-radius:6px; padding:10px 16px; cursor:pointer; width:fit-content; } .muted {
+   color:var(--muted); }
+
+scripts/support-helpdesk-check.js +

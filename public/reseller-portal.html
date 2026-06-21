@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Reseller Portal</title><link rel="stylesheet" href="/css/reseller-portal.css" /></head>
+<body>
+  <header class="rp-header"><h1>White Label & Reseller Portal</h1><span id="rp-mode" class="rp-badge">loading…</span>
+</header>
+  <section class="rp-overview">
+    <div class="rp-card"><span class="rp-label">Resellers</span><span id="ov-total">–</span></div>
+    <div class="rp-card"><span class="rp-label">Active</span><span id="ov-active">–</span></div>
+    <div class="rp-card"><span class="rp-label">Referrals</span><span id="ov-ref">–</span></div>
+    <div class="rp-card"><span class="rp-label">Commission (preview)</span><span id="ov-comm">–</span></div>
+  </section>
+  <nav class="rp-tabs">
+    <button data-tab="resellers" class="active">Resellers</button>
+    <button data-tab="branding">White label</button>
+    <button data-tab="referrals">Referrals</button>
+    <button data-tab="clients">Clients</button>
+    <button data-tab="commissions">Commissions</button>
+    <button data-tab="assets">Partner assets</button>
+    <button data-tab="safety">Safety</button>
+  </nav>
+  <main>
+    <section id="tab-resellers" class="rp-tab">
+      <form id="rsl-form"><input id="r-company" placeholder="Company name" /><select id="r-tier">
+<option>referral_partner</option><option>agency_partner</option><option>reseller</option>
+<option>white_label_reseller</option><option>enterprise_partner</option></select><button type="submit">Add
+reseller</button></form>
+      <div id="rsl-list"></div>
+    </section>
+    <section id="tab-branding" class="rp-tab" hidden><input id="b-rsl" placeholder="reseller id" /><input id="b-brand"
+placeholder="Brand name" /><input id="b-color" placeholder="#2f81f7" /><button id="b-preview">Preview branding</button>
+<pre id="branding-result"></pre></section>
+    <section id="tab-referrals" class="rp-tab" hidden><input id="rf-rsl" placeholder="reseller id" /><button id="rf-
+link">Preview referral link</button><pre id="ref-result"></pre></section>
+    <section id="tab-clients" class="rp-tab" hidden><input id="cl-rsl" placeholder="reseller id" /><button id="cl-
+load">Load clients</button><pre id="clients-result"></pre></section>
+    <section id="tab-commissions" class="rp-tab" hidden><input id="cm-rsl" placeholder="reseller id" /><button id="cm-
+load">Commission preview</button><pre id="comm-result"></pre></section>
+    <section id="tab-assets" class="rp-tab" hidden><select id="as-type"></select><select id="as-lang"><option
+value="roman_urdu">Roman Urdu</option><option value="en">English</option></select><button id="as-gen">Generate
+draft</button><pre id="assets-result"></pre></section>
+    <section id="tab-safety" class="rp-tab" hidden><pre id="safety-result"></pre></section>
+  </main>
+  <script src="/js/reseller-portal.js"></script>
+</body></html>

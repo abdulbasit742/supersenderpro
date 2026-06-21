@@ -1,0 +1,26 @@
+const express = require('express');
+const bootstrap = require('./src/bootstrap');
+
+const app = express();
+
+
+// Your real runtime dependencies (WhatsApp clients, db, redis, catalog, stock).
+// Pass whatever you already have; bootstrap wires modules around them and
+// degrades gracefully for anything missing.
+const deps = {
+     waCustomer: global.waCustomer,       // your Baileys/Cloud customer sender
+     waAdmin:    global.waAdmin,          // admin alert sender
+     waClients:   global.waClients || {}, // { 'customer-bot': {connected}, ... }
+     redis:       global.redis || null,
+     db:          global.db || null,
+     catalog:     global.catalog || null, // getCatalog/priceText etc.
+     stock:      global.stock || null,   // dealerCost/release etc.
+     adminNumber: process.env.ADMIN_NUMBER,
+};
+
+
+bootstrap(app, deps);
+
+
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => console.log(`SuperSender Pro listening on ${PORT}`));

@@ -1,0 +1,111 @@
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Incident Command Center</title>
+    <link rel="stylesheet" href="/css/incident-command.css" />
+  </head>
+  <body class="icc-body">
+    <header class="icc-header">
+      <div>
+        <h1>Incident Command <span class="icc-muted">Production Monitoring</span></h1>
+        <p class="icc-subtitle">One pane for system, module, queue, and config health. Read-only + dry-run.</p>
+      </div>
+      <div class="icc-badges">
+        <span id="badge-dryrun" class="icc-badge">dry-run: ?</span>
+        <span id="badge-livealerts" class="icc-badge">live-alerts: ?</span>
+        <span id="badge-autofix" class="icc-badge">auto-fix: ?</span>
+      </div>
+    </header>
+
+    <div class="icc-warn-banner">
+      Destructive fixes <strong>disabled</strong>. Live alerts <strong>disabled</strong>. Secret + PII masking
+  <strong>active</strong>. All actions are read-only or local-state.
+    </div>
+
+
+    <section class="icc-overview" id="overview">
+      <div class="icc-stat"><div class="icc-score" id="ov-score">--</div><div class="icc-stat-label">Health score</div>
+  </div>
+      <div class="icc-stat"><div class="icc-stat-num icc-crit" id="ov-critical">--</div><div class="icc-stat-
+  label">Critical</div></div>
+      <div class="icc-stat"><div class="icc-stat-num icc-warn" id="ov-warnings">--</div><div class="icc-stat-
+  label">Warnings</div></div>
+      <div class="icc-stat"><div class="icc-stat-num icc-ok" id="ov-healthy">--</div><div class="icc-stat-
+  label">Healthy</div></div>
+      <div class="icc-stat"><div class="icc-stat-num" id="ov-degraded">--</div><div class="icc-stat-label">Degraded</div>
+  </div>
+      <div class="icc-stat"><div class="icc-stat-num" id="ov-scan">--</div><div class="icc-stat-label">Last scan</div>
+  </div>
+    </section>
+
+
+    <div class="icc-toolbar">
+      <button id="btn-run-health" class="icc-btn">Run health scan</button>
+      <button id="btn-run-doctor" class="icc-btn icc-btn-ghost">Run doctor</button>
+      <button id="btn-gen-report" class="icc-btn icc-btn-ghost">Generate report</button>
+    </div>
+
+ <main class="icc-grid">
+   <section class="icc-card icc-span2">
+     <h2>Module Health</h2>
+     <div id="module-grid" class="icc-modgrid"><div class="icc-muted">Loading...</div></div>
+   </section>
+
+   <section class="icc-card icc-span2">
+    <h2>Incident Inbox</h2>
+    <div class="icc-filters">
+       <select id="f-sev"><option value="">any severity</option><option>critical</option><option>high</option>
+<option>medium</option><option>low</option><option>info</option></select>
+       <select id="f-state"><option value="">any state</option><option>open</option><option>ack</option>
+<option>snoozed</option><option>resolved</option></select>
+       <input id="f-mod" type="text" placeholder="moduleId" />
+       <button id="btn-filter" class="icc-btn icc-btn-tiny">Filter</button>
+    </div>
+    <table class="icc-table" id="inc-table">
+       <thead><tr><th>Severity</th><th>Module</th><th>Summary</th><th>State</th><th></th></tr></thead>
+       <tbody><tr><td class="icc-muted" colspan="5">No incidents loaded. Run doctor.</td></tr></tbody>
+     </table>
+   </section>
+
+   <section class="icc-card">
+    <h2>Runbook</h2>
+    <div id="runbook-body" class="icc-muted">Select an incident to see its runbook.</div>
+   </section>
+
+
+   <section class="icc-card">
+     <h2>Alert Rules <span class="icc-pill">dry-run</span></h2>
+    <div class="icc-form">
+      <input id="al-name" type="text" placeholder="rule name" />
+       <input id="al-cond" type="text" placeholder="severity>=high" />
+       <select id="al-out"><option>dashboard_alert</option><option>owner_command_digest_draft</option>
+<option>whatsapp_admin_draft</option><option>markdown_report</option><option>json_report</option></select>
+       <input id="al-cooldown" type="number" placeholder="cooldown min" />
+       <button id="btn-add-alert" class="icc-btn icc-btn-tiny">Add</button>
+       <button id="btn-test-alert" class="icc-btn icc-btn-ghost icc-btn-tiny">Test (dry-run)</button>
+     </div><ul id="alert-list" class="icc-list"><li class="icc-muted">No rules.</li></ul>
+   </section>
+
+
+   <section class="icc-card icc-span2">
+    <h2>Doctor / Report Output</h2>
+    <pre class="icc-pre" id="doctor-output">Run doctor or generate a report.</pre>
+   </section>
+
+   <section class="icc-card icc-span2">
+     <h2>Docs</h2><ul class="icc-list">
+       <li><a href="/docs/INCIDENT_COMMAND_CENTER.md">Incident Command Center</a></li>
+       <li><a href="/docs/PRODUCTION_MONITORING.md">Production Monitoring</a></li>
+       <li><a href="/docs/INCIDENT_RUNBOOKS.md">Runbooks</a></li>
+       <li><a href="/docs/INCIDENT_ALERT_RULES.md">Alert Rules</a></li>
+      <li><a href="/docs/INCIDENT_SAFETY.md">Safety</a></li>
+    </ul>
+   </section>
+ </main>
+
+ <script src="/js/incident-command.js"></script>
+
+</body>
+</html>

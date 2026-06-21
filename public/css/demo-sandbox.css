@@ -1,0 +1,27 @@
+   :root { --bg:#0d1117; --card:#161b22; --line:#30363d; --txt:#e6edf3; --muted:#8b949e; --accent:#2f81f7; }
+   * { box-sizing:border-box; }
+   body { margin:0; background:var(--bg); color:var(--txt); font:14px/1.5 system-ui, sans-serif; }
+   .ds-header { display:flex; align-items:center; gap:12px; padding:16px 24px; border-bottom:1px solid var(--line); }
+   .ds-header h1 { font-size:18px; margin:0; }
+   .ds-badge { font-size:12px; padding:3px 10px; border-radius:999px; border:1px solid #238636;
+   background:rgba(35,134,54,.15); color:#3fb950; }
+   .ds-overview { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; padding:20px 24px; }
+
+.ds-card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px; display:flex; flex-direction:column; gap:4px; }
+.ds-label { color:var(--muted); font-size:12px; }
+.ds-tabs { display:flex; gap:4px; padding:0 24px; border-bottom:1px solid var(--line); }
+.ds-tabs button { background:none; border:none; color:var(--muted); padding:10px 14px; cursor:pointer; border-bottom:2px
+solid transparent; }
+.ds-tabs button.active { color:var(--txt); border-bottom-color:var(--accent); }
+main { padding:20px 24px; }
+.ds-cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:12px; margin-bottom:16px; }
+.ds-tile { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px; }
+.ds-tile h3 { margin:0 0 6px; font-size:15px; }
+.ds-tile p { color:var(--muted); font-size:12px; min-height:34px; }
+button { background:var(--accent); color:#fff; border:none; border-radius:6px; padding:7px 12px; cursor:pointer; }
+#reset-demo { background:#21262d; border:1px solid var(--line); color:var(--txt); }
+pre { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:14px; overflow:auto; max-height:440px; white-space:pre-wrap; }
+.ds-links { display:flex; flex-wrap:wrap; gap:10px; }
+.ds-links a { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:10px 14px; color:var(--accent); text-decoration:none; }
+
+scripts/demo-sandbox-check.js +

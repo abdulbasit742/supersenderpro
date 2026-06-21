@@ -1,0 +1,60 @@
+  {
+      "generatedBy": "group-commerce-inbox-scan",
+      "note": "Scan of the SuperSender Pro workspace repo. Group Commerce OS core + adapters + QA pack already exist. No
+  inbox/market-intelligence layer exists. Building the inbox as a new isolated layer on top. No duplicates created.",
+    "existing": {
+        "lib/groupCommerce/store.js": "exists",
+        "lib/groupCommerce/groupRegistry.js": "exists",
+        "lib/groupCommerce/messageAnalyzer.js": "exists",
+        "lib/groupCommerce/moderation.js": "exists",
+        "lib/groupCommerce/catalog.js": "exists",
+        "lib/groupCommerce/ecommerceBridge.js": "exists",
+        "lib/groupCommerce/relayPlanner.js": "exists",
+        "lib/groupCommerce/agentRegistry.js": "exists",
+        "lib/groupCommerce/pauseManager.js": "exists",
+        "lib/groupCommerce/flowNodes.js": "exists",
+        "lib/groupCommerce/adapters/*": "exists",
+        "routes/groupCommerceRoutes.js": "exists",
+        "routes/groupCommerceAdapterRoutes.js": "exists",
+        "public/group-commerce.html": "exists"
+      },
+      "inboxLayer": {
+        "lib/groupCommerce/inbox/store.js": "missing -> create",
+        "lib/groupCommerce/inbox/aggregator.js": "missing -> create",
+        "lib/groupCommerce/inbox/filters.js": "missing -> create",
+        "lib/groupCommerce/inbox/marketSummary.js": "missing -> create",
+        "lib/groupCommerce/inbox/actionSuggestions.js": "missing -> create",
+        "routes/groupCommerceInboxRoutes.js": "missing -> create (needs_route)",
+        "public/group-commerce-inbox.html": "missing -> create (needs_ui)",
+        "public/js/group-commerce-inbox.js": "missing -> create (needs_ui)",
+        "public/css/group-commerce-inbox.css": "missing -> create (needs_ui)",
+        "docs/GROUP_COMMERCE_INBOX.md": "missing -> create (needs_docs)",
+        "tests/smoke/groupCommerceInboxSmoke.js": "missing -> create (needs_test)"
+      },
+      "classification": {
+        "exists": ["group_commerce_core", "adapters", "catalog", "analyzer", "moderation", "qa_pack"],
+        "partially_exists": ["market_intelligence (catalog has min/max/latest price but no aggregated inbox)"],
+        "missing": ["normalized_inbox", "market_summary_endpoint", "action_suggestions_endpoint", "inbox_dashboard"],
+        "duplicate_risk": ["do NOT rebuild catalog/analyzer/adapters/relay; inbox only reads + normalizes"],
+        "safe_to_extend": true,
+        "needs_route": ["routes/groupCommerceInboxRoutes.js"],
+        "needs_ui": ["public/group-commerce-inbox.*"],
+        "needs_test": ["tests/smoke/groupCommerceInboxSmoke.js"],
+        "needs_docs": ["docs/GROUP_COMMERCE_INBOX.md"]
+      },
+      "duplicatesSkipped": [
+        "Did NOT rebuild Group Commerce OS core",
+        "Did NOT rebuild adapters (whatsapp/ecommerce/social/channel/ai/flow/reporting)",
+
+       "Did NOT rebuild catalog, analyzer, moderation, relay planner",
+       "Did NOT rebuild WhatsApp/ecommerce/social/CRM/n8n/Sheets/reporting systems",
+       "Did NOT create a second dashboard for the same purpose"
+   ],
+   "safety": {
+       "dryRunDefault": true,
+       "storeRawDefault": false,
+       "autoActionsDefault": false,
+       "piiMasking": ["phones", "emails"],
+       "noLiveActions": true
+   }
+}

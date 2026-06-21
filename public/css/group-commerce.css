@@ -1,0 +1,26 @@
+/* public/css/group-commerce.css — dark theme matching the dashboard */
+.gc-wrap{background:#0f1115;color:#e6e6e6;font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-
+height:100vh;margin:0;padding:24px}
+.gc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.gc-head h1{font-size:20px;margin:0}
+.gc-badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-
+weight:700;background:#3a2e12;color:#f0c674}
+.gc-grid{display:grid;grid-template-columns:280px 1fr 320px;gap:16px;align-items:start}
+@media (max-width:1100px){.gc-grid{grid-template-columns:1fr}}
+.gc-card{background:#181b22;border:1px solid #242833;border-radius:12px;padding:14px 16px}
+.gc-card h2{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:#8a8f98;margin:0 0 10px}
+.gc-list{list-style:none;margin:0;padding:0}
+.gc-list li{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border:1px solid
+#242833;border-radius:8px;margin-bottom:6px;cursor:pointer}
+.gc-list li:hover{border-color:#3a72d4}.gc-list li.active{border-color:#5fd38a}
+.gc-btn{background:#3a72d4;color:#fff;border:0;border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer}
+.gc-btn.secondary{background:#242833;color:#e6e6e6}
+.gc-row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.gc-in{flex:1;background:#0f1115;color:#e6e6e6;border:1px solid #242833;border-radius:8px;padding:8px 10px}
+.gc-area{width:100%;min-height:90px;background:#0f1115;color:#cfd3da;border:1px solid #242833;border-
+radius:10px;padding:12px;font:13px/1.5 ui-monospace,monospace;resize:vertical}
+.gc-out{white-space:pre-wrap;font:12px/1.5 ui-monospace,monospace;color:#cfd3da;background:#0f1115;border:1px solid
+#242833;border-radius:10px;padding:12px;max-height:300px;overflow:auto}
+.gc-muted{color:#8a8f98;font-size:12px;margin-top:8px}
+.gc-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+.gc-dot.on{background:#5fd38a}.gc-dot.off{background:#6b7180}

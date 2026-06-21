@@ -1,0 +1,33 @@
+  <!DOCTYPE html>
+  <html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Marketing Journeys</title><link rel="stylesheet" href="/css/marketing-journeys.css" /></head>
+  <body>
+    <header class="mj-header"><h1>Email + SMS Marketing Journeys</h1><span id="mj-badge" class="mj-badge">loading…</span>
+  </header>
+    <section class="mj-cards" id="mj-analytics"></section>
+    <nav class="mj-tabs">
+      <button data-tab="journeys" class="active">Journeys</button>
+      <button data-tab="editor">Editor</button>
+      <button data-tab="segment">Segments</button>
+      <button data-tab="email">Email</button>
+      <button data-tab="sms">SMS</button>
+      <button data-tab="consent">Consent</button>
+      <button data-tab="preview">Dry-run</button>
+    </nav>
+    <main>
+      <section id="tab-journeys" class="mj-tab"><div id="journey-list" class="mj-grid"></div></section>
+      <section id="tab-editor" class="mj-tab" hidden><h3 id="ed-title">Pick a journey</h3><pre id="editor"></pre></section>
+      <section id="tab-segment" class="mj-tab" hidden><select id="seg-select"></select><button id="seg-load">Preview
+  segment</button><div id="segment"></div></section>
+      <section id="tab-email" class="mj-tab" hidden><select id="em-select"></select><button id="em-load">Preview
+  email</button><div id="email-preview"></div></section>
+      <section id="tab-sms" class="mj-tab" hidden><select id="sm-select"></select><button id="sm-load">Preview SMS</button>
+  <div id="sms-preview"></div></section>
+      <section id="tab-consent" class="mj-tab" hidden><div class="mj-panel"><h3>Consent / Unsubscribe safety</h3><p
+  class="muted">Every email draft includes an unsubscribe link. Every SMS includes STOP opt-out. Non-consenting recipients
+  are suppressed on live send.</p><div id="consent-result"></div></div></section>
+      <section id="tab-preview" class="mj-tab" hidden><h3 id="pv-title">Run a journey dry-run</h3><div id="preview"></div>
+  </section>
+    </main>
+    <script src="/js/marketing-journeys.js"></script>
+  </body></html>

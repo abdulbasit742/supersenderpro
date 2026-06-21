@@ -1,0 +1,27 @@
+# BEGIN V13 LAUNCH/SUPPORT/FUNNEL/INBOX HOOKS
+# Append-only examples. Paste only if missing. Do not overwrite existing server.js.
+
+// Pilot Ops
+app.use('/api/pilot-ops', require('./routes/pilotOpsRoutes'));
+
+// Support Helpdesk + KB
+app.use('/api/support-helpdesk', require('./routes/supportHelpdeskRoutes'));
+
+// White Label + Reseller Portal
+app.use('/api/reseller-portal', require('./routes/resellerPortalRoutes'));
+
+// Guided Demo Journey
+app.use('/api/guided-demo', require('./routes/guidedDemoRoutes'));
+
+// Demo Sandbox
+app.use('/api/demo-sandbox', require('./routes/demoSandboxRoutes'));
+
+// Public SaaS Funnel
+app.use('/api/public-funnel', require('./routes/publicSaasFunnelRoutes'));
+
+// Shared Inbox 2.0
+app.use('/api/shared-inbox', require('./routes/sharedInboxRoutes'));
+
+// Omnichannel Inbox v1 (module owns /api/inbox + /inbox)
+try { require('./src/modules/inbox').register(app); } catch (e) { console.warn('[inbox] not mounted:', e && e.message); }
+# END V13 LAUNCH/SUPPORT/FUNNEL/INBOX HOOKS

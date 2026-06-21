@@ -1,0 +1,33 @@
+# Source text: SuperSender_Pro_SaaS_Billing_Usage_Metering_Plan_Limits_Preview_layer_dry-run_scan-first_-2026062110105992.txt
+# Target file: server.js
+# Apply manually as append-only hook; do not overwrite existing file.
+
+ // BEGIN SAAS BILLING HOOK
+ try {
+   const saasBillingRoutes = require('./routes/saasBillingRoutes');
+     app.use('/api/saas-billing', saasBillingRoutes);
+     app.get('/saas-billing', (req, res) => res.sendFile(require('path').join(__dirname, 'public', 'saas-billing.html')));
+ } catch (e) { console.error('[saas-billing] mount skipped:', e && e.message); }
+ // END SAAS BILLING HOOK
+
+
+public/index.html (nav link)
+ <!-- BEGIN SAAS BILLING HOOK -->
+ <a href="/saas-billing" class="nav-link" title="Billing & Usage (dry-run)">Billing & Usage <span style="font-
+ size:11px;color:#e3b341">DRY-RUN</span></a>
+ <!-- END SAAS BILLING HOOK -->
+
+
+package.json (scripts; add only)
+ "saas-billing:check": "node scripts/saas-billing-check.js",
+ "saas-billing:smoke": "node tests/smoke/saasBillingSmoke.js"
+
+
+.gitignore (append-only)
+ data/saas-billing.json
+ data/saas-billing.smoke.json
+ data/saas-billing.check.json
+ data/saas-billing-events.json
+
+  data/saas-billing-events.smoke.json
+  data/saas-billing-events.check.json

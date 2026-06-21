@@ -1,0 +1,92 @@
+# Source: SuperSender Pro — Gumloop Push-Later Handoff Bundle + Safe Patch Manifest + Merge Checklist-2026062110021315.pdf
+# Target: public/index.html
+# Apply manually as append-only hook if needed.
+
+  <!-- BEGIN GUMLOOP HANDOFF HOOK -->
+  <a href="/gumloop-handoff.html" class="nav-link" title="Gumloop push-later handoff">Gumloop Handoff</a>
+  <!-- END GUMLOOP HANDOFF HOOK -->
+
+
+
+
+FILE: package.json — add inside "scripts" (do not remove existing scripts).
+
+
+  {
+      "scripts": {
+          "_comment_gumloop_handoff_begin": "BEGIN GUMLOOP HANDOFF HOOK",
+          "gumloop-handoff:check": "node scripts/gumloop-handoff-check.js",
+          "gumloop-handoff:smoke": "node tests/smoke/gumloopHandoffSmoke.js",
+          "_comment_gumloop_handoff_end": "END GUMLOOP HANDOFF HOOK"
+      }
+  }
+
+
+
+Merge the two real script lines into your existing "scripts" block; the _comment_* keys are optional markers.
+
+
+
+FILE: .env.example — add placeholders only. Never add real secrets.
+
+
+  # BEGIN GUMLOOP HANDOFF HOOK
+  GUMLOOP_HANDOFF_ENABLED=true
+  GUMLOOP_HANDOFF_DRY_RUN=true
+
+  GUMLOOP_HANDOFF_NO_COMMIT=true
+  GUMLOOP_HANDOFF_NO_PUSH=true
+  GUMLOOP_HANDOFF_REDACT_PII=true
+  GUMLOOP_HANDOFF_REDACT_SECRETS=true
+  GUMLOOP_HANDOFF_EXCLUDE_RUNTIME_DATA=true
+  GUMLOOP_HANDOFF_STRICT=false
+
+
+  # Safe global defaults (only add if missing; do not duplicate existing keys)
+  DRY_RUN=true
+  REQUIRE_APPROVAL=true
+  ALLOW_LIVE_WHATSAPP=false
+  ALLOW_LIVE_EMAIL=false
+  ALLOW_LIVE_PAYMENTS=false
+  ALLOW_LIVE_WEBHOOKS=false
+  ALLOW_TENANT_WRITE=false
+  ALLOW_AUTH_WRITE=false
+  REDACT_PII=true
+  REDACT_SECRETS=true
+  # END GUMLOOP HANDOFF HOOK
+
+
+
+
+FILE: .gitignore — ensure these protections exist (do not remove existing entries).
+
+
+  # BEGIN GUMLOOP HANDOFF HOOK
+  .env
+  .env.*
+  !.env.example
+  node_modules/
+  logs/
+  uploads/
+  data/*.json
+  data/**/*.json
+  sessions/
+  .wa-auth/
+  .baileys-auth/
+  baileys_auth*/
+  browser-cache/
+  private-backups/
+  exports/
+  *.zip
+  artifacts/*raw*
+  artifacts/*private*
+  *token*
+  *secret*
+  *.pem
+  *.key
+  # END GUMLOOP HANDOFF HOOK
+
+
+
+Note: demo/ is intentionally NOT ignored (safe sample data meant to ship). Keep artifacts/gumloop_* reports out
+of commits if you prefer.

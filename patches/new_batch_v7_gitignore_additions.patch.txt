@@ -1,0 +1,12 @@
+# BEGIN NEW MODULE GITIGNORE ADDITIONS (v7)
+data/revenue.json
+data/margins.json
+data/funnel.json
+data/retention.json
+data/ltv.json
+data/churnRisk.json
+data/kb.json
+data/intentLog.json
+data/currency.json
+data/reconcile.json
+# END NEW MODULE GITIGNORE ADDITIONS

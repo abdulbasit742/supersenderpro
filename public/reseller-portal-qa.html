@@ -1,0 +1,87 @@
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reseller Portal QA</title>
+    <link rel="stylesheet" href="/css/reseller-portal-qa.css" />
+  </head>
+  <body class="rq-body">
+    <header class="rq-header">
+      <div>
+        <h1>Reseller Portal QA <span class="rq-muted">Partner Onboarding Readiness Doctor</span></h1>
+        <p class="rq-subtitle">Read-only QA on the existing Reseller Portal. Payouts, live messages, custom domains stay
+  off.</p>
+      </div>
+      <div class="rq-badges">
+        <span id="badge-dryrun" class="rq-badge">dry-run: ?</span>
+        <span id="badge-payout" class="rq-badge">payouts: ?</span>
+        <span id="badge-live" class="rq-badge">live-msgs: ?</span>
+      </div>
+    </header>
+
+    <div class="rq-warn-banner">
+      QA is read-only. It never enables payouts, live messages, custom domains, or tenant writes. PII leaks are reported as
+  blockers.
+    </div>
+
+
+    <section class="rq-overview">
+      <div class="rq-stat"><div class="rq-score" id="ov-score">--</div><div class="rq-stat-label">Readiness</div></div>
+      <div class="rq-stat"><div class="rq-stat-num" id="ov-status">--</div><div class="rq-stat-label">Status</div></div>
+      <div class="rq-stat"><div class="rq-stat-num rq-bad" id="ov-blockers">--</div><div class="rq-stat-
+  label">Blockers</div></div>
+      <div class="rq-stat"><div class="rq-stat-num rq-warn" id="ov-warnings">--</div><div class="rq-stat-
+  label">Warnings</div></div>
+    </section>
+
+    <section class="rq-badges-row" id="readiness-badges"></section>
+
+
+    <div class="rq-toolbar">
+      <button id="btn-doctor" class="rq-btn">Run full doctor</button>
+      <button id="btn-onboarding" class="rq-btn rq-btn-ghost">Onboarding</button>
+      <button id="btn-branding" class="rq-btn rq-btn-ghost">Branding</button>
+      <button id="btn-referrals" class="rq-btn rq-btn-ghost">Referrals</button>
+      <button id="btn-commissions" class="rq-btn rq-btn-ghost">Commissions</button>
+      <button id="btn-privacy" class="rq-btn rq-btn-ghost">Privacy</button>
+      <button id="btn-public" class="rq-btn rq-btn-ghost">Public page</button>
+      <button id="btn-assets" class="rq-btn rq-btn-ghost">Assets</button>
+
+ </div>
+
+ <main class="rq-grid">
+   <section class="rq-card rq-span2">
+     <h2>Partner Onboarding Checklist</h2>
+     <div id="checklist-body" class="rq-muted">Run onboarding.</div>
+   </section>
+   <section class="rq-card"><h2>Branding QA</h2><pre class="rq-pre" id="branding-out">Run branding.</pre></section>
+   <section class="rq-card"><h2>Referral QA</h2><pre class="rq-pre" id="referral-out">Run referrals.</pre></section>
+   <section class="rq-card"><h2>Commission QA</h2><pre class="rq-pre" id="commission-out">Run commissions.</pre>
+</section>
+   <section class="rq-card"><h2>Privacy QA</h2><pre class="rq-pre" id="privacy-out">Run privacy.</pre></section>
+   <section class="rq-card"><h2>Public Partner Page QA</h2><pre class="rq-pre" id="public-out">Run public page.</pre>
+</section>
+   <section class="rq-card"><h2>Partner Assets QA</h2><pre class="rq-pre" id="assets-out">Run assets.</pre></section>
+   <section class="rq-card rq-span2"><h2>Doctor Output</h2><pre class="rq-pre" id="doctor-out">Run full doctor.</pre>
+</section>
+   <section class="rq-card rq-span2">
+     <h2>Docs</h2><ul class="rq-list">
+         <li><a href="/docs/RESELLER_PORTAL_QA.md">Reseller Portal QA</a></li>
+         <li><a href="/docs/PARTNER_ONBOARDING_READINESS.md">Partner Onboarding Readiness</a></li>
+         <li><a href="/docs/WHITE_LABEL_QA.md">White-Label QA</a></li>
+         <li><a href="/docs/REFERRAL_LINK_QA.md">Referral Link QA</a></li>
+         <li><a href="/docs/COMMISSION_PREVIEW_QA.md">Commission Preview QA</a></li>
+         <li><a href="/docs/RESELLER_PRIVACY_ISOLATION.md">Privacy Isolation</a></li>
+       <li><a href="/docs/PARTNER_LAUNCH_CHECKLIST.md">Partner Launch Checklist</a></li>
+     </ul>
+   </section>
+ </main>
+
+
+ <script src="/js/reseller-portal-qa.js"></script>
+</body>
+</html>
+
+public/js/reseller-portal-qa.js + public/css/reseller-portal-
+qa.css

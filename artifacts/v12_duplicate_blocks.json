@@ -1,0 +1,530 @@
+[
+  [
+    "routes/manufacturingCenterRoutes.js",
+    "SuperSender Pro \u2014 Manufacturing + BOM + Production Costing Center (code files)-2026062109593022.pdf",
+    162,
+    "replaced_by_longer",
+    "SuperSender Pro \u2014 Manufacturing + BOM + Production Costing Center (code files)-2026062109593022.pdf",
+    9472
+  ],
+  [
+    "routes/taxComplianceRoutes.js",
+    "SuperSender Pro \u2014 Tax - GST - VAT + Financial Compliance Reports (code files)-2026062109592052.pdf",
+    164,
+    "replaced_by_longer",
+    "SuperSender Pro \u2014 Tax - GST - VAT + Financial Compliance Reports (code files)-2026062109592052.pdf",
+    4873
+  ],
+  [
+    "public/index.html",
+    "SuperSender Pro \u2014 Tax - GST - VAT + Financial Compliance Reports (code files)-2026062109592052.pdf",
+    1114,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Manufacturing + BOM + Production Costing Center (code files)-2026062109593022.pdf",
+    1318
+  ],
+  [
+    "routes/cashbookCenterRoutes.js",
+    "SuperSender Pro \u2014 Cashbook + Bank Reconciliation + Payment Matching (code files)-2026062109590930.pdf",
+    158,
+    "replaced_by_longer",
+    "SuperSender Pro \u2014 Cashbook + Bank Reconciliation + Payment Matching (code files)-2026062109590930.pdf",
+    5158
+  ],
+  [
+    "public/index.html",
+    "SuperSender Pro \u2014 Cashbook + Bank Reconciliation + Payment Matching (code files)-2026062109590930.pdf",
+    1100,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Manufacturing + BOM + Production Costing Center (code files)-2026062109593022.pdf",
+    1318
+  ],
+  [
+    "public/index.html",
+    "SuperSender Pro \u2014 Admin Auth + Route Guard + Secure Session (code files)-2026062109584351.pdf",
+    1237,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Manufacturing + BOM + Production Costing Center (code files)-2026062109593022.pdf",
+    1318
+  ],
+  [
+    "scripts/group-commerce-check.js",
+    "SuperSender Pro \u2014 Group Commerce OS QA Pack (code files)-2026062109555942.pdf",
+    24,
+    "replaced_by_longer",
+    "SuperSender Pro \u2014 Group Commerce OS QA Pack (code files)-2026062109555942.pdf",
+    8872
+  ],
+  [
+    "tests/smoke/groupCommerceSmoke.js",
+    "SuperSender Pro \u2014 Group Commerce OS QA Pack (code files)-2026062109555942.pdf",
+    24,
+    "replaced_by_longer",
+    "SuperSender Pro \u2014 Group Commerce OS QA Pack (code files)-2026062109555942.pdf",
+    7520
+  ],
+  [
+    "lib/businessSetup/store.js",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    18,
+    "replaced_by_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    2775
+  ],
+  [
+    "lib/businessSetup/profileManager.js",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    18,
+    "replaced_by_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    2871
+  ],
+  [
+    "lib/businessSetup/industryPresets.js",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    18,
+    "replaced_by_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    9185
+  ],
+  [
+    "lib/businessSetup/presetRegistry.js",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    22,
+    "replaced_by_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    1169
+  ],
+  [
+    "lib/businessSetup/setupChecklist.js",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    18,
+    "replaced_by_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    5567
+  ],
+  [
+    "lib/businessSetup/readinessScoring.js",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    18,
+    "replaced_by_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    3467
+  ],
+  [
+    "lib/businessSetup/safetyGuard.js",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    22,
+    "replaced_by_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    1373
+  ],
+  [
+    "lib/businessSetup/presetApplier.js",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    22,
+    "replaced_by_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    2529
+  ],
+  [
+    "routes/businessSetupRoutes.js",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    18,
+    "replaced_by_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    3575
+  ],
+  [
+    "scripts/business-setup-check.js",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    38,
+    "replaced_by_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    4578
+  ],
+  [
+    "tests/smoke/businessSetupSmoke.js",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    38,
+    "replaced_by_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    4010
+  ],
+  [
+    "package.json",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    1844,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Group Commerce OS QA Pack (code files)-2026062109555942.pdf",
+    2022
+  ],
+  [
+    "lib/businessSetup/store.js",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109552011.pdf",
+    18,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    2775
+  ],
+  [
+    "lib/businessSetup/store.js",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109552011.pdf",
+    2775,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    2775
+  ],
+  [
+    "lib/businessSetup/profileManager.js",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109552011.pdf",
+    18,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    2871
+  ],
+  [
+    "lib/businessSetup/profileManager.js",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109552011.pdf",
+    2871,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    2871
+  ],
+  [
+    "lib/businessSetup/industryPresets.js",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109552011.pdf",
+    18,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    9185
+  ],
+  [
+    "lib/businessSetup/industryPresets.js",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109552011.pdf",
+    9185,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    9185
+  ],
+  [
+    "lib/businessSetup/presetRegistry.js",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109552011.pdf",
+    22,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    1169
+  ],
+  [
+    "lib/businessSetup/presetRegistry.js",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109552011.pdf",
+    1169,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    1169
+  ],
+  [
+    "lib/businessSetup/recommendedPlaybooks.js",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109552011.pdf",
+    4454,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    4454
+  ],
+  [
+    "lib/businessSetup/recommendedAgents.js",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109552011.pdf",
+    1646,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    1646
+  ],
+  [
+    "lib/businessSetup/recommendedFlows.js",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109552011.pdf",
+    419,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    419
+  ],
+  [
+    "lib/businessSetup/setupChecklist.js",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109552011.pdf",
+    18,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    5567
+  ],
+  [
+    "lib/businessSetup/setupChecklist.js",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109552011.pdf",
+    5567,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    5567
+  ],
+  [
+    "lib/businessSetup/readinessScoring.js",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109552011.pdf",
+    18,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    3467
+  ],
+  [
+    "lib/businessSetup/readinessScoring.js",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109552011.pdf",
+    3467,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    3467
+  ],
+  [
+    "lib/businessSetup/safetyGuard.js",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109552011.pdf",
+    22,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    1373
+  ],
+  [
+    "lib/businessSetup/safetyGuard.js",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109552011.pdf",
+    1373,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    1373
+  ],
+  [
+    "lib/businessSetup/presetApplier.js",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109552011.pdf",
+    22,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    2529
+  ],
+  [
+    "lib/businessSetup/presetApplier.js",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109552011.pdf",
+    2529,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    2529
+  ],
+  [
+    "routes/businessSetupRoutes.js",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109552011.pdf",
+    18,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    3575
+  ],
+  [
+    "routes/businessSetupRoutes.js",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109552011.pdf",
+    3575,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    3575
+  ],
+  [
+    "public/business-setup.html",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109552011.pdf",
+    2558,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    2558
+  ],
+  [
+    "public/js/business-setup.js",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109552011.pdf",
+    4655,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    4655
+  ],
+  [
+    "public/css/business-setup.css",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109552011.pdf",
+    2903,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    2903
+  ],
+  [
+    "scripts/business-setup-check.js",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109552011.pdf",
+    38,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    4578
+  ],
+  [
+    "scripts/business-setup-check.js",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109552011.pdf",
+    4578,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    4578
+  ],
+  [
+    "tests/smoke/businessSetupSmoke.js",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109552011.pdf",
+    38,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    4010
+  ],
+  [
+    "tests/smoke/businessSetupSmoke.js",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109552011.pdf",
+    4010,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    4010
+  ],
+  [
+    "docs/BUSINESS_SETUP_WIZARD.md",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109552011.pdf",
+    1318,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    1318
+  ],
+  [
+    "docs/BUSINESS_PRESETS.md",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109552011.pdf",
+    1268,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    1268
+  ],
+  [
+    "docs/BUSINESS_SETUP_READINESS.md",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109552011.pdf",
+    884,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    884
+  ],
+  [
+    "docs/BUSINESS_SETUP_SAFETY.md",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109552011.pdf",
+    1185,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    1185
+  ],
+  [
+    "artifacts/business_setup_inventory.json",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109552011.pdf",
+    3025,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    3025
+  ],
+  [
+    "docs/BUSINESS_SETUP_GAP_REPORT.md",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109552011.pdf",
+    1949,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    1949
+  ],
+  [
+    "package.json",
+    "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109552011.pdf",
+    1844,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Group Commerce OS QA Pack (code files)-2026062109555942.pdf",
+    2022
+  ],
+  [
+    "lib/agentDeployment/store.js",
+    "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    18,
+    "replaced_by_longer",
+    "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    2844
+  ],
+  [
+    "lib/agentDeployment/agentRegistry.js",
+    "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    18,
+    "replaced_by_longer",
+    "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    3477
+  ],
+  [
+    "lib/agentDeployment/channelTargets.js",
+    "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    18,
+    "replaced_by_longer",
+    "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    2201
+  ],
+  [
+    "lib/agentDeployment/safetyGuard.js",
+    "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    18,
+    "replaced_by_longer",
+    "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    2895
+  ],
+  [
+    "lib/agentDeployment/deploymentRules.js",
+    "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    18,
+    "replaced_by_longer",
+    "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    3858
+  ],
+  [
+    "lib/agentDeployment/actionDrafts.js",
+    "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    18,
+    "replaced_by_longer",
+    "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    4631
+  ],
+  [
+    "lib/agentDeployment/flowNodes.js",
+    "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    18,
+    "replaced_by_longer",
+    "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    3093
+  ],
+  [
+    "routes/agentDeploymentRoutes.js",
+    "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    18,
+    "replaced_by_longer",
+    "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    4945
+  ],
+  [
+    "scripts/agent-deployment-check.js",
+    "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    38,
+    "replaced_by_longer",
+    "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    5039
+  ],
+  [
+    "tests/smoke/agentDeploymentSmoke.js",
+    "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    38,
+    "replaced_by_longer",
+    "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    4536
+  ],
+  [
+    "package.json",
+    "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    1999,
+    "kept_existing_longer",
+    "SuperSender Pro \u2014 Group Commerce OS QA Pack (code files)-2026062109555942.pdf",
+    2022
+  ]
+]

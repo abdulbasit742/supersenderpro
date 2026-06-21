@@ -1,0 +1,45 @@
+  {
+       "generatedBy": "gumloop-handoff-scan",
+       "note": "Scan of THIS ClickUp workspace only. No Manus/Gumloop changes assumed.",
+       "areas": [
+         { "path": "server.js", "status": ["exists", "safe_to_copy", "route_mount_needed", "conflict_risk"] },
+         { "path": "package.json", "status": ["exists", "safe_to_copy", "package_script_needed", "conflict_risk"] },
+         { "path": "package-lock.json", "status": ["partial", "safe_to_copy", "conflict_risk"], "note": "copy only if
+  intentionally changed." },
+      { "path": ".env.example", "status": ["exists", "safe_to_copy", "env_placeholder_needed"] },
+         { "path": ".env", "status": ["must_not_copy", "secret_risk"] },
+         { "path": ".gitignore", "status": ["exists", "safe_to_copy", "gitignore_protection_needed", "safe_fix_recommended"]
+  },
+         { "path": "README.md", "status": ["partial", "safe_to_copy", "conflict_risk"] },
+         { "path": "lib/", "status": ["exists", "safe_to_copy"] },
+         { "path": "lib/gumloopHandoff/", "status": ["missing", "safe_to_copy"], "note": "new + isolated; built by this
+  layer." },
+      { "path": "routes/", "status": ["exists", "safe_to_copy"] },
+         { "path": "routes/gumloopHandoffRoutes.js", "status": ["missing", "safe_to_copy", "route_mount_needed"] },
+         { "path": "public/", "status": ["exists", "safe_to_copy"] },
+         { "path": "public/index.html", "status": ["exists", "safe_to_copy", "dashboard_link_needed", "conflict_risk"] },
+         { "path": "public/gumloop-handoff.*", "status": ["missing", "safe_to_copy", "dashboard_link_needed"] },
+         { "path": "docs/", "status": ["exists", "safe_to_copy"] },
+         { "path": "scripts/", "status": ["exists", "safe_to_copy"] },
+         { "path": "tests/", "status": ["exists", "safe_to_copy"] },
+         { "path": "demo/", "status": ["exists", "safe_to_copy"], "note": "synthetic sample data, intentionally shippable." },
+      { "path": "artifacts/", "status": ["exists", "partial"], "note": "*.md safe; *.json safe only if redacted + non-
+  private." },
+         { "path": "data/ logs/ uploads/", "status": ["must_not_copy", "runtime_data_risk"] },
+         { "path": "node_modules/", "status": ["must_not_copy", "duplicate_risk"], "note": "reinstall via npm install." },
+      { "path": "sessions/ .wa-auth/ .baileys-auth/ baileys_auth*/", "status": ["must_not_copy", "secret_risk",
+  "live_action_risk"] },
+         { "path": "private-backups/ exports/", "status": ["must_not_copy"] }
+       ],
+       "existingSystems": [
+         "localExport", "localDemo", "mockGateway", "guidedDemo", "localRuntime"
+       ],
+       "duplicatesSkipped": [
+         "No existing Gumloop handoff/merge-plan/patch-manifest layer found; this is the first.",
+         "localExport packages source ZIPs (different concern); not rebuilt."
+       ],
+
+      "secretRisk": "mitigated_exclusion_plus_copy_safety_scan",
+      "runtimeDataRisk": "mitigated_data_logs_uploads_sessions_excluded",
+      "liveActionRisk": "mitigated_dry_run_defaults_preserved"
+  }

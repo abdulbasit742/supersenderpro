@@ -1,0 +1,56 @@
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SuperSender Pro — PhysiXplore Catalog</title>
+    <style>
+      :root{--bg:#0e1116;--card:#171c24;--line:#232a35;--fg:#e6edf3;--mut:#8b97a7;--accent:#6aa6ff;}
+      *{box-sizing:border-box}body{margin:0;font-family:system-ui,Segoe UI,Roboto,sans-serif;background:var(--
+  bg);color:var(--fg)}
+      header{padding:24px 32px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-
+  items:center}
+      header h1{font-size:22px;margin:0}.badge{font-size:13px;font-weight:600;padding:4px 12px;border-
+  radius:999px;background:rgba(106,166,255,.15);color:var(--accent)}
+      main{padding:32px;max-width:1100px;margin:0 auto}
+      .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+      .mod{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;text-
+  decoration:none;color:var(--fg)}
+      .mod:hover{border-color:var(--accent)}
+      .mod .id{font-size:12px;color:var(--accent);font-weight:700}
+      .mod .topic{font-weight:700;margin:6px 0 4px}
+      .mod .studio{font-size:13px;color:var(--mut)}
+      .bar{margin-bottom:20px;color:var(--mut);font-size:14px}
+      code{background:#0b0f14;border:1px solid var(--line);border-radius:6px;padding:2px 6px}
+    </style>
+  </head>
+  <body>
+    <header><h1>   🔬 PhysiXplore Catalog</h1><span class="badge" id="badge">SNAPSHOT</span></header>
+    <main>
+      <p class="bar">Pulled from qvlabs.space. On WhatsApp, customers type <code>!sims</code> to list and <code>!sim
+  4</code> for a module. <span id="meta"></span></p>
+      <div class="grid" id="grid">Loading…</div>
+    </main>
+    <script>
+    (function(){
+      function esc(v){return String(v==null?'':v).replace(/&/g,'&').replace(/</g,'<');}
+      fetch('/api/physixplore/modules').then(function(r){return r.json();}).then(function(d){
+        var mods=(d&&d.modules)||[];
+        if(d&&d.refresh&&d.refresh.live){document.getElementById('badge').textContent='LIVE';}
+        document.getElementById('meta').textContent=mods.length+' modules · source: '+
+  ((d&&d.refresh&&d.refresh.source)||'snapshot');
+        document.getElementById('grid').innerHTML=mods.map(function(m){
+          return '<a class="mod" href="https://qvlabs.space/sims/'+esc(m.slug)+'" target="_blank" rel="noopener">'+
+            '<div class="id">#'+m.id+'</div><div class="topic">'+esc(m.topic)+'</div>'+
+            '<div class="studio">'+esc(m.studio)+'</div></a>';
+        }).join('');
+      }).catch(function(){document.getElementById('grid').textContent='offline';});
+
+
+      })();
+    </script>
+  </body>
+  </html>
+
+
+
+Apply only if missing. Append-only, marked. No rewrites, no commit/push.

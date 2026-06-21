@@ -1,0 +1,12 @@
+'use strict';
+const assert = require('assert');
+const componentTypes = require('../../lib/whatsappFlows/componentTypes');
+const defaultFlows = require('../../lib/whatsappFlows/defaultFlows');
+const validator = require('../../lib/whatsappFlows/flowValidator');
+const runner = require('../../lib/whatsappFlows/flowRunnerPreview');
+assert.ok(componentTypes.isValid('TextInput'));
+defaultFlows.seeds().forEach((f) => assert.ok(validator.validate(f).ok, f.id));
+const order = defaultFlows.seeds().find((f) => f.id === 'flow_order');
+const r = runner.run(order, { screenId: 'PRODUCT', answers: { product: 'wa_pro_1m', quantity: 1 } });
+assert.strictEqual(r.advanced, true);
+console.log(JSON.stringify({ ok: true, dryRun: true, smoke: 'whatsapp-flows' }, null, 2));

@@ -1,0 +1,17 @@
+# Source: SuperSender Pro — Supplier Portal + Vendor Self-Service Status Center (Full build_ Foundation + Previews + Checks)-2026062110002657.pdf
+# Target: .gitignore
+# Apply manually as append-only hook if needed.
+
+  # BEGIN SUPPLIER PORTAL HOOK
+  data/supplier-portal.json
+  artifacts/supplier_portal_*
+  # END SUPPLIER PORTAL HOOK
+
+
+
+
+Route / nav dedup verification (run locally before mounting)
+  # Each should print 0 (clean repo, before paste) or 1 (after paste). Never 2+.
+  grep -c "require('./routes/supplierPortalRoutes')" server.js
+  grep -c "app.use('/api/supplier-portal'" server.js
+  grep -c "/supplier-portal.html" public/index.html

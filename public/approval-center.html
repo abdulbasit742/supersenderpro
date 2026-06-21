@@ -1,0 +1,95 @@
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Approval Center — SuperSender Pro</title>
+    <link rel="stylesheet" href="/css/approval-center.css" />
+  </head>
+  <body>
+    <header class="ap-header">
+      <div><h1>Approval Workflow + Maker-Checker</h1><span class="ap-sub">change request control center</span></div>
+      <div class="ap-header-right">
+        <span class="badge badge-dry">DRY-RUN</span>
+        <span class="badge badge-ok">no real mutation</span>
+        <span class="badge badge-ok">no payment</span>
+        <span class="badge badge-ok">no live sends</span>
+      </div>
+    </header>
+
+    <section class="ap-stats">
+      <div class="card kpi"><span class="kpi-num" id="kTotal">–</span><span>Requests</span></div>
+      <div class="card kpi"><span class="kpi-num warn" id="kPending">–</span><span>Pending</span></div>
+      <div class="card kpi"><span class="kpi-num crit" id="kHigh">–</span><span>High risk</span></div>
+      <div class="card kpi"><span class="kpi-num good" id="kApproved">–</span><span>Approved</span></div>
+      <div class="card kpi"><span class="kpi-num" id="kRejected">–</span><span>Rejected</span></div>
+    </section>
+
+
+    <nav class="ap-tabs">
+      <button class="tab active" data-tab="queue">Approval queue</button>
+      <button class="tab" data-tab="create">New change request</button>
+      <button class="tab" data-tab="policies">Policies</button>
+      <button class="tab" data-tab="audit">Audit</button>
+    </nav>
+
+    <main>
+      <section class="panel active" id="tab-queue">
+        <div class="card full"><div class="card-head"><h2>Requests</h2><div><select id="statusFilter"><option value="">all
+  statuses</option></select> <select id="riskFilter"><option value="">all risk</option><option>low</option>
+  <option>medium</option><option>high</option><option>critical</option></select> <button id="refreshBtn"
+  class="mini">Refresh</button></div></div><table class="ap-table" id="reqTable"><thead><tr><th>Title</th><th>Type</th>
+  <th>Source</th><th>Risk</th><th>Requested by</th><th>Status</th><th></th></tr></thead><tbody></tbody></table></div>
+        <div class="ap-grid">
+          <section class="card"><h2>Request detail</h2><pre id="reqDetail" class="ap-pre">Select a request…</pre><div
+  id="reqActions"></div></section>
+          <section class="card"><h2>Before / after</h2><div class="ba-compare"><div><h3>Before</h3><pre id="beforeBox"
+  class="ap-pre"></pre></div><div><h3>After</h3><pre id="afterBox" class="ap-pre"></pre></div></div></section>
+        </div>
+
+
+      </section>
+
+      <section class="panel" id="tab-create">
+        <div class="card">
+          <h2>New change request (preview)</h2>
+            <form id="crForm" class="ap-form">
+              <input name="title" placeholder="title" />
+              <select name="requestType"></select>
+              <input name="sourceModule" placeholder="source module (e.g. pricing)" />
+              <input name="requestedBy" placeholder="requested by (maker)" />
+              <input name="beforePrice" type="number" placeholder="before value/price" />
+              <input name="afterPrice" type="number" placeholder="after value/price" />
+              <input name="reason" placeholder="reason" />
+            <div class="ap-actions"><button type="button" id="previewBtn">Preview</button><button type="submit">Submit for
+  approval</button></div>
+            </form>
+            <pre id="crResult" class="ap-pre"></pre>
+        </div>
+      </section>
+
+
+      <section class="panel" id="tab-policies">
+        <div class="card full"><h2>Approval policies</h2><table class="ap-table" id="polTable"><thead><tr><th>Name</th>
+  <th>Request type</th><th>Required role</th><th>Approvals</th><th>Severity</th><th>On</th></tr></thead><tbody></tbody>
+  </table></div>
+        <div class="card"><h2>Evaluate policy preview</h2><form id="evalForm" class="ap-form inline"><select
+  name="requestType" id="evalType"></select><input name="value" type="number" placeholder="value" /><input name="changePct"
+  type="number" placeholder="change %" /><button type="submit">Evaluate</button></form><pre id="evalResult" class="ap-pre">
+  </pre></div>
+      </section>
+
+
+      <section class="panel" id="tab-audit">
+        <div class="card full"><div class="card-head"><h2>Audit preview</h2><button id="auditRefresh"
+  class="mini">Refresh</button></div><table class="ap-table" id="auditTable"><thead><tr><th>When</th><th>Event</th>
+  <th>Details</th></tr></thead><tbody></tbody></table></div>
+      </section>
+    </main>
+
+
+    <footer class="ap-footer">Approval Center · dry-run · no real mutation · no payment · no stock change · no live sends ·
+  maker-checker enforced</footer>
+    <script src="/js/approval-center.js"></script>
+  </body>
+  </html>

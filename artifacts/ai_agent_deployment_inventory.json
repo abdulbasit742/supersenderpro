@@ -1,0 +1,39 @@
+  {
+       "generatedAt": "2026-06-20",
+       "note": "Seed inventory from workspace scan. Re-run scripts/agent-deployment-check.js locally to refresh.",
+       "existingSystems": [
+         { "area": "AI provider modules", "status": "exists", "reuse": "safe_to_extend" },
+      { "area": "Flow Studio / automation builder (lib/superflow)", "status": "exists", "reuse": "safe_to_extend", "note":
+  "append-only trigger/action registry" },
+        { "area": "Marketplace Intelligence", "status": "exists", "reuse": "safe_to_extend" },
+        { "area": "Group Commerce OS", "status": "partially_exists", "reuse": "safe_to_extend", "note": "build in progress"
+  },
+        { "area": "Omnichannel inbox", "status": "exists", "reuse": "safe_to_extend" },
+        { "area": "Catalog & checkout", "status": "exists", "reuse": "safe_to_extend" },
+        { "area": "Compliance & opt-out", "status": "exists", "reuse": "safe_to_extend" },
+        { "area": "WABA / queue / analytics / backup", "status": "exists", "reuse": "safe_to_extend" },
+        { "area": "Voice AI Command Center", "status": "unknown", "reuse": "safe_to_extend", "note": "not found in scan;
+  treated as target if present" },
+      { "area": "Channel Automation Command Center", "status": "partially_exists", "reuse": "safe_to_extend", "note":
+  "referenced in backlog/adapters" },
+      { "area": "Admin auth / RBAC", "status": "unknown" },
+        { "area": "Launch Test Center", "status": "exists" },
+        { "area": "Security scan", "status": "exists" }
+       ],
+       "newCoordinationLayer": {
+        "area": "AI Agent Deployment Center",
+        "status": "missing_before_this_pack",
+        "files": [
+          "lib/agentDeployment/store.js", "lib/agentDeployment/agentRegistry.js",
+            "lib/agentDeployment/deploymentRules.js", "lib/agentDeployment/channelTargets.js",
+            "lib/agentDeployment/safetyGuard.js", "lib/agentDeployment/actionDrafts.js",
+            "lib/agentDeployment/flowNodes.js", "routes/agentDeploymentRoutes.js",
+            "public/agent-deployment.html", "public/js/agent-deployment.js", "public/css/agent-deployment.css",
+            "scripts/agent-deployment-check.js", "tests/smoke/agentDeploymentSmoke.js",
+            "docs/AI_AGENT_DEPLOYMENT_CENTER.md", "docs/AI_AGENT_DEPLOYMENT_SAFETY.md",
+            "docs/AI_AGENT_DEPLOYMENT_FLOW_STUDIO.md", "docs/AI_AGENT_DEPLOYMENT_TARGETS.md"
+        ]
+       },
+       "duplicateRisk": [],
+       "liveActionRisk": "none_by_default_all_gated"
+  }

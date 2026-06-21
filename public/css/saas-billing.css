@@ -1,47 +1,47 @@
-/* public/css/saas-billing.css — SaaS Billing Command Center dashboard */
-:root{--bg:#0b1020;--panel:#121a30;--panel2:#0f1729;--line:#23304f;--txt:#e6ecf8;--mut:#93a4c7;--acc:#5b8cff;--ok:#34d399;--warn:#fbbf24;--bad:#f87171}
-*{box-sizing:border-box}
-body{margin:0;font-family:Inter,Segoe UI,system-ui,Arial,sans-serif;background:linear-gradient(180deg,#0b1020,#0a0f1d);color:var(--txt)}
-.sb-header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 24px;border-bottom:1px solid var(--line);background:rgba(18,26,48,.6);backdrop-filter:blur(6px);position:sticky;top:0;z-index:5;flex-wrap:wrap}
-.sb-brand{display:flex;align-items:center;gap:12px}
-.sb-logo{font-size:26px}
-.sb-header h1{font-size:18px;margin:0}
-.sb-sub{margin:2px 0 0;color:var(--mut);font-size:12px}
-.sb-pill{padding:8px 16px;border-radius:999px;font-weight:700;font-size:12px;background:rgba(52,211,153,.14);color:#86efac;border:1px solid rgba(52,211,153,.35)}
-.sb-pill.live{background:rgba(248,113,113,.15);color:#fca5a5;border-color:rgba(248,113,113,.4)}
-.sb-main{max-width:1200px;margin:0 auto;padding:22px}
-.sb-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
-.sb-tab{background:var(--panel2);border:1px solid var(--line);color:var(--mut);padding:9px 14px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:600}
-.sb-tab.active{background:var(--acc);color:#fff;border-color:var(--acc)}
-.sb-section{display:none;animation:fade .2s ease}
-.sb-section.active{display:block}
-@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1}}
-.sb-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:18px}
-.sb-stat{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
-.sb-stat .n{font-size:26px;font-weight:800}
-.sb-stat .l{color:var(--mut);font-size:12px;margin-top:4px}
-.sb-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px}
-.sb-card h2{font-size:15px;margin:0 0 14px}
-.sb-table-wrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
-th{color:var(--mut);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.4px}
-.chip{display:inline-block;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700}
-.chip.ok{background:rgba(52,211,153,.15);color:#86efac}
-.chip.warn{background:rgba(251,191,36,.15);color:#fcd34d}
-.chip.bad{background:rgba(248,113,113,.15);color:#fca5a5}
-.chip.mut{background:rgba(147,164,199,.12);color:var(--mut)}
-.bar{height:7px;border-radius:6px;background:#1c2742;overflow:hidden;min-width:80px}
-.bar>i{display:block;height:100%;background:var(--acc)}
-.bar.warn>i{background:var(--warn)}.bar.bad>i{background:var(--bad)}
-.row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
-.field{display:flex;flex-direction:column;gap:4px;min-width:150px}
-.field label{font-size:11px;color:var(--mut)}
-input,select{background:var(--panel2);border:1px solid var(--line);color:var(--txt);padding:9px 10px;border-radius:9px;font-size:13px;width:100%}
-.btn{background:var(--acc);border:none;color:#fff;padding:10px 16px;border-radius:9px;cursor:pointer;font-weight:700;font-size:13px}
-.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--txt)}
-.muted{color:var(--mut);font-size:12px}
-pre{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px;overflow:auto;font-size:12px;max-height:340px}
-.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:13px}
-.kv b{color:var(--mut);font-weight:600}
-.banner{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);color:#fcd34d;padding:10px 14px;border-radius:10px;font-size:12px;margin-bottom:16px}
+ /* SaaS Billing — dark theme, scoped with sb- prefix. */
+ :root { --sb-bg:#0d1117; --sb-panel:#161b22; --sb-panel-2:#1c232d; --sb-border:#30363d; --sb-text:#e6edf3; --sb-
+ muted:#8b949e; --sb-accent:#e3b341; --sb-accent-dim:#c99a2e; --sb-bad:#f85149; --sb-warn:#d29922; --sb-ok:#3fb950; }
+ * { box-sizing:border-box; }
+ .sb-body { margin:0; background:var(--sb-bg); color:var(--sb-text); font-family:-apple-system,BlinkMacSystemFont,'Segoe
+ UI',Roboto,Helvetica,Arial,sans-serif; line-height:1.5; }
+ .sb-header { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; padding:24px 28px; border-
+ bottom:1px solid var(--sb-border); background:var(--sb-panel); }
+ .sb-header h1 { margin:0; font-size:22px; } .sb-subtitle { margin:6px 0 0; color:var(--sb-muted); font-size:13px; } .sb-
+ muted { color:var(--sb-muted); }
+ .sb-badge { font-size:12px; padding:5px 12px; border-radius:999px; border:1px solid var(--sb-border); background:var(--
+ sb-panel-2); } .sb-badge-on { border-color:#2f5a3a; color:var(--sb-ok); }
+ .sb-overview { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; padding:16px 28px 0; }
+ .sb-stat { background:var(--sb-panel); border:1px solid var(--sb-border); border-radius:10px; padding:14px; text-
+ align:center; }
+ .sb-stat-num { font-size:22px; font-weight:700; color:var(--sb-accent); } .sb-stat-label { font-size:12px; color:var(--
+ sb-muted); margin-top:4px; } .sb-bad { color:var(--sb-bad); } .sb-warn { color:var(--sb-warn); }
+ .sb-toolbar { display:flex; gap:10px; padding:16px 28px 0; }
+ .sb-btn { background:var(--sb-accent); color:#2a1d04; border:none; border-radius:8px; padding:9px 14px; font-size:13px;
+ font-weight:600; cursor:pointer; } .sb-btn:hover { background:var(--sb-accent-dim); } .sb-btn-ghost {
+ background:transparent; color:var(--sb-text); border:1px solid var(--sb-border); } .sb-btn-tiny { padding:6px 12px; font-
+ size:12px; }
+ .sb-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; padding:20px 28px 40px; } .sb-span2 { grid-
+ column:1 / -1; }
+ .sb-card { background:var(--sb-panel); border:1px solid var(--sb-border); border-radius:12px; padding:18px 20px; } .sb-
+ card h2 { margin:0 0 12px; font-size:15px; font-weight:600; }
+ .sb-cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:10px; }
+
+.sb-plan { background:var(--sb-panel-2); border:1px solid var(--sb-border); border-radius:10px; padding:12px; } .sb-plan-
+name { font-weight:600; font-size:13px; } .sb-plan-price { color:var(--sb-accent); font-size:13px; margin:4px 0; }
+.sb-meter { display:flex; align-items:center; gap:10px; margin:6px 0; font-size:13px; } .sb-meter-name { width:140px;
+color:var(--sb-muted); } .sb-meter-val { width:130px; text-align:right; font-family:ui-monospace,Menlo,monospace; font-
+size:12px; }
+.sb-bar { flex:1; height:8px; background:var(--sb-panel-2); border:1px solid var(--sb-border); border-radius:999px;
+overflow:hidden; } .sb-bar-fill { height:100%; background:var(--sb-ok); } .sb-bar-near { background:var(--sb-warn); }
+.sb-bar-over { background:var(--sb-bad); }
+.sb-form { display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap; } .sb-form select, .sb-form input {
+background:var(--sb-panel-2); border:1px solid var(--sb-border); color:var(--sb-text); border-radius:8px; padding:7px
+10px; font-size:13px; }
+.sb-table { width:100%; border-collapse:collapse; font-size:13px; } .sb-table th, .sb-table td { text-align:left;
+padding:8px 10px; border-bottom:1px solid var(--sb-border); } .sb-table th { color:var(--sb-muted); font-weight:600; }
+.sb-pre { background:var(--sb-panel-2); border:1px solid var(--sb-border); border-radius:8px; padding:14px; font-
+size:12px; overflow:auto; max-height:280px; font-family:ui-monospace,Menlo,monospace; }
+@media (max-width:1000px){ .sb-grid{ grid-template-columns:1fr; } .sb-overview{ grid-template-columns:repeat(2,1fr); } }
+
+scripts/saas-billing-check.js +
+tests/smoke/saasBillingSmoke.js + HOOKS (append-only)

@@ -1,0 +1,4 @@
+ <!-- BEGIN GROUP COMMERCE OS HOOK -->
+ <a href="/group-commerce" class="nav-link" title="Group Commerce OS (dry-run)">Group Commerce OS <span style="font-
+ size:11px;color:#f0c674">DRY-RUN</span></a>
+ <!-- END GROUP COMMERCE OS HOOK -->

@@ -1,0 +1,577 @@
+[
+  {
+    "path": "lib/manufacturingCenter/redactor.js",
+    "source": "SuperSender Pro \u2014 Manufacturing + BOM + Production Costing Center (code files)-2026062109593022.pdf",
+    "lines": 14
+  },
+  {
+    "path": "lib/manufacturingCenter/store.js",
+    "source": "SuperSender Pro \u2014 Manufacturing + BOM + Production Costing Center (code files)-2026062109593022.pdf",
+    "lines": 24
+  },
+  {
+    "path": "lib/manufacturingCenter/bomModel.js",
+    "source": "SuperSender Pro \u2014 Manufacturing + BOM + Production Costing Center (code files)-2026062109593022.pdf",
+    "lines": 100
+  },
+  {
+    "path": "lib/manufacturingCenter/productionOrderModel.js",
+    "source": "SuperSender Pro \u2014 Manufacturing + BOM + Production Costing Center (code files)-2026062109593022.pdf",
+    "lines": 60
+  },
+  {
+    "path": "lib/manufacturingCenter/bomService.js",
+    "source": "SuperSender Pro \u2014 Manufacturing + BOM + Production Costing Center (code files)-2026062109593022.pdf",
+    "lines": 37
+  },
+  {
+    "path": "lib/manufacturingCenter/materialRequirement.js",
+    "source": "SuperSender Pro \u2014 Manufacturing + BOM + Production Costing Center (code files)-2026062109593022.pdf",
+    "lines": 36
+  },
+  {
+    "path": "lib/manufacturingCenter/productionCosting.js",
+    "source": "SuperSender Pro \u2014 Manufacturing + BOM + Production Costing Center (code files)-2026062109593022.pdf",
+    "lines": 21
+  },
+  {
+    "path": "lib/manufacturingCenter/wastagePreview.js",
+    "source": "SuperSender Pro \u2014 Manufacturing + BOM + Production Costing Center (code files)-2026062109593022.pdf",
+    "lines": 22
+  },
+  {
+    "path": "lib/manufacturingCenter/batchProductionPreview.js",
+    "source": "SuperSender Pro \u2014 Manufacturing + BOM + Production Costing Center (code files)-2026062109593022.pdf",
+    "lines": 23
+  },
+  {
+    "path": "lib/manufacturingCenter/inventoryImpactPreview.js",
+    "source": "SuperSender Pro \u2014 Manufacturing + BOM + Production Costing Center (code files)-2026062109593022.pdf",
+    "lines": 31
+  },
+  {
+    "path": "lib/manufacturingCenter/profitMarginPreview.js",
+    "source": "SuperSender Pro \u2014 Manufacturing + BOM + Production Costing Center (code files)-2026062109593022.pdf",
+    "lines": 19
+  },
+  {
+    "path": "lib/manufacturingCenter/productionRiskScore.js",
+    "source": "SuperSender Pro \u2014 Manufacturing + BOM + Production Costing Center (code files)-2026062109593022.pdf",
+    "lines": 41
+  },
+  {
+    "path": "lib/manufacturingCenter/accountingImpactPreview.js",
+    "source": "SuperSender Pro \u2014 Manufacturing + BOM + Production Costing Center (code files)-2026062109593022.pdf",
+    "lines": 32
+  },
+  {
+    "path": "routes/manufacturingCenterRoutes.js",
+    "source": "SuperSender Pro \u2014 Manufacturing + BOM + Production Costing Center (code files)-2026062109593022.pdf",
+    "lines": 147
+  },
+  {
+    "path": "public/manufacturing-center.html",
+    "source": "SuperSender Pro \u2014 Manufacturing + BOM + Production Costing Center (code files)-2026062109593022.pdf",
+    "lines": 46
+  },
+  {
+    "path": "public/js/manufacturing-center.js",
+    "source": "SuperSender Pro \u2014 Manufacturing + BOM + Production Costing Center (code files)-2026062109593022.pdf",
+    "lines": 77
+  },
+  {
+    "path": "public/css/manufacturing-center.css",
+    "source": "SuperSender Pro \u2014 Manufacturing + BOM + Production Costing Center (code files)-2026062109593022.pdf",
+    "lines": 35
+  },
+  {
+    "path": "scripts/manufacturing-center-check.js",
+    "source": "SuperSender Pro \u2014 Manufacturing + BOM + Production Costing Center (code files)-2026062109593022.pdf",
+    "lines": 68
+  },
+  {
+    "path": "tests/smoke/manufacturingCenterSmoke.js",
+    "source": "SuperSender Pro \u2014 Manufacturing + BOM + Production Costing Center (code files)-2026062109593022.pdf",
+    "lines": 75
+  },
+  {
+    "path": "lib/taxCompliance/redactor.js",
+    "source": "SuperSender Pro \u2014 Tax - GST - VAT + Financial Compliance Reports (code files)-2026062109592052.pdf",
+    "lines": 16
+  },
+  {
+    "path": "lib/taxCompliance/store.js",
+    "source": "SuperSender Pro \u2014 Tax - GST - VAT + Financial Compliance Reports (code files)-2026062109592052.pdf",
+    "lines": 19
+  },
+  {
+    "path": "lib/taxCompliance/taxRuleModel.js",
+    "source": "SuperSender Pro \u2014 Tax - GST - VAT + Financial Compliance Reports (code files)-2026062109592052.pdf",
+    "lines": 89
+  },
+  {
+    "path": "lib/taxCompliance/taxCalculator.js",
+    "source": "SuperSender Pro \u2014 Tax - GST - VAT + Financial Compliance Reports (code files)-2026062109592052.pdf",
+    "lines": 30
+  },
+  {
+    "path": "lib/taxCompliance/invoiceTaxPreview.js",
+    "source": "SuperSender Pro \u2014 Tax - GST - VAT + Financial Compliance Reports (code files)-2026062109592052.pdf",
+    "lines": 25
+  },
+  {
+    "path": "lib/taxCompliance/expenseTaxPreview.js",
+    "source": "SuperSender Pro \u2014 Tax - GST - VAT + Financial Compliance Reports (code files)-2026062109592052.pdf",
+    "lines": 27
+  },
+  {
+    "path": "lib/taxCompliance/taxReportService.js",
+    "source": "SuperSender Pro \u2014 Tax - GST - VAT + Financial Compliance Reports (code files)-2026062109592052.pdf",
+    "lines": 38
+  },
+  {
+    "path": "lib/taxCompliance/taxRiskChecker.js",
+    "source": "SuperSender Pro \u2014 Tax - GST - VAT + Financial Compliance Reports (code files)-2026062109592052.pdf",
+    "lines": 19
+  },
+  {
+    "path": "lib/taxCompliance/complianceChecklist.js",
+    "source": "SuperSender Pro \u2014 Tax - GST - VAT + Financial Compliance Reports (code files)-2026062109592052.pdf",
+    "lines": 26
+  },
+  {
+    "path": "lib/taxCompliance/auditExportPreview.js",
+    "source": "SuperSender Pro \u2014 Tax - GST - VAT + Financial Compliance Reports (code files)-2026062109592052.pdf",
+    "lines": 24
+  },
+  {
+    "path": "routes/taxComplianceRoutes.js",
+    "source": "SuperSender Pro \u2014 Tax - GST - VAT + Financial Compliance Reports (code files)-2026062109592052.pdf",
+    "lines": 80
+  },
+  {
+    "path": "public/tax-compliance.html",
+    "source": "SuperSender Pro \u2014 Tax - GST - VAT + Financial Compliance Reports (code files)-2026062109592052.pdf",
+    "lines": 35
+  },
+  {
+    "path": "public/js/tax-compliance.js",
+    "source": "SuperSender Pro \u2014 Tax - GST - VAT + Financial Compliance Reports (code files)-2026062109592052.pdf",
+    "lines": 63
+  },
+  {
+    "path": "public/css/tax-compliance.css",
+    "source": "SuperSender Pro \u2014 Tax - GST - VAT + Financial Compliance Reports (code files)-2026062109592052.pdf",
+    "lines": 33
+  },
+  {
+    "path": "scripts/tax-compliance-check.js",
+    "source": "SuperSender Pro \u2014 Tax - GST - VAT + Financial Compliance Reports (code files)-2026062109592052.pdf",
+    "lines": 68
+  },
+  {
+    "path": "tests/smoke/taxComplianceSmoke.js",
+    "source": "SuperSender Pro \u2014 Tax - GST - VAT + Financial Compliance Reports (code files)-2026062109592052.pdf",
+    "lines": 58
+  },
+  {
+    "path": "lib/cashbookCenter/redactor.js",
+    "source": "SuperSender Pro \u2014 Cashbook + Bank Reconciliation + Payment Matching (code files)-2026062109590930.pdf",
+    "lines": 20
+  },
+  {
+    "path": "lib/cashbookCenter/store.js",
+    "source": "SuperSender Pro \u2014 Cashbook + Bank Reconciliation + Payment Matching (code files)-2026062109590930.pdf",
+    "lines": 30
+  },
+  {
+    "path": "lib/cashbookCenter/cashTransactionModel.js",
+    "source": "SuperSender Pro \u2014 Cashbook + Bank Reconciliation + Payment Matching (code files)-2026062109590930.pdf",
+    "lines": 74
+  },
+  {
+    "path": "lib/cashbookCenter/cashbookService.js",
+    "source": "SuperSender Pro \u2014 Cashbook + Bank Reconciliation + Payment Matching (code files)-2026062109590930.pdf",
+    "lines": 31
+  },
+  {
+    "path": "lib/cashbookCenter/balancePreview.js",
+    "source": "SuperSender Pro \u2014 Cashbook + Bank Reconciliation + Payment Matching (code files)-2026062109590930.pdf",
+    "lines": 20
+  },
+  {
+    "path": "lib/cashbookCenter/unmatchedTransactions.js",
+    "source": "SuperSender Pro \u2014 Cashbook + Bank Reconciliation + Payment Matching (code files)-2026062109590930.pdf",
+    "lines": 18
+  },
+  {
+    "path": "lib/cashbookCenter/paymentMatcher.js",
+    "source": "SuperSender Pro \u2014 Cashbook + Bank Reconciliation + Payment Matching (code files)-2026062109590930.pdf",
+    "lines": 39
+  },
+  {
+    "path": "lib/cashbookCenter/duplicateDetector.js",
+    "source": "SuperSender Pro \u2014 Cashbook + Bank Reconciliation + Payment Matching (code files)-2026062109590930.pdf",
+    "lines": 27
+  },
+  {
+    "path": "lib/cashbookCenter/reconciliationService.js",
+    "source": "SuperSender Pro \u2014 Cashbook + Bank Reconciliation + Payment Matching (code files)-2026062109590930.pdf",
+    "lines": 37
+  },
+  {
+    "path": "lib/cashbookCenter/accountingLinkPreview.js",
+    "source": "SuperSender Pro \u2014 Cashbook + Bank Reconciliation + Payment Matching (code files)-2026062109590930.pdf",
+    "lines": 34
+  },
+  {
+    "path": "routes/cashbookCenterRoutes.js",
+    "source": "SuperSender Pro \u2014 Cashbook + Bank Reconciliation + Payment Matching (code files)-2026062109590930.pdf",
+    "lines": 101
+  },
+  {
+    "path": "public/cashbook-center.html",
+    "source": "SuperSender Pro \u2014 Cashbook + Bank Reconciliation + Payment Matching (code files)-2026062109590930.pdf",
+    "lines": 40
+  },
+  {
+    "path": "public/js/cashbook-center.js",
+    "source": "SuperSender Pro \u2014 Cashbook + Bank Reconciliation + Payment Matching (code files)-2026062109590930.pdf",
+    "lines": 67
+  },
+  {
+    "path": "public/css/cashbook-center.css",
+    "source": "SuperSender Pro \u2014 Cashbook + Bank Reconciliation + Payment Matching (code files)-2026062109590930.pdf",
+    "lines": 36
+  },
+  {
+    "path": "scripts/cashbook-center-check.js",
+    "source": "SuperSender Pro \u2014 Cashbook + Bank Reconciliation + Payment Matching (code files)-2026062109590930.pdf",
+    "lines": 69
+  },
+  {
+    "path": "tests/smoke/cashbookCenterSmoke.js",
+    "source": "SuperSender Pro \u2014 Cashbook + Bank Reconciliation + Payment Matching (code files)-2026062109590930.pdf",
+    "lines": 58
+  },
+  {
+    "path": "lib/adminAuth/complianceRouteGuard.js",
+    "source": "SuperSender Pro \u2014 Compliance Routes Auth-Gate Patch (append-only, secure the consent endpoints)-2026062109585951.pdf",
+    "lines": 79
+  },
+  {
+    "path": "scripts/compliance-gate-check.js",
+    "source": "SuperSender Pro \u2014 Compliance Routes Auth-Gate Patch (append-only, secure the consent endpoints)-2026062109585951.pdf",
+    "lines": 45
+  },
+  {
+    "path": "tests/smoke/complianceGateSmoke.js",
+    "source": "SuperSender Pro \u2014 Compliance Routes Auth-Gate Patch (append-only, secure the consent endpoints)-2026062109585951.pdf",
+    "lines": 87
+  },
+  {
+    "path": "lib/adminAuth/authConfig.js",
+    "source": "SuperSender Pro \u2014 Admin Auth + Route Guard + Secure Session (code files)-2026062109584351.pdf",
+    "lines": 43
+  },
+  {
+    "path": "lib/adminAuth/sessionStore.js",
+    "source": "SuperSender Pro \u2014 Admin Auth + Route Guard + Secure Session (code files)-2026062109584351.pdf",
+    "lines": 53
+  },
+  {
+    "path": "lib/adminAuth/passwordAuth.js",
+    "source": "SuperSender Pro \u2014 Admin Auth + Route Guard + Secure Session (code files)-2026062109584351.pdf",
+    "lines": 40
+  },
+  {
+    "path": "lib/adminAuth/redactor.js",
+    "source": "SuperSender Pro \u2014 Admin Auth + Route Guard + Secure Session (code files)-2026062109584351.pdf",
+    "lines": 28
+  },
+  {
+    "path": "lib/adminAuth/authMiddleware.js",
+    "source": "SuperSender Pro \u2014 Admin Auth + Route Guard + Secure Session (code files)-2026062109584351.pdf",
+    "lines": 60
+  },
+  {
+    "path": "lib/adminAuth/routeGuard.js",
+    "source": "SuperSender Pro \u2014 Admin Auth + Route Guard + Secure Session (code files)-2026062109584351.pdf",
+    "lines": 65
+  },
+  {
+    "path": "routes/adminAuthRoutes.js",
+    "source": "SuperSender Pro \u2014 Admin Auth + Route Guard + Secure Session (code files)-2026062109584351.pdf",
+    "lines": 117
+  },
+  {
+    "path": "public/admin-login.html",
+    "source": "SuperSender Pro \u2014 Admin Auth + Route Guard + Secure Session (code files)-2026062109584351.pdf",
+    "lines": 21
+  },
+  {
+    "path": "public/js/admin-login.js",
+    "source": "SuperSender Pro \u2014 Admin Auth + Route Guard + Secure Session (code files)-2026062109584351.pdf",
+    "lines": 37
+  },
+  {
+    "path": "public/css/admin-login.css",
+    "source": "SuperSender Pro \u2014 Admin Auth + Route Guard + Secure Session (code files)-2026062109584351.pdf",
+    "lines": 17
+  },
+  {
+    "path": "public/js/auth-status.js",
+    "source": "SuperSender Pro \u2014 Admin Auth + Route Guard + Secure Session (code files)-2026062109584351.pdf",
+    "lines": 30
+  },
+  {
+    "path": "scripts/admin-auth-check.js",
+    "source": "SuperSender Pro \u2014 Admin Auth + Route Guard + Secure Session (code files)-2026062109584351.pdf",
+    "lines": 44
+  },
+  {
+    "path": "tests/smoke/adminAuthSmoke.js",
+    "source": "SuperSender Pro \u2014 Admin Auth + Route Guard + Secure Session (code files)-2026062109584351.pdf",
+    "lines": 58
+  },
+  {
+    "path": "scripts/group-commerce-check.js",
+    "source": "SuperSender Pro \u2014 Group Commerce OS QA Pack (code files)-2026062109555942.pdf",
+    "lines": 226
+  },
+  {
+    "path": "tests/smoke/groupCommerceFixtures.js",
+    "source": "SuperSender Pro \u2014 Group Commerce OS QA Pack (code files)-2026062109555942.pdf",
+    "lines": 60
+  },
+  {
+    "path": "tests/smoke/groupCommerceSmoke.js",
+    "source": "SuperSender Pro \u2014 Group Commerce OS QA Pack (code files)-2026062109555942.pdf",
+    "lines": 162
+  },
+  {
+    "path": "docs/GROUP_COMMERCE_QA.md",
+    "source": "SuperSender Pro \u2014 Group Commerce OS QA Pack (code files)-2026062109555942.pdf",
+    "lines": 93
+  },
+  {
+    "path": "docs/GROUP_COMMERCE_QA_REPORT.md",
+    "source": "SuperSender Pro \u2014 Group Commerce OS QA Pack (code files)-2026062109555942.pdf",
+    "lines": 61
+  },
+  {
+    "path": "artifacts/group_commerce_qa_report.json",
+    "source": "SuperSender Pro \u2014 Group Commerce OS QA Pack (code files)-2026062109555942.pdf",
+    "lines": 49
+  },
+  {
+    "path": "lib/businessSetup/store.js",
+    "source": "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    "lines": 74
+  },
+  {
+    "path": "lib/businessSetup/profileManager.js",
+    "source": "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    "lines": 72
+  },
+  {
+    "path": "lib/businessSetup/industryPresets.js",
+    "source": "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    "lines": 179
+  },
+  {
+    "path": "lib/businessSetup/presetRegistry.js",
+    "source": "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    "lines": 27
+  },
+  {
+    "path": "lib/businessSetup/recommendedPlaybooks.js",
+    "source": "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    "lines": 58
+  },
+  {
+    "path": "lib/businessSetup/recommendedAgents.js",
+    "source": "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    "lines": 24
+  },
+  {
+    "path": "lib/businessSetup/recommendedFlows.js",
+    "source": "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    "lines": 12
+  },
+  {
+    "path": "lib/businessSetup/setupChecklist.js",
+    "source": "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    "lines": 109
+  },
+  {
+    "path": "lib/businessSetup/readinessScoring.js",
+    "source": "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    "lines": 76
+  },
+  {
+    "path": "lib/businessSetup/safetyGuard.js",
+    "source": "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    "lines": 25
+  },
+  {
+    "path": "lib/businessSetup/presetApplier.js",
+    "source": "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    "lines": 72
+  },
+  {
+    "path": "routes/businessSetupRoutes.js",
+    "source": "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    "lines": 99
+  },
+  {
+    "path": "public/business-setup.html",
+    "source": "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    "lines": 59
+  },
+  {
+    "path": "public/js/business-setup.js",
+    "source": "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    "lines": 101
+  },
+  {
+    "path": "public/css/business-setup.css",
+    "source": "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    "lines": 36
+  },
+  {
+    "path": "scripts/business-setup-check.js",
+    "source": "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    "lines": 92
+  },
+  {
+    "path": "tests/smoke/businessSetupSmoke.js",
+    "source": "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    "lines": 89
+  },
+  {
+    "path": "docs/BUSINESS_SETUP_WIZARD.md",
+    "source": "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    "lines": 33
+  },
+  {
+    "path": "docs/BUSINESS_PRESETS.md",
+    "source": "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    "lines": 23
+  },
+  {
+    "path": "docs/BUSINESS_SETUP_READINESS.md",
+    "source": "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    "lines": 24
+  },
+  {
+    "path": "docs/BUSINESS_SETUP_SAFETY.md",
+    "source": "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    "lines": 28
+  },
+  {
+    "path": "artifacts/business_setup_inventory.json",
+    "source": "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    "lines": 43
+  },
+  {
+    "path": "docs/BUSINESS_SETUP_GAP_REPORT.md",
+    "source": "SuperSender Pro \u2014 Business Setup Wizard + Industry Preset Launcher (code files)-2026062109553322.pdf",
+    "lines": 38
+  },
+  {
+    "path": "lib/agentDeployment/store.js",
+    "source": "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    "lines": 82
+  },
+  {
+    "path": "lib/agentDeployment/agentRegistry.js",
+    "source": "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    "lines": 94
+  },
+  {
+    "path": "lib/agentDeployment/channelTargets.js",
+    "source": "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    "lines": 56
+  },
+  {
+    "path": "lib/agentDeployment/safetyGuard.js",
+    "source": "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    "lines": 83
+  },
+  {
+    "path": "lib/agentDeployment/deploymentRules.js",
+    "source": "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    "lines": 103
+  },
+  {
+    "path": "lib/agentDeployment/actionDrafts.js",
+    "source": "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    "lines": 97
+  },
+  {
+    "path": "lib/agentDeployment/flowNodes.js",
+    "source": "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    "lines": 50
+  },
+  {
+    "path": "routes/agentDeploymentRoutes.js",
+    "source": "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    "lines": 117
+  },
+  {
+    "path": "public/agent-deployment.html",
+    "source": "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    "lines": 69
+  },
+  {
+    "path": "public/js/agent-deployment.js",
+    "source": "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    "lines": 135
+  },
+  {
+    "path": "public/css/agent-deployment.css",
+    "source": "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    "lines": 37
+  },
+  {
+    "path": "scripts/agent-deployment-check.js",
+    "source": "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    "lines": 100
+  },
+  {
+    "path": "tests/smoke/agentDeploymentSmoke.js",
+    "source": "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    "lines": 110
+  },
+  {
+    "path": "docs/AI_AGENT_DEPLOYMENT_CENTER.md",
+    "source": "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    "lines": 48
+  },
+  {
+    "path": "docs/AI_AGENT_DEPLOYMENT_SAFETY.md",
+    "source": "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    "lines": 34
+  },
+  {
+    "path": "docs/AI_AGENT_DEPLOYMENT_FLOW_STUDIO.md",
+    "source": "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    "lines": 30
+  },
+  {
+    "path": "docs/AI_AGENT_DEPLOYMENT_TARGETS.md",
+    "source": "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    "lines": 28
+  },
+  {
+    "path": "artifacts/ai_agent_deployment_inventory.json",
+    "source": "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    "lines": 39
+  },
+  {
+    "path": "docs/AI_AGENT_DEPLOYMENT_GAP_REPORT.md",
+    "source": "SuperSender Pro \u2014 AI Agent Deployment Center + Flow Studio Control (code files)-2026062109550470.pdf",
+    "lines": 40
+  }
+]

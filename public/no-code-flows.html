@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>No-Code Flows</title>
+  <link rel="stylesheet" href="/css/no-code-flows.css" />
+</head>
+<body class="nf-body">
+  <header class="nf-header">
+    <div>
+      <h1>No-Code Flows <span class="nf-muted">+ Campaign Analytics</span></h1>
+      <p class="nf-subtitle">Build trigger/condition/action flows. Preview only. No live sends.</p>
+    </div>
+    <span class="nf-badge nf-badge-on" id="safety-badge">dry-run · no live sends · no external calls</span>
+  </header>
+
+
+  <div class="nf-toolbar">
+    <button id="btn-new-flow" class="nf-btn">New flow</button>
+    <button id="btn-refresh" class="nf-btn nf-btn-ghost">Refresh</button>
+  </div>
+
+
+  <main class="nf-grid">
+    <section class="nf-card">
+      <h2>Flows</h2>
+      <div id="flow-list" class="nf-list-box"><span class="nf-muted">Loading...</span></div>
+    </section>
+
+    <section class="nf-card">
+      <h2>Flow Editor</h2>
+      <div id="flow-editor" class="nf-muted">Select or create a flow.</div>
+    </section>
+
+    <section class="nf-card">
+      <h2>Trigger + Node Palette</h2>
+      <div class="nf-palette">
+        <div class="nf-key">Triggers</div>
+        <div id="palette-triggers" class="nf-chips"></div>
+        <div class="nf-key">Actions</div>
+        <div id="palette-actions" class="nf-chips"></div>
+      </div>
+    </section>
+
+    <section class="nf-card">
+      <h2>Validation</h2>
+      <pre class="nf-pre" id="validation-out">Validate a flow to see results.</pre>
+    </section>
+
+       <section class="nf-card nf-span2">
+         <h2>Dry-Run Preview</h2>
+        <button id="btn-preview" class="nf-btn nf-btn-tiny">Run preview</button>
+        <pre class="nf-pre" id="preview-out">Run a preview to see steps + message drafts.</pre>
+       </section>
+
+
+       <section class="nf-card nf-span2">
+         <h2>Campaign Analytics <span class="nf-pill">preview</span></h2>
+        <div id="campaign-cards" class="nf-cards"><span class="nf-muted">Loading...</span></div>
+        <h3 class="nf-key">Timeline</h3>
+         <pre class="nf-pre" id="timeline-out">Select a campaign to see its timeline.</pre>
+       </section>
+   </main>
+
+
+   <script src="/js/no-code-flows.js"></script>
+ </body>
+ </html>

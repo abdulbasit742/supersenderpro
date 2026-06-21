@@ -1,0 +1,13 @@
+{
+    "generatedAt": "2026-06-20",
+    "note": "Reuses Demo Sandbox + Demo Mode. New = audience journeys, step runner, acceptance checklist, scripts,
+report.",
+  "existing": { "demoSandbox": "exists (lib/demoSandbox)", "demoMode": "exists (src/modules/demoMode)", "guidedTours":
+"exists (demoSandbox tourRegistry)", "publicFunnel": "missing", "rbacAudit": "exists (src/modules/rbac)" },
+  "newLayer": { "area": "Guided Demo Journey + Walkthrough + Acceptance", "status": "missing_before_this_pack",
+"fileCount": 22 },
+  "duplicatesSkipped": ["Did NOT rebuild Demo Sandbox / Demo Mode / guided tours (reused).", "Did NOT build a public
+funnel."],
+  "liveActionRisk": "none_dry_run_sample_data_only", "externalCallRisk": "none", "secretRisk": "none_redacted",
+"piiRisk": "none_sample_only"
+}

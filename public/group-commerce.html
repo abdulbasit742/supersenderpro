@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Group Commerce OS</title>
+  <link rel="stylesheet" href="/css/group-commerce.css" />
+</head>
+<body class="gc-wrap">
+  <div class="gc-head">
+    <h1>Group Commerce OS <span class="gc-badge" id="gc-mode">DRY-RUN</span></h1>
+    <button class="gc-btn secondary" id="gc-refresh">Refresh</button>
+  </div>
+  <div class="gc-grid">
+    <div>
+      <div class="gc-card" style="margin-bottom:16px">
+        <h2>Groups</h2><ul class="gc-list" id="gc-groups"></ul>
+        <div class="gc-row"><input id="gc-new-name" placeholder="New group name" class="gc-in" /><button class="gc-btn"
+id="gc-add">Add</button></div>
+      </div>
+      <div class="gc-card">
+        <h2>AI Agents</h2>
+        <div id="gc-agents"></div>
+      </div>
+    </div>
+    <div class="gc-card">
+      <h2>Message analyzer</h2>
+      <textarea id="gc-msg" class="gc-area" placeholder="Paste a group message, e.g. ChatGPT available Rs 1500 in stock
+Lahore"></textarea>
+      <div class="gc-row"><button class="gc-btn" id="gc-analyze">Analyze + moderate</button></div>
+      <pre class="gc-out" id="gc-analysis">Run the analyzer to see seller/buyer/SKU + moderation.</pre>
+      <h2 style="margin-top:16px">Admin command tester</h2>
+      <div class="gc-row"><input id="gc-cmd" class="gc-in" placeholder="/status" /><input id="gc-admin" class="gc-in"
+placeholder="admin number" /><button class="gc-btn secondary" id="gc-run-cmd">Run</button></div>
+      <pre class="gc-out" id="gc-cmd-out">Command result appears here (dry-run).</pre>
+    </div>
+    <div>
+      <div class="gc-card" style="margin-bottom:16px">
+        <h2>Catalogue</h2>
+        <pre class="gc-out" id="gc-catalog">Select a group.</pre>
+      </div>
+      <div class="gc-card" style="margin-bottom:16px">
+        <h2>Relay / ecommerce preview</h2>
+        <pre class="gc-out" id="gc-preview">Drafts only. Nothing posts or writes live.</pre>
+      </div>
+
+
+      <div class="gc-card">
+          <h2>Pause</h2>
+          <div class="gc-row">
+           <button class="gc-btn secondary" data-pause="5">Pause 5m</button>
+           <button class="gc-btn secondary" data-pause="10">Pause 10m</button>
+            <button class="gc-btn" id="gc-resume">Resume</button>
+          </div>
+        <div class="gc-muted" id="gc-pause-state"></div>
+      </div>
+    </div>
+  </div>
+  <script src="/js/group-commerce.js"></script>
+</body>
+</html>

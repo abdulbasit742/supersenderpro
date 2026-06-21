@@ -1,0 +1,75 @@
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Business Alerts — SuperSender Pro</title>
+    <link rel="stylesheet" href="/css/business-alerts.css" />
+  </head>
+  <body>
+    <header class="ba-header">
+      <div><h1>Business Anomaly Detector + Alert Center</h1><span class="ba-sub">smart action rules</span></div>
+      <div class="ba-header-right">
+        <span class="badge badge-dry">DRY-RUN</span>
+        <span class="badge badge-ok">no live sends</span>
+        <span class="badge badge-ok">no automation</span>
+        <span class="badge badge-ok">no external calls</span>
+      </div>
+    </header>
+
+    <section class="ba-stats">
+      <div class="card kpi"><span class="kpi-num" id="kTotal">–</span><span>Alerts</span></div>
+      <div class="card kpi"><span class="kpi-num crit" id="kCrit">–</span><span>Critical</span></div>
+      <div class="card kpi"><span class="kpi-num warn" id="kHigh">–</span><span>High</span></div>
+      <div class="card kpi"><span class="kpi-num" id="kOpen">–</span><span>Unresolved</span></div>
+    </section>
+
+
+    <div class="ba-toolbar">
+      <button id="detectBtn" class="primary">Run detection</button>
+      <select id="sevFilter"><option value="">all severities</option><option>critical</option><option>high</option>
+  <option>medium</option><option>low</option><option>info</option></select>
+      <select id="catFilter"><option value="">all categories</option></select>
+      <button id="refreshBtn" class="mini">Refresh</button>
+      <button id="digestBtn" class="mini">Digest preview</button>
+    </div>
+
+    <section class="card full">
+      <h2>Alerts</h2>
+      <table class="ba-table" id="alertTable"><thead><tr><th>Severity</th><th>Title</th><th>Category</th><th>Source</th>
+  <th>Detected</th><th>Threshold</th><th>Status</th><th></th></tr></thead><tbody></tbody></table>
+    </section>
+
+
+    <div class="ba-grid">
+      <section class="card"><h2>Alert detail</h2><pre id="alertDetail" class="ba-pre">Select an alert…</pre><div
+  id="alertActions"></div></section>
+      <section class="card"><h2>Recommendations</h2><div id="recoBox"></div></section>
+    </div>
+
+
+    <div class="ba-grid">
+      <section class="card">
+        <h2>Anomaly rule builder</h2>
+        <form id="ruleForm" class="ba-form">
+          <input name="name" placeholder="rule name" />
+            <input name="metricKey" placeholder="metric key (e.g. overdue_amount)" />
+            <select name="condition"><option>gt</option><option>gte</option><option>lt</option><option>lte</option>
+  <option>eq</option><option>drop_pct</option><option>rise_pct</option></select>
+          <input name="threshold" type="number" placeholder="threshold" />
+          <select name="severity"><option>medium</option><option>high</option><option>critical</option><option>low</option>
+  <option>info</option></select>
+          <button type="submit">Add rule</button>
+        </form>
+        <table class="ba-table" id="ruleTable"><thead><tr><th>Name</th><th>Metric</th><th>Cond</th><th>Threshold</th>
+  <th>Severity</th><th>On</th></tr></thead><tbody></tbody></table>
+      </section>
+      <section class="card"><h2>Digest preview</h2><pre id="digestBox" class="ba-pre"></pre></section>
+    </div>
+
+
+    <footer class="ba-footer">Business Alerts · dry-run · no live sends · no automation execution · no external calls · PII
+  masked</footer>
+    <script src="/js/business-alerts.js"></script>
+  </body>
+  </html>

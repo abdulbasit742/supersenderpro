@@ -1,0 +1,6 @@
+  // BEGIN OWNER+INCIDENT COMMAND HOOK
+  const ownerCommandRoutes = require('./routes/ownerCommandRoutes');
+  const incidentCommandRoutes = require('./routes/incidentCommandRoutes');
+  app.use('/api/owner-command', ownerCommandRoutes);
+  app.use('/api/incident-command', incidentCommandRoutes);
+  // END OWNER+INCIDENT COMMAND HOOK

@@ -1,0 +1,85 @@
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fulfillment — SuperSender Pro</title>
+    <link rel="stylesheet" href="/css/fulfillment-center.css" />
+  </head>
+  <body>
+    <header class="fc-header">
+      <div><h1>Order Fulfillment, Delivery & Returns</h1><span class="fc-sub">preview center</span></div>
+      <div class="fc-header-right">
+        <span class="badge badge-dry">DRY-RUN</span>
+        <span class="badge badge-ok">no courier API</span>
+        <span class="badge badge-ok">no refund</span>
+        <span class="badge badge-ok">no stock mutation</span>
+      </div>
+    </header>
+
+    <section class="fc-stats">
+      <div class="card kpi"><span class="kpi-num" id="kOrders">–</span><span>Orders</span></div>
+      <div class="card kpi"><span class="kpi-num" id="kPending">–</span><span>Pending</span></div>
+      <div class="card kpi"><span class="kpi-num" id="kShipped">–</span><span>Shipped</span></div>
+      <div class="card kpi"><span class="kpi-num good" id="kDelivered">–</span><span>Delivered</span></div>
+      <div class="card kpi"><span class="kpi-num warn" id="kFailed">–</span><span>Failed</span></div>
+      <div class="card kpi"><span class="kpi-num" id="kReturns">–</span><span>Returns</span></div>
+    </section>
+
+    <nav class="fc-tabs">
+      <button class="tab active" data-tab="pipeline">Order pipeline</button>
+      <button class="tab" data-tab="failed">Failed deliveries</button>
+      <button class="tab" data-tab="returns">Returns / RMA</button>
+    </nav>
+
+    <main>
+      <section class="panel active" id="tab-pipeline">
+        <div class="card full">
+          <div class="card-head"><h2>Orders</h2><div><input id="ordSearch" placeholder="search" /> <select id="ordStatus">
+  <option value="">all fulfillment</option></select> <button id="ordRefresh" class="mini">Refresh</button></div></div>
+          <table class="fc-table" id="ordTable"><thead><tr><th>#</th><th>Customer</th><th>Payment</th><th>Fulfillment</th>
+  <th>Delivery</th><th>Courier</th><th>Total</th><th></th></tr></thead><tbody></tbody></table>
+        </div>
+        <div class="fc-grid">
+            <section class="card"><h2>Order detail</h2><pre id="ordDetail" class="fc-pre">Select an order…</pre></section>
+            <section class="card"><h2>Delivery timeline</h2><ol id="timeline" class="fc-timeline"></ol></section>
+        </div>
+      </section>
+
+
+      <section class="panel" id="tab-failed">
+        <div class="card full"><div class="card-head"><h2>Failed delivery queue</h2><button id="failedRefresh"
+  class="mini">Refresh</button></div><table class="fc-table" id="failedTable"><thead><tr><th>#</th><th>Customer</th>
+  <th>Delivery</th><th></th></tr></thead><tbody></tbody></table></div>
+      </section>
+
+
+      <section class="panel" id="tab-returns">
+        <div class="rc-grid fc-grid">
+            <section class="card">
+              <h2>New return request</h2>
+              <form id="retForm" class="fc-form">
+                <input name="orderId" placeholder="order id" />
+               <input name="customerName" placeholder="customer" />
+               <select name="reason"><option>wrong_item</option><option>damaged_item</option><option>defective_item</option>
+  <option>customer_changed_mind</option><option>size_or_variant_issue</option><option>delivery_failed</option>
+  <option>duplicate_order</option><option>other</option></select>
+               <input name="itemName" placeholder="item name" />
+               <input name="qty" type="number" value="1" />
+               <input name="unitPrice" type="number" value="0" />
+               <button type="submit">Create return</button>
+              </form>
+            </section>
+          <section class="card"><h2>Return detail</h2><pre id="retDetail" class="fc-pre">Select a return…</pre></section>
+        </div>
+        <div class="card full"><div class="card-head"><h2>Return requests</h2><button id="retRefresh"
+  class="mini">Refresh</button></div><table class="fc-table" id="retTable"><thead><tr><th>RMA</th><th>Customer</th>
+  <th>Reason</th><th>Status</th><th>Refund</th><th></th></tr></thead><tbody></tbody></table></div>
+      </section>
+    </main>
+
+    <footer class="fc-footer">Fulfillment · dry-run · no courier API · no refund · no stock mutation · no live
+  sends</footer>
+    <script src="/js/fulfillment-center.js"></script>
+  </body>
+  </html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Service Center — SuperSender Pro</title>
+  <link rel="stylesheet" href="/service-center.css" />
+</head>
+<body>
+  <header class="sc-header">
+    <h1>Service Work Order + Dispatch Center</h1>
+    <span class="sc-badge" id="modeBadge">preview</span>
+  </header>
+
+  <main class="sc-grid">
+    <section class="sc-card" id="sec-sla"><h2>SLA Watch</h2><div class="sc-body" id="slaBody">Loading…</div></section>
+    <section class="sc-card" id="sec-board"><h2>Technician Board</h2><div class="sc-body" id="boardBody">Loading…</div>
+</section>
+    <section class="sc-card sc-wide" id="sec-wo"><h2>Work Orders</h2><div class="sc-body" id="woBody">Loading…</div>
+</section>
+    <section class="sc-card" id="sec-jc"><h2>Job Cards</h2><div class="sc-body" id="jcBody">Loading…</div></section>
+    <section class="sc-card" id="sec-dispatch"><h2>Dispatch Suggestion</h2><div class="sc-body" id="dispatchBody">Pick a
+work order…</div></section>
+    <section class="sc-card" id="sec-diag"><h2>Diagnosis Hints</h2><div class="sc-body" id="diagBody">Pick a work order…
+</div></section>
+    <section class="sc-card" id="sec-parts"><h2>Parts Requirement</h2><div class="sc-body" id="partsBody">Pick a job
+card…</div></section>
+    <section class="sc-card" id="sec-labor"><h2>Labor Cost</h2><div class="sc-body" id="laborBody">Pick a job card…
+</div></section>
+    <section class="sc-card" id="sec-profit"><h2>Profitability</h2><div class="sc-body" id="profitBody">Loading…</div>
+</section>
+    <section class="sc-card" id="sec-approval"><h2>Customer Approval (preview)</h2><div class="sc-body"
+id="approvalBody">Pick a work order…</div></section>
+    <section class="sc-card" id="sec-inv"><h2>Inventory Impact (preview)</h2><div class="sc-body" id="invBody">Pick a job
+card…</div></section>
+    <section class="sc-card" id="sec-acct"><h2>Accounting Impact (preview)</h2><div class="sc-body" id="acctBody">Pick a
+work order…</div></section>
+    <section class="sc-card" id="sec-msg"><h2>Message Drafts (never sent)</h2><div class="sc-body" id="msgBody">Pick a
+work order…</div></section>
+  </main>
+
+
+  <footer class="sc-footer">
+    <span id="flagsLine">All live actions disabled. Preview/dry-run only.</span>
+  </footer>
+
+  <script src="/service-center.js"></script>
+</body>
+</html>

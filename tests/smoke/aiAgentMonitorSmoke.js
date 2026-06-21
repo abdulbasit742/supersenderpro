@@ -1,0 +1,11 @@
+'use strict';
+const assert = require('assert');
+const model = require('../../lib/aiAgentMonitor/aiReplyModel');
+const replyQuality = require('../../lib/aiAgentMonitor/replyQuality');
+const riskChecker = require('../../lib/aiAgentMonitor/riskChecker');
+const handoffRules = require('../../lib/aiAgentMonitor/handoffRules');
+assert.ok(model.newReply({ phone: '+923001112233' }).phoneMasked.includes('*'));
+assert.ok(replyQuality.scoreConfidence('I think maybe it might be fine') < 0.7);
+assert.ok(['high','critical'].includes(riskChecker.check('refund payment failed', 'sure', 0.4).riskLevel));
+assert.strictEqual(handoffRules.evaluate({ userMessage: 'human please', aiReply: 'ok', confidenceScore: 0.9 }).handoffRequired, true);
+console.log(JSON.stringify({ ok: true, dryRun: true, smoke: 'ai-agent-monitor' }, null, 2));

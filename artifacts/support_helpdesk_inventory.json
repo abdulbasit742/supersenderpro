@@ -1,0 +1,34 @@
+{
+    "generatedAt": "2026-06-20",
+    "note": "Seed inventory from workspace scan. Pilot Ops feedback is the main overlap; reused read-only, not rebuilt. Re-
+run scripts/support-helpdesk-check.js locally to refresh.",
+  "existingSystems": [
+    { "area": "Pilot Ops feedback (lib/pilotOps/feedbackStore + bugTriage)", "status": ["exists", "duplicate_risk",
+"safe_to_extend"], "note": "pilot feedback/bug tracking. Pulled in as ticket-shaped previews via pilotOpsAdapter; Pilot
+Ops keeps ownership." },
+    { "area": "Customer 360", "status": ["partially_exists", "privacy_risk"], "note": "masked contact preview adapter" },
+    { "area": "Owner Command", "status": ["exists", "safe_to_extend"], "note": "ownerCommandSummary feeds urgent tickets
++ SLA risks" },
+      { "area": "Incident Command", "status": ["exists", "safe_to_extend"], "note": "link production issues" },
+      { "area": "Compliance Center", "status": ["exists", "safe_to_extend"], "note": "gate marketing-ish follow-up" },
+      { "area": "Voice AI", "status": ["missing", "needs_wiring"], "note": "support summary adapter returns unavailable" },
+      { "area": "Public SaaS Funnel", "status": ["missing"], "note": "help link added when funnel exists" },
+      { "area": "Business Setup", "status": ["exists", "safe_to_extend"] },
+      { "area": "KPI Command", "status": ["exists", "safe_to_extend"] },
+    { "area": "AI provider", "status": ["partially_exists"], "note": "used only if SUPPORT_HELPDESK_AI_LIVE=true; rule-
+based fallback otherwise" }
+    ],
+    "newCoordinationLayer": {
+      "area": "Support Helpdesk + Knowledge Base Command Center",
+      "status": "missing_before_this_pack",
+      "fileCount": 30
+    },
+    "duplicatesSkipped": [
+      "Did NOT rebuild Pilot Ops feedback (pulled read-only as tickets).",
+      "Did NOT build a second CRM or customer store.",
+      "Did NOT build a second AI provider (rule-based fallback + optional existing provider).",
+      "Did NOT create a duplicate admin bot (command hooks only)."
+    ],
+    "privacyRisk": "mitigated_masking_plus_safe_previews_no_raw_messages",
+    "liveActionRisk": "none_replies_drafts_only"
+}

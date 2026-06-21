@@ -1,0 +1,1287 @@
+[
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "artifacts/pilot_ops_inventory.json",
+    "chars": 3291
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "docs/PILOT_OPS_GAP_REPORT.md",
+    "chars": 1810
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "lib/pilotOps/safetyGuard.js",
+    "chars": 1508
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "lib/pilotOps/privacyGuard.js",
+    "chars": 2033
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "lib/pilotOps/store.js",
+    "chars": 1188
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "lib/pilotOps/pilotRegistry.js",
+    "chars": 3735
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "lib/pilotOps/trialManager.js",
+    "chars": 2696
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "lib/pilotOps/onboardingChecklist.js",
+    "chars": 3358
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "lib/pilotOps/setupProgress.js",
+    "chars": 1005
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "lib/pilotOps/blockerTracker.js",
+    "chars": 936
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "lib/pilotOps/successScoring.js",
+    "chars": 2003
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "lib/pilotOps/riskScoring.js",
+    "chars": 1902
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "lib/pilotOps/conversionAdvisor.js",
+    "chars": 1836
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "lib/pilotOps/feedbackStore.js",
+    "chars": 2554
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "lib/pilotOps/feedbackClassifier.js",
+    "chars": 1755
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "lib/pilotOps/bugTriage.js",
+    "chars": 938
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "lib/pilotOps/messageTemplates.js",
+    "chars": 3788
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "lib/pilotOps/followupDrafts.js",
+    "chars": 2769
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "lib/pilotOps/adapters/_base.js",
+    "chars": 540
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "lib/pilotOps/adapters/publicFunnelAdapter.js",
+    "chars": 337
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "lib/pilotOps/adapters/businessSetupAdapter.js",
+    "chars": 335
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "lib/pilotOps/adapters/saasBillingAdapter.js",
+    "chars": 351
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "lib/pilotOps/adapters/tenantPortalAdapter.js",
+    "chars": 350
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "lib/pilotOps/adapters/customer360Adapter.js",
+    "chars": 324
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "lib/pilotOps/adapters/demoSandboxAdapter.js",
+    "chars": 265
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "lib/pilotOps/adapters/kpiCommandAdapter.js",
+    "chars": 251
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "lib/pilotOps/adapters/incidentCommandAdapter.js",
+    "chars": 840
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "lib/pilotOps/adapters/complianceAdapter.js",
+    "chars": 760
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "lib/pilotOps/adapters/ownerCommandAdapter.js",
+    "chars": 234
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "lib/pilotOps/adapters/ownerCommandSummary.js",
+    "chars": 1378
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "lib/pilotOps/adapters/kpiExportAdapter.js",
+    "chars": 1345
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "lib/pilotOps/adminCommands.js",
+    "chars": 3497
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "routes/pilotOpsRoutes.js",
+    "chars": 8016
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "public/pilot-ops.html",
+    "chars": 5062
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "public/js/pilot-ops.js",
+    "chars": 7487
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "public/css/pilot-ops.css",
+    "chars": 3737
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "scripts/pilot-ops-check.js",
+    "chars": 4191
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "tests/smoke/pilotOpsSmoke.js",
+    "chars": 5905
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "docs/PILOT_OPS_COMMAND_CENTER.md",
+    "chars": 1580
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "docs/PILOT_ONBOARDING_CHECKLIST.md",
+    "chars": 636
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "docs/PILOT_SUCCESS_SCORING.md",
+    "chars": 756
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "docs/PILOT_FEEDBACK_TRACKING.md",
+    "chars": 464
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "docs/PILOT_CONVERSION_PLAYBOOK.md",
+    "chars": 725
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "docs/PILOT_OPS_ADMIN_COMMANDS.md",
+    "chars": 2650
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109541138.pdf",
+    "path": "artifacts/pilot_ops_smoke.md",
+    "chars": 1734
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "artifacts/pilot_ops_inventory.json",
+    "chars": 3291
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "docs/PILOT_OPS_GAP_REPORT.md",
+    "chars": 1810
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "lib/pilotOps/safetyGuard.js",
+    "chars": 1508
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "lib/pilotOps/privacyGuard.js",
+    "chars": 2033
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "lib/pilotOps/store.js",
+    "chars": 1188
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "lib/pilotOps/pilotRegistry.js",
+    "chars": 3735
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "lib/pilotOps/trialManager.js",
+    "chars": 2696
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "lib/pilotOps/onboardingChecklist.js",
+    "chars": 3358
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "lib/pilotOps/setupProgress.js",
+    "chars": 1005
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "lib/pilotOps/blockerTracker.js",
+    "chars": 936
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "lib/pilotOps/successScoring.js",
+    "chars": 2003
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "lib/pilotOps/riskScoring.js",
+    "chars": 1902
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "lib/pilotOps/conversionAdvisor.js",
+    "chars": 1836
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "lib/pilotOps/feedbackStore.js",
+    "chars": 2554
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "lib/pilotOps/feedbackClassifier.js",
+    "chars": 1755
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "lib/pilotOps/bugTriage.js",
+    "chars": 938
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "lib/pilotOps/messageTemplates.js",
+    "chars": 3788
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "lib/pilotOps/followupDrafts.js",
+    "chars": 2769
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "lib/pilotOps/adapters/_base.js",
+    "chars": 540
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "lib/pilotOps/adapters/publicFunnelAdapter.js",
+    "chars": 337
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "lib/pilotOps/adapters/businessSetupAdapter.js",
+    "chars": 335
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "lib/pilotOps/adapters/saasBillingAdapter.js",
+    "chars": 351
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "lib/pilotOps/adapters/tenantPortalAdapter.js",
+    "chars": 350
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "lib/pilotOps/adapters/customer360Adapter.js",
+    "chars": 324
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "lib/pilotOps/adapters/demoSandboxAdapter.js",
+    "chars": 265
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "lib/pilotOps/adapters/kpiCommandAdapter.js",
+    "chars": 251
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "lib/pilotOps/adapters/incidentCommandAdapter.js",
+    "chars": 840
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "lib/pilotOps/adapters/complianceAdapter.js",
+    "chars": 760
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "lib/pilotOps/adapters/ownerCommandAdapter.js",
+    "chars": 234
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "lib/pilotOps/adapters/ownerCommandSummary.js",
+    "chars": 1378
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "lib/pilotOps/adapters/kpiExportAdapter.js",
+    "chars": 1345
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "lib/pilotOps/adminCommands.js",
+    "chars": 3497
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "routes/pilotOpsRoutes.js",
+    "chars": 8016
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "public/pilot-ops.html",
+    "chars": 5062
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "public/js/pilot-ops.js",
+    "chars": 7487
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "public/css/pilot-ops.css",
+    "chars": 3737
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "scripts/pilot-ops-check.js",
+    "chars": 4191
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "tests/smoke/pilotOpsSmoke.js",
+    "chars": 5905
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "docs/PILOT_OPS_COMMAND_CENTER.md",
+    "chars": 1580
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "docs/PILOT_ONBOARDING_CHECKLIST.md",
+    "chars": 636
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "docs/PILOT_SUCCESS_SCORING.md",
+    "chars": 756
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "docs/PILOT_FEEDBACK_TRACKING.md",
+    "chars": 464
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "docs/PILOT_CONVERSION_PLAYBOOK.md",
+    "chars": 725
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "docs/PILOT_OPS_ADMIN_COMMANDS.md",
+    "chars": 2650
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Pilot Customer Onboarding + Trial Operations Command Center (coordination layer, dry-run, scan-first)-2026062109535594.pdf",
+    "path": "artifacts/pilot_ops_smoke.md",
+    "chars": 1734
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "lib/supportHelpdesk/privacyGuard.js",
+    "chars": 1647
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "lib/supportHelpdesk/safetyGuard.js",
+    "chars": 1285
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "lib/supportHelpdesk/store.js",
+    "chars": 1774
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "lib/supportHelpdesk/ticketClassifier.js",
+    "chars": 1626
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "lib/supportHelpdesk/priorityScoring.js",
+    "chars": 498
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "lib/supportHelpdesk/ticketRegistry.js",
+    "chars": 3408
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "lib/supportHelpdesk/articleStore.js",
+    "chars": 2160
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "lib/supportHelpdesk/articleSearch.js",
+    "chars": 875
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "lib/supportHelpdesk/defaultArticles.js",
+    "chars": 3367
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "lib/supportHelpdesk/knowledgeBase.js",
+    "chars": 912
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "lib/supportHelpdesk/faqBuilder.js",
+    "chars": 464
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "lib/supportHelpdesk/supportPrompts.js",
+    "chars": 2214
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "lib/supportHelpdesk/resolutionAdvisor.js",
+    "chars": 972
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "lib/supportHelpdesk/supportDrafts.js",
+    "chars": 1696
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "lib/supportHelpdesk/escalationRules.js",
+    "chars": 826
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "lib/supportHelpdesk/slaTracker.js",
+    "chars": 973
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "lib/supportHelpdesk/adapters/_base.js",
+    "chars": 285
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "lib/supportHelpdesk/adapters/pilotOpsAdapter.js",
+    "chars": 688
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "lib/supportHelpdesk/adapters/customer360Adapter.js",
+    "chars": 403
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "lib/supportHelpdesk/adapters/ownerCommandSummary.js",
+    "chars": 1284
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "lib/supportHelpdesk/adminCommands.js",
+    "chars": 2083
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "routes/supportHelpdeskRoutes.js",
+    "chars": 6396
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "public/support-helpdesk.html",
+    "chars": 2397
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "public/js/support-helpdesk.js",
+    "chars": 3474
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "public/css/support-helpdesk.css",
+    "chars": 2100
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "public/help.html",
+    "chars": 956
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "public/js/help.js",
+    "chars": 1010
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "public/css/help.css",
+    "chars": 1144
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "scripts/support-helpdesk-check.js",
+    "chars": 5378
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "tests/smoke/supportHelpdeskSmoke.js",
+    "chars": 4172
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "docs/SUPPORT_HELPDESK_COMMAND_CENTER.md",
+    "chars": 994
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "docs/SUPPORT_TICKET_WORKFLOW.md",
+    "chars": 597
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "docs/KNOWLEDGE_BASE_GUIDE.md",
+    "chars": 392
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "docs/SUPPORT_ESCALATION_SLA.md",
+    "chars": 391
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "docs/SUPPORT_ADMIN_COMMANDS.md",
+    "chars": 570
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "docs/PUBLIC_HELP_CENTER.md",
+    "chars": 474
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "artifacts/support_helpdesk_inventory.json",
+    "chars": 2152
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Support Helpdesk + Knowledge Base Command Center (code files)-2026062109533121.pdf",
+    "path": "docs/SUPPORT_HELPDESK_GAP_REPORT.md",
+    "chars": 1750
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "lib/resellerPortal/privacyGuard.js",
+    "chars": 1223
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "lib/resellerPortal/safetyGuard.js",
+    "chars": 1863
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "lib/resellerPortal/store.js",
+    "chars": 1837
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "lib/resellerPortal/resellerProfiles.js",
+    "chars": 1601
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "lib/resellerPortal/resellerRegistry.js",
+    "chars": 1725
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "lib/resellerPortal/brandingPreview.js",
+    "chars": 949
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "lib/resellerPortal/domainPreview.js",
+    "chars": 840
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "lib/resellerPortal/whiteLabelSettings.js",
+    "chars": 2341
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "lib/resellerPortal/referralLinks.js",
+    "chars": 950
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "lib/resellerPortal/leadAttribution.js",
+    "chars": 454
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "lib/resellerPortal/referralTracker.js",
+    "chars": 1985
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "lib/resellerPortal/tenantAdapter.js",
+    "chars": 1043
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "lib/resellerPortal/clientPreview.js",
+    "chars": 1461
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "lib/resellerPortal/commissionPreview.js",
+    "chars": 1525
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "lib/resellerPortal/commissionReport.js",
+    "chars": 684
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "lib/resellerPortal/salesScripts.js",
+    "chars": 1692
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "lib/resellerPortal/demoScripts.js",
+    "chars": 825
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "lib/resellerPortal/assetLibrary.js",
+    "chars": 2134
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "lib/resellerPortal/adapters/index.js",
+    "chars": 1591
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "lib/resellerPortal/adminCommands.js",
+    "chars": 1696
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "routes/resellerPortalRoutes.js",
+    "chars": 5486
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "public/reseller-portal.html",
+    "chars": 2935
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "public/js/reseller-portal.js",
+    "chars": 3565
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "public/css/reseller-portal.css",
+    "chars": 2098
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "public/partners.html",
+    "chars": 1797
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "public/js/partners.js",
+    "chars": 749
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "public/css/partners.css",
+    "chars": 1427
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "scripts/reseller-portal-check.js",
+    "chars": 5891
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "tests/smoke/resellerPortalSmoke.js",
+    "chars": 4402
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "docs/RESELLER_PORTAL_COMMAND_CENTER.md",
+    "chars": 692
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "docs/WHITE_LABEL_BRANDING.md",
+    "chars": 524
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "docs/RESELLER_REFERRALS.md",
+    "chars": 479
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "docs/RESELLER_COMMISSIONS.md",
+    "chars": 520
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "docs/PARTNER_ASSET_LIBRARY.md",
+    "chars": 414
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "docs/RESELLER_PORTAL_SAFETY.md",
+    "chars": 616
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "docs/PARTNER_PUBLIC_PAGE.md",
+    "chars": 525
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "artifacts/reseller_portal_inventory.json",
+    "chars": 1864
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 White Label + Reseller Partner Portal Command Center (code files)-2026062109531072.pdf",
+    "path": "docs/RESELLER_PORTAL_GAP_REPORT.md",
+    "chars": 4106
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Guided Demo Journey + Client Walkthrough + Acceptance Checklist Center (code files)-2026062109523756.pdf",
+    "path": "lib/guidedDemo/demoSafety.js",
+    "chars": 1227
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Guided Demo Journey + Client Walkthrough + Acceptance Checklist Center (code files)-2026062109523756.pdf",
+    "path": "lib/guidedDemo/demoRedactor.js",
+    "chars": 1015
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Guided Demo Journey + Client Walkthrough + Acceptance Checklist Center (code files)-2026062109523756.pdf",
+    "path": "lib/guidedDemo/index.js",
+    "chars": 914
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Guided Demo Journey + Client Walkthrough + Acceptance Checklist Center (code files)-2026062109523756.pdf",
+    "path": "lib/guidedDemo/defaultJourneys.js",
+    "chars": 6981
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Guided Demo Journey + Client Walkthrough + Acceptance Checklist Center (code files)-2026062109523756.pdf",
+    "path": "lib/guidedDemo/demoJourneyRegistry.js",
+    "chars": 703
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Guided Demo Journey + Client Walkthrough + Acceptance Checklist Center (code files)-2026062109523756.pdf",
+    "path": "demo/guided-demo-journeys.json",
+    "chars": 222
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Guided Demo Journey + Client Walkthrough + Acceptance Checklist Center (code files)-2026062109523756.pdf",
+    "path": "lib/guidedDemo/demoStepRunner.js",
+    "chars": 2565
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Guided Demo Journey + Client Walkthrough + Acceptance Checklist Center (code files)-2026062109523756.pdf",
+    "path": "lib/guidedDemo/demoAcceptanceChecklist.js",
+    "chars": 2437
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Guided Demo Journey + Client Walkthrough + Acceptance Checklist Center (code files)-2026062109523756.pdf",
+    "path": "lib/guidedDemo/demoReadinessScoring.js",
+    "chars": 1752
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Guided Demo Journey + Client Walkthrough + Acceptance Checklist Center (code files)-2026062109523756.pdf",
+    "path": "lib/guidedDemo/demoReportBuilder.js",
+    "chars": 1744
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Guided Demo Journey + Client Walkthrough + Acceptance Checklist Center (code files)-2026062109523756.pdf",
+    "path": "routes/guidedDemoRoutes.js",
+    "chars": 2447
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Guided Demo Journey + Client Walkthrough + Acceptance Checklist Center (code files)-2026062109523756.pdf",
+    "path": "public/guided-demo.html",
+    "chars": 2021
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Guided Demo Journey + Client Walkthrough + Acceptance Checklist Center (code files)-2026062109523756.pdf",
+    "path": "public/js/guided-demo.js",
+    "chars": 3074
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Guided Demo Journey + Client Walkthrough + Acceptance Checklist Center (code files)-2026062109523756.pdf",
+    "path": "public/css/guided-demo.css",
+    "chars": 2687
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Guided Demo Journey + Client Walkthrough + Acceptance Checklist Center (code files)-2026062109523756.pdf",
+    "path": "scripts/guided-demo-check.js",
+    "chars": 3953
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Guided Demo Journey + Client Walkthrough + Acceptance Checklist Center (code files)-2026062109523756.pdf",
+    "path": "tests/smoke/guidedDemoSmoke.js",
+    "chars": 6587
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Guided Demo Journey + Client Walkthrough + Acceptance Checklist Center (code files)-2026062109523756.pdf",
+    "path": "artifacts/guided_demo_inventory.json",
+    "chars": 790
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Demo Sandbox + Guided Product Tour Command Center (code files)-2026062109522517.pdf",
+    "path": "lib/demoSandbox/store.js",
+    "chars": 1435
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Demo Sandbox + Guided Product Tour Command Center (code files)-2026062109522517.pdf",
+    "path": "lib/demoSandbox/demoConfig.js",
+    "chars": 1533
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Demo Sandbox + Guided Product Tour Command Center (code files)-2026062109522517.pdf",
+    "path": "lib/demoSandbox/demoModeGuard.js",
+    "chars": 1530
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Demo Sandbox + Guided Product Tour Command Center (code files)-2026062109522517.pdf",
+    "path": "lib/demoSandbox/demoDataFactory.js",
+    "chars": 5298
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Demo Sandbox + Guided Product Tour Command Center (code files)-2026062109522517.pdf",
+    "path": "lib/demoSandbox/demoReset.js",
+    "chars": 1169
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Demo Sandbox + Guided Product Tour Command Center (code files)-2026062109522517.pdf",
+    "path": "lib/demoSandbox/scenarioRegistry.js",
+    "chars": 3484
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Demo Sandbox + Guided Product Tour Command Center (code files)-2026062109522517.pdf",
+    "path": "lib/demoSandbox/scenarioRunner.js",
+    "chars": 1438
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Demo Sandbox + Guided Product Tour Command Center (code files)-2026062109522517.pdf",
+    "path": "lib/demoSandbox/tourRegistry.js",
+    "chars": 3268
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Demo Sandbox + Guided Product Tour Command Center (code files)-2026062109522517.pdf",
+    "path": "lib/demoSandbox/tourState.js",
+    "chars": 1293
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Demo Sandbox + Guided Product Tour Command Center (code files)-2026062109522517.pdf",
+    "path": "public/js/demo-tour.js",
+    "chars": 2841
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Demo Sandbox + Guided Product Tour Command Center (code files)-2026062109522517.pdf",
+    "path": "public/css/demo-tour.css",
+    "chars": 1386
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Demo Sandbox + Guided Product Tour Command Center (code files)-2026062109522517.pdf",
+    "path": "lib/demoSandbox/adapters/_base.js",
+    "chars": 437
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Demo Sandbox + Guided Product Tour Command Center (code files)-2026062109522517.pdf",
+    "path": "lib/demoSandbox/adapters/customer360DemoAdapter.js",
+    "chars": 138
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Demo Sandbox + Guided Product Tour Command Center (code files)-2026062109522517.pdf",
+    "path": "lib/demoSandbox/adapters/ownerCommandDemoAdapter.js",
+    "chars": 273
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Demo Sandbox + Guided Product Tour Command Center (code files)-2026062109522517.pdf",
+    "path": "lib/demoSandbox/adapters/voiceAIDemoAdapter.js",
+    "chars": 192
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Demo Sandbox + Guided Product Tour Command Center (code files)-2026062109522517.pdf",
+    "path": "lib/demoSandbox/adapters/channelAutomationDemoAdapter.js",
+    "chars": 257
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Demo Sandbox + Guided Product Tour Command Center (code files)-2026062109522517.pdf",
+    "path": "lib/demoSandbox/adapters/marketplaceDemoAdapter.js",
+    "chars": 165
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Demo Sandbox + Guided Product Tour Command Center (code files)-2026062109522517.pdf",
+    "path": "lib/demoSandbox/adapters/growthCampaignDemoAdapter.js",
+    "chars": 316
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Demo Sandbox + Guided Product Tour Command Center (code files)-2026062109522517.pdf",
+    "path": "lib/demoSandbox/adapters/kpiCommandDemoAdapter.js",
+    "chars": 151
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Demo Sandbox + Guided Product Tour Command Center (code files)-2026062109522517.pdf",
+    "path": "lib/demoSandbox/adapters/saasBillingDemoAdapter.js",
+    "chars": 161
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Demo Sandbox + Guided Product Tour Command Center (code files)-2026062109522517.pdf",
+    "path": "lib/demoSandbox/adapters/publicFunnelAdapter.js",
+    "chars": 968
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Demo Sandbox + Guided Product Tour Command Center (code files)-2026062109522517.pdf",
+    "path": "routes/demoSandboxRoutes.js",
+    "chars": 3330
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Demo Sandbox + Guided Product Tour Command Center (code files)-2026062109522517.pdf",
+    "path": "public/demo-sandbox.html",
+    "chars": 2188
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Demo Sandbox + Guided Product Tour Command Center (code files)-2026062109522517.pdf",
+    "path": "public/js/demo-sandbox.js",
+    "chars": 2380
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Demo Sandbox + Guided Product Tour Command Center (code files)-2026062109522517.pdf",
+    "path": "public/css/demo-sandbox.css",
+    "chars": 2111
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Demo Sandbox + Guided Product Tour Command Center (code files)-2026062109522517.pdf",
+    "path": "scripts/demo-sandbox-check.js",
+    "chars": 4917
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Demo Sandbox + Guided Product Tour Command Center (code files)-2026062109522517.pdf",
+    "path": "tests/smoke/demoSandboxSmoke.js",
+    "chars": 3827
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Demo Sandbox + Guided Product Tour Command Center (code files)-2026062109522517.pdf",
+    "path": "docs/DEMO_SANDBOX.md",
+    "chars": 1001
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Demo Sandbox + Guided Product Tour Command Center (code files)-2026062109522517.pdf",
+    "path": "docs/DEMO_SCENARIOS.md",
+    "chars": 529
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Demo Sandbox + Guided Product Tour Command Center (code files)-2026062109522517.pdf",
+    "path": "docs/GUIDED_PRODUCT_TOURS.md",
+    "chars": 574
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Demo Sandbox + Guided Product Tour Command Center (code files)-2026062109522517.pdf",
+    "path": "docs/DEMO_DATA_SAFETY.md",
+    "chars": 675
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Demo Sandbox + Guided Product Tour Command Center (code files)-2026062109522517.pdf",
+    "path": "docs/DEMO_PUBLIC_FUNNEL_INTEGRATION.md",
+    "chars": 605
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Demo Sandbox + Guided Product Tour Command Center (code files)-2026062109522517.pdf",
+    "path": "artifacts/demo_sandbox_inventory.json",
+    "chars": 2169
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Demo Sandbox + Guided Product Tour Command Center (code files)-2026062109522517.pdf",
+    "path": "docs/DEMO_SANDBOX_GAP_REPORT.md",
+    "chars": 2248
+  },
+  {
+    "pdf": "public-landing.html + pricing.html + features.html + start.html + css-js-2026062109515967.pdf",
+    "path": "public/css/funnel.css",
+    "chars": 1707
+  },
+  {
+    "pdf": "public-landing.html + pricing.html + features.html + start.html + css-js-2026062109515967.pdf",
+    "path": "public/js/funnel.js",
+    "chars": 1628
+  },
+  {
+    "pdf": "public-landing.html + pricing.html + features.html + start.html + css-js-2026062109515967.pdf",
+    "path": "public/landing.html",
+    "chars": 1582
+  },
+  {
+    "pdf": "public-landing.html + pricing.html + features.html + start.html + css-js-2026062109515967.pdf",
+    "path": "public/pricing.html",
+    "chars": 667
+  },
+  {
+    "pdf": "public-landing.html + pricing.html + features.html + start.html + css-js-2026062109515967.pdf",
+    "path": "public/features.html",
+    "chars": 1223
+  },
+  {
+    "pdf": "public-landing.html + pricing.html + features.html + start.html + css-js-2026062109515967.pdf",
+    "path": "public/start.html",
+    "chars": 1352
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Public SaaS Funnel (Phase 1, dry-run) code files-2026062109515391.pdf",
+    "path": "lib/publicSaasFunnel/safety.js",
+    "chars": 665
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Public SaaS Funnel (Phase 1, dry-run) code files-2026062109515391.pdf",
+    "path": "lib/publicSaasFunnel/store.js",
+    "chars": 1692
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Public SaaS Funnel (Phase 1, dry-run) code files-2026062109515391.pdf",
+    "path": "lib/publicSaasFunnel/pricing.js",
+    "chars": 1251
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Public SaaS Funnel (Phase 1, dry-run) code files-2026062109515391.pdf",
+    "path": "lib/publicSaasFunnel/leadCapture.js",
+    "chars": 995
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Public SaaS Funnel (Phase 1, dry-run) code files-2026062109515391.pdf",
+    "path": "routes/publicSaasFunnelRoutes.js",
+    "chars": 1772
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Public SaaS Funnel (Phase 1, dry-run) code files-2026062109515391.pdf",
+    "path": "public/css/funnel.css",
+    "chars": 1707
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Public SaaS Funnel (Phase 1, dry-run) code files-2026062109515391.pdf",
+    "path": "public/js/funnel.js",
+    "chars": 1628
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Public SaaS Funnel (Phase 1, dry-run) code files-2026062109515391.pdf",
+    "path": "public/landing.html",
+    "chars": 1582
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Public SaaS Funnel (Phase 1, dry-run) code files-2026062109515391.pdf",
+    "path": "public/pricing.html",
+    "chars": 667
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Public SaaS Funnel (Phase 1, dry-run) code files-2026062109515391.pdf",
+    "path": "public/features.html",
+    "chars": 1223
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Public SaaS Funnel (Phase 1, dry-run) code files-2026062109515391.pdf",
+    "path": "public/start.html",
+    "chars": 1429
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Public SaaS Funnel (Phase 1, dry-run) code files-2026062109515391.pdf",
+    "path": "scripts/public-funnel-check.js",
+    "chars": 3088
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Public SaaS Funnel (Phase 1, dry-run) code files-2026062109515391.pdf",
+    "path": "tests/smoke/publicFunnelSmoke.js",
+    "chars": 3946
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Shared Inbox 2.0 (code files)-2026062109513657.pdf",
+    "path": "lib/sharedInbox/store.js",
+    "chars": 1491
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Shared Inbox 2.0 (code files)-2026062109513657.pdf",
+    "path": "lib/sharedInbox/inboxAdapter.js",
+    "chars": 2012
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Shared Inbox 2.0 (code files)-2026062109513657.pdf",
+    "path": "lib/sharedInbox/conversationModel.js",
+    "chars": 1261
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Shared Inbox 2.0 (code files)-2026062109513657.pdf",
+    "path": "lib/sharedInbox/conversationService.js",
+    "chars": 2430
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Shared Inbox 2.0 (code files)-2026062109513657.pdf",
+    "path": "lib/sharedInbox/assignmentService.js",
+    "chars": 471
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Shared Inbox 2.0 (code files)-2026062109513657.pdf",
+    "path": "lib/sharedInbox/privateNotes.js",
+    "chars": 1293
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Shared Inbox 2.0 (code files)-2026062109513657.pdf",
+    "path": "lib/sharedInbox/savedReplies.js",
+    "chars": 902
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Shared Inbox 2.0 (code files)-2026062109513657.pdf",
+    "path": "lib/sharedInbox/slaService.js",
+    "chars": 827
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Shared Inbox 2.0 (code files)-2026062109513657.pdf",
+    "path": "lib/sharedInbox/collisionGuard.js",
+    "chars": 1629
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Shared Inbox 2.0 (code files)-2026062109513657.pdf",
+    "path": "lib/sharedInbox/replyPreview.js",
+    "chars": 1132
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Shared Inbox 2.0 (code files)-2026062109513657.pdf",
+    "path": "routes/sharedInboxRoutes.js",
+    "chars": 3362
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Shared Inbox 2.0 (code files)-2026062109513657.pdf",
+    "path": "public/shared-inbox.html",
+    "chars": 2178
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Shared Inbox 2.0 (code files)-2026062109513657.pdf",
+    "path": "public/js/shared-inbox.js",
+    "chars": 4980
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Shared Inbox 2.0 (code files)-2026062109513657.pdf",
+    "path": "public/css/shared-inbox.css",
+    "chars": 2772
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Shared Inbox 2.0 (code files)-2026062109513657.pdf",
+    "path": "scripts/shared-inbox-check.js",
+    "chars": 3203
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Shared Inbox 2.0 (code files)-2026062109513657.pdf",
+    "path": "tests/smoke/sharedInboxSmoke.js",
+    "chars": 4491
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Omnichannel Inbox v1 (drop-in)-2026062109511714.pdf",
+    "path": "src/modules/inbox/inboxStore.js",
+    "chars": 3210
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Omnichannel Inbox v1 (drop-in)-2026062109511714.pdf",
+    "path": "src/modules/inbox/cannedReplies.js",
+    "chars": 2826
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Omnichannel Inbox v1 (drop-in)-2026062109511714.pdf",
+    "path": "src/modules/inbox/inbox.js",
+    "chars": 3338
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Omnichannel Inbox v1 (drop-in)-2026062109511714.pdf",
+    "path": "src/modules/inbox/index.js",
+    "chars": 3406
+  },
+  {
+    "pdf": "SuperSender Pro \u2014 Omnichannel Inbox v1 (drop-in)-2026062109511714.pdf",
+    "path": "src/modules/inbox/inbox.page.js",
+    "chars": 10679
+  }
+]

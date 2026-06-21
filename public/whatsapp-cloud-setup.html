@@ -1,119 +1,104 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>WhatsApp Cloud Setup — SuperSender Pro</title>
-<link rel="stylesheet" href="/css/whatsapp-cloud-setup.css" />
-</head>
-<body>
-<header class="wcs-header">
-  <div class="wcs-brand">🟢 WhatsApp Cloud Setup <span class="wcs-tag">+ Template Manager</span></div>
-  <div id="wcs-safety-badges" class="wcs-badges"></div>
-</header>
-
-<nav class="wcs-tabs">
-  <button class="wcs-tab active" data-tab="readiness">Readiness</button>
-  <button class="wcs-tab" data-tab="checklist">Checklist</button>
-  <button class="wcs-tab" data-tab="account">WABA / Phone</button>
-  <button class="wcs-tab" data-tab="webhook">Webhook</button>
-  <button class="wcs-tab" data-tab="templates">Templates</button>
-  <button class="wcs-tab" data-tab="send">Send Preview</button>
-  <button class="wcs-tab" data-tab="safety">Safety</button>
-</nav>
-
-<main class="wcs-main">
-  <!-- 1. Readiness score -->
-  <section id="readiness" class="wcs-panel active">
-    <div class="wcs-score-wrap">
-      <div class="wcs-score" id="wcs-score">–</div>
-      <div class="wcs-score-meta">
-        <div class="wcs-status" id="wcs-status">loading…</div>
-        <div class="wcs-muted">Setup readiness score (dry-run)</div>
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WhatsApp Cloud API — Production Setup Wizard</title>
+    <link rel="stylesheet" href="/css/whatsapp-cloud-setup.css" />
+  </head>
+  <body class="wcs-body">
+    <header class="wcs-header">
+      <div>
+        <h1>WhatsApp Cloud API <span class="wcs-muted">Production Setup Wizard</span></h1>
+        <p class="wcs-subtitle">Configure, validate, and prepare the existing Cloud API lane. Dry-run first. Secrets never
+  shown.</p>
       </div>
-    </div>
-    <div class="wcs-cards" id="wcs-readiness-cards"></div>
-    <h4>Blockers</h4><ul id="wcs-blockers" class="wcs-list"></ul>
-    <h4>Warnings</h4><ul id="wcs-warnings" class="wcs-list"></ul>
-    <h4>Next steps</h4><ul id="wcs-nextsteps" class="wcs-list"></ul>
-  </section>
+      <div class="wcs-badges">
+        <span id="badge-enabled" class="wcs-badge">enabled: ?</span>
+        <span id="badge-dryrun" class="wcs-badge">dry-run: ?</span>
+        <span id="badge-livetest" class="wcs-badge">live-test: ?</span>
+      </div>
+    </header>
 
-  <!-- 2. Checklist -->
-  <section id="checklist" class="wcs-panel">
-    <p class="wcs-muted">14-step WhatsApp Cloud onboarding checklist. Auto-detected items update from your config.</p>
-    <div id="wcs-checklist" class="wcs-checklist"></div>
-  </section>
-
-  <!-- 3. WABA / Phone Number safe fields -->
-  <section id="account" class="wcs-panel">
-    <p class="wcs-muted">Enter safe identifiers only. Tokens belong in <code>.env</code> — never submit them here. IDs are masked on save.</p>
-    <form class="wcs-form" id="wcs-config-form">
-      <label class="wcs-field">Business name <input id="cfg-businessName" placeholder="My Business" /></label>
-      <label class="wcs-field">WABA ID <input id="cfg-wabaId" placeholder="will be masked" /></label>
-      <label class="wcs-field">Phone Number ID <input id="cfg-phoneNumberId" placeholder="will be masked" /></label>
-      <label class="wcs-field">App ID <input id="cfg-appId" placeholder="will be masked" /></label>
-      <label class="wcs-field">Webhook URL / path <input id="cfg-webhookUrl" placeholder="/api/whatsapp/webhook" /></label>
-      <button type="submit" class="wcs-btn">Validate &amp; save (masked)</button>
-    </form>
-    <pre class="wcs-result" id="wcs-config-result"></pre>
-  </section>
-
-  <!-- 4. Webhook verification guide -->
-  <section id="webhook" class="wcs-panel">
-    <div id="wcs-webhook-info"></div>
-    <h4>Test the verify handshake (dry-run)</h4>
-    <form class="wcs-form" id="wcs-webhook-form">
-      <label class="wcs-field">hub.verify_token <input id="wh-token" placeholder="(matches your .env value)" /></label>
-      <label class="wcs-field">hub.challenge <input id="wh-challenge" placeholder="SAMPLE_CHALLENGE_123" /></label>
-      <button type="submit" class="wcs-btn">Run preview</button>
-    </form>
-    <pre class="wcs-result" id="wcs-webhook-result"></pre>
-  </section>
-
-  <!-- 5/6/7/8. Template manager + preview + validation + sync -->
-  <section id="templates" class="wcs-panel">
-    <div class="wcs-row">
-      <button class="wcs-btn secondary" id="wcs-sync-preview">Sync preview</button>
-      <button class="wcs-btn secondary" id="wcs-template-report">Report</button>
-    </div>
-    <div class="table-wrapper">
-      <table id="wcs-templates"><thead><tr>
-        <th>Name</th><th>Category</th><th>Status</th><th>Quality</th><th>Vars</th><th>Actions</th>
-      </tr></thead><tbody></tbody></table>
+    <div class="wcs-warn-banner">
+      Baileys / local WhatsApp bot, QR sessions, and the local worker bridge are <strong>untouched</strong> by this wizard.
     </div>
 
-    <h4>Create / update draft template</h4>
-    <form class="wcs-form" id="wcs-template-form">
-      <label class="wcs-field">Name <input id="tpl-name" placeholder="order_update_utility" /></label>
-      <label class="wcs-field">Language <input id="tpl-language" value="en_US" /></label>
-      <label class="wcs-field">Category
-        <select id="tpl-category"><option>utility</option><option>marketing</option><option>authentication</option></select>
-      </label>
-      <label class="wcs-field wcs-wide">Body <textarea id="tpl-body" rows="3" placeholder="Hi {{name}}, your order {{order_id}} is {{status}}."></textarea></label>
-      <label class="wcs-field">Footer <input id="tpl-footer" placeholder="SuperSender Pro" /></label>
-      <button type="submit" class="wcs-btn">Save draft</button>
-    </form>
-    <pre class="wcs-result" id="wcs-template-result"></pre>
-  </section>
 
-  <!-- 9. Send preview -->
-  <section id="send" class="wcs-panel">
-    <p class="wcs-muted">Dry-run only. No message is ever sent. Recipient is masked.</p>
-    <form class="wcs-form" id="wcs-send-form">
-      <label class="wcs-field">Template ID <input id="send-templateId" placeholder="wct_..." /></label>
-      <label class="wcs-field">Recipient (masked) <input id="send-recipient" placeholder="+92300..." /></label>
-      <button type="submit" class="wcs-btn">Render send preview</button>
-    </form>
-    <pre class="wcs-result" id="wcs-send-result"></pre>
-  </section>
+    <main class="wcs-grid">
+      <section class="wcs-card" id="card-score">
+        <h2>Setup Score</h2>
+        <div class="wcs-score" id="setup-score">--</div>
+        <p class="wcs-muted" id="setup-score-note">Loading...</p>
+      </section>
 
-  <!-- 10. Safety panel -->
-  <section id="safety" class="wcs-panel">
-    <div class="wcs-cards" id="wcs-safety-cards"></div>
-    <p class="wcs-muted">This coordination layer never stores tokens, never exposes full phone numbers, and never performs a live Meta API call or real send by default.</p>
-  </section>
-</main>
+      <section class="wcs-card" id="card-missing">
+        <h2>Missing Config</h2><ul class="wcs-list" id="missing-list"><li class="wcs-muted">Loading...</li></ul>
+      </section>
 
-<script src="/js/whatsapp-cloud-setup.js"></script>
+      <section class="wcs-card" id="card-config">
+        <h2>Masked Config Preview</h2>
+        <table class="wcs-table" id="config-table"><tbody><tr><td class="wcs-muted">Loading...</td></tr></tbody></table>
+      </section>
+
+      <section class="wcs-card wcs-span2" id="card-templates">
+        <h2>Template Registry <span class="wcs-muted" id="tpl-count"></span></h2>
+        <table class="wcs-table" id="templates-table">
+          <thead><tr><th>Name</th><th>Category</th><th>Lang</th><th>Placeholders</th><th>Status</th></tr></thead>
+          <tbody><tr><td class="wcs-muted" colspan="5">Loading...</td></tr></tbody>
+
+     </table>
+   </section>
+
+   <section class="wcs-card wcs-span2" id="card-preview">
+     <h2>Template Preview Builder <span class="wcs-pill">dry-run</span></h2>
+     <div class="wcs-form">
+       <label>Template
+           <select id="preview-template"></select>
+         </label>
+         <label>Recipient (masked in output)
+           <input id="preview-to" type="text" placeholder="e.g. +92300xxxxxxx" />
+         </label>
+         <label>Params (comma-separated, optional)
+           <input id="preview-params" type="text" placeholder="Ahsan, ORD-10231, PKR 4,500" />
+         </label>
+         <div class="wcs-actions">
+           <button id="btn-preview" class="wcs-btn">Build Preview</button>
+           <button id="btn-test" class="wcs-btn wcs-btn-ghost">Run Dry-Run Test</button>
+         </div>
+     </div>
+     <pre class="wcs-pre" id="preview-output">Payload preview will appear here.</pre>
+   </section>
+
+
+   <section class="wcs-card wcs-span2" id="card-webhook">
+     <h2>Webhook Diagnostics</h2>
+     <div id="webhook-output" class="wcs-muted">Loading...</div>
+   </section>
+
+   <section class="wcs-card wcs-span2" id="card-checklist">
+     <h2>Production Readiness Checklist</h2><ul class="wcs-list" id="readiness-list"><li class="wcs-muted">Loading...
+</li></ul>
+   </section>
+
+
+   <section class="wcs-card wcs-span2" id="card-history">
+     <h2>History <span class="wcs-muted">(safe, masked)</span></h2>
+     <table class="wcs-table" id="history-table">
+       <thead><tr><th>Time</th><th>Action</th><th>Mode</th><th>Template</th><th>Target</th><th>Status</th><th></th></tr>
+</thead>
+         <tbody><tr><td class="wcs-muted" colspan="7">Loading...</td></tr></tbody>
+     </table>
+   </section>
+
+   <section class="wcs-card wcs-span2" id="card-docs">
+     <h2>Docs</h2><ul class="wcs-list">
+       <li><a href="/docs/WHATSAPP_CLOUD_SETUP_WIZARD.md">Setup Wizard Guide</a></li>
+       <li><a href="/docs/WHATSAPP_CLOUD_PRODUCTION_CHECKLIST.md">Production Checklist</a></li>
+     </ul>
+   </section>
+ </main>
+
+ <script src="/js/whatsapp-cloud-setup.js"></script>
 </body>
 </html>

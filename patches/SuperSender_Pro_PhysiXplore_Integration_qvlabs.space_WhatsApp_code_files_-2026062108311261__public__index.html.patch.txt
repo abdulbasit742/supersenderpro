@@ -1,0 +1,3 @@
+  <!-- BEGIN PHYSIXPLORE HOOK -->
+  <a href="/physixplore.html" class="nav-link">PhysiXplore</a>
+  <!-- END PHYSIXPLORE HOOK -->

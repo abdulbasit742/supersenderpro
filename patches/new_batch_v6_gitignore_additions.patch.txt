@@ -1,0 +1,11 @@
+# BEGIN NEW MODULE GITIGNORE ADDITIONS (v6)
+data/rbac.json
+data/backup.json
+backups/
+data/briefing.json
+data/dedupe.json
+data/spintax.json
+data/templates.json
+data/rotation.json
+data/banRisk.json
+# END NEW MODULE GITIGNORE ADDITIONS

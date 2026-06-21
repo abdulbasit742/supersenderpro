@@ -1,0 +1,9 @@
+[
+  "lib/pilotOps/adapters/kpiExportAdapter.js",
+  "lib/pilotOps/blockerTracker.js",
+  "lib/pilotOps/bugTriage.js",
+  "lib/pilotOps/conversionAdvisor.js",
+  "lib/pilotOps/followupDrafts.js",
+  "lib/pilotOps/store.js",
+  "lib/pilotOps/trialManager.js"
+]

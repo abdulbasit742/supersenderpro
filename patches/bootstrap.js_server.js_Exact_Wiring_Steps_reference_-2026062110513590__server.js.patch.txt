@@ -1,0 +1,17 @@
+// Add near other require lines
+const bootstrap = require('./src/bootstrap');
+
+// Add after app.use(express.json()) and before app.listen(...)
+// BEGIN BOOTSTRAP HOOK
+   const deps = {
+     waCustomer:    typeof waCustomer !== 'undefined' ? waCustomer : null,     // your customer WhatsApp sender
+     waAdmin:       typeof waAdmin    !== 'undefined' ? waAdmin    : null,     // your admin alert sender
+     waClients:     typeof waClients   !== 'undefined' ? waClients   : {},     // { 'customer-bot': {connected:true}, ... }
+     redis:         typeof redis       !== 'undefined' ? redis       : null,
+     db:            typeof db          !== 'undefined' ? db          : null,
+     catalog:       typeof catalog     !== 'undefined' ? catalog     : null,
+     stock:       typeof stock      !== 'undefined' ? stock          : null,
+     adminNumber: process.env.ADMIN_NUMBER,
+   };
+   bootstrap(app, deps);
+   // END BOOTSTRAP HOOK

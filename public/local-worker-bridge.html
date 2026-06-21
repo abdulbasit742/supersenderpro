@@ -1,0 +1,128 @@
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Local Worker Bridge — SuperSender Pro</title>
+    <link rel="stylesheet" href="/css/local-worker-bridge.css" />
+  </head>
+  <body>
+    <header class="lwb-header">
+      <div class="lwb-header-left">
+        <h1>Local Worker Bridge</h1>
+        <span class="lwb-sub">Public cloud dashboard &middot; local WhatsApp worker</span>
+      </div>
+      <div class="lwb-header-right">
+        <span id="dryRunBadge" class="badge badge-dry">DRY-RUN</span>
+        <a class="lwb-docs" href="/docs/LOCAL_WORKER_BRIDGE.md" target="_blank" rel="noopener">Docs</a>
+      </div>
+    </header>
+
+
+    <section class="lwb-stats" id="statusCards">
+      <div class="card stat"><span class="stat-num" id="statWorkers">–</span><span class="stat-label">Workers</span></div>
+      <div class="card stat"><span class="stat-num online" id="statOnline">–</span><span class="stat-label">Online</span>
+  </div>
+      <div class="card stat"><span class="stat-num stale" id="statStale">–</span><span class="stat-label">Stale</span>
+  </div>
+      <div class="card stat"><span class="stat-num offline" id="statOffline">–</span><span class="stat-
+  label">Offline</span></div>
+      <div class="card stat"><span class="stat-num" id="statPending">–</span><span class="stat-label">Pending jobs</span>
+  </div>
+      <div class="card stat"><span class="stat-num" id="statInbound">–</span><span class="stat-label">Inbound logged</span>
+  </div>
+    </section>
+
+    <div class="lwb-warning" id="tokenWarning" hidden>
+      Token secret is still the default <code>change-me-local-only</code>. Set a real
+      <code>LOCAL_WORKER_TOKEN_SECRET</code> in your <code>.env</code> before using this beyond local testing.
+    </div>
+
+    <main class="lwb-grid">
+      <!-- Register worker -->
+      <section class="card">
+        <h2>Register a worker</h2>
+        <form id="registerForm" class="lwb-form">
+          <label>Worker name <input name="workerName" placeholder="my-laptop" required /></label>
+            <label>Machine label <input name="machineLabel" placeholder="office-vps" /></label>
+            <label>Version <input name="version" placeholder="1.0.0" /></label>
+
+
+     <label>Capabilities (comma-separated)
+       <input name="capabilities" placeholder="whatsapp_send_text, whatsapp_channel_post" />
+     </label>
+    <button type="submit">Register & get token</button>
+  </form>
+  <div id="tokenReveal" class="token-reveal" hidden>
+    <p class="token-once">Token (shown once — copy it now):</p>
+     <code id="tokenValue"></code>
+     <button type="button" id="copyToken">Copy</button>
+  </div>
+</section>
+
+<!-- Create dry-run job -->
+<section class="card">
+  <h2>Create dry-run job</h2>
+  <form id="jobForm" class="lwb-form">
+    <label>Type
+       <select name="type">
+         <option value="dry_run_test">dry_run_test</option>
+         <option value="whatsapp_send_text">whatsapp_send_text</option>
+         <option value="whatsapp_send_template">whatsapp_send_template</option>
+         <option value="whatsapp_send_media">whatsapp_send_media</option>
+         <option value="whatsapp_channel_post">whatsapp_channel_post</option>
+         <option value="admin_alert">admin_alert</option>
+       </select>
+     </label>
+     <label>To (phone, optional) <input name="to" placeholder="923001234567" /></label>
+     <label>Text / summary <input name="text" placeholder="hello (dry-run)" /></label>
+     <button type="submit">Queue dry-run job</button>
+  </form>
+  <p class="hint">Jobs are dry-run by default. The server never sends WhatsApp.</p>
+ </section>
+</main>
+
+
+<section class="card full">
+<div class="card-head"><h2>Workers</h2><button id="refreshBtn" type="button">Refresh</button></div>
+<table class="lwb-table" id="workersTable">
+  <thead><tr>
+    <th>Name</th><th>Machine</th><th>Status</th><th>WhatsApp</th>
+    <th>Sessions</th><th>Queue</th><th>Last seen</th><th>Token</th><th></th>
+  </tr></thead>
+  <tbody></tbody>
+</table>
+</section>
+
+<section class="card full">
+ <h2>Job queue</h2>
+<table class="lwb-table" id="jobsTable">
+  <thead><tr>
+    <th>ID</th><th>Type</th><th>Status</th><th>Dry-run</th><th>To</th><th>Summary</th><th>Attempts</th><th></th>
+  </tr></thead>
+  <tbody></tbody>
+</table>
+</section>
+
+
+<section class="card full">
+ <h2>Inbound relay log <span class="hint">(phones masked, no raw payloads)</span></h2>
+
+
+   <table class="lwb-table" id="inboundTable">
+     <thead><tr>
+       <th>When</th><th>Worker</th><th>Channel</th><th>From</th><th>Type</th><th>Text</th>
+     </tr></thead>
+     <tbody></tbody>
+   </table>
+ </section>
+
+
+ <footer class="lwb-footer">
+   Local Worker Bridge &middot; dry-run safe &middot; no external APIs &middot;
+   <a href="/docs/CLOUD_DASHBOARD_LOCAL_WORKER.md" target="_blank" rel="noopener">architecture</a>
+ </footer>
+
+ <script src="/js/local-worker-bridge.js"></script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+{
+    "generatedBy": "mock-gateway-scan",
+    "workspace": "clickup-only",
+  "note": "ClickUp workspace is separate from Manus and Gumloop. Only files present here are considered. No commit/push.
+Mock gateway is a new offline simulator layer; existing modules are reused read-only, never rebuilt.",
+    "existing": {
+      "reseller_portal": "exists", "reseller_portal_qa": "exists", "pilot_ops": "exists",
+      "incident_command": "exists", "group_commerce": "exists", "group_commerce_inbox": "exists",
+      "payment_validation": "exists", "launch_center": "exists", "security_scan": "exists",
+    "integration_setup": "exists", "superflow": "exists", "whatsapp_cloud_setup": "exists", "local_worker_bridge":
+"exists"
+    },
+    "scannedAreas": {
+      "demo_sandbox": "partial", "mock_providers": "missing", "provider_adapters": "partial",
+      "whatsapp_adapter": "exists", "whatsapp_cloud_adapter": "exists", "payment_verifier": "exists",
+      "webhook_gateway": "missing", "ai_provider_settings": "partial", "voice_ai_provider_settings": "partial",
+      "ecommerce_adapters": "partial", "social_adapters": "partial", "approval_inbox": "partial",
+      "audit_ledger": "partial", "security_gateway": "exists", "feature_flags": "missing",
+      "team_access": "partial", "tenant_isolation": "partial", "local_demo_mode": "missing", "first_run_doctor": "partial"
+    },
+    "mockGatewayLayer": {
+      "lib/mockGateway/index.js": "missing -> create",
+      "lib/mockGateway/mockConfig.js": "missing -> create",
+      "lib/mockGateway/mockRegistry.js": "missing -> create",
+      "lib/mockGateway/mockRequest.js": "missing -> create",
+      "lib/mockGateway/mockResponse.js": "missing -> create",
+      "lib/mockGateway/mockScenarioRunner.js": "missing -> create",
+      "lib/mockGateway/mockSafety.js": "missing -> create",
+      "lib/mockGateway/mockRedactor.js": "missing -> create",
+      "lib/mockGateway/mockEventStore.js": "missing -> create",
+      "lib/mockGateway/mockScenarios.js": "missing -> create",
+      "lib/mockGateway/mockInputSanitizer.js": "missing -> create",
+      "lib/mockGateway/mockPIIPatterns.js": "missing -> create",
+      "lib/mockGateway/mockSecretPatterns.js": "missing -> create",
+      "lib/mockGateway/providers/*": "missing -> create (15)",
+      "lib/mockGateway/adapters/*": "missing -> create (read-only)",
+      "lib/mockGateway/mockGatewayDoctor.js": "missing -> create",
+      "lib/mockGateway/mockReadinessScoring.js": "missing -> create",
+      "routes/mockGatewayRoutes.js": "missing -> route_mounted:false",
+      "public/mock-gateway.*": "missing -> dashboard_linked:false",
+      "scripts/mock-gateway-check.js": "missing -> script_present:false",
+      "tests/smoke/mockGatewaySmoke.js": "missing -> smoke_test_present:false"
+    },
+  "riskFlags": { "external_call_risk": "none_by_default", "secret_risk": "redacted", "PII_risk": "redacted",
+"live_action_risk": "none_by_default", "safe_fix_recommended": true },
+
+    "duplicatesSkipped": [
+        "Did NOT rebuild WhatsApp/payment/AI/ecommerce/social modules",
+        "Did NOT duplicate existing demo sandbox or provider adapters",
+        "Mock gateway simulates responses only; reuses existing modules read-only"
+    ]
+}

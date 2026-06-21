@@ -1,21 +1,23 @@
-# Business Presets
+ # Business Presets
 
-Each business type maps to a recommended setup path (`lib/unifiedSetup/presets.js`).
+ Each preset declares recommended modules, agents, playbooks, channel rules, customer
+ tags, owner digest format, voice templates, ecommerce fields, payment methods, and
+ required/optional checklist + launch blockers. Presets are data only; applying one is
+ always dry-run.
 
-## Types
-`ai_tools_reseller · ecommerce_store · education_admissions · real_estate · support_center ·
-local_services · digital_products · marketplace_seller · agency · custom`
+ | Preset | Focus |
+ | --- | --- |
+ | AI Tools Reseller | bot, catalog, payment verify, delivery, renewals, agents |
+ | Ecommerce Store | catalog, orders, payments, cart recovery, posting |
+ | Dealer / Wholesale | marketplace intelligence, group commerce, price/stock radar |
 
-## Examples
-**AI tools reseller:** business profile → admin auth → security scan → WhatsApp local → payments →
-ecommerce → AI providers → voice AI (optional) → channel automation (optional) → owner command →
-launch center → pilot launch.
+ | Education / Scholarship | RSS sources, approval queue, daily digest, republish |
+ | Jobs Channel | scrape checklist, category routing, channel posts, dedupe |
+ | Digital Agency | lead inbox, proposal follow-up, voice replies, support SOP |
+ | Restaurant / Food | menu catalog, order alerts, daily offers, broadcast draft |
+ | Real Estate | listing drafts, buyer tracking, voice follow-up, posting |
+ | Sticker / Content | source rules, caption cleaner, branding, queue, repost |
+ | Custom Business | minimal safe setup; admin chooses modules |
 
-**Ecommerce store:** ecommerce → payments → channel automation → social → Google Sheets / n8n →
-Customer 360 → marketplace intelligence → launch.
-
-**Education / admissions:** WhatsApp bot → Customer 360 → voice replies → Google Sheets → social →
-playbooks → launch.
-
-Each preset lists `recommended` (ordered) and `optional` step ids. The planner annotates every
-recommended step with its live status so the owner always sees the next best action.
+ Unlisted business types (fashion, mobile accessories, local shop, coaching, islamic
+ content, affiliate) map to the closest preset automatically.

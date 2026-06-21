@@ -1,0 +1,96 @@
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Receivables — SuperSender Pro</title>
+    <link rel="stylesheet" href="/css/receivables-center.css" />
+  </head>
+  <body>
+    <header class="rc-header">
+      <div><h1>Invoices, Quotations & Receivables</h1><span class="rc-sub">preview center</span></div>
+      <div class="rc-header-right">
+        <span class="badge badge-dry">DRY-RUN</span>
+        <span class="badge badge-ok">no real send</span>
+        <span class="badge badge-ok">no payment action</span>
+        <span class="badge badge-ok">PII masked</span>
+      </div>
+    </header>
+
+    <section class="rc-stats">
+      <div class="card kpi"><span class="kpi-num" id="kInv">–</span><span>Invoices</span></div>
+      <div class="card kpi"><span class="kpi-num" id="kUnpaid">–</span><span>Unpaid</span></div>
+      <div class="card kpi"><span class="kpi-num warn" id="kOverdue">–</span><span>Overdue</span></div>
+      <div class="card kpi"><span class="kpi-num good" id="kPaid">–</span><span>Paid</span></div>
+      <div class="card kpi"><span class="kpi-num" id="kQuote">–</span><span>Quote value</span></div>
+      <div class="card kpi"><span class="kpi-num" id="kRisk">–</span><span>Risk</span></div>
+    </section>
+
+    <nav class="rc-tabs">
+      <button class="tab active" data-tab="invoices">Invoices</button>
+      <button class="tab" data-tab="quotations">Quotations</button>
+      <button class="tab" data-tab="builder">Builder / calculator</button>
+      <button class="tab" data-tab="aging">Aging</button>
+      <button class="tab" data-tab="balances">Customer balances</button>
+    </nav>
+
+    <main>
+      <section class="panel active" id="tab-invoices">
+        <div class="card full">
+          <div class="card-head"><h2>Invoices</h2><div><input id="invSearch" placeholder="search" /> <select
+  id="invStatus"><option value="">all</option></select> <button id="invRefresh" class="mini">Refresh</button></div></div>
+          <table class="rc-table" id="invTable"><thead><tr><th>#</th><th>Customer</th><th>Total</th><th>Paid</th>
+  <th>Balance</th><th>Status</th><th>Due</th><th></th></tr></thead><tbody></tbody></table>
+        </div>
+        <pre id="invDetail" class="rc-pre"></pre>
+      </section>
+
+
+      <section class="panel" id="tab-quotations">
+        <div class="card full">
+          <div class="card-head"><h2>Quotations</h2><button id="quoRefresh" class="mini">Refresh</button></div>
+          <table class="rc-table" id="quoTable"><thead><tr><th>#</th><th>Customer</th><th>Total</th><th>Status</th>
+  <th>Valid until</th><th></th></tr></thead><tbody></tbody></table>
+        </div>
+        <pre id="quoDetail" class="rc-pre"></pre>
+      </section>
+
+      <section class="panel" id="tab-builder">
+        <div class="rc-grid">
+            <div class="card">
+              <h2>Invoice / quote builder</h2>
+              <form id="buildForm" class="rc-form">
+                <input name="customerName" placeholder="customer name" />
+               <div id="itemRows"></div>
+               <button type="button" id="addItem" class="mini">+ item</button>
+               <label>Discount <input name="discountValue" type="number" value="0" /></label>
+               <label>Discount type
+                   <select name="discountType"><option value="flat">flat</option><option value="percent">percent</option>
+  </select>
+               </label>
+               <label>Tax % <input name="taxRate" type="number" value="0" /></label>
+               <label>Shipping <input name="shipping" type="number" value="0" /></label>
+               <div class="rc-actions"><button type="button" id="calcBtn">Calculate</button><button type="button"
+  id="saveInvBtn">Save invoice</button><button type="button" id="saveQuoBtn">Save quote</button></div>
+            </form>
+            </div>
+            <div class="card"><h2>Totals preview</h2><pre id="calcResult" class="rc-pre"></pre></div>
+        </div>
+      </section>
+
+      <section class="panel" id="tab-aging">
+        <div class="card full"><h2>Receivables aging</h2><pre id="agingResult" class="rc-pre"></pre></div>
+      </section>
+
+      <section class="panel" id="tab-balances">
+        <div class="card full"><div class="card-head"><h2>Customer balances</h2><button id="balRefresh"
+  class="mini">Refresh</button></div><table class="rc-table" id="balTable"><thead><tr><th>Customer</th><th>Invoices</th>
+  <th>Total</th><th>Paid</th><th>Balance</th></tr></thead><tbody></tbody></table></div>
+      </section>
+    </main>
+
+
+    <footer class="rc-footer">Receivables · dry-run · no real invoice send · no payment action · PII masked</footer>
+    <script src="/js/receivables-center.js"></script>
+  </body>
+  </html>

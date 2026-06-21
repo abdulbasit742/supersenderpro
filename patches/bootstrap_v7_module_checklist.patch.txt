@@ -1,0 +1,6 @@
+// BEGIN BOOTSTRAP V7 MODULE CHECKLIST
+// Analytics/AI/money modules now present and ready for bootstrap wiring:
+// revenue, margins, funnel, retention, ltv, churnRisk, kb, intent, currency, reconcile
+// The master src/bootstrap.js already safe-requires and registers many of these names.
+// If your local bootstrap predates this batch, add safe requires and register calls following docs.
+// END BOOTSTRAP V7 MODULE CHECKLIST
