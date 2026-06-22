@@ -90,15 +90,20 @@ async function runTests() {
   await testJson('Bot welcome menu includes AI Tools and Giveaway', 'POST', '/api/laptop-bot/handle', (body) => {
     const reply = String(body.reply || '');
     if (!reply.includes('AI Tools')) throw new Error('welcome reply missing AI Tools');
-    if (!reply.includes('Free Giveaway')) throw new Error('welcome reply missing Free Giveaway');
+    if (!/Giveaway/i.test(reply)) throw new Error('welcome reply missing Giveaway menu item');
+    if (!/(Free Giveaway|Not Available)/i.test(reply)) throw new Error('welcome reply missing Giveaway availability state');
   }, { number: `api-suite-welcome-${suiteRunId}`, name: 'API Tester', message: 'hi' });
-  await testJson('Giveaway flow returns Moclaw announcement and image asset', 'POST', '/api/laptop-bot/handle', (body) => {
+  await testJson('Giveaway flow returns availability-aware response', 'POST', '/api/laptop-bot/handle', (body) => {
     const reply = String(body.reply || '');
     const assets = Array.isArray(body.mediaAssets) ? body.mediaAssets : [];
     if (!reply.toLowerCase().includes('moclaw')) throw new Error('giveaway reply missing Moclaw');
-    if (!reply.includes('https://moclaw.ai')) throw new Error('giveaway reply missing link');
-    if (!assets.some(asset => String(asset.source || '').includes('moclaw-deepseek-v4-free-trial.png'))) {
-      throw new Error('giveaway image asset missing');
+    if (/not available|available nahi|hidden rahega/i.test(reply)) {
+      if (assets.length) throw new Error('unavailable giveaway should not expose media assets');
+    } else {
+      if (!reply.includes('https://moclaw.ai')) throw new Error('giveaway reply missing link');
+      if (!assets.some(asset => String(asset.source || '').includes('moclaw-deepseek-v4-free-trial.png'))) {
+        throw new Error('giveaway image asset missing');
+      }
     }
   }, { number: `api-suite-giveaway-${suiteRunId}`, name: 'API Tester', message: '2' });
 

@@ -8,6 +8,7 @@ class SentimentAnalyzer {
     this.dataDir = dataDir;
     this.settings = settings;
     this.sentimentFile = path.join(dataDir, 'sentiment.json');
+    this.lastErrorLogAt = 0;
     this.init();
   }
 
@@ -57,8 +58,15 @@ class SentimentAnalyzer {
 
       return { sentiment, score, mode: 'ai' };
     } catch (err) {
-      console.error('Sentiment analysis error:', err.message);
-      return { ...local, error: err.message, mode: 'local_fallback' };
+      const msg = err && err.message ? err.message : String(err);
+      const noisyTimeout = /abort|timeout|aborted/i.test(msg);
+      const shouldLog = String(process.env.SENTIMENT_LOG_ERRORS || '').toLowerCase() === 'true' || !noisyTimeout;
+      const now = Date.now();
+      if (shouldLog && now - this.lastErrorLogAt > 60000) {
+        this.lastErrorLogAt = now;
+        console.warn('Sentiment analysis fallback:', msg);
+      }
+      return { ...local, error: msg, mode: 'local_fallback' };
     }
   }
 

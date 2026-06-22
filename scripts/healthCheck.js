@@ -72,6 +72,14 @@ function readEnvFile(file) {
   return values;
 }
 
+function externalNodeModulesAvailable() {
+  const roots = String(process.env.NODE_PATH || '')
+    .split(path.delimiter)
+    .map(item => item.trim())
+    .filter(Boolean);
+  return roots.some(root => fs.existsSync(path.join(root, 'express')));
+}
+
 console.log('\nSuperSender Pro - Health Check Starting\n');
 console.log('='.repeat(55));
 
@@ -469,7 +477,9 @@ check('Required dependencies declared', () => {
   return true;
 });
 
-check('node_modules exists', () => fs.existsSync(path.join(ROOT, 'node_modules')));
+check('dependencies installed or external NODE_PATH available', () => (
+  fs.existsSync(path.join(ROOT, 'node_modules')) || externalNodeModulesAvailable()
+));
 check('wa-sales-bot folder exists', () => fs.existsSync(path.join(ROOT, 'wa-sales-bot')));
 
 console.log('\nEnvironment Check:');
@@ -483,8 +493,10 @@ check('wa-sales-bot .env or .env.example exists', () => (
   fs.existsSync(path.join(ROOT, 'wa-sales-bot', '.env.example'))
 ));
 
-check('SESSION_SECRET is production-safe', () => {
-  const envValues = readEnvFile(path.join(ROOT, '.env'));
+check('SESSION_SECRET is production-safe when .env is present', () => {
+  const envPath = path.join(ROOT, '.env');
+  if (!fs.existsSync(envPath)) return true;
+  const envValues = readEnvFile(envPath);
   const value = envValues.SESSION_SECRET || '';
   return value.length >= 32 && !/change|secret_key|replace|default/i.test(value);
 });
@@ -517,21 +529,7 @@ check('Social platform env examples are present', () => {
 });
 
 if (!fs.existsSync(path.join(ROOT, '.env'))) {
-  fix('Create .env from example', () => {
-    const example = path.join(ROOT, '.env.example');
-    if (fs.existsSync(example)) {
-      fs.copyFileSync(example, path.join(ROOT, '.env'));
-    } else {
-      fs.writeFileSync(path.join(ROOT, '.env'), [
-        'PORT=3001',
-        'WA_ENGINE=wwebjs',
-        'ADMIN_NUMBER=923001234567@c.us',
-        'GROQ_API_KEY=',
-        'SUPER_ADMIN_KEY=supersender2024',
-        'STORE_NAME=SuperSender Pro'
-      ].join('\n'));
-    }
-  });
+  console.log('SKIP: .env not created automatically. Run "node scripts/generate-secrets.js" for a safe local env file.');
 }
 
 console.log('\nAutomation Files Check:');

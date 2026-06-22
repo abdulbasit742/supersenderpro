@@ -1703,6 +1703,20 @@ const UI_MOJIBAKE_REPLACEMENTS = [
   ['“', '“'], ['”', '”'], ['‘', '‘'], ['’', '’'], ['═', '═']
 ];
 
+const UI_MOJIBAKE_EXTRA_REPLACEMENTS = [
+  ['\u00f0\u0178\u2019\u00bb', '💻'], ['\u00f0\u0178\u00a7\u00b0', '🧰'], ['\u00f0\u0178\u201c\u00b8', '📸'],
+  ['\u00f0\u0178\u2019\u00ac', '💬'], ['\u00f0\u0178\u201d\u017d', '🔎'], ['\u00f0\u0178\u201d\u2014', '🔗'],
+  ['\u00f0\u0178\u2019\u00b0', '💰'], ['\u00f0\u0178\u203a\u2019', '🛒'], ['\u00f0\u0178\u201c\u00a9', '📩'],
+  ['\u00f0\u0178\u201c\u00a3', '📣'], ['\u00f0\u0178\u201c\u0160', '📊'], ['\u00f0\u0178\u0178\u00a2', '🟢'],
+  ['\u00f0\u0178\u00a4\u2013', '🤖'], ['\u00f0\u0178\u017d\u0081', '🎁'], ['\u00f0\u0178\u00a7\u00a0', '🧠'],
+  ['\u00f0\u0178\u201d\u00a5', '🔥'], ['\u00f0\u0178\u201a\u00a6', '📦'], ['\u00f0\u0178\u203a\u008d\u00ef\u00b8\u008f', '🛍️'],
+  ['\u00e2\u0153\u2026', '✅'], ['\u00e2\u009d\u0152', '❌'], ['\u00e2\u0161\u00a0\u00ef\u00b8\u008f', '⚠️'],
+  ['\u00e2\u0161\u00a1', '⚡'], ['\u00e2\u00ad\u0090', '⭐'], ['\u00e2\u0080\u00a2', '•'],
+  ['\u00e2\u20ac\u201d', '—'], ['\u00e2\u20ac\u201c', '–'], ['\u00e2\u20ac\u02dc', '‘'], ['\u00e2\u20ac\u2122', '’'],
+  ['\u00e2\u20ac\u0153', '“'], ['\u00e2\u20ac\u009d', '”'], ['\u00c2\u00b7', '·'], ['\u00c2 ', ' '],
+  ['\u00ef\u00b8\u008f\u00e2\u0192\u00a3', '️⃣'], ['\u00e2\u0080\u00a6', '...']
+];
+
 const CP1252_REVERSE_BYTES = {
   0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87,
   0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E,
@@ -1734,7 +1748,9 @@ const MOJIBAKE_MARKER_RE = /(?:\u00f0|\u00e2|\u00c3|\u00ef|\u00c2)/;
 
 function cleanMojibakeText(value = '') {
   let text = (value ?? '').toString();
-  for (const [bad, good] of UI_MOJIBAKE_REPLACEMENTS) text = text.split(bad).join(good);
+  for (const [bad, good] of [...UI_MOJIBAKE_REPLACEMENTS, ...UI_MOJIBAKE_EXTRA_REPLACEMENTS]) {
+    text = text.split(bad).join(good);
+  }
   return decodePossibleMojibake(text);
 }
 

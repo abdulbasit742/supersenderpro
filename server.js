@@ -5514,6 +5514,15 @@ function noLidError(error) {
   return /No LID for user/i.test(String(error?.message || error || ''));
 }
 
+const waSendFailureLogCache = new Map();
+function shouldLogWASendFailure(key, windowMs = 60000) {
+  const now = Date.now();
+  const last = waSendFailureLogCache.get(key) || 0;
+  if (now - last < windowMs) return false;
+  waSendFailureLogCache.set(key, now);
+  return true;
+}
+
 function outboundFallbackChatIds(chatId = '') {
   const id = String(chatId || '').trim();
   if (!id) return [];
@@ -5525,15 +5534,37 @@ function outboundFallbackChatIds(chatId = '') {
   return [...new Set(ids.filter(Boolean))];
 }
 
+async function resolveRegisteredWWebChatId(inst, candidate = '') {
+  const raw = String(candidate || '').trim();
+  if (!raw.endsWith('@c.us')) return raw;
+  const user = raw.split('@')[0].replace(/\D/g, '');
+  if (!user || typeof inst?.client?.getNumberId !== 'function') return raw;
+  try {
+    const numberId = await inst.client.getNumberId(user);
+    const serialized = numberId?._serialized || numberId?.id?._serialized || '';
+    return serialized || raw;
+  } catch (error) {
+    const key = `getNumberId:${user}:${error.message || error}`;
+    if (shouldLogWASendFailure(key, 120000)) {
+      console.warn(`[WA] Number lookup skipped for ${user}: ${error.message || error}`);
+    }
+    return raw;
+  }
+}
+
 async function sendClientMessageWithFallback(inst, chatId, content, options = {}) {
   let lastError = null;
   for (const candidate of outboundFallbackChatIds(chatId)) {
+    const resolvedCandidate = await resolveRegisteredWWebChatId(inst, candidate);
     try {
-      return await inst.client.sendMessage(candidate, content, options);
+      return await inst.client.sendMessage(resolvedCandidate, content, options);
     } catch (error) {
       lastError = error;
       if (!noLidError(error)) throw error;
-      console.warn(`[WA] Send failed for ${candidate}: ${error.message}`);
+      const key = `send:${resolvedCandidate}:${error.message || error}`;
+      if (shouldLogWASendFailure(key)) {
+        console.warn(`[WA] Send failed for ${resolvedCandidate}: ${error.message || error}`);
+      }
     }
   }
   throw lastError || new Error('Message send failed');
@@ -5768,7 +5799,10 @@ async function sendDirect(number, text, options = {}) {
       type: 'text'
     });
 
-    console.error("Failed to send message:", error);
+    const sendErrorKey = `direct:${chatId}:${error.message || error}`;
+    if (shouldLogWASendFailure(sendErrorKey)) {
+      console.error("Failed to send message:", error.message || error);
+    }
     throw error;
   }
 }
