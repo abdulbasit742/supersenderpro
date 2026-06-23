@@ -50,7 +50,8 @@
     "vendor-portal:check": "node scripts/vendor-portal-check.js",
     "vendor-portal:smoke": "node tests/smoke/vendorPortalSmoke.js",
     "franchise-portal:check": "node scripts/franchise-portal-check.js",
-    "franchise-portal:smoke": "node tests/smoke/franchisePortalSmoke.js"
+    "franchise-portal:smoke": "node tests/smoke/franchisePortalSmoke.js",
+    "check:revenue-ops": "node scripts/check-revenue-ops.js"
   },
   "dependencies": {
     "@whiskeysockets/baileys": "^7.0.0-rc.9",
