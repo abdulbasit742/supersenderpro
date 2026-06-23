@@ -3144,6 +3144,19 @@ try {
 }
 // END FRANCHISE PORTAL HOOK
 
+// BEGIN PLATFORM CONTROL HOOK
+// Advanced Platform Control + Observability + Safety OS (read-only, preview-only:
+// no live actions, no external calls, no sends/payments/live AI, no secret/PII exposure, no stack traces).
+try {
+  const platformControlRoutes = require('./routes/platformControlRoutes');
+  app.use('/api/platform-control', platformControlRoutes);
+  app.get('/platform-control.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'platform-control.html')));
+  console.log('[PlatformControl] mounted at /api/platform-control (read-only, preview-only, no live actions)');
+} catch (e) {
+  console.error('[PlatformControl] failed to initialise (non-fatal):', e.message);
+}
+// END PLATFORM CONTROL HOOK
+
 
 let searchIndexRebuildTimer = null;
 function scheduleSearchIndexRebuild(reason = 'data-change', delayMs = Number(process.env.SEARCH_REBUILD_DEBOUNCE_MS || 30000)) {
