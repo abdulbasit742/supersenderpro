@@ -4,6 +4,11 @@
 
 Generated for the AI Business Command Center. Tasks are grouped by module and priority. Do not treat this as filler; each item has a concrete acceptance check.
 
+### TASK-0000 [P0] Harden SESSION_SECRET in .env
+Module: Core Stability
+Area: Security
+Acceptance: SESSION_SECRET is changed from default to a strong random string.
+
 ## 0001-0200: Critical stability and bug fixes (Immediate Sprint)
 
 ### TASK-0001 [P0] Fix health check for Core Stability

@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-05-16T10:24:57.432Z",
+  "timestamp": "2026-06-23T10:26:26.462Z",
   "passed": 249,
   "fixed": 0,
   "failed": 0,
-  "serverAlive": true,
+  "serverAlive": false,
   "issues": []
 }
