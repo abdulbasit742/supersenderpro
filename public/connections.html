@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SuperSender Pro — E-Commerce Connections</title>
+  <style>
+    :root{--bg:#0f172a;--card:#1e293b;--line:#334155;--txt:#e2e8f0;--muted:#94a3b8;--accent:#38bdf8;--red:#ef4444;--green:#22c55e;--amber:#f59e0b;}
+    *{box-sizing:border-box;}body{margin:0;font-family:system-ui,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--txt);}
+    header{padding:18px 24px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center;}
+    header h1{font-size:18px;margin:0;}.badge{font-size:12px;color:var(--muted);border:1px solid var(--line);padding:2px 8px;border-radius:999px;}
+    .wrap{max-width:1100px;margin:0 auto;padding:24px;}
+    h2{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:24px 0 12px;}
+    .grid{display:grid;gap:14px;grid-template-columns:1fr;}
+    @media(min-width:640px){.grid{grid-template-columns:1fr 1fr;}}
+    @media(min-width:960px){.grid{grid-template-columns:1fr 1fr 1fr;}}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;}
+    .card .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+    .name{font-weight:600;}
+    .pill{font-size:10px;padding:2px 8px;border-radius:999px;}
+    .ready{background:rgba(34,197,94,.15);color:var(--green);}
+    button{background:var(--accent);color:#05202b;border:none;border-radius:8px;padding:8px 12px;font-weight:600;cursor:pointer;font-size:13px;width:100%;}
+    button.ghost{background:transparent;color:var(--txt);border:1px solid var(--line);}button.danger{background:transparent;color:var(--red);border:1px solid var(--red);}
+    label{display:block;font-size:12px;margin:8px 0 3px;color:var(--muted);}
+    input{width:100%;background:#0b1220;border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:8px 10px;font-size:13px;}
+    .conn{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#0b1220;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:13px;flex-wrap:wrap;}
+    .muted{color:var(--muted);font-size:12px;}
+    .status-connected{color:var(--green);}.status-error{color:var(--red);}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:20px;}
+    .modal.show{display:flex;}
+    .modal .box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;max-width:420px;width:100%;}
+    .row{display:flex;gap:8px;}.row>*{flex:1;}
+    .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#0b1220;border:1px solid var(--line);padding:10px 16px;border-radius:10px;font-size:13px;display:none;}
+  </style>
+</head>
+<body>
+  <header><h1>🛒 E-Commerce Connections</h1><span class="badge">SuperSender Pro</span></header>
+  <div class="wrap">
+    <h2>Connected Stores</h2>
+    <div id="connections"></div>
+
+    <h2>Available Platforms</h2>
+    <div class="grid" id="platforms"></div>
+  </div>
+
+  <!-- Connect modal -->
+  <div class="modal" id="modal">
+    <div class="box">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <strong id="mTitle">Connect</strong><button class="ghost" style="width:auto;" onclick="closeModal()">✕</button>
+      </div>
+      <div id="mFields"></div>
+      <div class="row" style="margin-top:14px;"><button onclick="doConnect()" id="mBtn">Connect &amp; Test</button></div>
+      <div class="muted" id="mErr" style="margin-top:8px;color:var(--red);"></div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+
+<script>
+let PLATFORMS=[]; let current=null;
+async function api(p,o){const r=await fetch('/api'+p,Object.assign({headers:{'Content-Type':'application/json'}},o));return r.json();}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',2600);}
+
+async function load(){
+  const [p,c]=await Promise.all([api('/ecommerce/platforms'),api('/ecommerce/connections')]);
+  PLATFORMS=p.platforms||[];
+  document.getElementById('platforms').innerHTML=PLATFORMS.map(pl=>`<div class="card">
+    <div class="top"><span class="name">${esc(pl.label)}</span><span class="pill ready">Ready</span></div>
+    <div class="muted" style="margin-bottom:10px;">${(pl.credentialFields||[]).length} credential field(s)</div>
+    <button onclick="openModal('${pl.id}')">🔌 Connect</button></div>`).join('');
+  const conns=c.connections||[];
+  document.getElementById('connections').innerHTML=conns.length?conns.map(cn=>`<div class="conn">
+    <div><strong>${esc(cn.label)}</strong> <span class="muted">(${esc(cn.platform)})</span><br>
+      <span class="status-${cn.status}">● ${cn.status}</span> ${cn.lastSyncAt?'· synced '+new Date(cn.lastSyncAt).toLocaleString():''}</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+      <button class="ghost" style="width:auto;" onclick="act('${cn.id}','test')">Test</button>
+      <button class="ghost" style="width:auto;" onclick="act('${cn.id}','sync')">Sync products</button>
+      <button class="ghost" style="width:auto;" onclick="act('${cn.id}','orders')">Pull orders</button>
+      <button class="danger" style="width:auto;" onclick="act('${cn.id}','disconnect')">Disconnect</button>
+    </div></div>`).join(''):'<div class="muted">No stores connected yet.</div>';
+}
+
+function openModal(id){
+  current=PLATFORMS.find(p=>p.id===id); if(!current)return;
+  document.getElementById('mTitle').textContent='Connect '+current.label;
+  document.getElementById('mErr').textContent='';
+  document.getElementById('mFields').innerHTML=(current.credentialFields||[]).map(f=>`
+    <label>${esc(f.label)}</label>
+    <input id="f_${f.key}" type="${f.secret?'password':'text'}" placeholder="${esc(f.placeholder||'')}" />`).join('');
+  document.getElementById('modal').classList.add('show');
+}
+function closeModal(){document.getElementById('modal').classList.remove('show');}
+
+async function doConnect(){
+  const creds={}; (current.credentialFields||[]).forEach(f=>{const v=document.getElementById('f_'+f.key).value.trim();if(v)creds[f.key]=v;});
+  const btn=document.getElementById('mBtn');btn.disabled=true;btn.textContent='Testing…';
+  const res=await api('/ecommerce/connect',{method:'POST',body:JSON.stringify({platform:current.id,credentials:creds})});
+  btn.disabled=false;btn.textContent='Connect & Test';
+  if(!res.ok){document.getElementById('mErr').textContent=res.error||'failed';return;}
+  closeModal();toast('Connected: '+(res.connection.label||current.label));load();
+}
+
+async function act(id,verb){
+  if(verb==='disconnect'){if(!confirm('Disconnect this store?'))return;await api('/ecommerce/connections/'+id,{method:'DELETE'});toast('Disconnected');return load();}
+  if(verb==='test'){const r=await api('/ecommerce/connections/'+id+'/test',{method:'POST'});toast(r.ok?'Connection OK':'Test failed: '+(r.error||''));return load();}
+  if(verb==='sync'){const r=await api('/ecommerce/connections/'+id+'/sync-products',{method:'POST',body:'{}'});toast(r.ok?`Synced ${r.count} products`:'Sync failed: '+(r.error||''));return load();}
+  if(verb==='orders'){const r=await api('/ecommerce/connections/'+id+'/orders',{method:'POST',body:'{}'});toast(r.ok?`Pulled ${r.count} orders`:'Failed: '+(r.error||''));return load();}
+}
+load();
+</script>
+</body>
+</html>

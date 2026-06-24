@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SuperSender Pro — Team Inbox</title>
+  <style>
+    :root{--bg:#0f172a;--card:#1e293b;--line:#334155;--txt:#e2e8f0;--muted:#94a3b8;--accent:#38bdf8;--green:#22c55e;--amber:#f59e0b;}
+    *{box-sizing:border-box;}body{margin:0;font-family:system-ui,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--txt);height:100vh;display:flex;flex-direction:column;}
+    header{padding:14px 20px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center;}
+    header h1{font-size:17px;margin:0;}.badge{font-size:12px;color:var(--muted);border:1px solid var(--line);padding:2px 8px;border-radius:999px;}
+    .main{flex:1;display:grid;grid-template-columns:1fr;min-height:0;}
+    @media(min-width:760px){.main{grid-template-columns:320px 1fr;}}
+    .list{border-right:1px solid var(--line);overflow-y:auto;}
+    .filters{display:flex;gap:6px;padding:10px;border-bottom:1px solid var(--line);flex-wrap:wrap;}
+    .filters button{font-size:12px;padding:4px 10px;border-radius:999px;background:transparent;color:var(--muted);border:1px solid var(--line);cursor:pointer;}
+    .filters button.active{background:var(--accent);color:#05202b;border-color:var(--accent);}
+    .conv{padding:11px 14px;border-bottom:1px solid var(--line);cursor:pointer;}
+    .conv:hover,.conv.sel{background:#0b1220;}
+    .conv .name{font-weight:600;font-size:14px;}.conv .pre{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-left:6px;}.open{background:var(--green);}.pending{background:var(--amber);}.closed{background:var(--muted);}
+    .chat{display:flex;flex-direction:column;min-height:0;}
+    .chat .top{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+    .msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px;}
+    .m{max-width:75%;padding:8px 12px;border-radius:12px;font-size:14px;}
+    .m.in{background:#0b1220;align-self:flex-start;}.m.out{background:var(--accent);color:#05202b;align-self:flex-end;}
+    .m .meta{font-size:10px;opacity:.7;margin-top:3px;}
+    .composer{padding:12px;border-top:1px solid var(--line);display:flex;gap:8px;}
+    input,select,textarea{background:#0b1220;border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:8px 10px;font-size:13px;}
+    .composer input{flex:1;}button{background:var(--accent);color:#05202b;border:none;border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer;font-size:13px;}
+    button.ghost{background:transparent;color:var(--txt);border:1px solid var(--line);}
+    .empty{display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);}
+  </style>
+</head>
+<body>
+  <header><h1>💬 Team Inbox</h1><span class="badge" id="counts">…</span></header>
+  <div class="main">
+    <div class="list">
+      <div class="filters" id="filters"></div>
+      <div id="convs"></div>
+    </div>
+    <div class="chat" id="chat"><div class="empty">Select a conversation</div></div>
+  </div>
+<script>
+let cur=null, filter='', agents=[];
+async function api(p,o){const r=await fetch('/api'+p,Object.assign({headers:{'Content-Type':'application/json'}},o));return r.json();}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+function renderFilters(c){
+  const f=[['','All'],['open','Open'],['pending','Pending'],['closed','Closed']];
+  document.getElementById('filters').innerHTML=f.map(([v,l])=>`<button class="${filter===v?'active':''}" onclick="setF('${v}')">${l}${v&&c[v]!=null?' '+c[v]:''}</button>`).join('');
+}
+function setF(v){filter=v;load();}
+
+async function load(){
+  const [res,ag]=await Promise.all([api('/inbox/conversations'+(filter?'?status='+filter:'')),api('/inbox/agents')]);
+  agents=ag.agents||[];
+  const c=res.counts||{};
+  document.getElementById('counts').textContent=`${c.open||0} open · ${c.pending||0} pending · ${c.unread||0} unread`;
+  renderFilters(c);
+  document.getElementById('convs').innerHTML=(res.conversations||[]).map(cv=>{
+    const last=cv.messages[cv.messages.length-1];
+    return `<div class="conv ${cur===cv.id?'sel':''}" onclick="open_('${cv.id}')">
+      <div class="name">${esc(cv.contact.name||cv.contact.number)}<span class="dot ${cv.status}"></span>${cv.unread?` <span style="color:var(--accent)">●${cv.unread}</span>`:''}</div>
+      <div class="pre">${esc(last?last.text:'(no messages)')}</div></div>`;
+  }).join('')||'<div class="empty" style="height:120px;">No conversations</div>';
+}
+
+async function open_(id){
+  cur=id; await api('/inbox/conversations/'+id+'/read',{method:'POST'});
+  const res=await api('/inbox/conversations/'+id); const cv=res.conversation; if(!cv)return;
+  const opts=`<option value="">Unassigned</option>`+agents.map(a=>`<option value="${a.id}" ${cv.assignedTo===a.id?'selected':''}>${esc(a.name)}</option>`).join('');
+  document.getElementById('chat').innerHTML=`
+    <div class="top">
+      <strong>${esc(cv.contact.name||cv.contact.number)}</strong>
+      <select onchange="assign('${id}',this.value)">${opts}</select>
+      <select onchange="status_('${id}',this.value)">${['open','pending','closed'].map(s=>`<option ${cv.status===s?'selected':''}>${s}</option>`).join('')}</select>
+      <span class="badge">${(cv.tags||[]).join(', ')||'no tags'}</span>
+      <input id="tagIn" placeholder="add tag" style="width:90px;" onkeydown="if(event.key==='Enter')tag('${id}',this.value)" />
+    </div>
+    <div class="msgs" id="msgs">${cv.messages.map(m=>`<div class="m ${m.direction}">${esc(m.text)}<div class="meta">${new Date(m.at).toLocaleString()}</div></div>`).join('')}</div>
+    <div class="composer"><input id="reply" placeholder="Type a reply…" onkeydown="if(event.key==='Enter')reply('${id}')" /><button onclick="reply('${id}')">Send</button></div>`;
+  const m=document.getElementById('msgs');m.scrollTop=m.scrollHeight;
+  load();
+}
+async function reply(id){const el=document.getElementById('reply');const t=el.value.trim();if(!t)return;await api('/inbox/conversations/'+id+'/reply',{method:'POST',body:JSON.stringify({text:t})});open_(id);}
+async function assign(id,a){await api('/inbox/conversations/'+id+'/assign',{method:'POST',body:JSON.stringify({agentId:a})});}
+async function status_(id,s){await api('/inbox/conversations/'+id+'/status',{method:'POST',body:JSON.stringify({status:s})});load();}
+async function tag(id,t){if(!t.trim())return;await api('/inbox/conversations/'+id+'/tags',{method:'POST',body:JSON.stringify({tag:t.trim()})});open_(id);}
+load();setInterval(load,7000);
+</script>
+</body>
+</html>

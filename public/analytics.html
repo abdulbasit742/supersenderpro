@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SuperSender Pro — Analytics</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root{--bg:#0f172a;--card:#1e293b;--line:#334155;--txt:#e2e8f0;--muted:#94a3b8;--accent:#38bdf8;--green:#22c55e;--red:#ef4444;}
+    *{box-sizing:border-box;}body{margin:0;font-family:system-ui,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--txt);}
+    header{padding:18px 24px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center;}
+    header h1{font-size:18px;margin:0;}.badge{font-size:12px;color:var(--muted);border:1px solid var(--line);padding:2px 8px;border-radius:999px;}
+    .wrap{max-width:1100px;margin:0 auto;padding:24px;}
+    .kpis{display:grid;gap:12px;grid-template-columns:repeat(2,1fr);}
+    @media(min-width:680px){.kpis{grid-template-columns:repeat(4,1fr);}}
+    .kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;text-align:center;}
+    .kpi b{display:block;font-size:26px;}.kpi span{font-size:12px;color:var(--muted);}
+    .grid{display:grid;gap:16px;grid-template-columns:1fr;margin-top:18px;}
+    @media(min-width:760px){.grid{grid-template-columns:1fr 1fr;}}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;}
+    .card h2{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:0 0 12px;}
+    canvas{max-height:260px;}
+    table{width:100%;border-collapse:collapse;font-size:13px;}td{padding:6px 4px;border-bottom:1px solid var(--line);}td:last-child{text-align:right;font-weight:600;}
+  </style>
+</head>
+<body>
+  <header><h1>📊 Analytics Overview</h1><span class="badge">SuperSender Pro</span><span class="badge" id="ts"></span></header>
+  <div class="wrap">
+    <div class="kpis" id="kpis"></div>
+    <div class="grid">
+      <div class="card"><h2>Campaign Delivery</h2><canvas id="campChart"></canvas></div>
+      <div class="card"><h2>Channel Sharing</h2><canvas id="chanChart"></canvas></div>
+      <div class="card"><h2>Inbox Status</h2><canvas id="inboxChart"></canvas></div>
+      <div class="card"><h2>Feature Footprint</h2><table id="footprint"></table></div>
+    </div>
+  </div>
+<script>
+let charts={};
+function donut(id,labels,data,colors){
+  const ctx=document.getElementById(id);if(!ctx)return;
+  if(charts[id]){charts[id].data.datasets[0].data=data;charts[id].update();return;}
+  charts[id]=new Chart(ctx,{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors}]},options:{plugins:{legend:{labels:{color:'#e2e8f0'}}}}});
+}
+async function load(){
+  const res=await fetch('/api/analytics/overview');const {overview:o}=await res.json();
+  document.getElementById('ts').textContent=new Date(o.generatedAt).toLocaleString();
+  const camp=o.campaigns||{},chan=o.channels||{},eco=o.ecommerce||{},inb=o.inbox||{};
+  document.getElementById('kpis').innerHTML=`
+    <div class="kpi"><b>${camp.total||0}</b><span>Campaigns</span></div>
+    <div class="kpi"><b style="color:var(--green)">${camp.sent||0}</b><span>Messages sent</span></div>
+    <div class="kpi"><b>${eco.connections||0}</b><span>Stores connected</span></div>
+    <div class="kpi"><b>${inb.open||0}</b><span>Open chats</span></div>`;
+  donut('campChart',['Sent','Failed'],[camp.sent||0,camp.failed||0],['#22c55e','#ef4444']);
+  donut('chanChart',['Sent','Drafted','Failed'],[chan.sent||0,chan.drafted||0,chan.failed||0],['#22c55e','#38bdf8','#ef4444']);
+  donut('inboxChart',['Open','Pending','Closed'],[inb.open||0,inb.pending||0,inb.closed||0],['#22c55e','#f59e0b','#94a3b8']);
+  const rows=[['Contacts',(o.contacts||{}).total],['Templates',(o.templates||{}).total],['Chatbot rules',(o.automation||{}).rules],
+    ['Quick replies',(o.automation||{}).quickReplies],['Channel routes',chan.routes],['Store products',eco.products],
+    ['Store orders',eco.orders],['Inbox agents',inb.agents],['API keys',(o.developer||{}).apiKeys],['Webhooks',(o.developer||{}).webhooks]];
+  document.getElementById('footprint').innerHTML=rows.map(([k,v])=>`<tr><td>${k}</td><td>${v||0}</td></tr>`).join('');
+}
+load();setInterval(load,10000);
+</script>
+</body>
+</html>
