@@ -103,6 +103,10 @@ app.use('/api/inbox', require('./routes/inbox'));
 app.use('/api/quotes', require('./routes/quotes'));
 app.use('/api/webhook-queue', require('./routes/webhook-queue'));
 app.use('/api/knowledge-base', require('./routes/knowledge-base'));
+
+// ── Agentic AI SaaS ──────────────────────────────────────────────
+app.use('/api/agents', require('./routes/agents'));
+app.use('/api/saas-billing', require('./routes/saas-billing'));
 app.use('/webhook/n8n', require('./routes/n8n'));
 
 io.on('connection', (socket) => {
