@@ -2,6 +2,13 @@ const express = require('express');
 const os = require('os');
 const router = express.Router();
 
+let getStats;
+try {
+  getStats = require('../middleware/performance').getStats;
+} catch (_) {
+  getStats = () => ({ error: 'performance middleware not loaded' });
+}
+
 router.get('/health', (req, res) => {
   const uptime = process.uptime();
   const mem = process.memoryUsage();
@@ -20,6 +27,10 @@ router.get('/metrics', (req, res) => {
 
 router.get('/info', (req, res) => {
   res.json({ app: 'SuperSender Pro', version: process.env.npm_package_version||'1.0.0', description: 'AI Tools Business Command Center', environment: process.env.NODE_ENV||'development', nodeVersion: process.version, platform: process.platform, pid: process.pid, startedAt: new Date(Date.now()-process.uptime()*1000).toISOString() });
+});
+
+router.get('/performance', (req, res) => {
+  res.json(getStats());
 });
 
 function formatUptime(s) { const d=Math.floor(s/86400),h=Math.floor((s%86400)/3600),m=Math.floor((s%3600)/60),sec=Math.floor(s%60); return d+'d '+h+'h '+m+'m '+sec+'s'; }

@@ -9,11 +9,12 @@ const { scheduleAll } = require('./bot/scheduler/cron');
 const { startPaymentEmailWatcher } = require('./payment/emailParser');
 const { startPaymentQueue } = require('./queues/paymentQueue');
 
-
-// ── New: Monitoring, Error Handling, Swagger ──────────────
+// ── Monitoring, Error Handling, Swagger ──────────────────────────────────────
 const { initSentry, sentryRequestHandler, sentryErrorHandler } = require("./monitoring/sentry");
 const { errorHandler, notFound } = require("./middleware/errorHandler");
 const { authLimiter, paymentLimiter } = require("./middleware/rateLimiter");
+const { performanceMiddleware } = require("./middleware/performance");
+const { requestLogger } = require("./middleware/requestLogger");
 const monitoringRouter = require("./routes/monitoring");
 let rateLimit = null;
 try {
@@ -33,6 +34,8 @@ app.set('io', io);
 
 initSentry(app);
 app.use(sentryRequestHandler());
+app.use(requestLogger);
+app.use(performanceMiddleware);
 app.use(helmet({ crossOriginResourcePolicy: false }));
 app.use(cors({ origin: [env.frontendUrl, 'http://127.0.0.1:3000', 'http://localhost:3000', 'http://localhost:3001'], credentials: true }));
 app.use(express.json({ limit: '5mb' }));
@@ -102,7 +105,7 @@ app.use((err, req, res, next) => {
 async function main() {
   await prisma.$connect();
   server.listen(env.port, () => {
-    console.log(`AI Tools backend listening on http://127.0.0.1:${env.port}`);
+    console.log('AI Tools backend listening on http://127.0.0.1:' + env.port);
   });
 }
 

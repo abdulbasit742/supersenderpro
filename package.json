@@ -1,7 +1,7 @@
 {
   "name": "supersender-pro",
   "version": "1.0.0",
-  "description": "SuperSender Pro \u2014 AI Business Command Center (WhatsApp CRM + Price Intel + Base44 Hub)",
+  "description": "SuperSender Pro — AI Business Command Center (WhatsApp CRM + Price Intel + Base44 Hub)",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -50,7 +50,13 @@
     "vendor-portal:check": "node scripts/vendor-portal-check.js",
     "vendor-portal:smoke": "node tests/smoke/vendorPortalSmoke.js",
     "franchise-portal:check": "node scripts/franchise-portal-check.js",
-    "franchise-portal:smoke": "node tests/smoke/franchisePortalSmoke.js"
+    "franchise-portal:smoke": "node tests/smoke/franchisePortalSmoke.js",
+    "backup": "node scripts/backup-data.js",
+    "restore": "node scripts/restore-data.js",
+    "monitor": "node scripts/health-monitor.js",
+    "load-test": "node scripts/load-test.js",
+    "test": "cd backend && npm test",
+    "test:coverage": "cd backend && npm run test:coverage"
   },
   "dependencies": {
     "@whiskeysockets/baileys": "^7.0.0-rc.9",
