@@ -3083,6 +3083,33 @@ try {
   console.error('[WhatsAppCloudSetup] failed to initialise (non-fatal):', e.message);
 }
 // END WHATSAPP CLOUD SETUP HOOK
+// BEGIN PAYMENT GATEWAY HOOK
+try {
+  const paymentGatewayRoutes = require('./routes/paymentGatewayRoutes');
+  app.use('/api/payment-gateway', paymentGatewayRoutes);
+  app.get('/payment-instructions.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'payment-instructions.html')));
+  app.get('/payment-success.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'payment-success.html')));
+  console.log('[PaymentGateway] mounted at /api/payment-gateway (Stripe + Local PKR)');
+} catch (e) {
+  console.error('[PaymentGateway] failed to initialise (non-fatal):', e.message);
+}
+// END PAYMENT GATEWAY HOOK
+
+// BEGIN WHITE LABEL HOOK
+try {
+  const whiteLabelRoutes = require('./routes/whiteLabelRoutes');
+  app.use('/api/white-label', whiteLabelRoutes);
+  app.get('/white-label.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'white-label.html')));
+  console.log('[WhiteLabel] mounted at /api/white-label');
+} catch (e) {
+  console.error('[WhiteLabel] failed to initialise (non-fatal):', e.message);
+}
+// END WHITE LABEL HOOK
+
+// BEGIN ANALYTICS PAGE HOOK
+app.get('/analytics.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'analytics.html')));
+// END ANALYTICS PAGE HOOK
+
 
 // BEGIN CUSTOMER PORTAL HOOK
 // Customer Portal + Self-Service Status Center (preview-only: no live payment/send/mutation, PII masked, no external calls).
@@ -47044,6 +47071,7 @@ async function shutdown(signal) {
 
 process.on('SIGINT', () => shutdown('SIGINT'));
 process.on('SIGTERM', () => shutdown('SIGTERM'));
+
 
 
 

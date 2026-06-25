@@ -1,3 +1,32 @@
+﻿## [1.1.0] - 2026-06-25
+
+### Added — Value Increase Sprint
+
+#### 💳 Payment Gateway (Real Revenue Flow)
+- lib/paymentGateway/index.js — Stripe (international) + Local PKR (JazzCash/EasyPaisa) checkout engine
+- outes/paymentGatewayRoutes.js — /api/payment-gateway/status, /checkout, /webhook/:gateway
+- public/payment-instructions.html — Beautiful PKR payment page with JazzCash/EasyPaisa numbers, 30-min countdown timer, reference code copy, WhatsApp confirm button
+- public/payment-success.html — Post-payment confirmation page with next-steps guide
+- Webhook verification support for Stripe (HMAC-SHA256) and PayFast (ITN)
+- Sandbox mode ON by default (PAYMENT_SANDBOX=true) — safe to deploy immediately
+
+#### 📊 Real Analytics Dashboard
+- public/analytics.html — Live analytics with Chart.js revenue line chart + order status doughnut
+- Real KPIs: total revenue, order count, customer count, WhatsApp messages
+- Auto-refreshes every 60 seconds, reads from live API endpoints
+- Recent orders table + top plans table
+
+#### 🎨 White Label System
+- lib/whiteLabelConfig/index.js — Brand name, colors, logo, domain, support contact, currency, timezone
+- outes/whiteLabelRoutes.js — /api/white-label/brand (public), /config (admin GET/POST), /css
+- public/white-label.html — Visual admin UI with live preview, color pickers, toggle switches
+- CSS variable injection for dynamic theming across all pages
+- Resellers can now deploy with their own brand in minutes
+
+#### ⚙️ New .env Keys
+- PAYMENT_GATEWAY, PAYMENT_SANDBOX, STRIPE_TEST_SECRET_KEY, STRIPE_LIVE_SECRET_KEY, STRIPE_WEBHOOK_SECRET
+- WHITE_LABEL_BRAND_NAME, WHITE_LABEL_PRIMARY_COLOR, WHITE_LABEL_SUPPORT_WA, and 15+ more
+
 # Changelog
 
 All notable changes to SuperSender Pro are documented here.
