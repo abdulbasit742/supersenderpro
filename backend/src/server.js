@@ -95,6 +95,14 @@ app.use('/api/feedback', require('./routes/feedback'));
 app.use('/api/ai-reply', require('./routes/ai-reply'));
 app.use('/api/price-alerts', require('./routes/price-alerts'));
 app.use('/api/bulk-import', require('./routes/bulk-import'));
+
+// ── Repo-Inspired Features ─────────────────────────────────────────
+app.use('/api/wa-sessions', require('./routes/wa-sessions'));
+app.use('/api/ai-functions', require('./routes/ai-functions'));
+app.use('/api/inbox', require('./routes/inbox'));
+app.use('/api/quotes', require('./routes/quotes'));
+app.use('/api/webhook-queue', require('./routes/webhook-queue'));
+app.use('/api/knowledge-base', require('./routes/knowledge-base'));
 app.use('/webhook/n8n', require('./routes/n8n'));
 
 io.on('connection', (socket) => {
