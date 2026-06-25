@@ -51,6 +51,9 @@ if (rateLimit) {
   console.warn('[server] express-rate-limit is not installed; API rate limiting is disabled.');
 }
 
+// Serve static public files (setup-wizard, agent-dashboard)
+app.use(require('express').static(require('path').join(__dirname,'../../public')));
+
 app.use('/api/monitoring', monitoringRouter);
 
 app.get('/api/health', (req, res) => {

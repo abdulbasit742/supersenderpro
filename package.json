@@ -56,7 +56,15 @@
     "monitor": "node scripts/health-monitor.js",
     "load-test": "node scripts/load-test.js",
     "test": "cd backend && npm test",
-    "test:coverage": "cd backend && npm run test:coverage"
+    "test:coverage": "cd backend && npm run test:coverage",
+    "setup": "node scripts/full-setup.js",
+    "setup:db": "docker-compose up -d db redis",
+    "setup:n8n": "docker-compose up -d n8n",
+    "import:n8n": "node scripts/import-n8n-workflows.js",
+    "setup:secrets": "node scripts/generate-secrets.js",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f backend"
   },
   "dependencies": {
     "@whiskeysockets/baileys": "^7.0.0-rc.9",

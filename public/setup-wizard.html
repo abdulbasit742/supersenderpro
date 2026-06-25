@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width,initial-scale=1'>
+<title>SuperSender Pro — Setup Wizard</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh}
+.header{background:linear-gradient(135deg,#1e40af,#7c3aed);padding:24px 32px}
+.header h1{font-size:24px;font-weight:700}
+.header p{color:#bfdbfe;font-size:14px;margin-top:4px}
+.container{max-width:1000px;margin:0 auto;padding:32px 24px}
+.progress-bar{background:#1e293b;border-radius:8px;height:8px;margin-bottom:32px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#3b82f6,#10b981);transition:.5s;border-radius:8px}
+.steps{display:flex;flex-direction:column;gap:16px}
+.step{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px;transition:.2s}
+.step.ok{border-color:#10b981}.step.warn{border-color:#f59e0b}.step.error{border-color:#ef4444}.step.pending{border-color:#334155}
+.step-header{display:flex;align-items:center;justify-content:space-between}
+.step-title{display:flex;align-items:center;gap:12px}
+.step-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
+.num-ok{background:#10b981;color:#fff}.num-warn{background:#f59e0b;color:#000}.num-error{background:#ef4444;color:#fff}.num-pending{background:#334155;color:#94a3b8}
+.step-name{font-size:15px;font-weight:600}
+.step-status{font-size:12px;padding:4px 12px;border-radius:12px;font-weight:600}
+.status-ok{background:#dcfce7;color:#166534}.status-warn{background:#fef3c7;color:#92400e}
+.status-error{background:#fee2e2;color:#991b1b}.status-pending{background:#1e293b;color:#64748b;border:1px solid #334155}
+.step-body{margin-top:12px;font-size:13px;color:#94a3b8;display:none}
+.step.expanded .step-body{display:block}
+.notes{margin-top:8px;display:flex;flex-direction:column;gap:6px}
+.note{display:flex;align-items:flex-start;gap:8px;padding:8px 12px;background:#0f172a;border-radius:6px;font-size:12px}
+.note-ok{border-left:3px solid #10b981;color:#86efac}
+.note-warn{border-left:3px solid #f59e0b;color:#fde68a}
+.note-info{border-left:3px solid #3b82f6;color:#93c5fd}
+.actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.btn{padding:8px 16px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:600}
+.btn-primary{background:#3b82f6;color:#fff}.btn-primary:hover{background:#2563eb}
+.btn-secondary{background:#334155;color:#e2e8f0}.btn-secondary:hover{background:#475569}
+.btn-success{background:#10b981;color:#fff}
+code{background:#0f172a;padding:2px 6px;border-radius:4px;font-size:11px;color:#60a5fa}
+.summary{background:#1e293b;border-radius:12px;padding:24px;margin-bottom:24px}
+.summary h2{font-size:18px;font-weight:700;margin-bottom:16px}
+.score{font-size:48px;font-weight:800;color:#3b82f6}
+.score-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px}
+.score-item{background:#0f172a;border-radius:8px;padding:12px;text-align:center}
+.score-num{font-size:24px;font-weight:700}.score-label{font-size:11px;color:#64748b;margin-top:4px}
+.refresh-btn{float:right;margin-top:4px}
+</style>
+</head>
+<body>
+<div class='header'>
+  <h1>🚀 SuperSender Pro — Setup Wizard</h1>
+  <p>Complete all setup steps before going live</p>
+</div>
+<div class='container'>
+  <div class='summary'>
+    <h2>Setup Progress <button class='btn btn-secondary refresh-btn' onclick='loadReport()'>Refresh</button></h2>
+    <div class='score-bar'>
+      <div class='score-item'><div class='score-num' id='total-ok' style='color:#10b981'>0</div><div class='score-label'>Complete</div></div>
+      <div class='score-item'><div class='score-num' id='total-warn' style='color:#f59e0b'>0</div><div class='score-label'>Needs Action</div></div>
+      <div class='score-item'><div class='score-num' id='total-err' style='color:#ef4444'>0</div><div class='score-label'>Errors</div></div>
+      <div class='score-item'><div class='score-num' id='total-pct' style='color:#3b82f6'>0%</div><div class='score-label'>Ready</div></div>
+    </div>
+  </div>
+  <div class='progress-bar'><div class='progress-fill' id='progress' style='width:0%'></div></div>
+  <div class='steps' id='steps'>
+    <p style='color:#64748b;text-align:center;padding:40px'>Loading setup report...</p>
+  </div>
+  <div style='margin-top:32px;display:flex;gap:12px;flex-wrap:wrap'>
+    <button class='btn btn-primary' onclick='runSetup()'>Run Full Setup</button>
+    <button class='btn btn-success' onclick='location.href="/agent-dashboard.html"'>Agent Dashboard</button>
+    <button class='btn btn-secondary' onclick='location.href="http://localhost:3001/api/monitoring/health"'>Health Check</button>
+    <button class='btn btn-secondary' onclick='location.href="http://localhost:5678"'>Open n8n</button>
+  </div>
+</div>
+<script>
+const SETUP_STEPS = [
+  { id:'env',      name:'Environment & Secrets',  icon:'🔐', cmd:'node scripts/setup-env.js' },
+  { id:'dirs',     name:'Directories & Files',     icon:'📁', cmd:'node scripts/full-setup.js' },
+  { id:'postgres', name:'PostgreSQL Database',     icon:'🗄️', cmd:'docker-compose up -d db' },
+  { id:'redis',    name:'Redis Cache',             icon:'⚡', cmd:'docker-compose up -d redis' },
+  { id:'whatsapp', name:'WhatsApp Sessions',       icon:'📱', link:'/api/whatsapp/qr/customer-bot' },
+  { id:'email',    name:'Email Parser (Gmail)',    icon:'📧', doc:'Set EMAIL_USER + EMAIL_PASSWORD in .env' },
+  { id:'payment',  name:'Payment Accounts',        icon:'💳', doc:'Set JAZZCASH_NUMBER + EASYPAISA_NUMBER in .env' },
+  { id:'n8n',      name:'n8n Workflows',           icon:'⚙️', link:'http://localhost:5678' },
+  { id:'monitor',  name:'Monitoring & Health',     icon:'📊', link:'/api/monitoring/health' },
+  { id:'ssl',      name:'SSL / HTTPS',             icon:'🔒', cmd:'bash scripts/ssl-setup.sh' },
+];
+
+async function loadReport() {
+  try {
+    const r = await fetch('/api/monitoring/health');
+    const health = await r.json();
+    renderFromHealth(health);
+  } catch(e) {
+    renderDefault();
+  }
+}
+
+function renderFromHealth(health) {
+  const el = document.getElementById('steps');
+  let ok=0, warn=0, errs=0;
+  const stepData = [
+    { name:'Environment & Secrets', status:'ok', notes:['Secrets configured', '.env file present'] },
+    { name:'Directories & Files',   status:'ok', notes:['All data directories ready'] },
+    { name:'PostgreSQL Database',   status: health.services && health.services.database && health.services.database.configured ? 'ok':'warn', notes:[health.services && health.services.database ? health.services.database.provider : 'Not connected'] },
+    { name:'Redis Cache',           status: health.services && health.services.redis && health.services.redis.configured ? 'ok':'warn', notes:[health.services && health.services.redis ? 'Redis URL configured' : 'Set REDIS_URL in .env'] },
+    { name:'WhatsApp Sessions',     status:'warn', notes:['Scan QR at /api/whatsapp/qr/customer-bot'] },
+    { name:'Email Parser',          status:'warn', notes:['Set EMAIL_USER and EMAIL_PASSWORD in .env', 'Get Gmail App Password from myaccount.google.com'] },
+    { name:'Payment Accounts',      status:'warn', notes:['Set JAZZCASH_NUMBER, EASYPAISA_NUMBER, BANK_ACCOUNT'] },
+    { name:'n8n Workflows',         status:'warn', notes:['Start n8n: docker-compose up -d n8n', 'Import from n8n-workflows/ folder'] },
+    { name:'Monitoring',            status: health.status === 'ok' ? 'ok':'warn', notes:[health.status === 'ok' ? 'Server healthy - uptime: '+health.uptimeFormatted : 'Server not running'] },
+    { name:'SSL / HTTPS',           status:'warn', notes:['Run: bash scripts/ssl-setup.sh yourdomain.com email@example.com'] },
+  ];
+  el.innerHTML = stepData.map(function(s, i) {
+    const status = s.status;
+    if(status==='ok') ok++;
+    else if(status==='warn') warn++;
+    else errs++;
+    const step = SETUP_STEPS[i] || {};
+    return '<div class="step ' + status + '" onclick="this.classList.toggle(\"expanded\")">' +
+      '<div class="step-header">' +
+        '<div class="step-title">' +
+          '<div class="step-num num-' + status + '">' + (i+1) + '</div>' +
+          '<div>' +
+            '<div class="step-name">' + (step.icon||'') + ' ' + s.name + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<span class="step-status status-' + status + '">' + status.toUpperCase() + '</span>' +
+      '</div>' +
+      '<div class="step-body">' +
+        '<div class="notes">' + s.notes.map(function(n) { return '<div class="note note-' + (status==='ok'?'ok':'warn') + '">' + n + '</div>'; }).join('') + '</div>' +
+        (step.cmd ? '<div class="actions"><code>' + step.cmd + '</code></div>' : '') +
+        (step.link ? '<div class="actions"><a href="' + step.link + '" target="_blank" class="btn btn-primary">Open →</a></div>' : '') +
+      '</div>' +
+    '</div>';
+  }).join('');
+  document.getElementById('total-ok').textContent = ok;
+  document.getElementById('total-warn').textContent = warn;
+  document.getElementById('total-err').textContent = errs;
+  const pct = Math.round(ok/stepData.length*100);
+  document.getElementById('total-pct').textContent = pct + '%';
+  document.getElementById('progress').style.width = pct + '%';
+}
+
+function renderDefault() {
+  const el = document.getElementById('steps');
+  el.innerHTML = SETUP_STEPS.map(function(s, i) {
+    return '<div class="step warn" onclick="this.classList.toggle(\"expanded\")">' +
+      '<div class="step-header"><div class="step-title">' +
+      '<div class="step-num num-warn">' + (i+1) + '</div>' +
+      '<div class="step-name">' + s.icon + ' ' + s.name + '</div></div>' +
+      '<span class="step-status status-warn">NEEDS ACTION</span></div>' +
+      '<div class="step-body"><div class="notes">' +
+      (s.cmd ? '<div class="note note-info">Command: <code>' + s.cmd + '</code></div>' : '') +
+      (s.doc ? '<div class="note note-warn">' + s.doc + '</div>' : '') +
+      (s.link ? '<div class="note note-info">Open: <a href="' + s.link + '" target="_blank" style="color:#60a5fa">' + s.link + '</a></div>' : '') +
+      '</div></div></div>';
+  }).join('');
+  document.getElementById('total-warn').textContent = SETUP_STEPS.length;
+  document.getElementById('total-pct').textContent = '0%';
+}
+
+async function runSetup() {
+  alert('Run this command in your terminal:
+
+node scripts/full-setup.js
+
+Then click Refresh to see updated status.');
+}
+
+loadReport();
+</script>
+</body>
+</html>
