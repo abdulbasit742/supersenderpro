@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Channel to Group Auto Share - SuperSender Pro</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0b141a;color:#e9edef;font-family:Inter,system-ui,sans-serif;padding:20px}
+.hdr{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.back{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.05);border:1px solid #2a3942;color:#8696a0;padding:7px 12px;border-radius:7px;text-decoration:none;font-size:12px}
+.back:hover{border-color:#00a884;color:#00a884}
+h1{font-size:20px;font-weight:700}.sub{color:#8696a0;font-size:13px;margin-top:2px}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+.stat{background:#1f2c34;border:1px solid #2a3942;border-radius:10px;padding:14px;position:relative;overflow:hidden}
+.stat::after{content:"";position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#00a884,#53bdeb);opacity:.6}
+.sv{font-size:24px;font-weight:800;color:#00a884;line-height:1;margin-bottom:3px}
+.sl{font-size:10px;color:#8696a0;text-transform:uppercase;letter-spacing:.6px;font-weight:700}
+.card{background:#1f2c34;border:1px solid #2a3942;border-radius:12px;padding:18px;margin-bottom:14px}
+.ct{font-size:11px;color:#8696a0;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit;transition:.15s;white-space:nowrap}
+.btn-primary{background:#00a884;color:#fff}.btn-primary:hover{background:#00cf9d}
+.btn-secondary{background:rgba(255,255,255,.05);color:#8696a0;border:1px solid #2a3942}.btn-secondary:hover{border-color:#00a884;color:#00a884}
+.btn-danger{background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.2)}.btn-danger:hover{background:#ef4444;color:#fff}
+.btn-sm{padding:5px 10px;font-size:11px}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:10px;font-weight:700;color:#8696a0;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.field input,.field select,.field textarea{width:100%;padding:8px 10px;background:#111b21;border:1px solid #2a3942;border-radius:7px;color:#e9edef;font-size:13px;font-family:inherit;transition:.15s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:#00a884;outline:none}
+.field textarea{min-height:60px;resize:vertical}
+.field .hint{font-size:11px;color:#8696a0;margin-top:4px}
+.rule-card{background:#111b21;border:1px solid #2a3942;border-radius:10px;padding:14px;margin-bottom:10px}
+.rule-header{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.rule-name{font-size:14px;font-weight:600;flex:1}
+.rule-meta{font-size:11px;color:#8696a0;margin-bottom:8px}
+.rule-actions{display:flex;gap:6px;flex-wrap:wrap}
+.tag{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:600}
+.tag-g{background:rgba(0,168,132,.12);color:#00a884;border:1px solid rgba(0,168,132,.2)}
+.tag-y{background:rgba(245,158,11,.12);color:#f59e0b;border:1px solid rgba(245,158,11,.2)}
+.tag-r{background:rgba(239,68,68,.12);color:#ef4444;border:1px solid rgba(239,68,68,.2)}
+.tag-b{background:rgba(83,189,235,.12);color:#53bdeb;border:1px solid rgba(83,189,235,.2)}
+.modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto}
+.modal-ov.open{display:flex}
+.modal{background:#1f2c34;border:1px solid #2a3942;border-radius:14px;padding:24px;width:100%;max-width:580px;margin:auto}
+.modal-title{font-size:16px;font-weight:700;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center}
+.close-btn{background:none;border:none;color:#8696a0;font-size:22px;cursor:pointer;line-height:1}.close-btn:hover{color:#ef4444}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sdiv{font-size:10px;font-weight:700;color:#8696a0;text-transform:uppercase;letter-spacing:.8px;padding:10px 0 6px;border-top:1px solid #2a3942;margin-top:8px}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.tl{font-size:13px;color:#d1d9de}.ts{font-size:11px;color:#8696a0;margin-top:1px}
+.sw{width:38px;height:21px;background:#2a3942;border-radius:11px;cursor:pointer;position:relative;transition:.2s;flex-shrink:0}
+.sw.on{background:#00a884}.sw::after{content:"";width:15px;height:15px;background:#fff;border-radius:50%;position:absolute;top:3px;left:3px;transition:.2s}.sw.on::after{left:20px}
+.log-item{font-size:12px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);display:flex;gap:8px;align-items:flex-start}
+.lt{padding:2px 6px;border-radius:4px;font-size:9px;font-weight:700;text-transform:uppercase;flex-shrink:0}
+.ls{background:rgba(0,168,132,.15);color:#00a884}.lsk{background:rgba(245,158,11,.12);color:#f59e0b}
+.lf{background:rgba(239,68,68,.12);color:#ef4444}.ld{background:rgba(83,189,235,.12);color:#53bdeb}
+.log-text{flex:1;color:#d1d9de}.log-time{color:#8696a0;font-size:10px;flex-shrink:0}
+.empty{color:#8696a0;font-size:13px;text-align:center;padding:24px}
+.toast{position:fixed;bottom:20px;right:20px;background:#1f2c34;border:1px solid #2a3942;border-left:4px solid #00a884;border-radius:10px;padding:12px 16px;font-size:13px;display:none;z-index:999;max-width:300px}
+.help-box{background:rgba(83,189,235,.06);border:1px solid rgba(83,189,235,.2);border-radius:8px;padding:12px;font-size:12px;color:#d1d9de;line-height:1.6;margin-bottom:14px}
+@media(max-width:700px){.stats-row{grid-template-columns:repeat(2,1fr)}.form-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <a href="/index.html" class="back">&#8592; Dashboard</a>
+  <div style="flex:1">
+    <h1>&#128257; Channel &#8594; Group Auto Share</h1>
+    <p class="sub">Automatically forward WhatsApp channel posts to groups based on your rules</p>
+  </div>
+  <button class="btn btn-primary" onclick="openModal()">+ New Rule</button>
+</div>
+
+<div class="stats-row">
+  <div class="stat"><div class="sv" id="st-total">0</div><div class="sl">Total Rules</div></div>
+  <div class="stat"><div class="sv" id="st-active">0</div><div class="sl">Active</div></div>
+  <div class="stat"><div class="sv" id="st-sent">0</div><div class="sl">Posts Shared</div></div>
+  <div class="stat"><div class="sv" id="st-queue">0</div><div class="sl">In Queue</div></div>
+</div>
+
+<div class="help-box">
+  <strong>How it works:</strong> Create a rule with a source channel JID
+  (e.g. <code style="background:rgba(255,255,255,.08);padding:1px 5px;border-radius:3px">120363xxx@newsletter</code>)
+  and target group JIDs
+  (e.g. <code style="background:rgba(255,255,255,.08);padding:1px 5px;border-radius:3px">120363yyy@g.us</code>).
+  Set keyword filters, schedule window, branding header/footer, and delay.
+  Posts matching your rules auto-share to your groups.
+  <strong>Dry-run is ON by default</strong> &mdash; flip off per rule when ready to go live.
+</div>
+
+<div class="card">
+  <div class="ct">Rules <span id="rule-count" class="tag tag-b">0 rules</span></div>
+  <div id="rules-list"><p class="empty">No rules yet. Click + New Rule to start.</p></div>
+</div>
+
+<div class="card">
+  <div class="ct">Recent Activity <button class="btn btn-secondary btn-sm" onclick="loadLogs()">&#8635; Refresh</button></div>
+  <div id="logs-list"><p class="empty">No activity yet</p></div>
+</div>
+
+<!-- Modal -->
+<div class="modal-ov" id="modal">
+<div class="modal">
+  <div class="modal-title">
+    <span id="modal-title-text">New Rule</span>
+    <button class="close-btn" onclick="closeModal()">&#215;</button>
+  </div>
+
+  <div class="field"><label>Rule Name</label><input id="f-name" placeholder="e.g. Tech Channel to Sales Group"></div>
+  <div class="field">
+    <label>Source Channel JID</label>
+    <input id="f-src" placeholder="120363xxxxxxxxx@newsletter">
+    <div class="hint">The WhatsApp channel JID to monitor. Get it from WA admin commands or server logs.</div>
+  </div>
+  <div class="field">
+    <label>Target Groups (one JID per line)</label>
+    <textarea id="f-grps" placeholder="120363yyy@g.us&#10;120363zzz@g.us"></textarea>
+    <div class="hint">One WhatsApp group JID per line. Posts will be sent to all groups in order.</div>
+  </div>
+
+  <div class="sdiv">Filter Parameters</div>
+  <div class="field">
+    <label>Keywords (comma-separated &mdash; empty = share all posts)</label>
+    <input id="f-kw" placeholder="offer, deal, discount, new arrival">
+    <div class="hint">Post must contain at least one keyword. Leave empty to share all posts.</div>
+  </div>
+  <div class="field">
+    <label>Exclude Keywords (comma-separated)</label>
+    <input id="f-exkw" placeholder="spam, adult, blocked">
+    <div class="hint">Skip post if it contains any of these words.</div>
+  </div>
+  <div class="form-row">
+    <div class="field"><label>Min Text Length</label><input type="number" id="f-minl" value="0"></div>
+    <div class="field"><label>Max Text Length (0 = no limit)</label><input type="number" id="f-maxl" value="0"></div>
+  </div>
+  <div class="toggle-row">
+    <div><div class="tl">Media Only</div><div class="ts">Only share posts with image or video</div></div>
+    <div class="sw" id="sw-media" onclick="toggleSw(this)"></div>
+  </div>
+  <div class="toggle-row">
+    <div><div class="tl">Text Only</div><div class="ts">Only share text posts, skip media</div></div>
+    <div class="sw" id="sw-text" onclick="toggleSw(this)"></div>
+  </div>
+
+  <div class="sdiv">Transform / Branding</div>
+  <div class="field"><label>Add Header (prepended to post)</label><input id="f-hdr" placeholder="e.g. From our channel:"></div>
+  <div class="field"><label>Add Footer (appended to post)</label><input id="f-ftr" placeholder="e.g. Join: wa.me/g/..."></div>
+  <div class="toggle-row">
+    <div><div class="tl">Remove Links</div><div class="ts">Strip all URLs from post text</div></div>
+    <div class="sw" id="sw-links" onclick="toggleSw(this)"></div>
+  </div>
+  <div class="toggle-row">
+    <div><div class="tl">Strip Hashtags</div><div class="ts">Remove #hashtags from post text</div></div>
+    <div class="sw" id="sw-hash" onclick="toggleSw(this)"></div>
+  </div>
+
+  <div class="sdiv">Schedule Window</div>
+  <div class="toggle-row" style="margin-bottom:10px">
+    <div><div class="tl">Enable Schedule</div><div class="ts">Only share posts during set hours (Pakistan time)</div></div>
+    <div class="sw" id="sw-sched" onclick="toggleSw(this)"></div>
+  </div>
+  <div class="form-row">
+    <div class="field"><label>Start Time (HH:MM)</label><input id="f-ts" value="08:00"></div>
+    <div class="field"><label>End Time (HH:MM)</label><input id="f-te" value="22:00"></div>
+  </div>
+
+  <div class="sdiv">Delay Between Groups</div>
+  <div class="form-row">
+    <div class="field"><label>Min Delay (sec)</label><input type="number" id="f-dmin" value="2"></div>
+    <div class="field"><label>Max Delay (sec)</label><input type="number" id="f-dmax" value="8"></div>
+  </div>
+
+  <div class="toggle-row" style="margin-top:10px">
+    <div><div class="tl">Dry Run Mode</div><div class="ts">Preview only &mdash; no actual messages sent</div></div>
+    <div class="sw on" id="sw-dry" onclick="toggleSw(this)"></div>
+  </div>
+
+  <div style="margin-top:18px;display:flex;gap:8px">
+    <button class="btn btn-primary" onclick="saveRule()" style="flex:1">Save Rule</button>
+    <button class="btn btn-secondary" onclick="closeModal()" style="flex:1">Cancel</button>
+  </div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var editId = null, rules = [];
+function toast(m,t){var el=document.getElementById("toast");el.textContent=m;el.style.borderLeftColor=t==="error"?"#ef4444":"#00a884";el.style.display="block";setTimeout(function(){el.style.display="none";},2800);}
+function toggleSw(el){el.classList.toggle("on");}
+function swVal(id){return document.getElementById(id).classList.contains("on");}
+function swSet(id,v){var el=document.getElementById(id);v?el.classList.add("on"):el.classList.remove("on");}
+function getKw(id){return document.getElementById(id).value.split(",").map(function(s){return s.trim();}).filter(Boolean);}
+function openModal(rule){
+  editId=rule?rule.id:null;
+  document.getElementById("modal-title-text").textContent=rule?"Edit Rule":"New Rule";
+  document.getElementById("f-name").value=rule?rule.name:"";
+  document.getElementById("f-src").value=rule?rule.sourceChannelId:"";
+  document.getElementById("f-grps").value=rule?(rule.targetGroups||[]).join("\n"):"";
+  document.getElementById("f-kw").value=rule?((rule.filter&&rule.filter.keywords)||[]).join(", "):"";
+  document.getElementById("f-exkw").value=rule?((rule.filter&&rule.filter.excludeKeywords)||[]).join(", "):"";
+  document.getElementById("f-minl").value=rule?((rule.filter&&rule.filter.minLength)||0):0;
+  document.getElementById("f-maxl").value=rule?((rule.filter&&rule.filter.maxLength)||0):0;
+  document.getElementById("f-hdr").value=rule?((rule.transform&&rule.transform.addHeader)||""):"";
+  document.getElementById("f-ftr").value=rule?((rule.transform&&rule.transform.addFooter)||""):"";
+  document.getElementById("f-ts").value=rule?((rule.schedule&&rule.schedule.timeStart)||"08:00"):"08:00";
+  document.getElementById("f-te").value=rule?((rule.schedule&&rule.schedule.timeEnd)||"22:00"):"22:00";
+  document.getElementById("f-dmin").value=rule?((rule.delay&&rule.delay.minSec)||2):2;
+  document.getElementById("f-dmax").value=rule?((rule.delay&&rule.delay.maxSec)||8):8;
+  swSet("sw-media",rule&&rule.filter&&rule.filter.mediaOnly);
+  swSet("sw-text",rule&&rule.filter&&rule.filter.textOnly);
+  swSet("sw-links",rule&&rule.transform&&rule.transform.replaceLinks);
+  swSet("sw-hash",rule&&rule.transform&&rule.transform.stripHashtags);
+  swSet("sw-sched",rule&&rule.schedule&&rule.schedule.enabled);
+  swSet("sw-dry",rule?rule.dryRun:true);
+  document.getElementById("modal").classList.add("open");
+}
+function closeModal(){document.getElementById("modal").classList.remove("open");editId=null;}
+async function saveRule(){
+  var body={
+    name:document.getElementById("f-name").value.trim()||"Unnamed Rule",
+    sourceChannelId:document.getElementById("f-src").value.trim(),
+    targetGroups:document.getElementById("f-grps").value.split("\n").map(function(s){return s.trim();}).filter(Boolean),
+    filter:{keywords:getKw("f-kw"),excludeKeywords:getKw("f-exkw"),minLength:parseInt(document.getElementById("f-minl").value)||0,maxLength:parseInt(document.getElementById("f-maxl").value)||0,mediaOnly:swVal("sw-media"),textOnly:swVal("sw-text")},
+    transform:{addHeader:document.getElementById("f-hdr").value,addFooter:document.getElementById("f-ftr").value,replaceLinks:swVal("sw-links"),stripHashtags:swVal("sw-hash")},
+    schedule:{enabled:swVal("sw-sched"),timeStart:document.getElementById("f-ts").value,timeEnd:document.getElementById("f-te").value,daysOfWeek:[0,1,2,3,4,5,6]},
+    delay:{minSec:parseInt(document.getElementById("f-dmin").value)||2,maxSec:parseInt(document.getElementById("f-dmax").value)||8},
+    dryRun:swVal("sw-dry")
+  };
+  try{
+    var url=editId?"/api/channel-to-group/rules/"+editId:"/api/channel-to-group/rules",method=editId?"PUT":"POST";
+    var r=await fetch(url,{method:method,headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+    var d=await r.json();
+    if(d.ok){toast(editId?"Rule updated!":"Rule created!");closeModal();loadRules();}
+    else toast("Error: "+(d.error||"Unknown"),"error");
+  }catch(e){toast("Save failed: "+e.message,"error");}
+}
+async function deleteRule(id){
+  if(!confirm("Delete this rule?"))return;
+  try{var r=await fetch("/api/channel-to-group/rules/"+id,{method:"DELETE"});var d=await r.json();if(d.ok){toast("Deleted");loadRules();}else toast("Delete failed","error");}
+  catch(e){toast("Error: "+e.message,"error");}
+}
+async function toggleRule(id){
+  try{var r=await fetch("/api/channel-to-group/rules/"+id+"/toggle",{method:"POST"});var d=await r.json();if(d.ok){toast("Rule "+(d.rule.enabled?"enabled":"disabled"));loadRules();}else toast("Toggle failed","error");}
+  catch(e){toast("Error: "+e.message,"error");}
+}
+async function testRule(id){
+  var rule=rules.find(function(r){return r.id===id;});
+  if(!rule)return;
+  try{
+    var r=await fetch("/api/channel-to-group/test",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({channelId:rule.sourceChannelId,text:"Test post: offer deal discount available now"})});
+    var d=await r.json();
+    if(d.ok)toast("Test OK: processed="+d.testResult.processed+" sent="+d.testResult.totalSent+" skipped="+d.testResult.totalSkipped);
+    else toast("Test: "+(d.error||"No match"),"error");
+  }catch(e){toast("Error: "+e.message,"error");}
+}
+async function loadRules(){
+  try{
+    var r=await fetch("/api/channel-to-group/rules");
+    var d=await r.json();
+    if(!d.ok)return;
+    rules=d.rules||[];
+    document.getElementById("rule-count").textContent=rules.length+" rules";
+    document.getElementById("st-total").textContent=rules.length;
+    document.getElementById("st-active").textContent=rules.filter(function(r){return r.enabled;}).length;
+    var el=document.getElementById("rules-list");
+    if(!rules.length){el.innerHTML="<p class='empty'>No rules yet. Click + New Rule to start auto-sharing.</p>";return;}
+    var html="";
+    rules.forEach(function(rule){
+      var sentCount=(rule.stats&&rule.stats.sent)||0;
+      var skipCount=(rule.stats&&rule.stats.skipped)||0;
+      var st=rule.enabled?"<span class='tag tag-g'>Active</span>":"<span class='tag tag-r'>Disabled</span>";
+      var dr=rule.dryRun?"<span class='tag tag-y'>Dry Run</span>":"<span class='tag tag-g'>Live</span>";
+      var grps=rule.targetGroups?rule.targetGroups.length:0;
+      var kws=(rule.filter&&rule.filter.keywords&&rule.filter.keywords.length)?rule.filter.keywords.join(", "):"All posts";
+      html+="<div class='rule-card'>";
+      html+="<div class='rule-header'><div class='rule-name'>"+rule.name+"</div>"+st+" "+dr+"</div>";
+      html+="<div class='rule-meta'>Source: <strong>"+rule.sourceChannelId+"</strong> &rarr; "+grps+" group(s) &middot; Filter: "+kws+" &middot; Sent: "+sentCount+" Skipped: "+skipCount+"</div>";
+      html+="<div class='rule-actions'>";
+      html+="<button class='btn btn-secondary btn-sm' onclick='openModal(rules.find(function(r){return r.id===""+rule.id+"";}))'>&#9998; Edit</button>";
+      html+="<button class='btn btn-secondary btn-sm' onclick='toggleRule(""+rule.id+"")'>"+(rule.enabled?"Disable":"Enable")+"</button>";
+      html+="<button class='btn btn-secondary btn-sm' onclick='testRule(""+rule.id+"")'>&#9654; Test</button>";
+      html+="<button class='btn btn-danger btn-sm' onclick='deleteRule(""+rule.id+"")'>Delete</button>";
+      html+="</div></div>";
+    });
+    el.innerHTML=html;
+  }catch(e){document.getElementById("rules-list").innerHTML="<p class='empty'>Error: "+e.message+"</p>";}
+}
+async function loadLogs(){
+  try{
+    var r=await fetch("/api/channel-to-group/logs?limit=30");
+    var d=await r.json();
+    if(!d.ok)return;
+    var logs=d.logs||[];
+    var el=document.getElementById("logs-list");
+    if(!logs.length){el.innerHTML="<p class='empty'>No activity logged yet</p>";return;}
+    var html="";
+    logs.slice().reverse().forEach(function(l){
+      var cls=l.type==="sent"?"ls":l.type==="skip"?"lsk":l.type==="failed"?"lf":"ld";
+      var time=new Date(l.ts).toLocaleTimeString();
+      var detail=(l.ruleName||l.ruleId||"?")+((l.groupId?" &#8594; "+l.groupId.substring(0,18)+"...":""))+(l.reason?" ("+l.reason+")":"")+(l.text?" | "+l.text.substring(0,50)+"...":"");
+      html+="<div class='log-item'><span class='lt "+cls+"'>"+l.type+"</span><span class='log-text'>"+detail+"</span><span class='log-time'>"+time+"</span></div>";
+    });
+    el.innerHTML=html;
+  }catch(e){}
+}
+async function loadStats(){
+  try{
+    var r=await fetch("/api/channel-to-group/stats");
+    var d=await r.json();
+    if(d.ok&&d.stats){
+      document.getElementById("st-queue").textContent=d.stats.queuedItems||0;
+      var totalSent=0;
+      (d.stats.recentLogs||[]).forEach(function(l){if(l.type==="sent"||l.type==="dry_run")totalSent++;});
+    }
+  }catch(e){}
+}
+loadRules();loadLogs();loadStats();
+setInterval(loadLogs,30000);
+</script>
+</body>
+</html>

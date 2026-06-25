@@ -3087,7 +3087,7 @@ try {
 try {
   const paymentGatewayRoutes = require('./routes/paymentGatewayRoutes');
   app.use('/api/payment-gateway', paymentGatewayRoutes);
-  app.get('/payment-instructions.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'payment-instructions.html')));
+  app.get('/payment-instructions.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'payment-instr.html')));
   app.get('/payment-success.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'payment-success.html')));
   console.log('[PaymentGateway] mounted at /api/payment-gateway (Stripe + Local PKR)');
 } catch (e) {
@@ -3109,6 +3109,17 @@ try {
 // BEGIN ANALYTICS PAGE HOOK
 app.get('/analytics.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'analytics.html')));
 // END ANALYTICS PAGE HOOK
+// BEGIN CHANNEL TO GROUP HOOK
+try {
+  const channelToGroupRoutes = require('./routes/channelToGroupRoutes');
+  app.use('/api/channel-to-group', channelToGroupRoutes);
+  app.get('/channel-to-group.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'channel-to-group.html')));
+  console.log('[ChannelToGroup] mounted at /api/channel-to-group');
+} catch (e) {
+  console.error('[ChannelToGroup] failed to initialise (non-fatal):', e.message);
+}
+// END CHANNEL TO GROUP HOOK
+
 
 
 // BEGIN CUSTOMER PORTAL HOOK
@@ -47071,6 +47082,7 @@ async function shutdown(signal) {
 
 process.on('SIGINT', () => shutdown('SIGINT'));
 process.on('SIGTERM', () => shutdown('SIGTERM'));
+
 
 
 
