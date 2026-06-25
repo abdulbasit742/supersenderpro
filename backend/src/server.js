@@ -85,6 +85,16 @@ app.use('/api/n8n', require('./routes/n8n'));
 app.use('/api/payments', paymentLimiter, require('./routes/payments'));
 app.use('/api/zero-touch', require('./routes/zero-touch'));
 app.use('/api/wati', require('./routes/wati'));
+
+// ── New Feature Routes ────────────────────────────────────────────
+app.use('/api/invoices', require('./routes/invoices'));
+app.use('/api/scheduler', require('./routes/scheduler'));
+app.use('/api/segments', require('./routes/segments'));
+app.use('/api/renewals', require('./routes/renewals'));
+app.use('/api/feedback', require('./routes/feedback'));
+app.use('/api/ai-reply', require('./routes/ai-reply'));
+app.use('/api/price-alerts', require('./routes/price-alerts'));
+app.use('/api/bulk-import', require('./routes/bulk-import'));
 app.use('/webhook/n8n', require('./routes/n8n'));
 
 io.on('connection', (socket) => {
