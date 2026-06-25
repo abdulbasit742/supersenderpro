@@ -1,23 +1,15 @@
-import { Search, MessageCircle, Menu, Command, LogOut, Shield, User as UserIcon } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { api } from "@/lib/api";
+import { Search, Menu, Command, LogOut, Shield, User as UserIcon } from "lucide-react";
+import { useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { NotificationsBell } from "./notifications";
 import { useAuth } from "@/lib/auth-hook";
+import { useHealth } from "@/lib/hooks";
 
 export function TopBar({ onOpenMenu }: { onOpenMenu: () => void }) {
-  const [connected, setConnected] = useState<boolean | null>(null);
-  useEffect(() => {
-    let alive = true;
-    const tick = () =>
-      api.getHealth().then((h) => {
-        if (!alive) return;
-        setConnected(h?.status === "ok" || h?.status === "connected");
-      });
-    tick();
-    const t = setInterval(tick, 30000);
-    return () => { alive = false; clearInterval(t); };
-  }, []);
+  const { data: health, isLoading: healthLoading } = useHealth();
+  const connected: boolean | null = healthLoading
+    ? null
+    : (health?.status === "ok" || health?.status === "connected" ? true : false);
 
   return (
     <header className="sticky top-0 z-30 bg-background/85 backdrop-blur border-b border-border">
@@ -122,4 +114,3 @@ function UserMenu() {
   );
 }
 
-void MessageCircle;
