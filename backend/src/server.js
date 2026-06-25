@@ -9,6 +9,12 @@ const { scheduleAll } = require('./bot/scheduler/cron');
 const { startPaymentEmailWatcher } = require('./payment/emailParser');
 const { startPaymentQueue } = require('./queues/paymentQueue');
 
+
+// ── New: Monitoring, Error Handling, Swagger ──────────────
+const { initSentry, sentryRequestHandler, sentryErrorHandler } = require("./monitoring/sentry");
+const { errorHandler, notFound } = require("./middleware/errorHandler");
+const { authLimiter, paymentLimiter } = require("./middleware/rateLimiter");
+const monitoringRouter = require("./routes/monitoring");
 let rateLimit = null;
 try {
   rateLimit = require('express-rate-limit');
@@ -24,6 +30,9 @@ const io = new Server(server, {
 });
 
 app.set('io', io);
+
+initSentry(app);
+app.use(sentryRequestHandler());
 app.use(helmet({ crossOriginResourcePolicy: false }));
 app.use(cors({ origin: [env.frontendUrl, 'http://127.0.0.1:3000', 'http://localhost:3000', 'http://localhost:3001'], credentials: true }));
 app.use(express.json({ limit: '5mb' }));
@@ -39,6 +48,8 @@ if (rateLimit) {
   console.warn('[server] express-rate-limit is not installed; API rate limiting is disabled.');
 }
 
+app.use('/api/monitoring', monitoringRouter);
+
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
@@ -52,7 +63,7 @@ app.get('/qr', (req, res) => {
   res.redirect('/api/whatsapp/qr/customer-bot');
 });
 
-app.use('/api/auth', require('./routes/auth'));
+app.use('/api/auth', authLimiter, require('./routes/auth'));
 app.use('/api/dealers', require('./routes/dealers'));
 app.use('/api/rates', require('./routes/rates'));
 app.use('/api/purchases', require('./routes/purchases'));
@@ -68,7 +79,7 @@ app.use('/api/alerts', require('./routes/alerts'));
 app.use('/api/business', require('./routes/business'));
 app.use('/api/dealer-intelligence', require('./routes/dealer-intelligence'));
 app.use('/api/n8n', require('./routes/n8n'));
-app.use('/api/payments', require('./routes/payments'));
+app.use('/api/payments', paymentLimiter, require('./routes/payments'));
 app.use('/api/zero-touch', require('./routes/zero-touch'));
 app.use('/api/wati', require('./routes/wati'));
 app.use('/webhook/n8n', require('./routes/n8n'));
@@ -81,7 +92,8 @@ scheduleAll(io);
 startPaymentQueue(io);
 startPaymentEmailWatcher(io);
 
-app.use((req, res) => res.status(404).json({ error: 'Route not found' }));
+app.use(sentryErrorHandler());
+app.use(notFound);
 app.use((err, req, res, next) => {
   console.error('[api:error]', err);
   res.status(err.status || 500).json({ error: err.message || 'Internal server error' });

@@ -11,19 +11,21 @@
     "prisma:migrate": "prisma migrate dev --schema src/prisma/schema.prisma",
     "prisma:studio": "prisma studio --schema src/prisma/schema.prisma",
     "seed": "node src/prisma/seed.js",
-    "check": "node --check src/server.js"
+    "check": "node --check src/server.js",
+    "test": "jest --runInBand",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage --runInBand"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
     "@whiskeysockets/baileys": "^7.0.0-rc.9",
     "bcryptjs": "^2.4.3",
+    "bull": "^4.16.5",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "express-rate-limit": "^7.5.0",
     "googleapis": "^144.0.0",
     "helmet": "^8.0.0",
-    "bull": "^4.16.5",
     "imapflow": "^1.0.164",
     "ioredis": "^5.4.1",
     "jsonwebtoken": "^9.0.2",
@@ -36,10 +38,18 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "jest": "^29.5.0",
     "nodemon": "^3.1.7",
-    "prisma": "^5.22.0"
+    "prisma": "^5.22.0",
+    "supertest": "^6.3.4"
   },
   "engines": {
     "node": ">=18"
+  },
+  "optionalDependencies": {
+    "@sentry/node": "^8.0.0",
+    "express-rate-limit": "^7.0.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   }
 }
