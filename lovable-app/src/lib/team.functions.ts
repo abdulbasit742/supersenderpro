@@ -3,6 +3,14 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { logAuditEvent } from "./audit.functions";
 
+interface ProfileRow {
+  id: string;
+  display_name?: string | null;
+  avatar_url?: string | null;
+  created_at: string;
+  user_roles?: Array<{ role: string }> | null;
+}
+
 
 export const listTeamMembers = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -16,7 +24,7 @@ export const listTeamMembers = createServerFn({ method: "GET" })
 
     if (error) throw error;
 
-    return (data ?? []).map((p: any) => ({
+    return (data ?? []).map((p: ProfileRow) => ({
       id: p.id,
       name: p.display_name ?? "—",
       email: "",

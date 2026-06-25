@@ -17,7 +17,7 @@ export function useAuth() {
       if (!uid) { setRoles([]); return; }
       const { data } = await supabase.from("user_roles").select("role").eq("user_id", uid);
       if (!alive) return;
-      setRoles((data ?? []).map((r: any) => r.role as Role));
+      setRoles((data ?? []).map((r: { role: Role }) => r.role));
     }
 
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {

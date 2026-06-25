@@ -34,7 +34,7 @@ export const saveSocialAccount = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => SaveAccountInput.parse(d))
   .handler(async ({ data, context }) => {
   const { supabase, userId } = context;
-  const payload: any = {
+  const payload: Record<string, unknown> = {
     ...data,
     user_id: userId,
     updated_at: new Date().toISOString(),

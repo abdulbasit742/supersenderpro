@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PageHeader, Card, Btn, Input, Select, Section } from "@/components/ui-kit";
+import { PageHeader, Card, Btn, Input, Select, Section, Skeleton } from "@/components/ui-kit";
 import { API_BASE_URL } from "@/lib/api";
 import { Download } from "lucide-react";
 import { toast } from "sonner";
@@ -60,14 +60,24 @@ function SettingsPage() {
     try {
       await fnSave({ data: s });
       toast.success(`${section} saved`, { description: "Stored in your account." });
-    } catch (e: any) {
-      toast.error(e.message ?? "Save failed");
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : "Save failed");
     } finally {
       setBusy(false);
     }
   };
 
-  if (!loaded) return null;
+  if (!loaded) return (
+    <div className="grid lg:grid-cols-2 gap-4">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="rounded-xl border border-border bg-card p-4 space-y-3">
+          <Skeleton className="h-4 w-32 mb-1" />
+          {Array.from({ length: 3 }).map((_, j) => <Skeleton key={j} className="h-9 w-full rounded-md" />)}
+          <Skeleton className="h-9 w-24 rounded-md" />
+        </div>
+      ))}
+    </div>
+  );
 
   return (
     <>

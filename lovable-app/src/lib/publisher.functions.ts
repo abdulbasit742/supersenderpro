@@ -5,6 +5,27 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 const platforms = ["facebook", "instagram", "linkedin", "tiktok", "whatsapp", "telegram"] as const;
 type Platform = typeof platforms[number];
 
+interface SocialAccount {
+  id: string;
+  platform: Platform;
+  access_token?: string | null;
+  remote_id?: string | null;
+}
+
+interface PostRow {
+  id: string;
+  content: string | null;
+  media_urls: string[] | null;
+  media_type: string | null;
+  status: string;
+}
+
+interface PostTargetRow {
+  id: string;
+  platform: Platform;
+  social_accounts: SocialAccount | null;
+}
+
 const CaptionInput = z.object({
   topic: z.string().min(2).max(2000),
   platforms: z.array(z.enum(platforms)).min(1),
@@ -70,21 +91,22 @@ export const publishPost = createServerFn({ method: "POST" })
 
     await supabase.from("posts").update({ status: "publishing" }).eq("id", data.postId);
 
-    const results = await Promise.all(targets.map(async (t: any) => {
+    const results = await Promise.all((targets as PostTargetRow[]).map(async (t) => {
       const acc = t.social_accounts;
       try {
         await supabase.from("post_targets").update({ status: "publishing", attempted_at: new Date().toISOString() }).eq("id", t.id);
-        const r = await publishToPlatform(t.platform as Platform, acc, post);
+        const r = await publishToPlatform(t.platform, acc, post as PostRow);
         await supabase.from("post_targets").update({
           status: "published", remote_post_id: r.remote_post_id ?? null,
           remote_url: r.remote_url ?? null, completed_at: new Date().toISOString(),
         }).eq("id", t.id);
         return { id: t.id, ok: true };
-      } catch (e: any) {
+      } catch (e: unknown) {
+        const msg = e instanceof Error ? e.message : String(e);
         await supabase.from("post_targets").update({
-          status: "failed", error_message: String(e?.message ?? e).slice(0, 500), completed_at: new Date().toISOString(),
+          status: "failed", error_message: msg.slice(0, 500), completed_at: new Date().toISOString(),
         }).eq("id", t.id);
-        return { id: t.id, ok: false, error: String(e?.message ?? e) };
+        return { id: t.id, ok: false, error: msg };
       }
     }));
 
@@ -98,7 +120,7 @@ export const publishPost = createServerFn({ method: "POST" })
     return { results, status: finalStatus };
   });
 
-async function publishToPlatform(platform: Platform, account: any, post: any): Promise<{ remote_post_id?: string; remote_url?: string }> {
+async function publishToPlatform(platform: Platform, account: SocialAccount | null, post: PostRow): Promise<{ remote_post_id?: string; remote_url?: string }> {
   if (platform === "telegram") return publishTelegram(account, post);
   if (platform === "linkedin") return publishLinkedIn(account, post);
   if (platform === "tiktok") return publishTikTok(account, post);
@@ -106,7 +128,7 @@ async function publishToPlatform(platform: Platform, account: any, post: any): P
   throw new Error(`${platform}: OAuth setup pending. Connect via Connections page first.`);
 }
 
-async function publishLinkedIn(account: any, post: any) {
+async function publishLinkedIn(account: SocialAccount | null, post: PostRow) {
   const lovableKey = process.env.LOVABLE_API_KEY;
   const linkedInKey = process.env.LINKEDIN_API_KEY;
   if (!lovableKey || !linkedInKey) throw new Error("LinkedIn connector not linked. Open Connections → LinkedIn.");
@@ -150,12 +172,12 @@ async function publishLinkedIn(account: any, post: any) {
   return { remote_post_id: id, remote_url: id ? `https://www.linkedin.com/feed/update/${id}` : undefined };
 }
 
-async function publishTikTok(account: any, post: any) {
+async function publishTikTok(account: SocialAccount | null, post: PostRow) {
   const lovableKey = process.env.LOVABLE_API_KEY;
   const tiktokKey = process.env.TIKTOK_API_KEY;
   if (!lovableKey || !tiktokKey) throw new Error("TikTok connector not linked. Open Connections → TikTok.");
 
-  const videoUrl: string | undefined = (post.media_urls as string[])?.[0];
+  const videoUrl: string | undefined = post.media_urls?.[0];
   if (!videoUrl || post.media_type !== "video") {
     throw new Error("TikTok requires a video. Upload a video file.");
   }
@@ -187,14 +209,14 @@ async function publishTikTok(account: any, post: any) {
   return { remote_post_id: pubId };
 }
 
-async function publishTelegram(account: any, post: any) {
-  const botToken: string | undefined = account.access_token;
-  const chatId: string | undefined = account.remote_id;
+async function publishTelegram(account: SocialAccount | null, post: PostRow) {
+  const botToken: string | undefined = account?.access_token ?? undefined;
+  const chatId: string | undefined = account?.remote_id ?? undefined;
   if (!botToken || !chatId) throw new Error("Telegram bot token / chat_id missing");
 
   const base = `https://api.telegram.org/bot${botToken}`;
-  const text = post.content as string;
-  const media = (post.media_urls as string[]) ?? [];
+  const text = post.content ?? "";
+  const media = post.media_urls ?? [];
 
   let res: Response;
   if (media.length === 0) {

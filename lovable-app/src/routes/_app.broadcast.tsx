@@ -2,21 +2,24 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader, Card, Btn, Badge, Textarea, Section } from "@/components/ui-kit";
 import { Send, Trash2, RotateCw } from "lucide-react";
 import { toast } from "sonner";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-hook";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createPost, deletePost, listPosts } from "@/lib/social.functions";
 import { publishPost } from "@/lib/publisher.functions";
+import type { ScheduledPost } from "@/lib/types";
 
 export const Route = createFileRoute("/_app/broadcast")({
   component: BroadcastPage,
 });
 
+interface SocialAccount { id: string; handle: string; platform: string; }
+
 function BroadcastPage() {
   const { user } = useAuth();
-  const [accounts, setAccounts] = useState<any[]>([]);
-  const [history, setHistory] = useState<any[]>([]);
+  const qc = useQueryClient();
   const [content, setContent] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [scheduleDate, setScheduleDate] = useState("");
@@ -25,59 +28,74 @@ function BroadcastPage() {
 
   const fnCreate = useServerFn(createPost);
   const fnDelete = useServerFn(deletePost);
-  const fnList = useServerFn(listPosts);
-  const fnPub = useServerFn(publishPost);
+  const fnList   = useServerFn(listPosts);
+  const fnPub    = useServerFn(publishPost);
 
-  async function refresh() {
-    if (!user) return;
-    const [h, a] = await Promise.all([
-      fnList(),
-      supabase.from("social_accounts").select("id, handle, platform").eq("user_id", user.id).eq("is_active", true).then(({ data }) => data ?? []),
-    ]);
-    setHistory(h);
-    setAccounts(a);
-  }
+  const { data: history = [], isLoading: historyLoading } = useQuery<ScheduledPost[]>({
+    queryKey: ["broadcast-history"],
+    queryFn: () => fnList() as Promise<ScheduledPost[]>,
+    enabled: !!user,
+    staleTime: 30_000,
+  });
 
-  useEffect(() => { refresh(); }, [user]);
+  const { data: accounts = [] } = useQuery<SocialAccount[]>({
+    queryKey: ["social-accounts", user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      const { data } = await supabase.from("social_accounts").select("id, handle, platform").eq("user_id", user.id).eq("is_active", true);
+      return (data ?? []) as SocialAccount[];
+    },
+    enabled: !!user,
+    staleTime: 120_000,
+  });
 
   async function sendNow() {
-    if (!content.trim()) { toast.error("Message content required"); return; }
-    if (selected.size === 0) { toast.error("Select at least one target account"); return; }
+    if (!content.trim())      { toast.error("Message content required"); return; }
+    if (selected.size === 0)  { toast.error("Select at least one target account"); return; }
     const targets = Array.from(selected).map((id) => {
       const acc = accounts.find((a) => a.id === id);
       return { social_account_id: id, platform: acc!.platform };
     });
-    const scheduledAt = scheduleDate && scheduleTime ? new Date(`${scheduleDate}T${scheduleTime}`).toISOString() : null;
+    const scheduledAt = scheduleDate && scheduleTime
+      ? new Date(`${scheduleDate}T${scheduleTime}`).toISOString()
+      : null;
     setSending(true);
     try {
-      const post = await fnCreate({ data: { content, targets, scheduled_at: scheduledAt } });
+      const post = await fnCreate({ data: { content, targets, scheduled_at: scheduledAt } }) as ScheduledPost;
       if (!scheduledAt) {
         await fnPub({ data: { postId: post.id } });
         toast.success("Broadcast sent!");
       } else {
         toast.success("Broadcast scheduled");
       }
-      setContent("");
-      setSelected(new Set());
-      setScheduleDate("");
-      setScheduleTime("");
-      refresh();
-    } catch (e: any) {
-      toast.error(e.message);
+      setContent(""); setSelected(new Set()); setScheduleDate(""); setScheduleTime("");
+      qc.invalidateQueries({ queryKey: ["broadcast-history"] });
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : "Send failed");
     } finally {
       setSending(false);
     }
   }
 
   async function retry(id: string) {
-    try { await fnPub({ data: { postId: id } }); toast.success("Retried"); refresh(); }
-    catch (e: any) { toast.error(e.message); }
+    try {
+      await fnPub({ data: { postId: id } });
+      toast.success("Retried");
+      qc.invalidateQueries({ queryKey: ["broadcast-history"] });
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : "Retry failed");
+    }
   }
 
   async function remove(id: string) {
     if (!confirm("Delete?")) return;
-    try { await fnDelete({ data: { id } }); toast.success("Deleted"); refresh(); }
-    catch (e: any) { toast.error(e.message); }
+    try {
+      await fnDelete({ data: { id } });
+      toast.success("Deleted");
+      qc.invalidateQueries({ queryKey: ["broadcast-history"] });
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : "Delete failed");
+    }
   }
 
   const toggle = (id: string) => {
@@ -177,46 +195,57 @@ function BroadcastPage() {
               </tr>
             </thead>
             <tbody>
-              {history.length === 0 && (
+              {historyLoading ? (
+                Array.from({ length: 3 }).map((_, i) => (
+                  <tr key={i} className="border-t border-border">
+                    {Array.from({ length: 5 }).map((_, j) => (
+                      <td key={j} className="px-4 py-3">
+                        <div className="h-3 bg-muted rounded animate-pulse w-24" />
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              ) : history.length === 0 ? (
                 <tr><td colSpan={5} className="px-4 py-6 text-center text-muted-foreground">Abhi koi broadcast nahi.</td></tr>
-              )}
-              {history.map((h) => (
-                <tr key={h.id} className="border-t border-border">
-                  <td className="px-4 py-3 whitespace-nowrap text-muted-foreground">
-                    {new Date(h.created_at).toLocaleDateString()}
-                  </td>
-                  <td className="px-4 py-3 max-w-[300px] truncate">{h.content || "(no text)"}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex flex-wrap gap-1">
-                      {h.post_targets?.map((t: any) => (
-                        <span key={t.id} className="text-[10px] bg-muted rounded px-1.5 py-0.5">{t.platform}</span>
-                      ))}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <Badge variant={
-                      h.status === "published" ? "success" :
-                      h.status === "scheduled" ? "info" :
-                      h.status === "failed" ? "destructive" :
-                      h.status === "partial" ? "warning" : "default"
-                    }>
-                      {h.status}
-                    </Badge>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex gap-1">
-                      {(h.status === "failed" || h.status === "partial" || h.status === "draft") && (
-                        <button onClick={() => retry(h.id)} className="p-1.5 rounded hover:bg-accent" title="Retry">
-                          <RotateCw className="h-3.5 w-3.5 text-primary" />
+              ) : (
+                history.map((h: ScheduledPost) => (
+                  <tr key={h.id} className="border-t border-border hover:bg-accent/20">
+                    <td className="px-4 py-3 whitespace-nowrap text-muted-foreground">
+                      {new Date(h.created_at ?? "").toLocaleDateString()}
+                    </td>
+                    <td className="px-4 py-3 max-w-[300px] truncate">{h.content || "(no text)"}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-wrap gap-1">
+                        {h.post_targets?.map((t) => (
+                          <span key={t.id} className="text-[10px] bg-muted rounded px-1.5 py-0.5">{t.platform}</span>
+                        ))}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <Badge variant={
+                        h.status === "published" ? "success" :
+                        h.status === "scheduled" ? "info"    :
+                        h.status === "failed"    ? "destructive" :
+                        h.status === "partial"   ? "warning"    : "muted"
+                      }>
+                        {h.status}
+                      </Badge>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex gap-1">
+                        {(h.status === "failed" || h.status === "partial" || h.status === "draft") && (
+                          <button onClick={() => retry(h.id)} className="p-1.5 rounded hover:bg-accent" title="Retry">
+                            <RotateCw className="h-3.5 w-3.5 text-primary" />
+                          </button>
+                        )}
+                        <button onClick={() => remove(h.id)} className="p-1.5 rounded hover:bg-accent" title="Delete">
+                          <Trash2 className="h-3.5 w-3.5 text-destructive" />
                         </button>
-                      )}
-                      <button onClick={() => remove(h.id)} className="p-1.5 rounded hover:bg-accent" title="Delete">
-                        <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

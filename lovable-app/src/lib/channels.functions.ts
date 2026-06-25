@@ -2,6 +2,18 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+interface TelegramUpdate {
+  update_id: number;
+  channel_post?: {
+    message_id: number;
+    text?: string;
+    caption?: string;
+    chat?: { username?: string };
+    photo?: Array<{ file_id: string }>;
+    video?: { file_id: string };
+  };
+}
+
 export const listChannelSources = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
@@ -90,7 +102,7 @@ export const pullChannelUpdates = createServerFn({ method: "POST" })
     let lastId = Number(src.last_update_id ?? 0);
     let inserted = 0;
 
-    for (const upd of (j.result as any[])) {
+    for (const upd of (j.result as TelegramUpdate[])) {
       lastId = Math.max(lastId, upd.update_id);
       const p = upd.channel_post;
       if (!p) continue;
@@ -165,10 +177,10 @@ export const broadcastChannelItem = createServerFn({ method: "POST" })
     // Delegate publishing
     const { publishPost } = await import("./publisher.functions");
     try {
-      const res = await (publishPost as any)({ data: { postId: post.id } });
+      const res = await publishPost({ data: { postId: post.id } });
       await supabase.from("channel_items").update({ status: "published" }).eq("id", item.id);
       return { ok: true, postId: post.id, res };
-    } catch (e: any) {
+    } catch (e: unknown) {
       await supabase.from("channel_items").update({ status: "failed" }).eq("id", item.id);
       throw e;
     }

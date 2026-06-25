@@ -1,85 +1,75 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader, Card, Btn, Badge, Input } from "@/components/ui-kit";
 import { Sparkles, Send, Plus, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   listConversations, getMessages, sendMessage, createConversation, deleteConversation,
 } from "@/lib/inbox.functions";
+import type { ConversationThread, InboxMessage } from "@/lib/types";
 
 export const Route = createFileRoute("/_app/inbox")({
   component: InboxPage,
 });
 
 function InboxPage() {
-  const [conversations, setConversations] = useState<any[]>([]);
+  const qc = useQueryClient();
   const [activeId, setActiveId] = useState<string | null>(null);
-  const [messages, setMessages] = useState<any[]>([]);
   const [draft, setDraft] = useState("");
-  const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
   const [newName, setNewName] = useState("");
   const [newPhone, setNewPhone] = useState("");
   const [newIntent, setNewIntent] = useState("");
 
-  const fnList = useServerFn(listConversations);
-  const fnMsgs = useServerFn(getMessages);
-  const fnSend = useServerFn(sendMessage);
+  const fnList   = useServerFn(listConversations);
+  const fnMsgs   = useServerFn(getMessages);
+  const fnSend   = useServerFn(sendMessage);
   const fnCreate = useServerFn(createConversation);
-  const fnDel = useServerFn(deleteConversation);
+  const fnDel    = useServerFn(deleteConversation);
 
-  async function refreshConversations() {
-    try {
-      const data = await fnList();
-      setConversations(data);
+  const { data: conversations = [], isLoading } = useQuery<ConversationThread[]>({
+    queryKey: ["inbox-conversations"],
+    queryFn: async () => {
+      const data = await fnList() as ConversationThread[];
       if (data.length > 0 && !activeId) setActiveId(data[0].id);
-    } catch (e: any) {
-      toast.error(e.message);
-    } finally {
-      setLoading(false);
-    }
-  }
+      return data;
+    },
+    staleTime: 15_000,
+    refetchInterval: 30_000,
+  });
 
-  async function loadMessages(id: string) {
-    try {
-      const data = await fnMsgs({ data: { conversationId: id } });
-      setMessages(data);
-    } catch (e: any) {
-      toast.error(e.message);
-    }
-  }
-
-  useEffect(() => {
-    refreshConversations();
-  }, []);
-
-  useEffect(() => {
-    if (activeId) loadMessages(activeId);
-  }, [activeId]);
+  const { data: messages = [] } = useQuery<InboxMessage[]>({
+    queryKey: ["inbox-messages", activeId],
+    queryFn: () => fnMsgs({ data: { conversationId: activeId! } }) as Promise<InboxMessage[]>,
+    enabled: !!activeId,
+    staleTime: 10_000,
+    refetchInterval: 15_000,
+  });
 
   async function handleSend() {
     if (!draft.trim() || !activeId) return;
     try {
       await fnSend({ data: { conversationId: activeId, content: draft } });
       setDraft("");
-      loadMessages(activeId);
-      refreshConversations();
-    } catch (e: any) {
-      toast.error(e.message);
+      qc.invalidateQueries({ queryKey: ["inbox-messages", activeId] });
+      qc.invalidateQueries({ queryKey: ["inbox-conversations"] });
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : "Send failed");
     }
   }
 
   async function handleCreate() {
     if (!newName.trim()) { toast.error("Name required"); return; }
     try {
-      const conv = await fnCreate({ data: { contactName: newName, contactPhone: newPhone, intent: newIntent } });
+      const conv = await fnCreate({ data: { contactName: newName, contactPhone: newPhone, intent: newIntent } }) as ConversationThread;
       setShowAdd(false);
       setNewName(""); setNewPhone(""); setNewIntent("");
-      refreshConversations();
+      qc.invalidateQueries({ queryKey: ["inbox-conversations"] });
       setActiveId(conv.id);
-    } catch (e: any) {
-      toast.error(e.message);
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : "Failed");
     }
   }
 
@@ -88,9 +78,9 @@ function InboxPage() {
     try {
       await fnDel({ data: { id } });
       if (activeId === id) setActiveId(null);
-      refreshConversations();
-    } catch (e: any) {
-      toast.error(e.message);
+      qc.invalidateQueries({ queryKey: ["inbox-conversations"] });
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : "Failed");
     }
   }
 
@@ -112,17 +102,18 @@ function InboxPage() {
         }
       />
       <div className="grid lg:grid-cols-[280px_1fr_280px] gap-4 h-[calc(100vh-220px)] min-h-[500px]">
+        {/* ── Threads list ── */}
         <Card className="p-0 overflow-hidden flex flex-col">
           <div className="p-3 border-b border-border">
             <Input placeholder="Search threads" />
           </div>
           <div className="overflow-y-auto flex-1">
-            {loading ? (
+            {isLoading ? (
               <div className="animate-pulse space-y-2 p-3">
-                {[1, 2, 3].map((i) => <div key={i} className="h-12 rounded bg-muted" />)}
+                {Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-12 rounded bg-muted" />)}
               </div>
             ) : (
-              conversations.map((t) => (
+              conversations.map((t: ConversationThread) => (
                 <button
                   key={t.id}
                   onClick={() => setActiveId(t.id)}
@@ -137,12 +128,13 @@ function InboxPage() {
                 </button>
               ))
             )}
-            {!loading && conversations.length === 0 && (
+            {!isLoading && conversations.length === 0 && (
               <div className="p-6 text-center text-sm text-muted-foreground">Koi conversation nahi.<br />"New Chat" se shuru karein.</div>
             )}
           </div>
         </Card>
 
+        {/* ── Message thread ── */}
         <Card className="p-0 flex flex-col overflow-hidden">
           {active ? (
             <>
@@ -159,7 +151,7 @@ function InboxPage() {
                 {messages.length === 0 && (
                   <div className="text-center text-sm text-muted-foreground py-12">Pehla message bhejein.</div>
                 )}
-                {messages.map((m) => (
+                {messages.map((m: InboxMessage) => (
                   <div key={m.id} className={`flex ${m.sender === "me" ? "justify-end" : "justify-start"}`}>
                     <div className={`max-w-[70%] px-3 py-2 rounded-2xl text-sm ${m.sender === "me" ? "bg-primary text-primary-foreground rounded-br-sm" : "bg-muted rounded-bl-sm"}`}>
                       {m.content}
@@ -179,6 +171,7 @@ function InboxPage() {
           )}
         </Card>
 
+        {/* ── Quick replies ── */}
         <Card>
           <div className="flex items-center gap-2 mb-2">
             <Sparkles className="h-4 w-4 text-primary" />
@@ -192,6 +185,7 @@ function InboxPage() {
         </Card>
       </div>
 
+      {/* ── New conversation modal ── */}
       {showAdd && (
         <div className="fixed inset-0 z-50 bg-black/60 grid place-items-center p-4" onClick={() => setShowAdd(false)}>
           <div onClick={(e) => e.stopPropagation()} className="bg-card border border-border rounded-xl p-6 w-full max-w-md">

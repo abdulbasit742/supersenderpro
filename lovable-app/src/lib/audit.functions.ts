@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export const logAuditEvent = createServerFn({ method: "POST" })
@@ -11,7 +12,7 @@ export const logAuditEvent = createServerFn({ method: "POST" })
         target: z.string().optional(),
         targetType: z.string().optional(),
         severity: z.enum(["info", "success", "warning", "destructive", "muted"]).optional(),
-        metadata: z.any().optional(),
+        metadata: z.record(z.string(), z.unknown()).optional(),
       })
       .parse(d),
   )
@@ -24,7 +25,9 @@ export const logAuditEvent = createServerFn({ method: "POST" })
       .eq("id", userId)
       .single();
 
-    const { error } = await (supabase as any).from("audit_events").insert({
+    // audit_events is not in the generated Supabase types — use untyped client
+    const db = supabase as unknown as SupabaseClient<Record<string, unknown>>;
+    const { error } = await db.from("audit_events").insert({
       user_id: userId,
       user_name: profile?.display_name ?? "Unknown",
       action: data.action,
@@ -44,7 +47,8 @@ export const listAuditEvents = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
 
-    let query = (supabase as any)
+    const db = supabase as unknown as SupabaseClient<Record<string, unknown>>;
+    let query = db
       .from("audit_events")
       .select("*")
       .order("created_at", { ascending: false })
@@ -80,7 +84,8 @@ export const getAuditStats = createServerFn({ method: "GET" })
       .eq("role", "admin")
       .single();
 
-    let query = (supabase as any).from("audit_events").select("severity", { count: "exact" });
+    const db = supabase as unknown as SupabaseClient<Record<string, unknown>>;
+    let query = db.from("audit_events").select("severity", { count: "exact" });
     if (!roleData) {
       query = query.eq("user_id", userId);
     }

@@ -6,5 +6,5 @@ export function createLovableAiGatewayProvider(apiKey: string) {
     baseURL: "https://ai.gateway.lovable.dev/v1",
     headers: { "Lovable-API-Key": apiKey },
   });
-  return (modelId: string) => (provider as any).chat(modelId);
+  return (modelId: string) => provider.chat(modelId);
 }

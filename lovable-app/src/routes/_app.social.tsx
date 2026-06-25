@@ -3,6 +3,28 @@ import { PageHeader, Card, Btn, Badge, Input, Select, Textarea } from "@/compone
 import { Facebook, Instagram, Linkedin, Music2, MessageCircle, Send, Eye, EyeOff, Save, Trash2, Plus, Loader2 } from "lucide-react";
 import { useState, createElement } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+
+interface SocialAccount {
+  id: string;
+  platform: string;
+  handle: string;
+  is_active: boolean;
+  access_token?: string;
+  remote_id?: string;
+  refresh_token?: string;
+  token_expires_at?: string;
+}
+
+interface PostTarget { id: string; platform: string; status: string; social_accounts?: { platform: string }; }
+
+interface Post {
+  id: string;
+  content: string;
+  status: string;
+  scheduled_at?: string;
+  media_urls?: string[];
+  post_targets?: PostTarget[];
+}
 import { useServerFn } from "@tanstack/react-start";
 import {
   listSocialAccounts,
@@ -41,7 +63,7 @@ function SocialPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const [showSecret, setShowSecret] = useState(false);
-  const [editingAccount, setEditingAccount] = useState<any>(null);
+  const [editingAccount, setEditingAccount] = useState<SocialAccount | null>(null);
   const [postForm, setPostForm] = useState({
     content: "",
     mediaUrl: "",
@@ -57,26 +79,28 @@ function SocialPage() {
   const createPostFn = useServerFn(createPost);
   const delPostFn = useServerFn(deletePost);
 
-  const { data: accounts = [], isLoading: accountsLoading } = useQuery({
+  const { data: accounts = [], isLoading: accountsLoading } = useQuery<SocialAccount[]>({
     queryKey: ["socialAccounts"],
-    queryFn: () => listAccFn(),
+    queryFn: () => listAccFn() as Promise<SocialAccount[]>,
     enabled: !!user,
+    staleTime: 60_000,
   });
 
-  const { data: posts = [], isLoading: postsLoading } = useQuery({
+  const { data: posts = [], isLoading: postsLoading } = useQuery<Post[]>({
     queryKey: ["posts"],
-    queryFn: () => listPostsFn(),
+    queryFn: () => listPostsFn() as Promise<Post[]>,
     enabled: !!user,
+    staleTime: 30_000,
   });
 
   const saveAccount = useMutation({
-    mutationFn: (payload: any) => saveAccFn({ data: payload }),
+    mutationFn: (payload: Partial<SocialAccount> & { meta?: Record<string, unknown> }) => saveAccFn({ data: payload }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["socialAccounts"] });
       setEditingAccount(null);
       toast.success("Account saved");
     },
-    onError: (e: any) => toast.error(e?.message ?? "Failed to save account"),
+    onError: (e: Error) => toast.error(e?.message ?? "Failed to save account"),
   });
 
   const removeAccount = useMutation({
@@ -85,17 +109,22 @@ function SocialPage() {
       qc.invalidateQueries({ queryKey: ["socialAccounts"] });
       toast.success("Account removed");
     },
-    onError: (e: any) => toast.error(e?.message ?? "Failed to remove account"),
+    onError: (e: Error) => toast.error(e?.message ?? "Failed to remove account"),
   });
 
+  interface CreatePostPayload {
+    content: string; media_urls: string[]; media_type: string | null;
+    scheduled_at: string | null; targets: { platform: string; social_account_id: string }[];
+  }
+
   const createPostMut = useMutation({
-    mutationFn: (payload: any) => createPostFn({ data: payload }),
+    mutationFn: (payload: CreatePostPayload) => createPostFn({ data: payload }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["posts"] });
       setPostForm({ content: "", mediaUrl: "", mediaType: "", schedule: "", selectedAccounts: [] });
       toast.success("Post created");
     },
-    onError: (e: any) => toast.error(e?.message ?? "Failed to create post"),
+    onError: (e: Error) => toast.error(e?.message ?? "Failed to create post"),
   });
 
   const removePost = useMutation({
@@ -104,17 +133,17 @@ function SocialPage() {
       qc.invalidateQueries({ queryKey: ["posts"] });
       toast.success("Post deleted");
     },
-    onError: (e: any) => toast.error(e?.message ?? "Failed to delete post"),
+    onError: (e: Error) => toast.error(e?.message ?? "Failed to delete post"),
   });
 
-  const connectedAccounts = accounts.filter((a: any) => a.is_active && a.access_token);
+  const connectedAccounts = accounts.filter((a) => a.is_active && a.access_token);
 
   const handleSaveAccount = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     saveAccount.mutate({
       id: editingAccount?.id || undefined,
-      platform: fd.get("platform") as any,
+      platform: fd.get("platform") as string,
       handle: String(fd.get("handle") || ""),
       access_token: String(fd.get("access_token") || "") || undefined,
       remote_id: String(fd.get("remote_id") || "") || undefined,
@@ -136,7 +165,7 @@ function SocialPage() {
       return;
     }
     const targets = postForm.selectedAccounts.map((id) => {
-      const acc = accounts.find((a: any) => a.id === id)!;
+      const acc = accounts.find((a) => a.id === id)!;
       return { platform: acc.platform, social_account_id: acc.id };
     });
     createPostMut.mutate({
@@ -163,7 +192,7 @@ function SocialPage() {
             No accounts connected yet. Add one below.
           </Card>
         ) : (
-          accounts.map((a: any) => {
+          accounts.map((a) => {
             const Icon = icons[a.platform] || Facebook;
             const connected = !!a.access_token && a.is_active;
             return (
@@ -258,7 +287,7 @@ function SocialPage() {
               />
               <Select
                 value={postForm.mediaType}
-                onChange={(e) => setPostForm((s) => ({ ...s, mediaType: e.target.value as any }))}
+                onChange={(e) => setPostForm((s) => ({ ...s, mediaType: e.target.value as "image" | "video" | "" }))}
               >
                 <option value="">Media type</option>
                 <option value="image">Image</option>
@@ -276,7 +305,7 @@ function SocialPage() {
                 {connectedAccounts.length === 0 && (
                   <span className="text-xs text-muted-foreground">No connected accounts</span>
                 )}
-                {connectedAccounts.map((a: any) => {
+                {connectedAccounts.map((a) => {
                   const selected = postForm.selectedAccounts.includes(a.id);
                   const Icon = icons[a.platform] || Facebook;
                   return (
@@ -325,7 +354,7 @@ function SocialPage() {
           <div className="text-center py-6 text-muted-foreground text-sm">No posts yet.</div>
         ) : (
           <div className="space-y-2">
-            {posts.map((p: any) => (
+            {posts.map((p) => (
               <div key={p.id} className="flex items-start justify-between p-3 rounded-lg bg-muted/50">
                 <div className="min-w-0">
                   <div className="text-sm font-medium truncate">{p.content.slice(0, 80)}{p.content.length > 80 ? "…" : ""}</div>
@@ -334,7 +363,7 @@ function SocialPage() {
                       {p.status}
                     </Badge>
                     {p.scheduled_at && <span>Scheduled: {new Date(p.scheduled_at).toLocaleString()}</span>}
-                    {p.post_targets?.map((t: any) => (
+                    {p.post_targets?.map((t) => (
                       <span key={t.id} className="inline-flex items-center gap-1">
                         {t.social_accounts?.platform && (
                           <>

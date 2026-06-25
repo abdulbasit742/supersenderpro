@@ -5,6 +5,7 @@ import {
   Sparkles, Send, Play, RefreshCw, Smartphone, Layers, CheckCircle2, MessageSquare
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
 
@@ -24,12 +25,14 @@ interface CostAnalytics {
   };
 }
 
+interface TemplateOption { id?: string; title: string; description?: string; rows?: { id: string; title: string; description?: string }[] }
+
 interface InteractiveTemplate {
   id: string;
   name: string;
   type: "buttons" | "list";
   bodyText: string;
-  options: any[];
+  options: TemplateOption[];
   createdAt?: string;
 }
 
@@ -37,7 +40,7 @@ interface AdLead {
   id: string;
   adId: string;
   sourcePlatform: string;
-  referralData: any;
+  referralData: { adName?: string; campaign?: string } | null;
   timestamp: string;
 }
 
@@ -58,126 +61,115 @@ interface ChatbotFlow {
   updatedAt?: string;
 }
 
+const DEFAULT_COSTS: CostAnalytics = {
+  totalSpent: 42.85, currency: "USD", markupSavings: 8.57,
+  breakdown: { marketing: 22.05, utility: 10.40, authentication: 4.40, service: 6.00 },
+};
+
+const DEFAULT_TEMPLATES: InteractiveTemplate[] = [
+  {
+    id: "INT-1", name: "welcome_buttons", type: "buttons",
+    bodyText: "SuperSender Pro main aapka khushamdeed! Niche diye gaye buttons se ek option select karein:",
+    options: [{ id: "opt-1", title: "Rate Sweep Info" }, { id: "opt-2", title: "AI Store Agent" }, { id: "opt-3", title: "Talk to Human" }],
+  },
+  {
+    id: "INT-2", name: "support_options_list", type: "list",
+    bodyText: "Aap kis cheez ke baare main information chahte hain?",
+    options: [
+      { title: "AI Tools Deals", rows: [{ id: "row-1", title: "Canva Premium", description: "Standard rates" }, { id: "row-2", title: "ChatGPT Plus", description: "Shared and private packages" }] },
+      { title: "Account Support", rows: [{ id: "row-3", title: "Payment Issue", description: "Verify transactions" }, { id: "row-4", title: "Warranty Claim", description: "Ask for replacement" }] },
+    ],
+  },
+];
+
+const DEFAULT_FLOWS: ChatbotFlow[] = [
+  {
+    id: "FLOW-1", name: "AI Welcome & Greeting", active: true,
+    nodes: [
+      { id: "node-1", type: "trigger", label: "Trigger Word", value: "hello, hi, assalam" },
+      { id: "node-2", type: "reply", label: "Send Reply", value: "Assalamu Alaikum! SuperSender Bot main aapka khushamdeed." },
+      { id: "node-3", type: "tag", label: "Tag Contact", value: "New Lead" },
+    ],
+  },
+  {
+    id: "FLOW-2", name: "Canva Pro Purchase Flow", active: false,
+    nodes: [
+      { id: "node-1", type: "trigger", label: "Trigger Word", value: "canva, buy canva" },
+      { id: "node-2", type: "reply", label: "Send Reply", value: "Canva Premium price is PKR 450/month. Please pay via EasyPaisa and send the screenshot." },
+      { id: "node-3", type: "tag", label: "Tag Contact", value: "Interested Canva" },
+    ],
+  },
+];
+
+const DEFAULT_LEADS: AdLead[] = [
+  { id: "LEAD-1", adId: "ad_fb_120409", sourcePlatform: "facebook", referralData: { adName: "Eid Promo Video", campaign: "Conversations PK" }, timestamp: new Date().toISOString() },
+  { id: "LEAD-2", adId: "ad_ig_593849", sourcePlatform: "instagram", referralData: { adName: "AI Tool Deal Carousel", campaign: "Lead Generation" }, timestamp: new Date().toISOString() },
+];
+
 function WatiSuitePage() {
+  const qc = useQueryClient();
   const [activeTab, setActiveTab] = useState<"billing" | "templates" | "chatbot" | "leads">("billing");
-  
-  // Cost States
-  const [costStats, setCostStats] = useState<CostAnalytics>({
-    totalSpent: 42.85,
-    currency: "USD",
-    markupSavings: 8.57,
-    breakdown: { marketing: 22.05, utility: 10.40, authentication: 4.40, service: 6.00 }
-  });
-  
-  // Template States
-  const [templates, setTemplates] = useState<InteractiveTemplate[]>([
-    {
-      id: "INT-1",
-      name: "welcome_buttons",
-      type: "buttons",
-      bodyText: "SuperSender Pro main aapka khushamdeed! Niche diye gaye buttons se ek option select karein:",
-      options: [
-        { id: "opt-1", title: "Rate Sweep Info" },
-        { id: "opt-2", title: "AI Store Agent" },
-        { id: "opt-3", title: "Talk to Human" }
-      ]
+
+  const { data: costStats = DEFAULT_COSTS } = useQuery<CostAnalytics>({
+    queryKey: ["wati-costs"],
+    queryFn: async () => {
+      const res = await api.getWatiCosts() as (CostAnalytics & { success?: boolean }) | null;
+      return res?.success ? res : DEFAULT_COSTS;
     },
-    {
-      id: "INT-2",
-      name: "support_options_list",
-      type: "list",
-      bodyText: "Aap kis cheez ke baare main information chahte hain?",
-      options: [
-        {
-          title: "AI Tools Deals",
-          rows: [
-            { id: "row-1", title: "Canva Premium", description: "Standard rates and availability" },
-            { id: "row-2", title: "ChatGPT Plus", description: "Shared and private packages" }
-          ]
-        },
-        {
-          title: "Account Support",
-          rows: [
-            { id: "row-3", title: "Payment Issue", description: "Verify transactions" },
-            { id: "row-4", title: "Warranty Claim", description: "Ask for replacement" }
-          ]
-        }
-      ]
-    }
-  ]);
+    staleTime: 60_000,
+    placeholderData: DEFAULT_COSTS,
+  });
+
+  const { data: templates = DEFAULT_TEMPLATES } = useQuery<InteractiveTemplate[]>({
+    queryKey: ["wati-templates"],
+    queryFn: async () => {
+      const res = await api.getWatiTemplates() as { success?: boolean; templates?: InteractiveTemplate[] } | null;
+      return (res?.success && res.templates?.length) ? res.templates : DEFAULT_TEMPLATES;
+    },
+    staleTime: 60_000,
+    placeholderData: DEFAULT_TEMPLATES,
+  });
+
+  const { data: flows = DEFAULT_FLOWS } = useQuery<ChatbotFlow[]>({
+    queryKey: ["wati-flows"],
+    queryFn: async () => {
+      const res = await api.getWatiFlows() as { success?: boolean; flows?: ChatbotFlow[] } | null;
+      return (res?.success && res.flows?.length) ? res.flows : DEFAULT_FLOWS;
+    },
+    staleTime: 60_000,
+    placeholderData: DEFAULT_FLOWS,
+  });
+
+  const { data: adLeads = DEFAULT_LEADS } = useQuery<AdLead[]>({
+    queryKey: ["wati-leads"],
+    queryFn: async () => {
+      const res = await api.getWatiAdLeads() as { success?: boolean; leads?: AdLead[] } | null;
+      return (res?.success && res.leads?.length) ? res.leads : DEFAULT_LEADS;
+    },
+    staleTime: 60_000,
+    placeholderData: DEFAULT_LEADS,
+  });
+
+  function invalidateWati() {
+    qc.invalidateQueries({ queryKey: ["wati-costs"] });
+    qc.invalidateQueries({ queryKey: ["wati-templates"] });
+    qc.invalidateQueries({ queryKey: ["wati-flows"] });
+    qc.invalidateQueries({ queryKey: ["wati-leads"] });
+  }
   const [newTemplateName, setNewTemplateName] = useState("");
   const [newTemplateType, setNewTemplateType] = useState<"buttons" | "list">("buttons");
   const [newTemplateBody, setNewTemplateBody] = useState("");
   const [newTemplateOptions, setNewTemplateOptions] = useState<string>("Rate Sweep Info, AI Store Agent, Talk to Human");
 
-  // Chatbot Flow States
-  const [flows, setFlows] = useState<ChatbotFlow[]>([
-    {
-      id: "FLOW-1",
-      name: "AI Welcome & Greeting",
-      active: true,
-      nodes: [
-        { id: "node-1", type: "trigger", label: "Trigger Word", value: "hello, hi, assalam" },
-        { id: "node-2", type: "reply", label: "Send Reply", value: "Assalamu Alaikum! SuperSender Bot main aapka khushamdeed. Main aapki kya madad kar sakta hoon?" },
-        { id: "node-3", type: "tag", label: "Tag Contact", value: "New Lead" }
-      ]
-    },
-    {
-      id: "FLOW-2",
-      name: "Canva Pro Purchase Flow",
-      active: false,
-      nodes: [
-        { id: "node-1", type: "trigger", label: "Trigger Word", value: "canva, buy canva" },
-        { id: "node-2", type: "reply", label: "Send Reply", value: "Canva Premium price is PKR 450/month. Please pay via EasyPaisa and send the screenshot." },
-        { id: "node-3", type: "tag", label: "Tag Contact", value: "Interested Canva" }
-      ]
-    }
-  ]);
   const [selectedFlowId, setSelectedFlowId] = useState<string | null>("FLOW-1");
   const [editingFlowName, setEditingFlowName] = useState("");
   const [editingFlowNodes, setEditingFlowNodes] = useState<ChatbotNode[]>([]);
-  
-  // Interactive Chatbot Simulator States
   const [simMessages, setSimMessages] = useState<{ sender: "user" | "bot"; text: string }[]>([
-    { sender: "bot", text: "Simulated chat window. flow check karne ke liye koi trigger word message karein (e.g. 'hello' ya 'canva')." }
+    { sender: "bot", text: "Simulated chat window. flow check karne ke liye koi trigger word message karein (e.g. 'hello' ya 'canva')." },
   ]);
   const [simInput, setSimInput] = useState("");
-
-  // Ad Lead States
-  const [adLeads, setAdLeads] = useState<AdLead[]>([
-    { id: "LEAD-1", adId: "ad_fb_120409", sourcePlatform: "facebook", referralData: { adName: "Eid Promo Video", campaign: "Conversations PK" }, timestamp: new Date().toISOString() },
-    { id: "LEAD-2", adId: "ad_ig_593849", sourcePlatform: "instagram", referralData: { adName: "AI Tool Deal Carousel", campaign: "Lead Generation" }, timestamp: new Date().toISOString() }
-  ]);
   const [simAdId, setSimAdId] = useState("ad_fb_993041");
   const [simPlatform, setSimPlatform] = useState("facebook");
-
-  // Load Data from Backend APIs
-  async function loadData() {
-    try {
-      const costs = await api.getWatiCosts();
-      if (costs && costs.success) {
-        setCostStats(costs);
-      }
-      const tps = await api.getWatiTemplates();
-      if (tps && tps.success && tps.templates.length > 0) {
-        setTemplates(tps.templates);
-      }
-      const lds = await api.getWatiAdLeads();
-      if (lds && lds.success && lds.leads.length > 0) {
-        setAdLeads(lds.leads);
-      }
-      const fls = await api.getWatiFlows();
-      if (fls && fls.success && fls.flows.length > 0) {
-        setFlows(fls.flows);
-      }
-    } catch (e: any) {
-      console.warn("Wati APIs failed or in demo mode. Falling back to demo data.", e);
-    }
-  }
-
-  useEffect(() => {
-    loadData();
-  }, []);
 
   // Update Editing Flow State
   useEffect(() => {
@@ -193,23 +185,18 @@ function WatiSuitePage() {
   // Wati Cost Logging simulation
   async function handleLogSimulatedCost(category: string) {
     try {
-      const res = await api.logWatiCost({ category, tenantId: "default-tenant", currency: "USD", country: "PK" });
-      if (res && res.success) {
+      const res = await api.logWatiCost({ category, tenantId: "default-tenant", currency: "USD", country: "PK" }) as { success?: boolean } | null;
+      if (res?.success) {
         toast.success(`Log successful! Injected 1 simulated ${category} conversation cost.`);
-        loadData();
+        qc.invalidateQueries({ queryKey: ["wati-costs"] });
       } else {
-        // Fallback local logging
         const rates: Record<string, number> = { marketing: 0.0147, utility: 0.008, authentication: 0.004, service: 0.005 };
         const cost = rates[category] || 0.005;
-        setCostStats(prev => {
-          const updatedBreakdown = { ...prev.breakdown, [category]: prev.breakdown[category as keyof typeof prev.breakdown] + cost };
+        qc.setQueryData<CostAnalytics>(["wati-costs"], (prev = DEFAULT_COSTS) => {
+          const key = category as keyof typeof prev.breakdown;
+          const updatedBreakdown = { ...prev.breakdown, [key]: prev.breakdown[key] + cost };
           const updatedSpent = prev.totalSpent + cost;
-          return {
-            ...prev,
-            totalSpent: parseFloat(updatedSpent.toFixed(4)),
-            markupSavings: parseFloat((updatedSpent * 0.20).toFixed(4)),
-            breakdown: updatedBreakdown
-          };
+          return { ...prev, totalSpent: parseFloat(updatedSpent.toFixed(4)), markupSavings: parseFloat((updatedSpent * 0.20).toFixed(4)), breakdown: updatedBreakdown };
         });
         toast.success(`Logged simulated ${category} cost local fallback.`);
       }
@@ -225,52 +212,28 @@ function WatiSuitePage() {
       return;
     }
 
-    let parsedOptions: any[] = [];
-    if (newTemplateType === "buttons") {
-      parsedOptions = newTemplateOptions.split(",").map((o, idx) => ({
-        id: `opt-${Date.now()}-${idx}`,
-        title: o.trim()
-      })).slice(0, 3);
-    } else {
-      parsedOptions = [
-        {
-          title: "Options List",
-          rows: newTemplateOptions.split(",").map((o, idx) => ({
-            id: `row-${Date.now()}-${idx}`,
-            title: o.trim().slice(0, 24),
-            description: "Category description details"
-          })).slice(0, 10)
-        }
-      ];
-    }
+    const parsedOptions: TemplateOption[] = newTemplateType === "buttons"
+      ? newTemplateOptions.split(",").map((o, idx) => ({ id: `opt-${Date.now()}-${idx}`, title: o.trim() })).slice(0, 3)
+      : [{ title: "Options List", rows: newTemplateOptions.split(",").map((o, idx) => ({ id: `row-${Date.now()}-${idx}`, title: o.trim().slice(0, 24), description: "Category description details" })).slice(0, 10) }];
 
     const payload = {
       tenantId: "default-tenant",
       name: newTemplateName.trim().replace(/\s+/g, "_").toLowerCase(),
       type: newTemplateType,
       bodyText: newTemplateBody.trim(),
-      options: parsedOptions
+      options: parsedOptions,
     };
 
     try {
-      const res = await api.createWatiTemplate(payload);
-      if (res && res.success) {
+      const res = await api.createWatiTemplate(payload) as { success?: boolean } | null;
+      if (res?.success) {
         toast.success("Interactive template created on backend!");
-        setNewTemplateName("");
-        setNewTemplateBody("");
-        loadData();
+        setNewTemplateName(""); setNewTemplateBody("");
+        qc.invalidateQueries({ queryKey: ["wati-templates"] });
       } else {
-        // Fallback local
-        const newTmp: InteractiveTemplate = {
-          id: `INT-${Date.now()}`,
-          name: payload.name,
-          type: payload.type,
-          bodyText: payload.bodyText,
-          options: payload.options
-        };
-        setTemplates(prev => [...prev, newTmp]);
-        setNewTemplateName("");
-        setNewTemplateBody("");
+        const newTmp: InteractiveTemplate = { id: `INT-${Date.now()}`, name: payload.name, type: payload.type, bodyText: payload.bodyText, options: payload.options };
+        qc.setQueryData<InteractiveTemplate[]>(["wati-templates"], (prev = DEFAULT_TEMPLATES) => [...prev, newTmp]);
+        setNewTemplateName(""); setNewTemplateBody("");
         toast.success("Interactive template created successfully (Local).");
       }
     } catch {
@@ -290,20 +253,13 @@ function WatiSuitePage() {
       }
     };
     try {
-      const res = await api.trackWatiAdLead(payload);
-      if (res && res.success) {
+      const res = await api.trackWatiAdLead(payload) as { success?: boolean } | null;
+      if (res?.success) {
         toast.success("Ad Lead successfully logged to database!");
-        loadData();
+        qc.invalidateQueries({ queryKey: ["wati-leads"] });
       } else {
-        // Fallback local
-        const newLd: AdLead = {
-          id: `LEAD-${Date.now()}`,
-          adId: payload.adId,
-          sourcePlatform: payload.sourcePlatform,
-          referralData: payload.referralData,
-          timestamp: new Date().toISOString()
-        };
-        setAdLeads(prev => [newLd, ...prev]);
+        const newLd: AdLead = { id: `LEAD-${Date.now()}`, adId: payload.adId, sourcePlatform: payload.sourcePlatform, referralData: payload.referralData, timestamp: new Date().toISOString() };
+        qc.setQueryData<AdLead[]>(["wati-leads"], (prev = DEFAULT_LEADS) => [newLd, ...prev]);
         toast.success("Simulated Ad Lead captured (Local).");
       }
     } catch {
@@ -349,12 +305,12 @@ function WatiSuitePage() {
     };
 
     try {
-      const res = await api.saveWatiFlow(updatedFlow);
-      if (res && res.success) {
+      const res = await api.saveWatiFlow(updatedFlow) as { success?: boolean } | null;
+      if (res?.success) {
         toast.success("Flow saved successfully to server.");
-        loadData();
+        qc.invalidateQueries({ queryKey: ["wati-flows"] });
       } else {
-        setFlows(prev => prev.map(f => f.id === selectedFlowId ? updatedFlow : f));
+        qc.setQueryData<ChatbotFlow[]>(["wati-flows"], (prev = DEFAULT_FLOWS) => prev.map((f) => f.id === selectedFlowId ? updatedFlow : f));
         toast.success("Flow saved locally.");
       }
     } catch {
@@ -363,16 +319,15 @@ function WatiSuitePage() {
   }
 
   function handleToggleFlowActive(id: string) {
-    const target = flows.find(f => f.id === id);
+    const target = flows.find((f) => f.id === id);
     if (!target) return;
     const updated = { ...target, active: !target.active };
-
-    api.saveWatiFlow(updated).then((res) => {
-      if (res && res.success) {
+    (api.saveWatiFlow(updated) as Promise<{ success?: boolean } | null>).then((res) => {
+      if (res?.success) {
         toast.success(`Flow ${updated.active ? "activated" : "deactivated"}`);
-        loadData();
+        qc.invalidateQueries({ queryKey: ["wati-flows"] });
       } else {
-        setFlows(prev => prev.map(f => f.id === id ? updated : f));
+        qc.setQueryData<ChatbotFlow[]>(["wati-flows"], (prev = DEFAULT_FLOWS) => prev.map((f) => f.id === id ? updated : f));
         toast.success(`Flow ${updated.active ? "activated" : "deactivated"} (Local)`);
       }
     });
@@ -390,13 +345,13 @@ function WatiSuitePage() {
       ]
     };
     try {
-      const res = await api.saveWatiFlow(newFl);
-      if (res && res.success) {
+      const res = await api.saveWatiFlow(newFl) as { success?: boolean } | null;
+      if (res?.success) {
         toast.success("New flow created!");
-        loadData();
+        qc.invalidateQueries({ queryKey: ["wati-flows"] });
         setSelectedFlowId(newId);
       } else {
-        setFlows(prev => [...prev, newFl]);
+        qc.setQueryData<ChatbotFlow[]>(["wati-flows"], (prev = DEFAULT_FLOWS) => [...prev, newFl]);
         setSelectedFlowId(newId);
         toast.success("New flow initialized locally.");
       }
@@ -408,14 +363,15 @@ function WatiSuitePage() {
   async function handleDeleteFlow(id: string) {
     if (!confirm("Are you sure you want to delete this flow?")) return;
     try {
-      const res = await api.deleteWatiFlow(id);
-      if (res && res.success) {
+      const res = await api.deleteWatiFlow(id) as { success?: boolean } | null;
+      const nextId = flows.find((f) => f.id !== id)?.id ?? null;
+      if (res?.success) {
         toast.success("Flow deleted.");
-        setSelectedFlowId(flows.find(f => f.id !== id)?.id || null);
-        loadData();
+        setSelectedFlowId(nextId);
+        qc.invalidateQueries({ queryKey: ["wati-flows"] });
       } else {
-        setFlows(prev => prev.filter(f => f.id !== id));
-        setSelectedFlowId(flows.find(f => f.id !== id)?.id || null);
+        qc.setQueryData<ChatbotFlow[]>(["wati-flows"], (prev = DEFAULT_FLOWS) => prev.filter((f) => f.id !== id));
+        setSelectedFlowId(nextId);
         toast.success("Flow deleted (Local).");
       }
     } catch {
@@ -472,7 +428,7 @@ function WatiSuitePage() {
         subtitle="Manage WhatsApp marketing campaigns, 0% Markup conversation bills, visual flows, and ad attribution."
         actions={
           <div className="flex gap-2">
-            <Btn variant="outline" onClick={loadData}><RefreshCw className="h-4 w-4" /> Sync Data</Btn>
+            <Btn variant="outline" onClick={invalidateWati}><RefreshCw className="h-4 w-4" /> Sync Data</Btn>
             <Btn variant="primary"><Crown className="h-4 w-4 text-warning" /> Wati Enterprise Mode</Btn>
           </div>
         }
@@ -488,7 +444,7 @@ function WatiSuitePage() {
         ].map(t => (
           <button
             key={t.id}
-            onClick={() => setActiveTab(t.id as any)}
+            onClick={() => setActiveTab(t.id as "billing" | "templates" | "chatbot" | "leads")}
             className={`flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 transition-all -mb-px whitespace-nowrap ${activeTab === t.id ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}
           >
             <t.icon className="h-4 w-4" />
@@ -579,7 +535,7 @@ function WatiSuitePage() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs text-muted-foreground block mb-1">Interactive Type</label>
-                  <Select value={newTemplateType} onChange={(e) => setNewTemplateType(e.target.value as any)}>
+                  <Select value={newTemplateType} onChange={(e) => setNewTemplateType(e.target.value as "buttons" | "list")}>
                     <option value="buttons">Interactive Reply Buttons (Max 3)</option>
                     <option value="list">Interactive Select List Menu (Max 10)</option>
                   </Select>
