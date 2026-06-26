@@ -8,6 +8,7 @@
     "dev": "nodemon server.js",
     "smoke": "node scripts/smoke-test.js",
     "health": "node scripts/healthCheck.js",
+    "social:check": "node scripts/socialMediaReadiness.js",
     "launch:check": "node scripts/launch-readiness.js",
     "fix": "node scripts/fixAllBugs.js",
     "test:api": "node scripts/testAllAPIs.js",
