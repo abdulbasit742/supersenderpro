@@ -12,6 +12,7 @@ import {
   Key, UserPlus, FlaskConical, Filter, DollarSign, TicketIcon,
   Receipt, RotateCcw, Bell, TrendingDown, Pencil, UserCheck,
   MessageCircleReply, Trophy, PackageCheck, StickyNote, BadgeDollarSign,
+  Layers, Truck, ShieldOff, BookOpen, Sparkles, Clock,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-hook";
 import { useState } from "react";
@@ -182,6 +183,24 @@ const NAV_GROUPS: Array<{ group: string; items: NavItem[] }> = [
       { to: "/bundles",              label: "Bundle Builder",        icon: Package },
       { to: "/team-performance",     label: "Team Performance",      icon: Trophy },
       { to: "/broadcast-analytics",  label: "Broadcast Analytics",   icon: Radio },
+      { to: "/smart-suggestions",    label: "AI Smart Suggestions",  icon: Sparkles },
+      { to: "/order-tracking",       label: "Order Tracking",        icon: Truck },
+      { to: "/blacklist",            label: "Blacklist Manager",     icon: ShieldOff },
+    ],
+  },
+  {
+    group: "Scheduling",
+    items: [
+      { to: "/drip-campaigns",       label: "Drip Campaigns",        icon: Layers },
+      { to: "/broadcast-scheduler",  label: "Broadcast Scheduler",   icon: Clock },
+    ],
+  },
+  {
+    group: "Business Setup",
+    items: [
+      { to: "/packages",             label: "Pricing Packages",      icon: Layers },
+      { to: "/payment-gateway",      label: "Payment Gateway",       icon: CreditCard },
+      { to: "/knowledge-base",       label: "Knowledge Base",        icon: BookOpen },
     ],
   },
   {
