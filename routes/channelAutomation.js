@@ -57,6 +57,10 @@ module.exports = function (center) {
 
   // ── Event ingestion (source post detected) ──────────────────────────────────
   router.post('/channels/events/source-post', adminGuard, async (req, res) => { try { ok(res, { result: await center.ingestSourcePost(req.body || {}) }); } catch (e) { fail(res, e); } });
+  router.post('/channels/events/group-message', adminGuard, async (req, res) => { try { ok(res, { result: await center.ingestGroupChatMessage(req.body || {}, { force: !!(req.body || {}).force }) }); } catch (e) { fail(res, e); } });
+  router.post('/channels/events/chat-message', adminGuard, async (req, res) => { try { ok(res, { result: await center.ingestDirectChatMessage(req.body || {}, { force: !!(req.body || {}).force }) }); } catch (e) { fail(res, e); } });
+  router.post('/channels/content-flow/preview', (req, res) => { try { ok(res, { preview: center.previewContentFlow(req.body || {}) }); } catch (e) { fail(res, e); } });
+  router.get('/channels/content-flow/status', (req, res) => { try { ok(res, { flow: center.contentFlowStatus() }); } catch (e) { fail(res, e); } });
   router.post('/channels/events/ecommerce', adminGuard, async (req, res) => { try { ok(res, { result: await center.ecommerceEvent(req.body || {}) }); } catch (e) { fail(res, e); } });
 
   // ── Test publish / dry-run ──────────────────────────────────────────────────

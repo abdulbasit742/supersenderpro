@@ -55,7 +55,8 @@
     "personality-disc:smoke": "node tests/smoke/personalityDiscSmoke.js",
     "platform-control:check": "node scripts/checkPlatformControl.js",
     "workflow-orchestrator:check": "node scripts/checkWorkflowOrchestrator.js",
-    "campaign-intelligence:check": "node scripts/checkCampaignIntelligence.js"
+    "campaign-intelligence:check": "node scripts/checkCampaignIntelligence.js",
+    "channel-flow:smoke": "node tests/smoke/channelAutomationContentFlowSmoke.js"
   },
   "dependencies": {
     "@whiskeysockets/baileys": "^7.0.0-rc.9",

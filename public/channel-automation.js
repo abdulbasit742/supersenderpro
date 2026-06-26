@@ -43,7 +43,7 @@ async function loadSources() {
   document.getElementById('srcBody').innerHTML = (d.sources || []).map(s => `
     <tr>
       <td>${esc(s.name)}<div class="small">${esc(s.id)}</div></td>
-      <td>${esc(s.category)}</td>
+      <td>${esc(s.category)}<div class="small">${esc(s.sourceType || 'whatsapp_channel')}</div></td>
       <td><span class="pill ${s.health?.status || 'dead'}">${esc(s.health?.status || 'unknown')}</span></td>
       <td class="small">${s.health?.lastPostAt ? new Date(s.health.lastPostAt).toLocaleString() : '—'}</td>
       <td>${s.priority}</td>
@@ -96,7 +96,7 @@ async function refreshAll() { await Promise.all([loadStatus(), loadSources(), lo
 // actions
 async function ctl(action) { await postJSON(`${API}/control`, { action }); toast('Mode: ' + action); refreshAll(); }
 async function addSource() {
-  const body = { name: v('sName'), channelId: v('sChan'), link: v('sChan'), category: v('sCat'), priority: Number(v('sPri')) || 1, requireApproval: document.getElementById('sApprove').checked };
+  const body = { name: v('sName'), channelId: v('sChan'), link: v('sChan'), sourceType: v('sType'), category: v('sCat'), priority: Number(v('sPri')) || 1, requireApproval: document.getElementById('sApprove').checked };
   if (!body.name) return toast('Name required');
   await postJSON(`${API}/sources`, body); toast('Source saved'); loadSources(); loadStatus();
 }
@@ -119,6 +119,24 @@ async function testAutomation() {
   const r = await postJSON(`${API}/test-publish`, { text: 'Test post from Command Center 🚀' });
   toast('Test ran (dry-run): ' + ((r.result && r.result.steps || []).join(' → ')));
   loadQueue(); loadLogs();
+}
+async function previewFlow() {
+  const body = { channelId: v('cfSource'), groupId: v('cfSource'), sourceType: v('cfType'), text: v('cfText') };
+  const r = await postJSON(`${API}/content-flow/preview`, body);
+  document.getElementById('flowPreview').textContent = JSON.stringify(r.preview || r, null, 2);
+}
+async function ingestFlowTest() {
+  const sourceType = v('cfType');
+  const body = { channelId: v('cfSource'), groupId: v('cfSource'), sourceType, text: v('cfText'), force: true };
+  const endpoint = sourceType === 'whatsapp_group'
+    ? `${API}/events/group-message`
+    : sourceType === 'whatsapp_chat'
+      ? `${API}/events/chat-message`
+      : `${API}/events/source-post`;
+  const r = await postJSON(endpoint, body);
+  document.getElementById('flowPreview').textContent = JSON.stringify(r.result || r, null, 2);
+  toast('Flow test queued/processed');
+  loadQueue(); loadLogs(); loadStatus();
 }
 async function genDigest() { const r = await postJSON(`${API}/digest/generate`, {}); alert(r.digest || 'No digest'); }
 async function exportCfg() {

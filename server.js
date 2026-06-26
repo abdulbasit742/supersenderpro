@@ -3192,6 +3192,22 @@ try {
 }
 // END CAMPAIGN INTELLIGENCE HOOK
 
+// BEGIN CHANNEL CONTENT FLOW HOOK
+// Channel + group chat content flow: source capture -> filters -> branding -> approval queue -> target dispatch.
+// Safe by default: dry-run mode and admin-guarded writes unless CHANNEL_ADMIN_SECRET is configured.
+try {
+  const { createChannelAutomationCenter } = require('./lib/channelAutomationCenter');
+  const channelCenter = createChannelAutomationCenter({ dataDir });
+  channelCenter.startScheduler();
+  app.use('/api', require('./routes/channelAutomation')(channelCenter));
+  app.get('/channel-automation.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'channel-automation.html')));
+  global.__superSenderChannelCenter = channelCenter;
+  console.log('[ChannelContentFlow] mounted at /api/channels and /channel-automation.html');
+} catch (e) {
+  console.error('[ChannelContentFlow] failed to initialise (non-fatal):', e.message);
+}
+// END CHANNEL CONTENT FLOW HOOK
+
 
 let searchIndexRebuildTimer = null;
 function scheduleSearchIndexRebuild(reason = 'data-change', delayMs = Number(process.env.SEARCH_REBUILD_DEBOUNCE_MS || 30000)) {
@@ -4833,6 +4849,19 @@ async function handleBaileysIncoming(instance, m) {
       if (typeof groupAutoReply.checkGroupAutoReply === 'function') await groupAutoReply.checkGroupAutoReply(groupMsg);
     } catch (e) { console.warn('[Groups] auto-reply skipped:', e.message); }
     try {
+      if (global.__superSenderChannelCenter && typeof global.__superSenderChannelCenter.ingestGroupChatMessage === 'function') {
+        await global.__superSenderChannelCenter.ingestGroupChatMessage({
+          groupId: chatId,
+          channelId: chatId,
+          text: body,
+          sender: senderNumber || baileysToWWebId(authorJid),
+          senderName,
+          messageId,
+          sourceType: 'whatsapp_group'
+        });
+      }
+    } catch (e) { console.warn('[ContentFlow] Baileys group ingest skipped:', e.message); }
+    try {
       await captureGroupPriceIntel({
         body,
         groupId: chatId,
@@ -5334,6 +5363,19 @@ async function getOrCreateWAClient(tenantId = 'default', attempt = 0) {
         try {
           if (typeof groupAutoReply.checkGroupAutoReply === 'function') await groupAutoReply.checkGroupAutoReply(msg);
         } catch (e) { console.warn('[Groups] auto-reply skipped:', e.message); }
+        try {
+          if (global.__superSenderChannelCenter && typeof global.__superSenderChannelCenter.ingestGroupChatMessage === 'function') {
+            await global.__superSenderChannelCenter.ingestGroupChatMessage({
+              groupId: chatId,
+              channelId: chatId,
+              text: msg.body || msg.caption || '',
+              sender: senderNumber || msg.author || contact?.id?._serialized || '',
+              senderName,
+              messageId,
+              sourceType: 'whatsapp_group'
+            });
+          }
+        } catch (e) { console.warn('[ContentFlow] wwebjs group ingest skipped:', e.message); }
         try {
           await captureGroupPriceIntel({
             body: msg.body || '',
@@ -31260,7 +31302,7 @@ function splitSocialCommandArgs(text = '') {
 }
 
 function isWhatsAppSocialCommand(text = '') {
-  return /^!(social|connect|post|draft|approvepost|sharepost|poststatus|comment|telegram|control|admin|menuadmin|server|status|health|complete|completion|setupcheck|setupvalidator|setupfix|doctor|watchdog|cloudapi|officialwa|next50|antigravity|aihub|automationhub|agents|agentcontrol|agenttask|autobuild|claw|claws|zeroclaw|pcagents|importskills|skillpacks|packs|waauto|automation|autosettings|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|channel|channelcenter|channelpreset|channelfix|channelwatch|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
+  return /^!(social|connect|post|draft|approvepost|sharepost|poststatus|comment|telegram|control|admin|menuadmin|server|status|health|complete|completion|setupcheck|setupvalidator|setupfix|doctor|watchdog|cloudapi|officialwa|next50|antigravity|aihub|automationhub|agents|agentcontrol|agenttask|autobuild|claw|claws|zeroclaw|pcagents|importskills|skillpacks|packs|waauto|automation|autosettings|webfetch|webpost|webshare|salesdraft|activation|scholarship|scholarships|scholarshipsources|scholarshipsource|scholarshipfetch|scholarshipauto|scholarshipgroups|scholarshipscan|scholarshippost|autopilot|contentflow|flowstatus|channel|channelcenter|channelpreset|channelfix|channelwatch|channelrun|channelqr|channelcatch|channelscan|channeluse|channelsource|channelcopy|channelset|channelauto|channelnow|channelfb|channel2fb|channelboost|bridgereport|bridgehealth|sharechannel|channelshare|channelpost|channelmedia|channelschedule|relay|groups|grouppost|groupschedule|groupdist|groupmembers|grouptemplates|sellerrates|ratesweep|finder|find|report|backup)\b/i.test(String(text || '').trim());
 }
 
 function adminNumberCandidates() {
@@ -32463,6 +32505,12 @@ async function handleWhatsAppSocialAdminCommand(ctx = {}) {
 
     if (command === '!aihub' || command === '!automationhub') {
       await reply(buildAiAutomationHubReply());
+      return true;
+    }
+
+    if ((command === '!contentflow' || command === '!flowstatus') && global.__superSenderChannelCenter) {
+      const message = await global.__superSenderChannelCenter.handleAdminCommand(command, args.slice(1));
+      await reply(message);
       return true;
     }
 

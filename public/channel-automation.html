@@ -80,12 +80,33 @@
     <input id="impFile" type="file" accept="application/json" style="display:none" onchange="importCfg(event)"/>
   </div>
 
+  <section>
+    <h2>Content Flow Preview</h2>
+    <div class="grid2">
+      <div>
+        <div class="form-row"><label>Source / Group ID</label><input id="cfSource" placeholder="120363xxxx@g.us or @newsletter"/></div>
+        <div class="form-row"><label>Source type</label>
+          <select id="cfType"><option value="whatsapp_group">WhatsApp Group</option><option value="whatsapp_channel">WhatsApp Channel</option><option value="whatsapp_chat">Direct Chat</option><option value="webhook">Webhook</option><option value="ecommerce">Ecommerce</option></select>
+        </div>
+        <div class="form-row"><label>Incoming content sample</label><textarea id="cfText" rows="4" placeholder="Paste group/channel post text here..."></textarea></div>
+        <button class="btn" onclick="previewFlow()">Preview Flow</button>
+        <button class="btn ghost" onclick="ingestFlowTest()">Add to Queue</button>
+      </div>
+      <div>
+        <div class="feed" id="flowPreview">Preview will appear here.</div>
+      </div>
+    </div>
+  </section>
+
   <div class="grid2">
     <!-- Add source -->
     <section>
       <h2>➕ Add Source Channel</h2>
       <div class="form-row"><label>Name</label><input id="sName" placeholder="AI Tools Daily"/></div>
       <div class="form-row"><label>Channel ID / link</label><input id="sChan" placeholder="120363xxxx@newsletter"/></div>
+      <div class="form-row"><label>Source type</label>
+        <select id="sType"><option value="whatsapp_channel">WhatsApp Channel</option><option value="whatsapp_group">WhatsApp Group</option><option value="whatsapp_chat">Direct Chat</option><option value="webhook">Webhook</option><option value="ecommerce">Ecommerce</option></select>
+      </div>
       <div class="form-row"><label>Category</label>
         <select id="sCat"><option>general</option><option>stickers</option><option>ai tools</option><option>tech</option><option>scholarship</option><option>ecommerce deals</option><option>islamic</option><option>education</option><option>jobs</option></select>
       </div>
