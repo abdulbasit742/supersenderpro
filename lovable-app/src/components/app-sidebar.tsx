@@ -11,6 +11,7 @@ import {
   Cake, Smartphone, Target, Link2, CalendarRange, PackageOpen, Languages, MessageSquare,
   Key, UserPlus, FlaskConical, Filter, DollarSign, TicketIcon,
   Receipt, RotateCcw, Bell, TrendingDown, Pencil, UserCheck,
+  MessageCircleReply, Trophy, PackageCheck, StickyNote, BadgeDollarSign,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-hook";
 import { useState } from "react";
@@ -159,9 +160,28 @@ const NAV_GROUPS: Array<{ group: string; items: NavItem[] }> = [
   {
     group: "Finance",
     items: [
-      { to: "/expense-tracker",   label: "Expense Tracker",      icon: Receipt },
-      { to: "/refund-manager",    label: "Refund Manager",       icon: RotateCcw },
-      { to: "/revenue-leakage",   label: "Revenue Leakage",      icon: TrendingDown },
+      { to: "/expense-tracker",      label: "Expense Tracker",       icon: Receipt },
+      { to: "/refund-manager",       label: "Refund Manager",        icon: RotateCcw },
+      { to: "/revenue-leakage",      label: "Revenue Leakage",       icon: TrendingDown },
+      { to: "/commission-manager",   label: "Commission Manager",    icon: BadgeDollarSign },
+    ],
+  },
+  {
+    group: "Automation",
+    items: [
+      { to: "/chatbot-builder",      label: "Chatbot Builder",       icon: Bot },
+      { to: "/auto-reply",           label: "Auto-Reply Engine",     icon: MessageCircleReply },
+      { to: "/stock-alerts",         label: "Stock Arrival Alerts",  icon: PackageCheck },
+    ],
+  },
+  {
+    group: "CRM",
+    items: [
+      { to: "/customer-ltv",         label: "Customer LTV",          icon: TrendingUp },
+      { to: "/customer-notes",       label: "Notes & Tags",          icon: StickyNote },
+      { to: "/bundles",              label: "Bundle Builder",        icon: Package },
+      { to: "/team-performance",     label: "Team Performance",      icon: Trophy },
+      { to: "/broadcast-analytics",  label: "Broadcast Analytics",   icon: Radio },
     ],
   },
   {
