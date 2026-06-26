@@ -10,6 +10,7 @@ import {
   Webhook, GitBranch, Eye, QrCode, Phone, Table2, BarChart2,
   Cake, Smartphone, Target, Link2, CalendarRange, PackageOpen, Languages, MessageSquare,
   Key, UserPlus, FlaskConical, Filter, DollarSign, TicketIcon,
+  Receipt, RotateCcw, Bell, TrendingDown, Pencil, UserCheck,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-hook";
 import { useState } from "react";
@@ -142,6 +143,25 @@ const NAV_GROUPS: Array<{ group: string; items: NavItem[] }> = [
       { to: "/sub-reseller",    label: "Sub-Resellers",       icon: UserPlus },
       { to: "/affiliate",       label: "Affiliate Program",   icon: Link2 },
       { to: "/support-tickets", label: "Support Tickets",     icon: TicketIcon },
+    ],
+  },
+  {
+    group: "Growth Engine",
+    items: [
+      { to: "/flash-sale",          label: "Flash Sale Manager",   icon: Zap },
+      { to: "/churn-prediction",    label: "Churn Prediction",     icon: Brain },
+      { to: "/nps-surveys",         label: "NPS Surveys",          icon: Star },
+      { to: "/price-alerts",        label: "Price Alerts",         icon: Bell },
+      { to: "/onboarding-flow",     label: "Onboarding Flow",      icon: UserCheck },
+      { to: "/message-personalizer",label: "Message Personalizer", icon: Pencil },
+    ],
+  },
+  {
+    group: "Finance",
+    items: [
+      { to: "/expense-tracker",   label: "Expense Tracker",      icon: Receipt },
+      { to: "/refund-manager",    label: "Refund Manager",       icon: RotateCcw },
+      { to: "/revenue-leakage",   label: "Revenue Leakage",      icon: TrendingDown },
     ],
   },
   {
