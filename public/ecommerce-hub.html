@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SuperSender Pro \u2014 Ecommerce Hub</title>
+  <style>
+    :root{--bg:#0e1116;--card:#171c24;--line:#232a35;--fg:#e6edf3;--mut:#8b97a7;--accent:#6aa6ff;--red:#d23f3f;--green:#2ea043;}
+    *{box-sizing:border-box}body{margin:0;font-family:system-ui,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--fg)}
+    header{padding:24px 32px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+    header h1{font-size:22px;margin:0}.badge{font-size:13px;font-weight:600;padding:4px 12px;border-radius:999px;background:rgba(106,166,255,.15);color:var(--accent)}
+    main{padding:32px;max-width:1150px;margin:0 auto;display:grid;gap:24px}
+    .platforms{display:flex;gap:12px;flex-wrap:wrap}
+    .pf{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px;font-weight:600}
+    .pf .live{font-size:11px;font-weight:700;margin-left:8px;padding:2px 8px;border-radius:4px}
+    .pf .live.on{background:rgba(46,160,67,.15);color:var(--green)}
+    .pf .live.off{background:rgba(139,151,167,.15);color:var(--mut)}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px}
+    .card h2{font-size:14px;margin:0 0 14px;color:var(--mut);text-transform:uppercase;letter-spacing:.05em}
+    table{width:100%;border-collapse:collapse;font-size:14px}
+    th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line)}
+    th{color:var(--mut);font-weight:600}
+    .out{color:var(--red)}
+    button{background:var(--accent);color:#0b0f14;border:none;border-radius:8px;padding:9px 16px;font-weight:700;cursor:pointer}
+  </style>
+</head>
+<body>
+  <header><h1>\ud83d\uded2 Ecommerce Hub</h1><span class="badge" id="badge">DRY-RUN</span></header>
+  <main>
+    <div class="card">
+      <h2>Connected Platforms</h2>
+      <div class="platforms" id="platforms">Loading\u2026</div>
+      <p style="color:var(--mut);font-size:13px;margin-top:14px">On WhatsApp: customers type <code>!shop</code>, <code>!product &lt;id&gt;</code>, <code>!orders</code>. <button id="sync" style="margin-left:10px">Sync now</button></p>
+    </div>
+    <div class="card">
+      <h2>Products (all platforms)</h2>
+      <table><thead><tr><th>Platform</th><th>ID</th><th>Title</th><th>Price</th><th>Stock</th></tr></thead><tbody id="products"><tr><td colspan="5">Loading\u2026</td></tr></tbody></table>
+    </div>
+    <div class="card">
+      <h2>Clients (masked)</h2>
+      <table><thead><tr><th>Platform</th><th>Name</th><th>Contact</th><th>Orders</th></tr></thead><tbody id="clients"><tr><td colspan="4">Loading\u2026</td></tr></tbody></table>
+    </div>
+  </main>
+  <script>
+  (function(){
+    function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+    fetch('/api/ecommerce-hub/status').then(function(r){return r.json();}).then(function(d){
+      if(d&&d.dryRun===false){document.getElementById('badge').textContent='LIVE';}
+      var pf=(d&&d.platforms)||[];
+      document.getElementById('platforms').innerHTML=pf.map(function(p){
+        return '<div class="pf">'+esc(p.label)+'<span class="live '+(p.live?'on':'off')+'">'+(p.live?'LIVE':'dry-run')+'</span></div>';
+      }).join('');
+    });
+    function loadProducts(){
+      fetch('/api/ecommerce-hub/products').then(function(r){return r.json();}).then(function(d){
+        var ps=(d&&d.products)||[];
+        document.getElementById('products').innerHTML=ps.length?ps.map(function(p){
+          return '<tr><td>'+esc(p.platform)+'</td><td>'+esc(p.id)+'</td><td>'+esc(p.title)+'</td><td>'+esc((p.currency||'')+' '+(p.price==null?'-':p.price))+'</td><td class="'+(p.stock===0?'out':'')+'">'+(p.stock===0?'out':esc(p.stock==null?'-':p.stock))+'</td></tr>';
+        }).join(''):'<tr><td colspan=5>No products.</td></tr>';
+      });
+    }
+    function loadClients(){
+      fetch('/api/ecommerce-hub/clients').then(function(r){return r.json();}).then(function(d){
+        var cs=(d&&d.clients)||[];
+        document.getElementById('clients').innerHTML=cs.length?cs.map(function(c){
+          return '<tr><td>'+esc(c.platform)+'</td><td>'+esc(c.name||'-')+'</td><td>'+esc(c.phoneMasked||c.emailMasked||'-')+'</td><td>'+esc(c.orders)+'</td></tr>';
+        }).join(''):'<tr><td colspan=4>No clients.</td></tr>';
+      });
+    }
+    document.getElementById('sync').addEventListener('click',function(){
+      fetch('/api/ecommerce-hub/sync',{method:'POST'}).then(function(){loadProducts();loadClients();});
+    });
+    loadProducts();loadClients();
+  })();
+  </script>
+</body>
+</html>
