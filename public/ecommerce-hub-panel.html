@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SuperSender Pro \u2014 Ecommerce Hub Control Panel</title>
+<style>
+:root{--bg:#0e1116;--card:#171c24;--line:#232a35;--fg:#e6edf3;--mut:#8b97a7;--accent:#6aa6ff;--green:#2ea043;--red:#d23f3f;--amber:#d29922;}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--fg)}
+header{padding:24px 32px;border-bottom:1px solid var(--line)}h1{font-size:22px;margin:0}
+main{padding:28px;max-width:1100px;margin:0 auto;display:grid;gap:22px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px}
+.card h2{font-size:13px;margin:0 0 14px;color:var(--mut);text-transform:uppercase;letter-spacing:.05em}
+.row{display:flex;flex-wrap:wrap;gap:10px}
+.pill{background:#10151c;border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:13px}
+.pill b{color:var(--accent)}
+.ok{color:var(--green)}.bad{color:var(--red)}.warn{color:var(--amber)}
+table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left;padding:8px;border-bottom:1px solid var(--line)}th{color:var(--mut)}
+code{background:#10151c;border:1px solid var(--line);border-radius:4px;padding:1px 6px;font-size:12.5px}
+.cmds{columns:2;font-size:13.5px;line-height:1.9}
+@media(max-width:680px){.cmds{columns:1}}
+.status{font-size:14px}
+</style>
+</head>
+<body>
+<header><h1>\ud83d\udee0\ufe0f Ecommerce Hub \u2014 Control Panel</h1></header>
+<main>
+  <div class="card">
+    <h2>Ship readiness (self-test)</h2>
+    <div class="status" id="selftest">Checking\u2026</div>
+  </div>
+  <div class="card">
+    <h2>Platforms</h2>
+    <div class="row" id="platforms">Loading\u2026</div>
+  </div>
+  <div class="card">
+    <h2>Go-live checklist (env flags)</h2>
+    <table id="flags"><thead><tr><th>Flag</th><th>Purpose</th></tr></thead><tbody><tr><td colspan=2>Loading\u2026</td></tr></tbody></table>
+  </div>
+  <div class="card">
+    <h2>WhatsApp commands</h2>
+    <div class="cmds">
+      <div><b>Customer</b></div>
+      <div><code>!shop</code> products</div>
+      <div><code>!product &lt;id&gt;</code> detail</div>
+      <div><code>!find &lt;q&gt;</code> search</div>
+      <div><code>!track &lt;orderId&gt;</code> tracking</div>
+      <div><code>!points</code> / <code>!redeem</code> loyalty</div>
+      <div><code>!coupon</code> discount</div>
+      <div><code>!mycart</code> cart</div>
+      <div><code>!faq</code> help</div>
+      <div><code>!agent</code> human</div>
+      <div><code>!lang en|ur|roman</code></div>
+      <div><code>STOP</code> / <code>START</code> opt-out</div>
+      <div style="margin-top:8px"><b>Admin</b></div>
+      <div><code>!setstock &lt;sku&gt; &lt;qty&gt;</code></div>
+      <div><code>!setprice &lt;sku&gt; &lt;price&gt;</code></div>
+      <div><code>!settrack &lt;orderId&gt; &lt;courier&gt; &lt;id&gt;</code></div>
+      <div><code>!lowstock</code> / <code>!digest</code></div>
+      <div><code>!broadcast &lt;msg&gt;</code></div>
+      <div><code>!coupon &lt;pct&gt;</code></div>
+      <div><code>!remind</code></div>
+    </div>
+  </div>
+</main>
+<script>
+(function(){
+  fetch('/api/ecommerce-hub/selftest').then(function(r){return r.json();}).then(function(d){
+    var el=document.getElementById('selftest');
+    var cls=d.ok?'ok':'bad';
+    el.innerHTML='<span class="'+cls+'">'+(d.ok?'\u2705 READY':'\u26a0\ufe0f ISSUES')+'</span> \u2014 '+d.loaded+'/'+d.totalModules+' modules loaded'+(d.failedCount?(', '+d.failedCount+' failed'):'')+'.<br><span style="color:#8b97a7">'+(d.note||'')+'</span>';
+    var tb=document.querySelector('#flags tbody');
+    tb.innerHTML=(d.requiredFlagsToGoLive||[]).map(function(f){return '<tr><td><code>'+f.key+'</code></td><td>'+f.purpose+'</td></tr>';}).join('');
+  }).catch(function(){document.getElementById('selftest').innerHTML='<span class="bad">self-test endpoint not reachable</span>';});
+  fetch('/api/ecommerce-hub/status').then(function(r){return r.json();}).then(function(d){
+    var pf=(d&&d.platforms)||[];
+    document.getElementById('platforms').innerHTML=pf.map(function(p){return '<span class="pill">'+p.label+' <b>'+(p.live?'LIVE':'dry-run')+'</b></span>';}).join('')||'No platforms.';
+  }).catch(function(){document.getElementById('platforms').textContent='status endpoint not reachable';});
+})();
+</script>
+</body>
+</html>
