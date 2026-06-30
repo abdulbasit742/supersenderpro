@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Product Performance — SuperSender Pro</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#0b141a;color:#e9edef;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:24px;max-width:1040px;margin:0 auto}
+  a.back{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.05);border:1px solid #2a3942;color:#8696a0;padding:7px 12px;border-radius:7px;text-decoration:none;font-size:12px;margin-bottom:16px}
+  a.back:hover{border-color:#00a884;color:#00a884}
+  h1{font-size:22px;font-weight:800;margin-bottom:2px}
+  .sub{color:#8696a0;font-size:13px;margin-bottom:18px}
+  .banner{font-size:12px;padding:9px 12px;border-radius:9px;margin-bottom:14px;display:none}
+  .banner.show{display:block;background:rgba(83,189,235,.08);border:1px solid rgba(83,189,235,.25);color:#9fd7f2}
+  .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+  .kpi{background:#1f2c34;border:1px solid #2a3942;border-radius:12px;padding:14px}
+  .kv{font-size:21px;font-weight:800;color:#00a884;line-height:1.1}
+  .kl{font-size:10px;color:#8696a0;text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-top:4px}
+  .card{background:#1f2c34;border:1px solid #2a3942;border-radius:12px;padding:16px;margin-bottom:14px}
+  .ct{font-size:10px;color:#8696a0;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th{text-align:left;padding:7px 8px;border-bottom:1px solid #2a3942;font-size:10px;font-weight:700;color:#8696a0;text-transform:uppercase}
+  td{padding:9px 8px;border-bottom:1px solid rgba(255,255,255,.03)}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .bar{height:7px;border-radius:5px;background:rgba(255,255,255,.06);overflow:hidden;min-width:60px}
+  .bar>span{display:block;height:100%;background:linear-gradient(90deg,#00a884,#53bdeb)}
+  .cls{display:inline-block;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;padding:2px 7px;border-radius:9px}
+  .cls.star{background:rgba(0,168,132,.16);color:#00a884}
+  .cls.steady{background:rgba(83,189,235,.14);color:#53bdeb}
+  .cls.slow_mover{background:rgba(245,158,11,.14);color:#f59e0b}
+  .cls.dormant{background:rgba(239,68,68,.14);color:#ef4444}
+  .pareto{font-size:13px;color:#e9edef;margin-bottom:6px}
+  .pareto b{color:#00a884}
+  .empty{color:#8696a0;text-align:center;padding:18px;font-size:13px}
+</style>
+</head>
+<body>
+  <a class="back" href="/founder-analytics.html">&larr; Analytics</a>
+  <h1>Product Performance</h1>
+  <div class="sub">Which products make the money, which ones are dead weight.</div>
+  <div class="banner" id="banner"></div>
+
+  <div class="kpi-row">
+    <div class="kpi"><div class="kv" id="kProd">&mdash;</div><div class="kl">Products</div></div>
+    <div class="kpi"><div class="kv" id="kRev">&mdash;</div><div class="kl">Total revenue</div></div>
+    <div class="kpi"><div class="kv" id="kUnits">&mdash;</div><div class="kl">Units sold</div></div>
+    <div class="kpi"><div class="kv" id="kStars">&mdash;</div><div class="kl">Star products</div></div>
+  </div>
+
+  <div class="card">
+    <div class="pareto" id="pareto"></div>
+    <div class="ct">Revenue leaderboard</div>
+    <table><thead><tr><th>Product</th><th></th><th class="num">Revenue</th><th class="num">Units</th><th class="num">Avg</th><th class="num">Repeat</th><th>Share</th></tr></thead><tbody id="rows"></tbody></table>
+  </div>
+
+  <div class="card">
+    <div class="ct">Slow movers &amp; dormant &mdash; candidates to discount, bundle, or drop</div>
+    <table><thead><tr><th>Product</th><th></th><th class="num">Revenue</th><th class="num">Units</th><th class="num">Last sold</th></tr></thead><tbody id="slow"></tbody></table>
+  </div>
+
+<script>
+(function(){
+  var PKR=function(n){return 'PKR '+Number(n||0).toLocaleString();};
+  var el=function(id){return document.getElementById(id);};
+  var snap=null;
+
+  async function loadData(){
+    var tries=[{u:'/products/snapshot.json',pick:function(j){return j.primary||j;}},{u:'/api/products/all',pick:function(j){return j.snapshot.primary||j.snapshot;},live:true}];
+    for(var i=0;i<tries.length;i++){
+      try{ var r=await fetch(tries[i].u,{cache:'no-store'}); if(!r.ok) continue; var j=await r.json(); var s=tries[i].pick(j); if(s&&s.products){ return {snap:s,live:tries[i].live}; } }catch(e){}
+    }
+    return null;
+  }
+
+  function clsTag(c){return '<span class="cls '+c+'">'+c.replace('_',' ')+'</span>';}
+
+  function render(){
+    var s=snap.summary;
+    el('kProd').textContent=s.products;
+    el('kRev').textContent=PKR(s.totalRevenue);
+    el('kUnits').textContent=s.totalUnits;
+    el('kStars').textContent=(s.classCounts&&s.classCounts.star)||0;
+    if(s.products){ el('pareto').innerHTML='<b>'+s.paretoProductsFor80Pct+'</b> product(s) ('+s.paretoSharePct+'% of catalog) drive <b>80%</b> of revenue.'; }
+
+    var max=(snap.products[0]&&snap.products[0].revenue)||1;
+    el('rows').innerHTML=snap.products.length?snap.products.map(function(p){
+      return '<tr><td><b>'+p.product+'</b></td><td>'+clsTag(p.class)+'</td>'
+        +'<td class="num">'+PKR(p.revenue)+'</td><td class="num">'+p.units+'</td>'
+        +'<td class="num">'+PKR(p.avgPrice)+'</td><td class="num">'+p.repeatBuyRatePct+'%</td>'
+        +'<td><div class="bar" style="width:90px"><span style="width:'+(p.revenue/max*100).toFixed(1)+'%"></span></div> '+p.revenueSharePct+'%</td></tr>';
+    }).join(''):'<tr><td colspan="7" class="empty">No product data yet. Run the batch on PC #2.</td></tr>';
+
+    var slow=snap.slowMovers||[];
+    el('slow').innerHTML=slow.length?slow.map(function(p){
+      return '<tr><td>'+p.product+'</td><td>'+clsTag(p.class)+'</td><td class="num">'+PKR(p.revenue)+'</td>'
+        +'<td class="num">'+p.units+'</td><td class="num">'+(p.daysSinceLastSale==null?'\u2014':p.daysSinceLastSale+'d ago')+'</td></tr>';
+    }).join(''):'<tr><td colspan="5" class="empty">No slow movers \uD83C\uDF89 everything\u2019s selling.</td></tr>';
+  }
+
+  loadData().then(function(res){
+    if(!res){ el('banner').className='banner show'; el('banner').textContent='No product data found. Run: node scripts/products-batch.js on PC #2.'; return; }
+    snap=res.snap;
+    if(res.live){ el('banner').className='banner show'; el('banner').textContent='Live data (computed on request).'; }
+    render();
+  });
+})();
+</script>
+</body>
+</html>
