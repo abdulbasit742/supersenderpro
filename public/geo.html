@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Geographic Analytics — SuperSender Pro</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#0b141a;color:#e9edef;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:24px;max-width:1040px;margin:0 auto}
+  a.back{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.05);border:1px solid #2a3942;color:#8696a0;padding:7px 12px;border-radius:7px;text-decoration:none;font-size:12px;margin-bottom:16px}
+  a.back:hover{border-color:#00a884;color:#00a884}
+  h1{font-size:22px;font-weight:800;margin-bottom:2px}
+  .sub{color:#8696a0;font-size:13px;margin-bottom:18px}
+  .banner{font-size:12px;padding:9px 12px;border-radius:9px;margin-bottom:14px;display:none}
+  .banner.show{display:block;background:rgba(83,189,235,.08);border:1px solid rgba(83,189,235,.25);color:#9fd7f2}
+  .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+  .kpi{background:#1f2c34;border:1px solid #2a3942;border-radius:12px;padding:14px}
+  .kv{font-size:21px;font-weight:800;color:#00a884;line-height:1.1}
+  .kl{font-size:10px;color:#8696a0;text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-top:4px}
+  .g2{display:grid;grid-template-columns:1.6fr 1fr;gap:14px}
+  .card{background:#1f2c34;border:1px solid #2a3942;border-radius:12px;padding:16px;margin-bottom:14px}
+  .ct{font-size:10px;color:#8696a0;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th{text-align:left;padding:7px 8px;border-bottom:1px solid #2a3942;font-size:10px;font-weight:700;color:#8696a0;text-transform:uppercase}
+  td{padding:9px 8px;border-bottom:1px solid rgba(255,255,255,.03)}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .bar{height:7px;border-radius:5px;background:rgba(255,255,255,.06);overflow:hidden;min-width:60px}
+  .bar>span{display:block;height:100%;background:linear-gradient(90deg,#00a884,#53bdeb)}
+  .opp{padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px}
+  .opp b{color:#f59e0b}
+  .opp .c{color:#8696a0;font-size:11px}
+  .empty{color:#8696a0;text-align:center;padding:18px;font-size:13px}
+  @media(max-width:820px){.kpi-row{grid-template-columns:repeat(2,1fr)}.g2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+  <a class="back" href="/founder-analytics.html">&larr; Analytics</a>
+  <h1>Geographic Analytics</h1>
+  <div class="sub">Where your revenue physically lives. Find your strongest cities and your untapped ones.</div>
+  <div class="banner" id="banner"></div>
+
+  <div class="kpi-row">
+    <div class="kpi"><div class="kv" id="kCities">&mdash;</div><div class="kl">Cities</div></div>
+    <div class="kpi"><div class="kv" id="kRev">&mdash;</div><div class="kl">Total revenue</div></div>
+    <div class="kpi"><div class="kv" id="kTop">&mdash;</div><div class="kl">Top city</div></div>
+    <div class="kpi"><div class="kv" id="kKnown">&mdash;</div><div class="kl">City known</div></div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="ct">Cities by revenue</div>
+      <table><thead><tr><th>City</th><th class="num">Customers</th><th class="num">Revenue</th><th class="num">Rev/cust</th><th class="num">Active 30d</th><th>Share</th></tr></thead><tbody id="rows"></tbody></table>
+    </div>
+    <div class="card">
+      <div class="ct">Underpenetrated &mdash; lots of people, not enough revenue</div>
+      <div id="opps"></div>
+    </div>
+  </div>
+
+<script>
+(function(){
+  var PKR=function(n){return 'PKR '+Number(n||0).toLocaleString();};
+  var el=function(id){return document.getElementById(id);};
+  var snap=null;
+
+  async function loadData(){
+    var tries=[{u:'/geo/snapshot.json',pick:function(j){return j.primary||j;}},{u:'/api/geo/all',pick:function(j){return j.snapshot.primary||j.snapshot;},live:true}];
+    for(var i=0;i<tries.length;i++){
+      try{ var r=await fetch(tries[i].u,{cache:'no-store'}); if(!r.ok) continue; var j=await r.json(); var s=tries[i].pick(j); if(s&&s.regions){ return {snap:s,live:tries[i].live}; } }catch(e){}
+    }
+    return null;
+  }
+
+  function render(){
+    var s=snap.summary;
+    el('kCities').textContent=s.cities;
+    el('kRev').textContent=PKR(s.totalRevenue);
+    el('kTop').textContent=s.topCity||'\u2014';
+    el('kTop').style.fontSize='16px';
+    el('kKnown').textContent=(s.knownCityPct==null?'\u2014':s.knownCityPct+'%');
+
+    var max=(snap.regions[0]&&snap.regions[0].revenue)||1;
+    el('rows').innerHTML=snap.regions.length?snap.regions.map(function(r){
+      return '<tr><td><b>'+r.city+'</b></td><td class="num">'+r.customers+'</td>'
+        +'<td class="num">'+PKR(r.revenue)+'</td><td class="num">'+PKR(r.revenuePerCustomer)+'</td>'
+        +'<td class="num">'+r.active30dPct+'%</td>'
+        +'<td><div class="bar" style="width:80px"><span style="width:'+(r.revenue/max*100).toFixed(1)+'%"></span></div> '+r.revenueSharePct+'%</td></tr>';
+    }).join(''):'<tr><td colspan="6" class="empty">No city data yet. Run the batch on PC #2.</td></tr>';
+
+    var opps=snap.opportunities||[];
+    el('opps').innerHTML=opps.length?opps.map(function(o){
+      return '<div class="opp"><b>'+o.city+'</b> &mdash; '+o.gapPct+'% revenue gap'
+        +'<div class="c">'+o.customers+' customers, only '+o.buyerRatePct+'% have bought. Push a local offer.</div></div>';
+    }).join(''):'<div class="empty">No clear gaps \u2014 revenue tracks your customer base well.</div>';
+  }
+
+  loadData().then(function(res){
+    if(!res){ el('banner').className='banner show'; el('banner').textContent='No geo data found. Run: node scripts/geo-batch.js on PC #2.'; return; }
+    snap=res.snap;
+    if(res.live){ el('banner').className='banner show'; el('banner').textContent='Live data (computed on request).'; }
+    render();
+  });
+})();
+</script>
+</body>
+</html>
