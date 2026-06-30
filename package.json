@@ -40,7 +40,9 @@
  "analytics:batch": "node scripts/analytics-batch.js",
  "analytics-insights:check": "node scripts/analytics-insights-check.js",
  "reengage:batch": "node scripts/reengage-batch.js",
- "experiments:batch": "node scripts/experiments-batch.js"
+ "experiments:batch": "node scripts/experiments-batch.js",
+ "forecast:batch": "node scripts/forecast-batch.js",
+ "alerts:batch": "node scripts/alerts-batch.js"
  },
  "dependencies": {
  "@whiskeysockets/baileys": "^7.0.0-rc.9",
