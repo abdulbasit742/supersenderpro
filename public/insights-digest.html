@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Founder Command Center — SuperSender Pro</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#0b141a;color:#e9edef;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:24px;max-width:1100px;margin:0 auto}
+  a.back{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.05);border:1px solid #2a3942;color:#8696a0;padding:7px 12px;border-radius:7px;text-decoration:none;font-size:12px;margin-bottom:16px}
+  a.back:hover{border-color:#00a884;color:#00a884}
+  h1{font-size:23px;font-weight:800;margin-bottom:2px}
+  .sub{color:#8696a0;font-size:13px;margin-bottom:16px}
+  .narrative{background:rgba(0,168,132,.07);border:1px solid rgba(0,168,132,.25);border-radius:12px;padding:14px 16px;font-size:14px;line-height:1.55;margin-bottom:16px}
+  .kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}
+  .kpi{background:#1f2c34;border:1px solid #2a3942;border-radius:12px;padding:14px}
+  .kv{font-size:19px;font-weight:800;color:#00a884;line-height:1.1}
+  .kv.warn{color:#f59e0b}.kv.muted{color:#8696a0}
+  .kl{font-size:9px;color:#8696a0;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-top:4px}
+  .g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+  .card{background:#1f2c34;border:1px solid #2a3942;border-radius:12px;padding:16px}
+  .ct{font-size:10px;color:#8696a0;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
+  ul.acts{list-style:none}
+  ul.acts li{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;display:flex;gap:8px;align-items:flex-start}
+  .pr{font-size:9px;font-weight:800;text-transform:uppercase;padding:2px 7px;border-radius:9px;white-space:nowrap;margin-top:1px}
+  .pr.critical{background:rgba(239,68,68,.16);color:#ef4444}
+  .pr.high{background:rgba(245,158,11,.16);color:#f59e0b}
+  .pr.medium{background:rgba(83,189,235,.16);color:#53bdeb}
+  .pr.low{background:rgba(0,168,132,.16);color:#00a884}
+  .mods{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+  .mod{display:flex;justify-content:space-between;align-items:center;background:#0b141a;border:1px solid #2a3942;border-radius:8px;padding:9px 11px;text-decoration:none;color:#e9edef;font-size:13px}
+  .mod:hover{border-color:#00a884}
+  .mod .st{font-size:9px;font-weight:700;text-transform:uppercase;padding:2px 7px;border-radius:9px}
+  .mod .on{background:rgba(0,168,132,.16);color:#00a884}
+  .mod .off{background:rgba(255,255,255,.06);color:#8696a0}
+  .exp{display:flex;gap:10px;margin-top:14px}
+  .exp a{background:#00a884;color:#04231b;font-weight:700;padding:8px 14px;border-radius:8px;text-decoration:none;font-size:12px}
+  .exp a.ghost{background:rgba(255,255,255,.05);color:#e9edef;border:1px solid #2a3942}
+  .empty{color:#8696a0;text-align:center;padding:18px;font-size:13px}
+  .banner{font-size:12px;padding:9px 12px;border-radius:9px;margin-bottom:14px;display:none}
+  .banner.show{display:block;background:rgba(83,189,235,.08);border:1px solid rgba(83,189,235,.25);color:#9fd7f2}
+  @media(max-width:820px){.kpi-row{grid-template-columns:repeat(2,1fr)}.g2{grid-template-columns:1fr}.mods{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+  <a class="back" href="/index.html">&larr; Dashboard</a>
+  <h1>Founder Command Center</h1>
+  <div class="sub" id="sub">Loading the whole picture&hellip;</div>
+  <div class="banner" id="banner"></div>
+
+  <div class="narrative" id="narrative">&hellip;</div>
+
+  <div class="kpi-row">
+    <div class="kpi"><div class="kv" id="kRev">&mdash;</div><div class="kl">Revenue</div></div>
+    <div class="kpi"><div class="kv" id="kMrr">&mdash;</div><div class="kl">MRR</div></div>
+    <div class="kpi"><div class="kv" id="kFc">&mdash;</div><div class="kl">Next 30d</div></div>
+    <div class="kpi"><div class="kv warn" id="kRisk">&mdash;</div><div class="kl">Revenue at risk</div></div>
+    <div class="kpi"><div class="kv warn" id="kAlerts">&mdash;</div><div class="kl">Open alerts</div></div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="ct">Do this today</div>
+      <ul class="acts" id="acts"></ul>
+    </div>
+    <div class="card">
+      <div class="ct">Insights modules</div>
+      <div class="mods" id="mods"></div>
+      <div class="exp">
+        <a id="repHtml" href="/api/digest/report?format=html" target="_blank">Open report (PDF-ready)</a>
+        <a id="repCsv" class="ghost" href="/api/digest/report?format=csv">Download CSV</a>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function(){
+  var PKR=function(n){return n==null?'\u2014':'PKR '+Number(n||0).toLocaleString();};
+  var el=function(id){return document.getElementById(id);};
+  var MODS=[
+    ['analytics','Analytics & Insights','/founder-analytics.html'],
+    ['forecast','Revenue Forecast','/forecast.html'],
+    ['churn','Churn (in Analytics)','/founder-analytics.html'],
+    ['reEngagement','Win-Back','/reengagement.html'],
+    ['experiments','A/B Testing','/experiments.html'],
+    ['attribution','Attribution','/attribution.html'],
+    ['cohorts','Cohort Retention','/cohorts.html'],
+    ['alerts','Alerts','/alerts.html']
+  ];
+
+  async function load(){
+    var tries=[{u:'/digest/digest.json',pick:function(j){return j.primary||j;}},{u:'/api/digest/all',pick:function(j){return j.digest.primary||j.digest;},live:true}];
+    for(var i=0;i<tries.length;i++){
+      try{ var r=await fetch(tries[i].u,{cache:'no-store'}); if(!r.ok) continue; var j=await r.json(); var d=tries[i].pick(j); if(d&&d.sections){ return {d:d,live:tries[i].live}; } }catch(e){}
+    }
+    return null;
+  }
+
+  function render(d, live){
+    el('sub').textContent=d.modulesAvailable+'/'+d.modulesTotal+' modules reporting \u00b7 '+new Date(d.generatedAt).toLocaleString();
+    el('narrative').textContent=d.narrative;
+    var h=d.headline||{};
+    el('kRev').textContent=PKR(h.revenue);
+    el('kMrr').textContent=PKR(h.mrr);
+    el('kFc').textContent=PKR(h.next30Revenue);
+    el('kRisk').textContent=PKR(h.revenueAtRisk);
+    var al=el('kAlerts'); al.textContent=h.openAlerts==null?'\u2014':h.openAlerts; if(h.openAlerts){al.className='kv warn';}else{al.className='kv muted';}
+
+    el('acts').innerHTML=(d.actions||[]).map(function(a){
+      return '<li><span class="pr '+a.priority+'">'+a.priority+'</span><span>'+a.text+'</span></li>';
+    }).join('')||'<li class="empty">Nothing to do \uD83C\uDF89</li>';
+
+    el('mods').innerHTML=MODS.map(function(m){
+      var s=d.sections[m[0]];var on=s&&s.available;
+      return '<a class="mod" href="'+m[2]+'"><span>'+m[1]+'</span><span class="st '+(on?'on':'off')+'">'+(on?'live':'no data')+'</span></a>';
+    }).join('');
+  }
+
+  load().then(function(res){
+    if(!res){ el('banner').className='banner show'; el('banner').textContent='No digest yet. Run the batches then: node scripts/digest-batch.js on PC #2.'; el('narrative').textContent='\u2014'; return; }
+    if(res.live){ el('banner').className='banner show'; el('banner').textContent='Live data (computed on request).'; }
+    render(res.d, res.live);
+  });
+})();
+</script>
+</body>
+</html>
