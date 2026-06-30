@@ -1,21 +1,23 @@
 // routes/contentAutopilotRoutes.js
 // REST surface for the Social Content Autopilot.
 // Mount in server.js:  app.use('/api/content-autopilot', require('./routes/contentAutopilotRoutes'));
+// Dashboard UI is served statically at /content-autopilot.html (from public/).
 const express = require('express');
 const router = express.Router();
 let ap; try { ap = require('../lib/contentAutopilot'); } catch (e) { ap = null; }
 let sched; try { sched = require('../lib/contentAutopilot/scheduler'); } catch (e) { sched = null; }
 let vhook; try { vhook = require('../lib/contentAutopilot/videoHook'); } catch (e) { vhook = null; }
+let analytics; try { analytics = require('../lib/contentAutopilot/analytics'); } catch (e) { analytics = null; }
 
 function guard(res) {
   if (!ap) { res.status(503).json({ ok: false, error: 'Content Autopilot module not loaded' }); return false; }
   return true;
 }
 
-// Health + counts per queue folder.
+// Health + counts per queue folder + scheduler + analytics summary.
 router.get('/status', (req, res) => {
   if (!guard(res)) return;
-  res.json({ ok: true, ...ap.status(), scheduler: sched ? sched.status() : null });
+  res.json({ ok: true, ...ap.status(), scheduler: sched ? sched.status() : null, analytics: analytics ? analytics.summarize() : null });
 });
 
 // Generate AI content -> queue one job per platform.
@@ -33,6 +35,14 @@ router.get('/queue', (req, res) => {
   if (!guard(res)) return;
   const status = (req.query.status || 'queued').toString();
   res.json({ ok: true, status, jobs: ap.listJobs(status) });
+});
+
+// Analytics summary + recent activity. ?recent=N for recent list.
+router.get('/analytics', (req, res) => {
+  if (!analytics) return res.status(503).json({ ok: false, error: 'analytics not loaded' });
+  const out = { ok: true, analytics: analytics.summarize() };
+  if (req.query.recent) out.recent = analytics.recent(req.query.recent);
+  res.json(out);
 });
 
 // Schedule a queued job. body: { id, when (ISO) }
@@ -77,12 +87,10 @@ router.get('/scheduler/status', (req, res) => {
 });
 
 // --- video hook (GPU pipeline glue) ---------------------------------------
-// List finished videos your GPU pipeline dropped in inbox/.
 router.get('/media/ready', (req, res) => {
   if (!vhook) return res.status(503).json({ ok: false, error: 'video hook not loaded' });
   res.json({ ok: true, media: vhook.listReadyMedia() });
 });
-// Attach an inbox video to a queued job. body: { id, fileName }
 router.post('/media/attach', (req, res) => {
   if (!vhook || !ap) return res.status(503).json({ ok: false, error: 'modules not loaded' });
   try {
