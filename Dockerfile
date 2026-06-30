@@ -6,18 +6,18 @@ FROM node:18-slim AS base
 
 # Chromium + fonts for whatsapp-web.js / puppeteer, tini for PID 1 signal handling
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      chromium \
-      fonts-freefont-ttf \
-      libxss1 \
-      ca-certificates \
-      wget \
-      tini \
-  && rm -rf /var/lib/apt/lists/*
+ chromium \
+ fonts-freefont-ttf \
+ libxss1 \
+ ca-certificates \
+ wget \
+ tini \
+ && rm -rf /var/lib/apt/lists/*
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium \
-    NODE_ENV=production \
-    PORT=3001
+ PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium \
+ NODE_ENV=production \
+ PORT=3001
 
 WORKDIR /app
 
@@ -32,17 +32,23 @@ FROM base AS runtime
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Build identity: pass at build time so /version reports the real commit instead of 'unknown'
+#   docker build --build-arg BUILD_SHA=$(git rev-parse HEAD) .
+ARG BUILD_SHA=unknown
+ENV BUILD_SHA=$BUILD_SHA
+
 # Writable runtime dirs, owned by the non-root node user
 RUN mkdir -p uploads logs data .wa-auth public \
-  && chown -R node:node /app
+ && chown -R node:node /app
 
 USER node
 
 EXPOSE 3001
 
-# Container-level health probe against the existing /api/health route
+# Container-level health probe against the readiness route so a draining instance
+# (graceful shutdown, PR #140) is correctly reported unhealthy and removed from rotation.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
-  CMD wget -qO- http://127.0.0.1:3001/api/health || exit 1
+ CMD wget -qO- http://127.0.0.1:3001/api/health/ready || exit 1
 
 # tini reaps zombie chromium processes and forwards signals cleanly
 ENTRYPOINT ["/usr/bin/tini", "--"]
