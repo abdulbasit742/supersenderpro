@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cohort Retention — SuperSender Pro</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#0b141a;color:#e9edef;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:24px;max-width:1180px;margin:0 auto}
+  a.back{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.05);border:1px solid #2a3942;color:#8696a0;padding:7px 12px;border-radius:7px;text-decoration:none;font-size:12px;margin-bottom:16px}
+  a.back:hover{border-color:#00a884;color:#00a884}
+  h1{font-size:22px;font-weight:800;margin-bottom:2px}
+  .sub{color:#8696a0;font-size:13px;margin-bottom:18px}
+  .banner{font-size:12px;padding:9px 12px;border-radius:9px;margin-bottom:14px;display:none}
+  .banner.show{display:block;background:rgba(83,189,235,.08);border:1px solid rgba(83,189,235,.25);color:#9fd7f2}
+  .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+  .kpi{background:#1f2c34;border:1px solid #2a3942;border-radius:12px;padding:14px}
+  .kv{font-size:22px;font-weight:800;color:#00a884;line-height:1.1}
+  .kv.warn{color:#f59e0b}
+  .kl{font-size:10px;color:#8696a0;text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-top:4px}
+  .card{background:#1f2c34;border:1px solid #2a3942;border-radius:12px;padding:16px;margin-bottom:14px;overflow-x:auto}
+  .ct{font-size:10px;color:#8696a0;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
+  table{border-collapse:collapse;font-size:11px}
+  th{padding:6px 8px;font-size:10px;font-weight:700;color:#8696a0;text-transform:uppercase;white-space:nowrap}
+  td{padding:0;text-align:center}
+  .cohort-lbl{text-align:left;color:#e9edef;font-weight:600;white-space:nowrap;padding-right:10px}
+  .size{color:#8696a0;font-weight:400;font-size:10px}
+  .cell{width:54px;height:34px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-weight:700;color:#04231b;margin:2px}
+  .cell.empty{background:transparent;color:#3a4a52;font-weight:400}
+  .legend{display:flex;gap:6px;align-items:center;font-size:11px;color:#8696a0;margin-top:10px}
+  .swatch{width:22px;height:12px;border-radius:3px}
+  .empty{color:#8696a0;text-align:center;padding:18px;font-size:13px}
+  svg text{fill:#8696a0;font-size:10px}
+</style>
+</head>
+<body>
+  <a class="back" href="/founder-analytics.html">&larr; Analytics</a>
+  <h1>Cohort Retention &amp; LTV</h1>
+  <div class="sub">Group customers by signup month. Are newer cohorts stickier than older ones?</div>
+  <div class="banner" id="banner"></div>
+
+  <div class="kpi-row">
+    <div class="kpi"><div class="kv" id="kCo">&mdash;</div><div class="kl">Cohorts</div></div>
+    <div class="kpi"><div class="kv" id="kM1">&mdash;</div><div class="kl">Avg M1 retention</div></div>
+    <div class="kpi"><div class="kv" id="kM3">&mdash;</div><div class="kl">Avg M3 retention</div></div>
+    <div class="kpi"><div class="kv" id="kTrend">&mdash;</div><div class="kl">M1 trend (new vs old)</div></div>
+  </div>
+
+  <div class="card">
+    <div class="ct">Retention heatmap &mdash; % of each cohort still ordering, by month since signup</div>
+    <table id="heat"><thead id="heatHead"></thead><tbody id="heatBody"></tbody></table>
+    <div class="legend">Low <span class="swatch" style="background:#3a1d1d"></span><span class="swatch" style="background:#7a4a1a"></span><span class="swatch" style="background:#b8901f"></span><span class="swatch" style="background:#5fae6e"></span><span class="swatch" style="background:#00a884"></span> High</div>
+  </div>
+
+  <div class="card">
+    <div class="ct">Cumulative LTV per member &mdash; by cohort</div>
+    <div id="ltv"></div>
+  </div>
+
+<script>
+(function(){
+  var PKR=function(n){return 'PKR '+Number(n||0).toLocaleString();};
+  var el=function(id){return document.getElementById(id);};
+  var snap=null;
+
+  async function loadData(){
+    var tries=[{u:'/cohorts/snapshot.json',pick:function(j){return j.primary||j;}},{u:'/api/cohorts/all',pick:function(j){return j.snapshot.primary||j.snapshot;},live:true}];
+    for(var i=0;i<tries.length;i++){
+      try{ var r=await fetch(tries[i].u,{cache:'no-store'}); if(!r.ok) continue; var j=await r.json(); var s=tries[i].pick(j); if(s&&s.cohorts){ return {snap:s,live:tries[i].live}; } }catch(e){}
+    }
+    return null;
+  }
+
+  // Map a 0..100 retention pct to a heat colour.
+  function heatColor(pct){
+    if(pct==null) return 'transparent';
+    var stops=[[0,'#3a1d1d'],[25,'#7a4a1a'],[50,'#b8901f'],[75,'#5fae6e'],[100,'#00a884']];
+    for(var i=stops.length-1;i>=0;i--){ if(pct>=stops[i][0]) return stops[i][1]; }
+    return stops[0][1];
+  }
+
+  function renderHeatmap(){
+    var maxM=snap.summary.maxMonthsTracked||0;
+    maxM=Math.min(maxM,12); // cap columns for readability
+    var head='<tr><th class="cohort-lbl">Cohort</th>';
+    for(var m=0;m<=maxM;m++) head+='<th>M'+m+'</th>';
+    head+='</tr>';
+    el('heatHead').innerHTML=head;
+
+    var rows=(snap.cohorts||[]);
+    if(!rows.length){ el('heatBody').innerHTML='<tr><td class="empty" colspan="'+(maxM+2)+'">No cohorts yet. Run the batch on PC #2.</td></tr>'; return; }
+    el('heatBody').innerHTML=rows.map(function(c){
+      var tds='<td class="cohort-lbl">'+c.cohort+' <span class="size">(n='+c.size+')</span></td>';
+      for(var m=0;m<=maxM;m++){
+        var r=c.retention[m];
+        if(r){ tds+='<td><div class="cell" style="background:'+heatColor(r.pct)+'">'+Math.round(r.pct)+'</div></td>'; }
+        else { tds+='<td><div class="cell empty">&middot;</div></td>'; }
+      }
+      return '<tr>'+tds+'</tr>';
+    }).join('');
+  }
+
+  function renderLTV(){
+    var rows=(snap.cohorts||[]).filter(function(c){return c.ltv&&c.ltv.length;});
+    if(!rows.length){ el('ltv').innerHTML='<div class="empty">No LTV data yet</div>'; return; }
+    var w=680,h=220,pad=36;
+    var maxM=Math.min(snap.summary.maxMonthsTracked||0,12);
+    var maxV=Math.max.apply(null,rows.map(function(c){return Math.max.apply(null,c.ltv.map(function(p){return p.perMember;}));}).concat([1]));
+    var palette=['#00a884','#53bdeb','#f59e0b','#ef4444','#a78bfa','#34d399','#fb7185'];
+    var stepX=maxM>0?(w-pad*2)/maxM:0;
+    var paths='';var dots='';var leg='';
+    rows.slice(0,7).forEach(function(c,ci){
+      var col=palette[ci%palette.length];
+      var pts=c.ltv.slice(0,maxM+1).map(function(p,i){var x=pad+i*stepX;var y=h-pad-(p.perMember/maxV)*(h-pad*2);return [x,y];});
+      if(!pts.length) return;
+      paths+='<path d="'+pts.map(function(p,i){return (i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1);}).join(' ')+'" fill="none" stroke="'+col+'" stroke-width="2"/>';
+      pts.forEach(function(p){dots+='<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="2" fill="'+col+'"/>';});
+      leg+='<span style="color:'+col+';margin-right:12px">\u25CF '+c.cohort+'</span>';
+    });
+    var axis='<text x="'+pad+'" y="14">'+PKR(maxV)+'/member</text>'
+      +'<text x="'+pad+'" y="'+(h-6)+'">M0</text>'
+      +'<text x="'+(w-pad)+'" y="'+(h-6)+'" text-anchor="end">M'+maxM+'</text>';
+    el('ltv').innerHTML='<svg viewBox="0 0 '+w+' '+h+'" width="100%" height="220">'+paths+dots+axis+'</svg>'
+      +'<div style="font-size:11px;margin-top:8px">'+leg+'</div>';
+  }
+
+  loadData().then(function(res){
+    if(!res){ el('banner').className='banner show'; el('banner').textContent='No cohort data found. Run: node scripts/cohorts-batch.js on PC #2.'; return; }
+    snap=res.snap;
+    if(res.live){ el('banner').className='banner show'; el('banner').textContent='Live data (computed on request).'; }
+    el('kCo').textContent=snap.summary.cohorts;
+    el('kM1').textContent=snap.summary.avgM1RetentionPct==null?'\u2014':snap.summary.avgM1RetentionPct+'%';
+    el('kM3').textContent=snap.summary.avgM3RetentionPct==null?'\u2014':snap.summary.avgM3RetentionPct+'%';
+    var t=snap.summary.m1RetentionTrendPct;
+    var tEl=el('kTrend');
+    if(t==null){ tEl.textContent='\u2014'; }
+    else { tEl.textContent=(t>=0?'\u25B2 +':'\u25BC ')+t+'%'; if(t<0) tEl.className='kv warn'; }
+    renderHeatmap(); renderLTV();
+  });
+})();
+</script>
+</body>
+</html>
