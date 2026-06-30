@@ -1,0 +1,38 @@
+{
+  "_note": "Sample tenant-scoped property catalog. Replace with real data or migrate to Postgres (lib/db) for production. Every property MUST carry a tenantId for tenant isolation.",
+  "properties": [
+    {
+      "id": "PES-1001",
+      "tenantId": "demo-tenant",
+      "title": "2 Bed Apartment, Bahria Town",
+      "type": "apartment",
+      "bedrooms": 2,
+      "area": "Phase 4",
+      "city": "Islamabad",
+      "price": "PKR 1.6 Crore",
+      "description": "Modern 2-bed with balcony, covered parking, 24/7 security. Ready to move in."
+    },
+    {
+      "id": "PES-1002",
+      "tenantId": "demo-tenant",
+      "title": "5 Marla House, DHA Phase 2",
+      "type": "house",
+      "bedrooms": 3,
+      "area": "DHA Phase 2",
+      "city": "Lahore",
+      "price": "PKR 2.9 Crore",
+      "description": "Brand new 5 marla, double storey, 3 bed, modern kitchen, near commercial area."
+    },
+    {
+      "id": "PES-1003",
+      "tenantId": "demo-tenant",
+      "title": "Commercial Plot, Gulberg Greens",
+      "type": "plot",
+      "bedrooms": 0,
+      "area": "Gulberg Greens",
+      "city": "Islamabad",
+      "price": "PKR 4.5 Crore",
+      "description": "8 marla commercial plot on main boulevard, ideal for offices or retail."
+    }
+  ]
+}
