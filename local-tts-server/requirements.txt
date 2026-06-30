@@ -1,0 +1,24 @@
+# Core HTTP server (always needed)
+fastapi>=0.110
+uvicorn[standard]>=0.27
+pydantic>=2.5
+
+# --- Pick ONE engine stack below and uncomment it on PC #1 ---
+
+# GPT-SoVITS (recommended for few-shot cloning; clone the repo + follow its install)
+#   git clone https://github.com/RVC-Boss/GPT-SoVITS
+#   then install its own requirements.txt
+# torch        # install the CUDA build matching your driver, e.g. cu121
+# torchaudio
+# numpy
+# librosa
+
+# Chatterbox (SoTA quality, MIT)
+# chatterbox-tts
+# torch
+# torchaudio
+
+# Coqui XTTS v2 (multilingual cloning)
+# TTS>=0.22
+# torch
+# torchaudio
