@@ -45,7 +45,10 @@
  "alerts:batch": "node scripts/alerts-batch.js",
  "attribution:batch": "node scripts/attribution-batch.js",
  "cohorts:batch": "node scripts/cohorts-batch.js",
- "products:batch": "node scripts/products-batch.js"
+ "products:batch": "node scripts/products-batch.js",
+ "geo:batch": "node scripts/geo-batch.js",
+ "sendtime:batch": "node scripts/sendtime-batch.js",
+ "rfm:batch": "node scripts/rfm-batch.js"
  },
  "dependencies": {
  "@whiskeysockets/baileys": "^7.0.0-rc.9",
