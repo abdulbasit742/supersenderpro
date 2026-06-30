@@ -45,7 +45,9 @@
  "alerts:batch": "node scripts/alerts-batch.js",
  "attribution:batch": "node scripts/attribution-batch.js",
  "cohorts:batch": "node scripts/cohorts-batch.js",
- "products:batch": "node scripts/products-batch.js"
+ "products:batch": "node scripts/products-batch.js",
+ "purchase-orders:check": "node scripts/purchase-orders-check.js",
+ "purchase-orders:smoke": "node tests/smoke/purchaseOrdersSmoke.js"
  },
  "dependencies": {
  "@whiskeysockets/baileys": "^7.0.0-rc.9",
