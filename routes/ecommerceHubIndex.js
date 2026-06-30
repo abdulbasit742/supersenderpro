@@ -33,6 +33,7 @@ mount('./ecommerceHubBatch5Routes');
 mount('./ecommerceHubBatch6Routes');
 mount('./ecommerceHubBatch7Routes');
 mount('./ecommerceHubBatch8Routes');
+mount('./ecommerceHubAdminRoutes');
 
 router.get('/_modules', function (req, res) {
   res.json({ ok: true, note: 'Ecommerce Hub aggregated router mounted.' });
