@@ -15,6 +15,7 @@ const WIRERS = [
   'scripts/wire-health-check.js',
   'scripts/wire-admin-alerts.js',
   'scripts/wire-sales-pipeline.js',
+  'scripts/wire-chatbot-builder.js',
 ];
 
 let ran = 0, missing = 0, failed = 0;
@@ -27,7 +28,7 @@ for (const rel of WIRERS) {
 }
 
 console.log('\n================ WIRE-ALL SUMMARY ================');
-console.log('  wired: ' + ran + '  missing: ' + missing + '  failed: ' + failed);
-console.log('  Verify server.js now contains: AUTH HOOK, BILLING HOOK, HEALTH CHECK HOOK, ADMIN ALERTS HOOK, SALES PIPELINE HOOK');
+console.log(' wired: ' + ran + ' missing: ' + missing + ' failed: ' + failed);
+console.log(' Verify server.js now contains: AUTH HOOK, BILLING HOOK, HEALTH CHECK HOOK, ADMIN ALERTS HOOK, SALES PIPELINE HOOK, CHATBOT BUILDER HOOK');
 console.log('==================================================');
 process.exit(failed ? 1 : 0);
