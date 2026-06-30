@@ -1,0 +1,37 @@
+name: AI Suite Self-Test
+
+# Runs the whole AI-suite offline smoke set on every push / PR. All smoke tests
+# are model-free (they point at unreachable AI hosts and exercise the
+# deterministic cores + graceful fallbacks), so this is fast and needs no GPU.
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch: {}
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # The AI suite features use only Node built-ins + global fetch, so no
+      # install is strictly required to run the smoke tests. We run them directly.
+      - name: Run AI suite self-test
+        run: node scripts/run-ai-suite-tests.js --timeout 30000
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-suite-selftest-report
+          path: data/selftest/last-run.json
+          if-no-files-found: ignore
