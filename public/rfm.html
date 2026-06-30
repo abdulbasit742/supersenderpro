@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RFM Segments — SuperSender Pro</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#0b141a;color:#e9edef;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:24px;max-width:1080px;margin:0 auto}
+  a.back{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.05);border:1px solid #2a3942;color:#8696a0;padding:7px 12px;border-radius:7px;text-decoration:none;font-size:12px;margin-bottom:16px}
+  a.back:hover{border-color:#00a884;color:#00a884}
+  h1{font-size:22px;font-weight:800;margin-bottom:2px}
+  .sub{color:#8696a0;font-size:13px;margin-bottom:18px}
+  .banner{font-size:12px;padding:9px 12px;border-radius:9px;margin-bottom:14px;display:none}
+  .banner.show{display:block;background:rgba(83,189,235,.08);border:1px solid rgba(83,189,235,.25);color:#9fd7f2}
+  .kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+  .kpi{background:#1f2c34;border:1px solid #2a3942;border-radius:12px;padding:14px}
+  .kv{font-size:21px;font-weight:800;color:#00a884;line-height:1.1}
+  .kl{font-size:10px;color:#8696a0;text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-top:4px}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  .seg{background:#1f2c34;border:1px solid #2a3942;border-left-width:4px;border-radius:12px;padding:14px}
+  .seg h3{font-size:15px;font-weight:800;display:flex;justify-content:space-between;align-items:baseline}
+  .seg h3 .n{color:#8696a0;font-size:12px;font-weight:600}
+  .meters{display:flex;gap:14px;margin:8px 0;font-size:11px;color:#8696a0}
+  .meters b{color:#e9edef}
+  .bar{height:7px;border-radius:5px;background:rgba(255,255,255,.06);overflow:hidden;margin:6px 0}
+  .bar>span{display:block;height:100%;background:linear-gradient(90deg,#00a884,#53bdeb)}
+  .act{font-size:12px;color:#cfe9e0;line-height:1.45;margin-top:6px}
+  .rfm{font-size:10px;color:#8696a0;margin-top:4px}
+  .empty{color:#8696a0;text-align:center;padding:30px;font-size:14px;grid-column:1/-1}
+  /* segment accent colors */
+  .Champions{border-left-color:#00a884}.Loyal{border-left-color:#53bdeb}
+  .New{border-left-color:#a78bfa}.Potential{border-left-color:#34d399}
+  .NeedsAttention{border-left-color:#f59e0b}.AtRisk{border-left-color:#fb923c}
+  .CantLose{border-left-color:#ef4444}.Hibernating{border-left-color:#8696a0}.Lost{border-left-color:#6b7280}
+</style>
+</head>
+<body>
+  <a class="back" href="/founder-analytics.html">&larr; Analytics</a>
+  <h1>RFM Customer Segments</h1>
+  <div class="sub">Every customer bucketed by Recency, Frequency &amp; Monetary value, with what to do about each group.</div>
+  <div class="banner" id="banner"></div>
+
+  <div class="kpi-row">
+    <div class="kpi"><div class="kv" id="kCust">&mdash;</div><div class="kl">Customers segmented</div></div>
+    <div class="kpi"><div class="kv" id="kSeg">&mdash;</div><div class="kl">Active segments</div></div>
+    <div class="kpi"><div class="kv" id="kRev">&mdash;</div><div class="kl">Total revenue</div></div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+<script>
+(function(){
+  var PKR=function(n){return 'PKR '+Number(n||0).toLocaleString();};
+  var el=function(id){return document.getElementById(id);};
+  var snap=null;
+
+  async function loadData(){
+    var tries=[{u:'/rfm/snapshot.json',pick:function(j){return j.primary||j;}},{u:'/api/rfm/all',pick:function(j){return j.snapshot.primary||j.snapshot;},live:true}];
+    for(var i=0;i<tries.length;i++){
+      try{ var r=await fetch(tries[i].u,{cache:'no-store'}); if(!r.ok) continue; var j=await r.json(); var s=tries[i].pick(j); if(s&&s.segments){ return {snap:s,live:tries[i].live}; } }catch(e){}
+    }
+    return null;
+  }
+
+  function render(){
+    el('kCust').textContent=snap.summary.customers;
+    el('kSeg').textContent=snap.summary.segments;
+    el('kRev').textContent=PKR(snap.summary.totalRevenue);
+
+    var segs=snap.segments||[];
+    if(!segs.length){ el('grid').innerHTML='<div class="empty">No segments yet. Run the batch on PC #2.</div>'; return; }
+    el('grid').innerHTML=segs.map(function(s){
+      var cls=s.segment.replace(/[^A-Za-z]/g,'');
+      return '<div class="seg '+cls+'"><h3>'+s.segment+' <span class="n">'+s.customers+' \u00b7 '+s.customerSharePct+'%</span></h3>'
+        +'<div class="meters">Revenue <b>'+PKR(s.revenue)+'</b> &middot; <b>'+s.revenueSharePct+'%</b> of total</div>'
+        +'<div class="bar"><span style="width:'+s.revenueSharePct+'%"></span></div>'
+        +'<div class="rfm">avg R'+s.avgScores.R+' F'+s.avgScores.F+' M'+s.avgScores.M+'</div>'
+        +'<div class="act">'+s.action+'</div></div>';
+    }).join('');
+  }
+
+  loadData().then(function(res){
+    if(!res){ el('banner').className='banner show'; el('banner').textContent='No RFM data found. Run: node scripts/rfm-batch.js on PC #2.'; return; }
+    snap=res.snap;
+    if(res.live){ el('banner').className='banner show'; el('banner').textContent='Live data (computed on request).'; }
+    render();
+  });
+})();
+</script>
+</body>
+</html>
