@@ -42,7 +42,10 @@
  "reengage:batch": "node scripts/reengage-batch.js",
  "experiments:batch": "node scripts/experiments-batch.js",
  "forecast:batch": "node scripts/forecast-batch.js",
- "alerts:batch": "node scripts/alerts-batch.js"
+ "alerts:batch": "node scripts/alerts-batch.js",
+ "attribution:batch": "node scripts/attribution-batch.js",
+ "cohorts:batch": "node scripts/cohorts-batch.js",
+ "products:batch": "node scripts/products-batch.js"
  },
  "dependencies": {
  "@whiskeysockets/baileys": "^7.0.0-rc.9",
