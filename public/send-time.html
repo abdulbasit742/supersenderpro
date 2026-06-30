@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Best Time to Send — SuperSender Pro</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#0b141a;color:#e9edef;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:24px;max-width:1080px;margin:0 auto}
+  a.back{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.05);border:1px solid #2a3942;color:#8696a0;padding:7px 12px;border-radius:7px;text-decoration:none;font-size:12px;margin-bottom:16px}
+  a.back:hover{border-color:#00a884;color:#00a884}
+  h1{font-size:22px;font-weight:800;margin-bottom:2px}
+  .sub{color:#8696a0;font-size:13px;margin-bottom:18px}
+  .banner{font-size:12px;padding:9px 12px;border-radius:9px;margin-bottom:14px;display:none}
+  .banner.show{display:block;background:rgba(83,189,235,.08);border:1px solid rgba(83,189,235,.25);color:#9fd7f2}
+  .kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+  .kpi{background:#1f2c34;border:1px solid #2a3942;border-radius:12px;padding:14px}
+  .kv{font-size:20px;font-weight:800;color:#00a884;line-height:1.1}
+  .kl{font-size:10px;color:#8696a0;text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-top:4px}
+  .card{background:#1f2c34;border:1px solid #2a3942;border-radius:12px;padding:16px;margin-bottom:14px;overflow-x:auto}
+  .ct{font-size:10px;color:#8696a0;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
+  table.heat{border-collapse:collapse;font-size:9px}
+  table.heat th{padding:2px 3px;color:#8696a0;font-weight:600;font-size:9px}
+  table.heat td{padding:0}
+  .cell{width:26px;height:22px;border-radius:3px;margin:1px}
+  .rowlbl{color:#e9edef;font-weight:600;font-size:10px;padding-right:6px;text-align:right;white-space:nowrap}
+  .rec{padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px}
+  .rec b{color:#00a884}
+  .legend{display:flex;gap:6px;align-items:center;font-size:11px;color:#8696a0;margin-top:10px}
+  .sw{width:20px;height:11px;border-radius:3px}
+  .empty{color:#8696a0;text-align:center;padding:18px;font-size:13px}
+</style>
+</head>
+<body>
+  <a class="back" href="/founder-analytics.html">&larr; Analytics</a>
+  <h1>Best Time to Send</h1>
+  <div class="sub" id="sub">When your customers are actually awake and responding. Schedule broadcasts here.</div>
+  <div class="banner" id="banner"></div>
+
+  <div class="kpi-row">
+    <div class="kpi"><div class="kv" id="kBest">&mdash;</div><div class="kl">Best window</div></div>
+    <div class="kpi"><div class="kv" id="kDay">&mdash;</div><div class="kl">Peak day</div></div>
+    <div class="kpi"><div class="kv" id="kHour">&mdash;</div><div class="kl">Peak hour</div></div>
+  </div>
+
+  <div class="card">
+    <div class="ct">Engagement heatmap &mdash; darker = more customer activity (<span id="tz">local</span>)</div>
+    <table class="heat" id="heat"></table>
+    <div class="legend">Quiet <span class="sw" style="background:#16242b"></span><span class="sw" style="background:#14463a"></span><span class="sw" style="background:#0c7a5e"></span><span class="sw" style="background:#00a884"></span> Busy</div>
+  </div>
+
+  <div class="card">
+    <div class="ct">Recommended send windows</div>
+    <div id="recs"></div>
+  </div>
+
+<script>
+(function(){
+  var el=function(id){return document.getElementById(id);};
+  var HOURS=Array.from({length:24},function(_,h){return h;});
+  var snap=null;
+
+  async function loadData(){
+    var tries=[{u:'/send-time/snapshot.json',pick:function(j){return j.primary||j;}},{u:'/api/send-time/all',pick:function(j){return j.snapshot.primary||j.snapshot;},live:true}];
+    for(var i=0;i<tries.length;i++){
+      try{ var r=await fetch(tries[i].u,{cache:'no-store'}); if(!r.ok) continue; var j=await r.json(); var s=tries[i].pick(j); if(s&&s.grid){ return {snap:s,live:tries[i].live}; } }catch(e){}
+    }
+    return null;
+  }
+
+  function color(v,max){
+    if(!v) return '#16242b';
+    var t=max?v/max:0;
+    if(t>=0.75) return '#00a884';
+    if(t>=0.5) return '#0c7a5e';
+    if(t>=0.25) return '#14463a';
+    return '#16242b';
+  }
+  function hourLabel(h){var a=h<12?'a':'p';var hr=h%12===0?12:h%12;return hr+a;}
+
+  function render(){
+    el('tz').textContent=snap.timeZone||'local';
+    el('kBest').textContent=snap.summary.bestWindow||'\u2014'; el('kBest').style.fontSize='15px';
+    el('kDay').textContent=snap.summary.peakDay||'\u2014';
+    el('kHour').textContent=snap.summary.peakHour||'\u2014';
+
+    var grid=snap.grid||[];
+    var max=0; grid.forEach(function(row){row.forEach(function(v){if(v>max)max=v;});});
+    var head='<tr><th></th>'+HOURS.map(function(h){return '<th>'+hourLabel(h)+'</th>';}).join('')+'</tr>';
+    var body=grid.map(function(row,d){
+      return '<tr><td class="rowlbl">'+(snap.byDay&&snap.byDay[d]?snap.byDay[d].day:d)+'</td>'
+        +row.map(function(v){return '<td><div class="cell" style="background:'+color(v,max)+'" title="'+v+' events"></div></td>';}).join('')+'</tr>';
+    }).join('');
+    el('heat').innerHTML=grid.length?(head+body):'<tr><td class="empty">No activity data yet. Run the batch on PC #2.</td></tr>';
+
+    var recs=snap.recommendations||[];
+    el('recs').innerHTML=recs.length?recs.map(function(r){return '<div class="rec"><b>'+r.label+'</b> &mdash; '+r.text.replace(r.label,'').replace(/^[^A-Za-z0-9]+/,'')+'</div>';}).join(''):'<div class="empty">Not enough activity yet to recommend a window.</div>';
+  }
+
+  loadData().then(function(res){
+    if(!res){ el('banner').className='banner show'; el('banner').textContent='No send-time data found. Run: node scripts/sendtime-batch.js on PC #2.'; return; }
+    snap=res.snap;
+    if(res.live){ el('banner').className='banner show'; el('banner').textContent='Live data (computed on request).'; }
+    render();
+  });
+})();
+</script>
+</body>
+</html>
