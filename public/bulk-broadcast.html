@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bulk Group Broadcast - SuperSender Pro</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0b141a;color:#e9edef;font-family:Inter,system-ui,sans-serif;padding:20px}
+.hdr{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.back{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.05);border:1px solid #2a3942;color:#8696a0;padding:7px 12px;border-radius:7px;text-decoration:none;font-size:12px}
+.back:hover{border-color:#00a884;color:#00a884}
+h1{font-size:20px;font-weight:700}.sub{color:#8696a0;font-size:13px;margin-top:2px}
+.layout{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:800px){.layout{grid-template-columns:1fr}}
+.card{background:#1f2c34;border:1px solid #2a3942;border-radius:12px;padding:18px;margin-bottom:14px}
+.ct{font-size:11px;color:#8696a0;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;transition:.15s}
+.btn-primary{background:#00a884;color:#fff}.btn-primary:hover{background:#00cf9d}
+.btn-secondary{background:rgba(255,255,255,.05);color:#8696a0;border:1px solid #2a3942}.btn-secondary:hover{border-color:#00a884;color:#00a884}
+.btn-danger{background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.2)}
+.btn-sm{padding:5px 10px;font-size:11px}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:10px;font-weight:700;color:#8696a0;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.field input,.field textarea,.field select{width:100%;padding:9px 11px;background:#111b21;border:1px solid #2a3942;border-radius:7px;color:#e9edef;font-size:13px;font-family:inherit;transition:.15s}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:#00a884;outline:none}
+.field textarea{min-height:120px;resize:vertical}
+.field .hint{font-size:11px;color:#8696a0;margin-top:4px}
+.groups-grid{display:flex;flex-direction:column;gap:6px;max-height:400px;overflow-y:auto}
+.group-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#111b21;border:1px solid #2a3942;border-radius:8px;cursor:pointer;transition:.15s}
+.group-row:hover{border-color:rgba(0,168,132,.3)}
+.group-row.selected{border-color:#00a884;background:rgba(0,168,132,.08)}
+.group-check{width:18px;height:18px;border-radius:4px;border:2px solid #2a3942;background:#0b141a;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s}
+.group-row.selected .group-check{background:#00a884;border-color:#00a884}
+.group-name{font-size:13px;color:#e9edef;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.group-id{font-size:10px;color:#8696a0;font-family:monospace}
+.sel-count{background:rgba(0,168,132,.12);color:#00a884;border:1px solid rgba(0,168,132,.2);padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.stat{background:#111b21;border:1px solid #2a3942;border-radius:10px;padding:12px;text-align:center}
+.stat-val{font-size:22px;font-weight:800;color:#00a884}
+.stat-lbl{font-size:10px;color:#8696a0;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.log-box{background:#111b21;border:1px solid #2a3942;border-radius:8px;padding:12px;max-height:200px;overflow-y:auto;font-size:12px;font-family:monospace}
+.log-line{padding:2px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+.log-ok{color:#00a884}.log-err{color:#ef4444}.log-info{color:#8696a0}.log-warn{color:#f59e0b}
+.progress-bar{height:6px;background:#2a3942;border-radius:3px;overflow:hidden;margin:10px 0}
+.progress-fill{height:100%;background:linear-gradient(90deg,#00a884,#53bdeb);transition:width .3s}
+.tag{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:600}
+.tag-g{background:rgba(0,168,132,.12);color:#00a884;border:1px solid rgba(0,168,132,.2)}
+.tag-r{background:rgba(239,68,68,.12);color:#ef4444;border:1px solid rgba(239,68,68,.2)}
+.tag-y{background:rgba(245,158,11,.12);color:#f59e0b;border:1px solid rgba(245,158,11,.2)}
+.toast{position:fixed;bottom:20px;right:20px;background:#1f2c34;border:1px solid #2a3942;border-left:4px solid #00a884;border-radius:10px;padding:12px 16px;font-size:13px;display:none;z-index:999}
+.wa-status{display:flex;align-items:center;gap:6px;font-size:12px;margin-bottom:14px}
+.wa-dot{width:9px;height:9px;border-radius:50%;background:#ef4444;flex-shrink:0}
+.wa-dot.on{background:#00a884;box-shadow:0 0 6px rgba(0,168,132,.5)}
+.char-count{font-size:11px;color:#8696a0;text-align:right;margin-top:3px}
+.select-all-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #2a3942;margin-bottom:8px}
+.dry-badge{background:rgba(245,158,11,.12);color:#f59e0b;border:1px solid rgba(245,158,11,.2);padding:4px 10px;border-radius:8px;font-size:11px;font-weight:700}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <a href="/index.html" class="back">&#8592; Dashboard</a>
+  <div>
+    <h1>&#128226; Bulk Group Broadcast</h1>
+    <p class="sub">Send one message to all selected WhatsApp groups</p>
+  </div>
+</div>
+
+<div class="stats-row">
+  <div class="stat"><div class="stat-val" id="s-groups">0</div><div class="stat-lbl">Total Groups</div></div>
+  <div class="stat"><div class="stat-val" id="s-selected">0</div><div class="stat-lbl">Selected</div></div>
+  <div class="stat"><div class="stat-val" id="s-sent">0</div><div class="stat-lbl">Sent This Session</div></div>
+</div>
+
+<div class="layout">
+  <!-- LEFT: Message Composer -->
+  <div>
+    <div class="card">
+      <div class="ct">Message Composer</div>
+
+      <div class="wa-status">
+        <div class="wa-dot" id="wa-dot"></div>
+        <span id="wa-status-text">Checking WhatsApp...</span>
+      </div>
+
+      <div class="field">
+        <label>Message Text</label>
+        <textarea id="msg-text" placeholder="Type your message here...&#10;&#10;Supports:&#10;- *bold* text&#10;- line breaks&#10;- emojis &#128512;" oninput="updateCharCount()"></textarea>
+        <div class="char-count" id="char-count">0 characters</div>
+        <div class="hint">WhatsApp supports *bold*, _italic_, ~strikethrough~, and emojis</div>
+      </div>
+
+      <div class="field">
+        <label>Image URL (optional)</label>
+        <input type="url" id="msg-image" placeholder="https://example.com/image.jpg">
+        <div class="hint">Leave empty for text-only message</div>
+      </div>
+
+      <div class="field">
+        <label>Caption (if image is set)</label>
+        <input id="msg-caption" placeholder="Optional caption for the image">
+      </div>
+
+      <div class="field">
+        <label>Delay Between Groups (seconds)</label>
+        <input type="number" id="msg-delay" value="3" min="1" max="30">
+        <div class="hint">Minimum 1 sec. Recommended 3-5 sec to avoid rate limits</div>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:#d1d9de">
+          <input type="checkbox" id="dry-run" checked style="width:auto;cursor:pointer">
+          <span>Dry Run (preview only, don't send)</span>
+        </label>
+        <span class="dry-badge" id="dry-badge">DRY RUN</span>
+      </div>
+
+      <button class="btn btn-primary" style="width:100%" onclick="sendBroadcast()" id="send-btn">
+        &#128226; Send to Selected Groups
+      </button>
+
+      <div class="progress-bar" id="progress-bar" style="display:none">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <!-- Results Log -->
+    <div class="card">
+      <div class="ct" style="display:flex;justify-content:space-between">
+        <span>Broadcast Log</span>
+        <button class="btn btn-secondary btn-sm" onclick="clearLog()">Clear</button>
+      </div>
+      <div class="log-box" id="log-box">
+        <div class="log-line log-info">Ready. Select groups and type a message to start.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Group Selector -->
+  <div>
+    <div class="card">
+      <div class="ct">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span>Select Groups <span class="sel-count" id="sel-badge">0 selected</span></span>
+          <button class="btn btn-secondary btn-sm" onclick="loadGroups()" id="refresh-btn">&#8635; Refresh</button>
+        </div>
+      </div>
+
+      <div class="field" style="margin-bottom:10px">
+        <input id="group-search" placeholder="Search groups..." oninput="filterGroups()">
+      </div>
+
+      <div class="select-all-row">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:#d1d9de">
+          <input type="checkbox" id="select-all-cb" onclick="toggleSelectAll()" style="width:auto;cursor:pointer">
+          <span>Select All Visible</span>
+        </label>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-secondary btn-sm" onclick="selectNone()">Clear</button>
+          <button class="btn btn-secondary btn-sm" onclick="selectAllVisible()">All</button>
+        </div>
+      </div>
+
+      <div class="groups-grid" id="groups-list">
+        <div class="log-line log-info" style="padding:20px;text-align:center">Loading groups...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var allGroups = [];
+var selectedGroups = new Set();
+var sessionSent = 0;
+
+function toast(msg, type) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.borderLeftColor = type === 'error' ? '#ef4444' : type === 'warn' ? '#f59e0b' : '#00a884';
+  el.style.display = 'block';
+  setTimeout(function(){ el.style.display = 'none'; }, 3000);
+}
+
+function log(msg, type) {
+  var box = document.getElementById('log-box');
+  var div = document.createElement('div');
+  div.className = 'log-line log-' + (type||'info');
+  div.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+function clearLog() {
+  document.getElementById('log-box').innerHTML = '<div class="log-line log-info">Log cleared.</div>';
+}
+
+function updateCharCount() {
+  var txt = document.getElementById('msg-text').value;
+  document.getElementById('char-count').textContent = txt.length + ' characters';
+}
+
+function updateStats() {
+  document.getElementById('s-groups').textContent = allGroups.length;
+  document.getElementById('s-selected').textContent = selectedGroups.size;
+  document.getElementById('s-sent').textContent = sessionSent;
+  document.getElementById('sel-badge').textContent = selectedGroups.size + ' selected';
+}
+
+// Load WhatsApp status
+function loadWaStatus() {
+  fetch('/api/wa/status').then(function(r){return r.json();}).then(function(d){
+    var connected = d.connected || d.status === 'ready' || d.status === 'authenticated';
+    var dot = document.getElementById('wa-dot');
+    var txt = document.getElementById('wa-status-text');
+    dot.className = 'wa-dot' + (connected ? ' on' : '');
+    txt.textContent = connected ? 'WhatsApp Connected' : 'WhatsApp Disconnected - scan QR first';
+  }).catch(function(){
+    document.getElementById('wa-status-text').textContent = 'Cannot reach server';
+  });
+}
+
+// Load groups from API
+function loadGroups() {
+  var btn = document.getElementById('refresh-btn');
+  btn.textContent = 'Loading...';
+  btn.disabled = true;
+  
+  fetch('/api/wa/groups').then(function(r){return r.json();}).then(function(data){
+    var groups = data.groups || data.chats || data || [];
+    allGroups = Array.isArray(groups) ? groups : [];
+    renderGroups(allGroups);
+    updateStats();
+    log('Loaded ' + allGroups.length + ' groups', 'ok');
+    toast('Loaded ' + allGroups.length + ' groups', 'ok');
+  }).catch(function(e){
+    log('Could not load groups: ' + e.message + ' - check WhatsApp connection', 'err');
+    // Show manual entry option
+    document.getElementById('groups-list').innerHTML = '<div style="padding:16px;color:#8696a0;font-size:13px">Could not auto-load groups. Enter group JIDs manually below.</div>';
+  }).finally(function(){
+    btn.textContent = '? Refresh';
+    btn.disabled = false;
+  });
+}
+
+function renderGroups(groups) {
+  var list = document.getElementById('groups-list');
+  var search = document.getElementById('group-search').value.toLowerCase();
+  var filtered = search ? groups.filter(function(g){ return (g.name||g.id||'').toLowerCase().includes(search); }) : groups;
+  
+  if (!filtered.length) {
+    list.innerHTML = '<div style="padding:20px;text-align:center;color:#8696a0;font-size:13px">' + (groups.length ? 'No groups match search' : 'No groups found. Make sure WhatsApp is connected.') + '</div>';
+    return;
+  }
+  
+  list.innerHTML = '';
+  filtered.forEach(function(g) {
+    var id = g.id || g.jid || g._serialized || g.chatId || '';
+    var name = g.name || g.subject || g.pushname || id || 'Unknown Group';
+    var isSelected = selectedGroups.has(id);
+    var div = document.createElement('div');
+    div.className = 'group-row' + (isSelected ? ' selected' : '');
+    div.setAttribute('data-id', id);
+    div.innerHTML = '<div class="group-check">' + (isSelected ? '<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>' : '') + '</div><div class="group-name" title="' + name + '">' + name + '</div><div class="group-id">' + id.substring(0,20) + '</div>';
+    div.onclick = function(){ toggleGroup(id, div); };
+    list.appendChild(div);
+  });
+}
+
+function filterGroups() {
+  renderGroups(allGroups);
+}
+
+function toggleGroup(id, el) {
+  if (selectedGroups.has(id)) {
+    selectedGroups.delete(id);
+    el.classList.remove('selected');
+    el.querySelector('.group-check').innerHTML = '';
+  } else {
+    selectedGroups.add(id);
+    el.classList.add('selected');
+    el.querySelector('.group-check').innerHTML = '<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  }
+  updateStats();
+}
+
+function selectAllVisible() {
+  var rows = document.querySelectorAll('.group-row');
+  rows.forEach(function(row){
+    var id = row.getAttribute('data-id');
+    if (id) {
+      selectedGroups.add(id);
+      row.classList.add('selected');
+      row.querySelector('.group-check').innerHTML = '<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    }
+  });
+  document.getElementById('select-all-cb').checked = true;
+  updateStats();
+}
+
+function selectNone() {
+  selectedGroups.clear();
+  var rows = document.querySelectorAll('.group-row');
+  rows.forEach(function(row){ row.classList.remove('selected'); row.querySelector('.group-check').innerHTML = ''; });
+  document.getElementById('select-all-cb').checked = false;
+  updateStats();
+}
+
+function toggleSelectAll() {
+  if (document.getElementById('select-all-cb').checked) selectAllVisible();
+  else selectNone();
+}
+
+document.getElementById('dry-run').addEventListener('change', function(){
+  document.getElementById('dry-badge').textContent = this.checked ? 'DRY RUN' : 'LIVE';
+  document.getElementById('dry-badge').style.background = this.checked ? 'rgba(245,158,11,.12)' : 'rgba(239,68,68,.12)';
+  document.getElementById('dry-badge').style.color = this.checked ? '#f59e0b' : '#ef4444';
+  document.getElementById('dry-badge').style.borderColor = this.checked ? 'rgba(245,158,11,.2)' : 'rgba(239,68,68,.2)';
+});
+
+async function sendBroadcast() {
+  var text = document.getElementById('msg-text').value.trim();
+  var imageUrl = document.getElementById('msg-image').value.trim();
+  var caption = document.getElementById('msg-caption').value.trim();
+  var delay = Math.max(1, parseInt(document.getElementById('msg-delay').value) || 3);
+  var dryRun = document.getElementById('dry-run').checked;
+  var groups = Array.from(selectedGroups);
+
+  if (!text && !imageUrl) { toast('Please enter a message or image URL', 'warn'); return; }
+  if (!groups.length) { toast('Please select at least one group', 'warn'); return; }
+  if (!dryRun && !confirm('Send live message to ' + groups.length + ' groups?')) return;
+
+  var btn = document.getElementById('send-btn');
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+
+  var progressBar = document.getElementById('progress-bar');
+  var progressFill = document.getElementById('progress-fill');
+  progressBar.style.display = 'block';
+
+  var sent = 0, failed = 0;
+  log('Starting broadcast to ' + groups.length + ' groups' + (dryRun ? ' [DRY RUN]' : ' [LIVE]'), 'info');
+
+  for (var i = 0; i < groups.length; i++) {
+    var groupId = groups[i];
+    var groupName = (allGroups.find(function(g){ return (g.id||g.jid||g._serialized||g.chatId) === groupId; })||{}).name || groupId;
+    progressFill.style.width = Math.round(((i+1)/groups.length)*100) + '%';
+
+    try {
+      var payload = { groupId: groupId, message: text, dryRun: dryRun };
+      if (imageUrl) { payload.imageUrl = imageUrl; payload.caption = caption || text; }
+
+      var resp = await fetch('/api/broadcast/group', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      var data = await resp.json();
+
+      if (data.ok || data.success || data.sent) {
+        sent++;
+        sessionSent++;
+        log((dryRun ? '[DRY] ' : '') + 'Sent to: ' + groupName, 'ok');
+      } else {
+        failed++;
+        log('Failed: ' + groupName + ' - ' + (data.error || 'Unknown error'), 'err');
+      }
+    } catch (e) {
+      failed++;
+      log('Error: ' + groupName + ' - ' + e.message, 'err');
+    }
+
+    updateStats();
+    if (i < groups.length - 1) await sleep(delay * 1000);
+  }
+
+  progressFill.style.width = '100%';
+  setTimeout(function(){ progressBar.style.display = 'none'; }, 2000);
+
+  log('Broadcast complete: ' + sent + ' sent, ' + failed + ' failed', sent > 0 ? 'ok' : 'warn');
+  toast(sent + ' sent, ' + failed + ' failed', failed > 0 ? 'warn' : 'ok');
+  btn.disabled = false;
+  btn.textContent = '?? Send to Selected Groups';
+}
+
+function sleep(ms) { return new Promise(function(r){ setTimeout(r, ms); }); }
+
+// Init
+loadWaStatus();
+loadGroups();
+setInterval(loadWaStatus, 30000);
+</script>
+
+</body>
+</html>

@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const http = require('http');
 const dns = require('dns');
 const crypto = require('crypto');
@@ -3119,6 +3119,120 @@ try {
   console.error('[ChannelToGroup] failed to initialise (non-fatal):', e.message);
 }
 // END CHANNEL TO GROUP HOOK
+// BEGIN BULK GROUP BROADCAST HOOK
+// GET /api/wa/groups  ? list all WhatsApp groups
+// POST /api/broadcast/group  ? send message to one group (called in loop by frontend)
+// POST /api/broadcast/groups  ? send to all selected groups server-side with delay
+
+app.get('/api/wa/groups', function(req, res) {
+  try {
+    var inst = waClients && waClients.get ? waClients.get('default') : null;
+    if (!inst || (!inst.isReady && !inst.connected)) {
+      return res.json({ ok: false, groups: [], error: 'WhatsApp not connected. Scan QR first.' });
+    }
+    var getChats = inst.getChats || inst.getGroups;
+    if (typeof getChats !== 'function') {
+      // Baileys: return from known groups list
+      var knownGroups = [];
+      try {
+        var groupIds = String(process.env.SELLING_GROUPS || process.env.CUSTOMER_GROUPS || '').split(',').filter(Boolean);
+        knownGroups = groupIds.map(function(id){ return { id: id.trim(), name: id.trim(), isGroup: true }; });
+      } catch(e) {}
+      return res.json({ ok: true, groups: knownGroups, note: 'From env config. Connect via wwebjs for full group list.' });
+    }
+    getChats.call(inst).then(function(chats) {
+      var groups = (chats || []).filter(function(c){ return c.isGroup || (c.id && (c.id._serialized || c.id || '').endsWith('@g.us')); }).map(function(c){
+        return { id: c.id && c.id._serialized ? c.id._serialized : String(c.id || ''), name: c.name || c.subject || c.pushname || '', isGroup: true };
+      });
+      res.json({ ok: true, groups: groups });
+    }).catch(function(e){ res.json({ ok: false, groups: [], error: e.message }); });
+  } catch(e) { res.status(500).json({ ok: false, groups: [], error: e.message }); }
+});
+
+app.post('/api/broadcast/group', async function(req, res) {
+  try {
+    var body = req.body || {};
+    var groupId = String(body.groupId || body.chatId || '').trim();
+    var message = String(body.message || '').trim();
+    var imageUrl = String(body.imageUrl || '').trim();
+    var caption = String(body.caption || body.message || '').trim();
+    var dryRun = body.dryRun !== false && body.dryRun !== 'false';
+
+    if (!groupId) return res.status(400).json({ ok: false, error: 'groupId is required' });
+    if (!message && !imageUrl) return res.status(400).json({ ok: false, error: 'message or imageUrl is required' });
+
+    if (dryRun) {
+      return res.json({ ok: true, sent: true, dryRun: true, groupId: groupId, message: message, imageUrl: imageUrl || null });
+    }
+
+    var inst = waClients && waClients.get ? waClients.get('default') : null;
+    if (!inst || (!inst.isReady && !inst.connected)) {
+      return res.status(503).json({ ok: false, error: 'WhatsApp not connected' });
+    }
+
+    if (imageUrl && inst.sendMessage) {
+      var media = { url: imageUrl };
+      try { var { MessageMedia } = require('whatsapp-web.js'); media = await MessageMedia.fromUrl(imageUrl); } catch(e) {}
+      await inst.sendMessage(groupId, media, { caption: caption });
+    } else if (inst.sendMessage) {
+      await inst.sendMessage(groupId, message);
+    } else {
+      return res.status(503).json({ ok: false, error: 'sendMessage not available on this WA engine' });
+    }
+
+    res.json({ ok: true, sent: true, dryRun: false, groupId: groupId });
+  } catch(e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
+app.post('/api/broadcast/groups', async function(req, res) {
+  try {
+    var body = req.body || {};
+    var groupIds = Array.isArray(body.groupIds) ? body.groupIds : String(body.groupIds || '').split(',').map(function(s){ return s.trim(); }).filter(Boolean);
+    var message = String(body.message || '').trim();
+    var imageUrl = String(body.imageUrl || '').trim();
+    var caption = String(body.caption || body.message || '').trim();
+    var delayMs = Math.max(1000, (Number(body.delaySeconds) || 3) * 1000);
+    var dryRun = body.dryRun !== false && body.dryRun !== 'false';
+
+    if (!groupIds.length) return res.status(400).json({ ok: false, error: 'groupIds array is required' });
+    if (!message && !imageUrl) return res.status(400).json({ ok: false, error: 'message or imageUrl is required' });
+
+    var results = [];
+    var inst = waClients && waClients.get ? waClients.get('default') : null;
+
+    for (var i = 0; i < groupIds.length; i++) {
+      var gid = groupIds[i];
+      if (dryRun) {
+        results.push({ groupId: gid, sent: true, dryRun: true });
+      } else {
+        try {
+          if (!inst || (!inst.isReady && !inst.connected)) throw new Error('WhatsApp not connected');
+          if (imageUrl && inst.sendMessage) {
+            var media2 = { url: imageUrl };
+            try { var { MessageMedia: MM } = require('whatsapp-web.js'); media2 = await MM.fromUrl(imageUrl); } catch(e) {}
+            await inst.sendMessage(gid, media2, { caption: caption });
+          } else if (inst.sendMessage) {
+            await inst.sendMessage(gid, message);
+          } else { throw new Error('sendMessage not available'); }
+          results.push({ groupId: gid, sent: true, dryRun: false });
+        } catch(e) {
+          results.push({ groupId: gid, sent: false, error: e.message });
+        }
+      }
+      if (i < groupIds.length - 1) await new Promise(function(r){ setTimeout(r, delayMs); });
+    }
+
+    var sent = results.filter(function(r){ return r.sent; }).length;
+    var failed = results.filter(function(r){ return !r.sent; }).length;
+    res.json({ ok: true, sent: sent, failed: failed, dryRun: dryRun, results: results });
+  } catch(e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
+app.get('/bulk-broadcast.html', function(req, res) {
+  res.sendFile(require('path').join(__dirname, 'public', 'bulk-broadcast.html'));
+});
+// END BULK GROUP BROADCAST HOOK
+
 
 
 
