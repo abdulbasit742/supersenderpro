@@ -52,7 +52,9 @@
  "clv:batch": "node scripts/clv-batch.js",
  "basket:batch": "node scripts/basket-batch.js",
  "concentration:batch": "node scripts/concentration-batch.js",
- "engagement:batch": "node scripts/engagement-batch.js"
+ "engagement:batch": "node scripts/engagement-batch.js",
+ "digest:batch": "node scripts/digest-batch.js",
+ "analytics:all": "node scripts/analytics-batch.js && node scripts/attribution-batch.js && node scripts/cohorts-batch.js && node scripts/forecast-batch.js && node scripts/products-batch.js && node scripts/geo-batch.js && node scripts/sendtime-batch.js && node scripts/rfm-batch.js && node scripts/clv-batch.js && node scripts/basket-batch.js && node scripts/concentration-batch.js && node scripts/engagement-batch.js && node scripts/reengage-batch.js && node scripts/alerts-batch.js && node scripts/experiments-batch.js && node scripts/digest-batch.js"
  },
  "dependencies": {
  "@whiskeysockets/baileys": "^7.0.0-rc.9",
