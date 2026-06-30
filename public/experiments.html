@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>A/B Testing — SuperSender Pro</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#0b141a;color:#e9edef;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:24px;max-width:1080px;margin:0 auto}
+  a.back{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.05);border:1px solid #2a3942;color:#8696a0;padding:7px 12px;border-radius:7px;text-decoration:none;font-size:12px;margin-bottom:16px}
+  a.back:hover{border-color:#00a884;color:#00a884}
+  h1{font-size:22px;font-weight:800;margin-bottom:2px}
+  .sub{color:#8696a0;font-size:13px;margin-bottom:18px}
+  .card{background:#1f2c34;border:1px solid #2a3942;border-radius:12px;padding:16px;margin-bottom:14px}
+  .ct{font-size:10px;color:#8696a0;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
+  label{display:block;font-size:11px;color:#8696a0;margin:8px 0 4px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+  input,select,textarea{width:100%;background:#0b141a;border:1px solid #2a3942;color:#e9edef;border-radius:8px;padding:9px 10px;font-size:13px;font-family:inherit}
+  textarea{min-height:54px;resize:vertical}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  button{background:#00a884;color:#04231b;border:0;font-weight:700;padding:9px 16px;border-radius:8px;cursor:pointer;font-size:13px;margin-top:10px}
+  button:hover{filter:brightness(1.08)}
+  button.ghost{background:rgba(255,255,255,.05);color:#e9edef;border:1px solid #2a3942}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th{text-align:left;padding:7px 8px;border-bottom:1px solid #2a3942;font-size:10px;font-weight:700;color:#8696a0;text-transform:uppercase}
+  td{padding:9px 8px;border-bottom:1px solid rgba(255,255,255,.03)}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .bar{height:8px;border-radius:5px;background:rgba(255,255,255,.06);overflow:hidden;min-width:80px}
+  .bar>span{display:block;height:100%;background:linear-gradient(90deg,#00a884,#53bdeb)}
+  .pill{display:inline-block;font-size:10px;padding:2px 8px;border-radius:11px;font-weight:700}
+  .pill.win{background:rgba(0,168,132,.16);color:#00a884}
+  .pill.run{background:rgba(83,189,235,.14);color:#53bdeb}
+  .pill.wait{background:rgba(245,158,11,.14);color:#f59e0b}
+  .exp{border:1px solid #2a3942;border-radius:10px;padding:12px;margin-bottom:10px}
+  .exp h3{font-size:14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+  .rec{font-size:12px;color:#8696a0;margin-top:8px}
+  .empty{color:#8696a0;text-align:center;padding:16px;font-size:13px}
+  .status{color:#8696a0;font-size:12px;margin-left:8px}
+</style>
+</head>
+<body>
+  <a class="back" href="/founder-analytics.html">&larr; Analytics</a>
+  <h1>A/B Testing</h1>
+  <div class="sub">Test message variants, let the math pick the winner. No more guessing which broadcast works.</div>
+
+  <div class="card">
+    <div class="ct">New experiment</div>
+    <label>Name</label>
+    <input id="name" placeholder="e.g. Win-back greeting test" />
+    <div class="row">
+      <div>
+        <label>Success metric</label>
+        <select id="metric"><option value="replied">Replied</option><option value="ordered">Ordered</option><option value="delivered">Delivered</option></select>
+      </div>
+      <div></div>
+    </div>
+    <label>Variant A message</label>
+    <textarea id="vA" placeholder="Assalam o Alaikum {{name}}! ..."></textarea>
+    <label>Variant B message</label>
+    <textarea id="vB" placeholder="Hi {{name}}! ..."></textarea>
+    <button id="create">Create experiment</button>
+    <span class="status" id="createStatus"></span>
+  </div>
+
+  <div class="card">
+    <div class="ct">Experiments <button class="ghost" id="refresh" style="margin:0 0 0 8px;padding:4px 10px;font-size:11px">Refresh</button></div>
+    <div id="list"><div class="empty">Loading\u2026</div></div>
+  </div>
+
+<script>
+(function(){
+  var el=function(id){return document.getElementById(id);};
+  var pct=function(n){return (Number(n||0)*100).toFixed(1)+'%';};
+
+  function statusPill(e){
+    if(e.status==='decided'||e.winner) return '<span class="pill win">winner: '+(e.winner||'?')+'</span>';
+    if(e.significant) return '<span class="pill win">significant</span>';
+    return '<span class="pill run">running</span>';
+  }
+
+  async function loadResults(storeId, id){
+    try{ var r=await fetch('/api/experiments/'+id+'/results?deriveCRM=true',{cache:'no-store'}); var j=await r.json(); return j.success?j.results:null; }catch(e){ return null; }
+  }
+
+  async function load(){
+    el('list').innerHTML='<div class="empty">Loading\u2026</div>';
+    try{
+      var r=await fetch('/api/experiments',{cache:'no-store'});
+      var j=await r.json();
+      if(!j.success) throw new Error(j.error||'failed');
+      if(!j.experiments.length){ el('list').innerHTML='<div class="empty">No experiments yet. Create one above \u2191</div>'; return; }
+      var html='';
+      for(var i=0;i<j.experiments.length;i++){
+        var e=j.experiments[i];
+        var res=await loadResults(e.storeId, e.id);
+        var maxRate=res?Math.max.apply(null,res.perVariant.map(function(v){return v.rate;}).concat([0.0001])):1;
+        var rows=res?res.perVariant.map(function(v){
+          var lead=res.leader===v.key;
+          return '<tr><td>'+(lead?'\u2b50 ':'')+v.label+'</td><td class="num">'+v.sent+'</td><td class="num">'+v.conversions+'</td>'
+            +'<td class="num">'+pct(v.rate)+'</td><td><div class="bar"><span style="width:'+(maxRate?(v.rate/maxRate*100):0).toFixed(1)+'%"></span></div></td></tr>';
+        }).join(''):'<tr><td colspan="5" class="empty">No data yet</td></tr>';
+        html+='<div class="exp"><h3>'+e.name+' '+statusPill(Object.assign({},e,{significant:res&&res.decided}))+'</h3>'
+          +'<table><thead><tr><th>Variant</th><th class="num">Sent</th><th class="num">Conv.</th><th class="num">Rate</th><th>vs best</th></tr></thead><tbody>'+rows+'</tbody></table>'
+          +(res?'<div class="rec">'+res.recommendation+'</div>':'')+'</div>';
+      }
+      el('list').innerHTML=html;
+    }catch(e){ el('list').innerHTML='<div class="empty">Could not load: '+e.message+' (is the API mounted?)</div>'; }
+  }
+
+  el('create').onclick=async function(){
+    var name=el('name').value.trim();
+    var metric=el('metric').value;
+    var vA=el('vA').value.trim(), vB=el('vB').value.trim();
+    if(!name||!vA||!vB){ el('createStatus').textContent='Name + both variants required'; return; }
+    el('create').disabled=true; el('createStatus').textContent='Creating\u2026';
+    try{
+      var r=await fetch('/api/experiments',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({name:name,metric:metric,variants:[{label:'Variant A',template:vA},{label:'Variant B',template:vB}]})});
+      var j=await r.json();
+      if(!j.success) throw new Error(j.error||'failed');
+      el('createStatus').textContent='Created \u2705'; el('name').value=el('vA').value=el('vB').value='';
+      load();
+    }catch(e){ el('createStatus').textContent='Failed: '+e.message; }
+    el('create').disabled=false;
+  };
+
+  el('refresh').onclick=load;
+  load();
+})();
+</script>
+</body>
+</html>
