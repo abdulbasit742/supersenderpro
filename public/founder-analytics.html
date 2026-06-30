@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Founder Analytics — SuperSender Pro</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#0b141a;color:#e9edef;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:24px;max-width:1180px;margin:0 auto}
+  a.back{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.05);border:1px solid #2a3942;color:#8696a0;padding:7px 12px;border-radius:7px;text-decoration:none;font-size:12px;margin-bottom:16px}
+  a.back:hover{border-color:#00a884;color:#00a884}
+  h1{font-size:22px;font-weight:800;margin-bottom:2px}
+  .sub{color:#8696a0;font-size:13px;margin-bottom:20px}
+  .sub b{color:#53bdeb;font-weight:700}
+  .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+  .kpi{background:#1f2c34;border:1px solid #2a3942;border-radius:12px;padding:16px;position:relative;overflow:hidden}
+  .kpi::after{content:"";position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#00a884,#53bdeb)}
+  .kpi.warn::after{background:linear-gradient(90deg,#f59e0b,#ef4444)}
+  .kv{font-size:25px;font-weight:800;color:#00a884;line-height:1.05;margin-bottom:4px}
+  .kpi.warn .kv{color:#f59e0b}
+  .kl{font-size:10px;color:#8696a0;text-transform:uppercase;letter-spacing:.6px;font-weight:700}
+  .kd{font-size:11px;color:#8696a0;margin-top:5px}
+  .kd.up{color:#00a884}.kd.down{color:#ef4444}
+  .g2{display:grid;grid-template-columns:1.4fr 1fr;gap:12px;margin-bottom:14px}
+  .card{background:#1f2c34;border:1px solid #2a3942;border-radius:12px;padding:16px}
+  .ct{font-size:10px;color:#8696a0;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th{text-align:left;padding:7px 8px;border-bottom:1px solid #2a3942;font-size:10px;font-weight:700;color:#8696a0;text-transform:uppercase}
+  td{padding:9px 8px;border-bottom:1px solid rgba(255,255,255,.03)}
+  tr:hover td{background:rgba(0,168,132,.04)}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .tg{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
+  .tg-g{background:rgba(0,168,132,.15);color:#00a884}
+  .tg-y{background:rgba(245,158,11,.14);color:#f59e0b}
+  .tg-r{background:rgba(239,68,68,.14);color:#ef4444}
+  .bar{height:8px;border-radius:5px;background:rgba(255,255,255,.06);overflow:hidden}
+  .bar>span{display:block;height:100%;background:linear-gradient(90deg,#00a884,#53bdeb)}
+  .funnel-row{margin-bottom:11px}
+  .funnel-row .lab{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
+  .funnel-row .lab b{color:#e9edef}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:#8696a0;margin-top:10px}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:middle}
+  .empty{color:#8696a0;text-align:center;padding:18px;font-size:13px}
+  .banner{background:rgba(83,189,235,.08);border:1px solid rgba(83,189,235,.25);color:#9fd7f2;font-size:12px;padding:9px 12px;border-radius:9px;margin-bottom:16px}
+  @media(max-width:760px){.kpi-row{grid-template-columns:repeat(2,1fr)}.g2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+  <a class="back" href="/index.html">&larr; Dashboard</a>
+  <h1>Founder Analytics &amp; Insights</h1>
+  <div class="sub" id="sub">Loading the brain&hellip;</div>
+  <div class="banner" id="banner" style="display:none"></div>
+
+  <div class="kpi-row">
+    <div class="kpi"><div class="kv" id="kRev">&mdash;</div><div class="kl">Revenue</div><div class="kd" id="kRevD"></div></div>
+    <div class="kpi"><div class="kv" id="kMrr">&mdash;</div><div class="kl">MRR</div><div class="kd" id="kMrrD"></div></div>
+    <div class="kpi"><div class="kv" id="kConv">&mdash;</div><div class="kl">Lead &rarr; Customer</div><div class="kd" id="kConvD"></div></div>
+    <div class="kpi warn"><div class="kv" id="kChurn">&mdash;</div><div class="kl">Predicted Churn</div><div class="kd" id="kChurnD"></div></div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="ct">Revenue &mdash; last 30 days</div>
+      <div id="revChart"></div>
+      <div class="legend"><span><span class="dot" style="background:#00a884"></span>Daily revenue</span><span id="revTotals"></span></div>
+    </div>
+    <div class="card">
+      <div class="ct">Conversion funnel</div>
+      <div id="funnel"></div>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="ct">Channel performance</div>
+      <table><thead><tr><th>Channel</th><th class="num">Customers</th><th class="num">Revenue</th><th class="num">Conv.</th><th>Share</th></tr></thead><tbody id="channels"></tbody></table>
+    </div>
+    <div class="card">
+      <div class="ct">Churn risk breakdown</div>
+      <div style="display:flex;align-items:center;gap:18px">
+        <div id="donut"></div>
+        <div id="churnLegend" style="font-size:12px"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ct">Save these first &mdash; high-value customers at risk</div>
+    <table><thead><tr><th>Customer</th><th>Channel</th><th class="num">Last seen</th><th class="num">Spent</th><th class="num">Risk</th><th>Why</th></tr></thead><tbody id="saveList"></tbody></table>
+  </div>
+
+<script>
+(function(){
+  var PKR = function(n){ return 'PKR ' + Number(n||0).toLocaleString(); };
+  var pct = function(n){ return (Number(n||0)).toFixed(n%1?1:0) + '%'; };
+  var el = function(id){ return document.getElementById(id); };
+
+  // Try the static batch snapshot first, then the committed sample, then the live API.
+  async function loadData(){
+    var tries = [
+      { url:'/analytics/insights.json', pick:function(j){ return j; } },
+      { url:'/analytics/insights.sample.json', pick:function(j){ return j; }, sample:true },
+      { url:'/api/analytics-insights/all', pick:function(j){ return j.snapshot; }, live:true }
+    ];
+    for (var i=0;i<tries.length;i++){
+      try{
+        var r = await fetch(tries[i].url, { cache:'no-store' });
+        if(!r.ok) continue;
+        var j = await r.json();
+        var snap = tries[i].pick(j);
+        if(snap && snap.headline) return { snap:snap, src:tries[i] };
+      }catch(e){ /* try next */ }
+    }
+    return null;
+  }
+
+  function svgLine(series){
+    var w=560,h=180,pad=28;
+    if(!series||!series.length) return '<div class="empty">No revenue data yet</div>';
+    var max=Math.max.apply(null,series.map(function(p){return p.revenue;}));
+    if(max<=0) max=1;
+    var stepX=(w-pad*2)/(series.length-1||1);
+    var pts=series.map(function(p,i){
+      var x=pad+i*stepX;
+      var y=h-pad-(p.revenue/max)*(h-pad*2);
+      return [x,y];
+    });
+    var line=pts.map(function(p,i){return (i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1);}).join(' ');
+    var area=line+' L '+pts[pts.length-1][0].toFixed(1)+' '+(h-pad)+' L '+pad+' '+(h-pad)+' Z';
+    var dots=pts.filter(function(_,i){return i%5===0||i===pts.length-1;})
+      .map(function(p){return '<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="2.5" fill="#00a884"/>';}).join('');
+    var lblFirst=series[0].date.slice(5), lblLast=series[series.length-1].date.slice(5);
+    return '<svg viewBox="0 0 '+w+' '+h+'" width="100%" height="180" preserveAspectRatio="none">'
+      +'<defs><linearGradient id="rg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#00a884" stop-opacity=".25"/><stop offset="1" stop-color="#00a884" stop-opacity="0"/></linearGradient></defs>'
+      +'<path d="'+area+'" fill="url(#rg)"/>'
+      +'<path d="'+line+'" fill="none" stroke="#00a884" stroke-width="2"/>'
+      +dots
+      +'<text x="'+pad+'" y="'+(h-6)+'" fill="#8696a0" font-size="10">'+lblFirst+'</text>'
+      +'<text x="'+(w-pad)+'" y="'+(h-6)+'" fill="#8696a0" font-size="10" text-anchor="end">'+lblLast+'</text>'
+      +'<text x="'+pad+'" y="14" fill="#8696a0" font-size="10">'+PKR(max)+'</text>'
+      +'</svg>';
+  }
+
+  function donut(bands){
+    var total=(bands.high||0)+(bands.medium||0)+(bands.low||0);
+    var segs=[['#ef4444',bands.high||0],['#f59e0b',bands.medium||0],['#00a884',bands.low||0]];
+    if(total<=0) return '<div class="empty" style="width:130px">No customers</div>';
+    var r=52,c=2*Math.PI*r,off=0,arcs='';
+    segs.forEach(function(s){
+      var frac=s[1]/total, len=frac*c;
+      arcs+='<circle cx="70" cy="70" r="'+r+'" fill="none" stroke="'+s[0]+'" stroke-width="16" '
+        +'stroke-dasharray="'+len.toFixed(2)+' '+(c-len).toFixed(2)+'" stroke-dashoffset="'+(-off).toFixed(2)+'" transform="rotate(-90 70 70)"/>';
+      off+=len;
+    });
+    return '<svg width="140" height="140" viewBox="0 0 140 140">'+arcs
+      +'<text x="70" y="66" text-anchor="middle" fill="#e9edef" font-size="20" font-weight="800">'+total+'</text>'
+      +'<text x="70" y="84" text-anchor="middle" fill="#8696a0" font-size="9">CUSTOMERS</text></svg>';
+  }
+
+  function riskTag(band){
+    var cls=band==='high'?'tg-r':band==='medium'?'tg-y':'tg-g';
+    return '<span class="tg '+cls+'">'+band+'</span>';
+  }
+
+  function render(snap, src){
+    var p = snap.primary || snap; // primary store detail, or a single-store snapshot
+    var head = snap.headline || p.headline;
+    var rev = p.revenue || {};
+    var conv = p.conversion || {};
+    var ch = p.churn || {};
+
+    el('sub').innerHTML = 'Across <b>'+((snap.stores&&snap.stores.length)||1)+'</b> store(s) &middot; generated '
+      + new Date(snap.generatedAt||Date.now()).toLocaleString();
+
+    if(src.sample){ el('banner').style.display='block'; el('banner').innerHTML='Showing <b>demo data</b>. Run <code>node scripts/analytics-batch.js</code> on PC #2 to populate real numbers.'; }
+    else if(src.live){ el('banner').style.display='block'; el('banner').textContent='Live data (computed on request).'; }
+
+    el('kRev').textContent = PKR(head.revenue);
+    el('kRevD').innerHTML = rev.wowGrowthPct==null ? 'Lifetime' :
+      '<span class="'+(rev.wowGrowthPct>=0?'up':'down')+'">'+(rev.wowGrowthPct>=0?'\u25B2':'\u25BC')+' '+Math.abs(rev.wowGrowthPct)+'% WoW</span>';
+    el('kMrr').textContent = PKR(head.mrr);
+    el('kMrrD').textContent = rev.arr!=null ? PKR(rev.arr)+' ARR' : '';
+    el('kConv').textContent = pct(head.leadToCustomerPct!=null?head.leadToCustomerPct:conv.leadToCustomerPct);
+    el('kConvD').textContent = (head.customers||0)+' customers, '+(head.orders||0)+' orders';
+    el('kChurn').textContent = pct(head.predictedChurnRatePct!=null?head.predictedChurnRatePct:ch.predictedChurnRatePct);
+    el('kChurnD').textContent = PKR(head.revenueAtRisk||ch.revenueAtRisk||0)+' at risk';
+
+    el('revChart').innerHTML = svgLine(rev.dailySeries);
+    el('revTotals').innerHTML = '7d '+PKR(rev.revenueLast7Days||0)+' &middot; 30d '+PKR(rev.revenueLast30Days||0);
+
+    var fmax = (conv.funnel&&conv.funnel[0]&&conv.funnel[0].count)||1;
+    el('funnel').innerHTML = (conv.funnel||[]).map(function(f){
+      var wpct = fmax? (f.count/fmax*100):0;
+      return '<div class="funnel-row"><div class="lab"><span>'+f.stage+'</span><b>'+f.count+' &middot; '+pct(f.pctOfTop)+'</b></div>'
+        +'<div class="bar"><span style="width:'+wpct.toFixed(1)+'%"></span></div></div>';
+    }).join('') || '<div class="empty">No funnel data</div>';
+
+    var chans = p.channels||[];
+    el('channels').innerHTML = chans.length? chans.map(function(c){
+      return '<tr><td>'+c.channel+'</td><td class="num">'+c.customers+'</td><td class="num">'+PKR(c.revenue)+'</td>'
+        +'<td class="num">'+pct(c.conversionPct)+'</td><td><div class="bar" style="width:80px"><span style="width:'+(c.revenueSharePct||0)+'%"></span></div></td></tr>';
+    }).join('') : '<tr><td colspan="5" class="empty">No channel data</td></tr>';
+
+    var bands = ch.bands||{high:0,medium:0,low:0};
+    el('donut').innerHTML = donut(bands);
+    el('churnLegend').innerHTML =
+      '<div style="margin-bottom:7px"><span class="dot" style="background:#ef4444"></span>High &mdash; <b>'+(bands.high||0)+'</b></div>'
+      +'<div style="margin-bottom:7px"><span class="dot" style="background:#f59e0b"></span>Medium &mdash; <b>'+(bands.medium||0)+'</b></div>'
+      +'<div style="margin-bottom:7px"><span class="dot" style="background:#00a884"></span>Low &mdash; <b>'+(bands.low||0)+'</b></div>'
+      +(ch.subscription? '<div style="color:#8696a0;margin-top:6px">Sub. churn '+pct(ch.subscription.churnRatePct)+'</div>':'');
+
+    var save = ch.saveList||[];
+    el('saveList').innerHTML = save.length? save.map(function(s){
+      return '<tr><td>'+(s.name||s.phone||'-')+'</td><td>'+s.channel+'</td><td class="num">'+s.recencyDays+'d</td>'
+        +'<td class="num">'+PKR(s.monetary)+'</td><td class="num">'+riskTag(s.band)+' '+s.churnRisk+'</td>'
+        +'<td style="color:#8696a0">'+((s.reasons||[]).join(', '))+'</td></tr>';
+    }).join('') : '<tr><td colspan="6" class="empty">Nobody at risk \uD83C\uDF89</td></tr>';
+  }
+
+  loadData().then(function(res){
+    if(!res){ el('sub').textContent='Could not load analytics. Run the batch on PC #2 first.'; return; }
+    render(res.snap, res.src);
+  });
+})();
+</script>
+</body>
+</html>

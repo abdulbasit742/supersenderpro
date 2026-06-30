@@ -33,6 +33,8 @@
     "docs:api": "node scripts/gen-api-docs.js",
     "install:hooks": "node scripts/install-hooks.js",
     "doctor": "node scripts/doctor.js",
+    "analytics:batch": "node scripts/analytics-batch.js",
+    "analytics-insights:check": "node scripts/analytics-insights-check.js",
     "developer-portal:check": "node scripts/developer-portal-check.js",
     "developer-portal:smoke": "node tests/smoke/developerPortalSmoke.js",
     "feature-flags:check": "node scripts/feature-flags-check.js",
