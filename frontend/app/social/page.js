@@ -65,6 +65,8 @@ export default function SocialPage() {
     message: ''
   });
   const [notice, setNotice] = useState('');
+  const [readiness, setReadiness] = useState(null);
+  const [readinessLoading, setReadinessLoading] = useState(false);
 
   async function load() {
     const [state, urls] = await Promise.all([
@@ -75,7 +77,19 @@ export default function SocialPage() {
     setOauth(urls);
   }
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); loadReadiness(); }, []);
+
+  async function loadReadiness() {
+    setReadinessLoading(true);
+    try {
+      const data = await safeApi('/api/social/readiness', null);
+      setReadiness(data);
+    } catch (e) {
+      setReadiness(null);
+    } finally {
+      setReadinessLoading(false);
+    }
+  }
 
   const accountsByPlatform = useMemo(() => {
     const grouped = { facebook: [], instagram: [], linkedin: [] };
@@ -205,7 +219,74 @@ export default function SocialPage() {
 
   return (
     <AppShell title="Social Platforms / Meta + LinkedIn">
-      <div className="grid gap-4 xl:grid-cols-3">
+
+      {/* Social Production Readiness Panel */}
+      <Panel title="Social Production Readiness">
+        <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+          <div className="flex items-center gap-3">
+            {readiness ? (
+              <StatusBadge tone={readiness.readiness === 'production-ready' ? 'good' : readiness.readiness === 'staging-ready' ? 'warn' : 'bad'}>
+                {readiness.readiness || 'unknown'}
+              </StatusBadge>
+            ) : (
+              <StatusBadge tone="warn">{readinessLoading ? 'Checking...' : 'Not loaded'}</StatusBadge>
+            )}
+            {readiness && (
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                Score: {readiness.score}% &middot; {readiness.totals?.passed}/{readiness.totals?.checks} passed
+              </span>
+            )}
+          </div>
+          <button className="btn btn-sm" onClick={loadReadiness} disabled={readinessLoading}>
+            {readinessLoading ? 'Checking...' : 'Refresh Readiness'}
+          </button>
+        </div>
+
+        {readiness && (
+          <>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 mb-3">
+              <div className="rounded-lg bg-slate-100 dark:bg-slate-800 p-2 text-center">
+                <p className="text-xs text-slate-500">Accounts</p>
+                <p className="font-bold text-slate-800 dark:text-slate-100">{readiness.summary?.configuredAccounts}/{readiness.summary?.socialAccounts}</p>
+              </div>
+              <div className="rounded-lg bg-slate-100 dark:bg-slate-800 p-2 text-center">
+                <p className="text-xs text-slate-500">Critical Failed</p>
+                <p className={`font-bold ${readiness.totals?.criticalFailed > 0 ? 'text-red-500' : 'text-emerald-500'}`}>{readiness.totals?.criticalFailed}</p>
+              </div>
+              <div className="rounded-lg bg-slate-100 dark:bg-slate-800 p-2 text-center">
+                <p className="text-xs text-slate-500">Warnings</p>
+                <p className={`font-bold ${readiness.totals?.warningFailed > 0 ? 'text-amber-500' : 'text-emerald-500'}`}>{readiness.totals?.warningFailed}</p>
+              </div>
+              <div className="rounded-lg bg-slate-100 dark:bg-slate-800 p-2 text-center">
+                <p className="text-xs text-slate-500">Public URL</p>
+                <p className="text-xs font-medium truncate text-slate-700 dark:text-slate-300">{readiness.summary?.publicBaseUrl || 'missing'}</p>
+              </div>
+            </div>
+
+            {readiness.nextSteps && readiness.nextSteps.length > 0 && (
+              <div>
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Top Issues</p>
+                <ul className="space-y-1">
+                  {readiness.nextSteps.slice(0, 5).map((step, idx) => (
+                    <li key={idx} className="flex gap-2 text-xs">
+                      <span className={`shrink-0 font-bold ${step.level === 'critical' ? 'text-red-500' : 'text-amber-500'}`}>[{step.level}]</span>
+                      <span className="text-slate-600 dark:text-slate-400">{step.name} &mdash; {step.recommendation}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {readiness.nextSteps && readiness.nextSteps.length === 0 && (
+              <p className="text-sm text-emerald-600 dark:text-emerald-400">All checks passed. Ready for production posting.</p>
+            )}
+          </>
+        )}
+
+        <p className="mt-3 text-xs text-slate-400">CLI: <code className="bg-slate-100 dark:bg-slate-800 px-1 rounded">npm run social:check</code> &middot; <code className="bg-slate-100 dark:bg-slate-800 px-1 rounded">npm run social:smoke</code></p>
+      </Panel>
+
+      <div className="mt-4 grid gap-4 xl:grid-cols-3">
         {Object.entries(platformMeta).map(([key, meta]) => {
           const row = (status.platforms || []).find((item) => item.platform === key) || {};
           const configured = Boolean(row.configured);
