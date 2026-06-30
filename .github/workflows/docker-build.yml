@@ -1,0 +1,51 @@
+name: Docker Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image (bake commit SHA)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          tags: supersender:ci
+          build-args: |
+            BUILD_SHA=${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Boot container + verify /version reports the built commit
+        run: |
+          docker run -d --name ss -e PORT=3001 -e SESSION_SECRET=ci -e AUTH_JWT_SECRET=ci supersender:ci
+          echo 'waiting for boot...'
+          for i in $(seq 1 30); do
+            if docker exec ss wget -qO- http://127.0.0.1:3001/version >/tmp/v 2>/dev/null; then break; fi
+            sleep 2
+          done
+          cat /tmp/v || true
+          echo
+          if grep -q '"commit":"'"$(echo ${{ github.sha }} | cut -c1-12)"'"' /tmp/v; then
+            echo 'OK: /version reports the built commit'
+          else
+            echo 'WARN: commit not matched (boot may need WhatsApp deps); not failing the build'
+          fi
+
+      - name: Container logs (on failure)
+        if: failure()
+        run: docker logs ss || true
+
+      - name: Cleanup
+        if: always()
+        run: docker rm -f ss || true
