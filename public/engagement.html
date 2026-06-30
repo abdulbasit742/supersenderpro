@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Messaging Engagement — SuperSender Pro</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#0b141a;color:#e9edef;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:24px;max-width:1000px;margin:0 auto}
+  a.back{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.05);border:1px solid #2a3942;color:#8696a0;padding:7px 12px;border-radius:7px;text-decoration:none;font-size:12px;margin-bottom:16px}
+  a.back:hover{border-color:#00a884;color:#00a884}
+  h1{font-size:22px;font-weight:800;margin-bottom:2px}
+  .sub{color:#8696a0;font-size:13px;margin-bottom:18px}
+  .banner{font-size:12px;padding:9px 12px;border-radius:9px;margin-bottom:14px;display:none}
+  .banner.show{display:block;background:rgba(83,189,235,.08);border:1px solid rgba(83,189,235,.25);color:#9fd7f2}
+  .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+  .kpi{background:#1f2c34;border:1px solid #2a3942;border-radius:12px;padding:14px}
+  .kv{font-size:21px;font-weight:800;color:#00a884;line-height:1.1}
+  .kl{font-size:10px;color:#8696a0;text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-top:4px}
+  .card{background:#1f2c34;border:1px solid #2a3942;border-radius:12px;padding:16px;margin-bottom:14px}
+  .ct{font-size:10px;color:#8696a0;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px}
+  .hist .row{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:12px}
+  .hist .lab{width:64px;color:#8696a0;text-align:right}
+  .hist .bar{flex:1;height:20px;background:rgba(255,255,255,.05);border-radius:5px;overflow:hidden}
+  .hist .bar>span{display:block;height:100%;background:linear-gradient(90deg,#00a884,#53bdeb)}
+  .hist .c{width:40px;font-weight:600}
+  .empty{color:#8696a0;text-align:center;padding:18px;font-size:13px}
+</style>
+</head>
+<body>
+  <a class="back" href="/founder-analytics.html">&larr; Analytics</a>
+  <h1>Messaging Engagement</h1>
+  <div class="sub">Are your messages working? Reply rate, how fast people respond, and how often a message leads to an order.</div>
+  <div class="banner" id="banner"></div>
+
+  <div class="kpi-row">
+    <div class="kpi"><div class="kv" id="kRate">&mdash;</div><div class="kl">Reply rate</div></div>
+    <div class="kpi"><div class="kv" id="kMed">&mdash;</div><div class="kl">Median reply time</div></div>
+    <div class="kpi"><div class="kv" id="kOrd">&mdash;</div><div class="kl">Message &rarr; order</div></div>
+    <div class="kpi"><div class="kv" id="kOut">&mdash;</div><div class="kl">Outbound messages</div></div>
+  </div>
+
+  <div class="card">
+    <div class="ct">How fast customers reply</div>
+    <div class="hist" id="hist"></div>
+  </div>
+
+<script>
+(function(){
+  var el=function(id){return document.getElementById(id);};
+  var snap=null;
+
+  async function loadData(){
+    var tries=[{u:'/engagement/snapshot.json',pick:function(j){return j.primary||j;}},{u:'/api/engagement/all',pick:function(j){return j.snapshot.primary||j.snapshot;},live:true}];
+    for(var i=0;i<tries.length;i++){
+      try{ var r=await fetch(tries[i].u,{cache:'no-store'}); if(!r.ok) continue; var j=await r.json(); var s=tries[i].pick(j); if(s&&s.summary){ return {snap:s,live:tries[i].live}; } }catch(e){}
+    }
+    return null;
+  }
+
+  function render(){
+    var s=snap.summary;
+    el('kRate').textContent=s.replyRatePct+'%';
+    el('kMed').textContent=s.medianReplyLatencyHours==null?'\u2014':s.medianReplyLatencyHours+'h';
+    el('kOrd').textContent=s.messageToOrderPct+'%';
+    el('kOut').textContent=s.outboundMessages;
+
+    var hist=snap.latencyHistogram||[];
+    var max=Math.max.apply(null,hist.map(function(b){return b.count;}).concat([1]));
+    el('hist').innerHTML=hist.length&&s.replies?hist.map(function(b){
+      return '<div class="row"><div class="lab">'+b.label+'</div><div class="bar"><span style="width:'+(b.count/max*100).toFixed(1)+'%"></span></div><div class="c">'+b.count+'</div></div>';
+    }).join(''):'<div class="empty">No replies tracked yet. Run the batch on PC #2 (needs outbound + inbound history).</div>';
+  }
+
+  loadData().then(function(res){
+    if(!res){ el('banner').className='banner show'; el('banner').textContent='No engagement data found. Run: node scripts/engagement-batch.js on PC #2.'; return; }
+    snap=res.snap;
+    if(res.live){ el('banner').className='banner show'; el('banner').textContent='Live data (computed on request).'; }
+    render();
+  });
+})();
+</script>
+</body>
+</html>
