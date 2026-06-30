@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SuperSender · AI Suite Control Panel</title>
+<style>
+  :root { --bg:#0b1020; --card:#141b30; --line:#243047; --txt:#e6ecf6; --mut:#8a97b1; --ok:#3ad29f; --bad:#ff6b6b; --warn:#ffd166; --accent:#6c8cff; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--txt); font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif; }
+  header { padding:22px 26px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+  h1 { font-size:18px; margin:0; font-weight:650; }
+  .sub { color:var(--mut); font-size:13px; }
+  .summary { display:flex; gap:10px; flex-wrap:wrap; }
+  .pill { background:var(--card); border:1px solid var(--line); border-radius:999px; padding:6px 13px; font-size:13px; }
+  .pill b { color:var(--accent); }
+  main { padding:22px 26px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px 16px; }
+  .card .top { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .name { font-weight:600; }
+  .dot { width:10px; height:10px; border-radius:50%; display:inline-block; flex:none; }
+  .dot.ok { background:var(--ok); box-shadow:0 0 0 4px rgba(58,210,159,.15); }
+  .dot.bad { background:var(--bad); box-shadow:0 0 0 4px rgba(255,107,107,.15); }
+  .dot.off { background:#4b5675; }
+  .path { color:var(--mut); font-size:12px; font-family:ui-monospace,Menlo,monospace; margin-top:4px; }
+  details { margin-top:10px; }
+  summary { cursor:pointer; color:var(--accent); font-size:13px; }
+  pre { background:#0c1striking; background:#0c1426; border:1px solid var(--line); border-radius:8px; padding:10px; overflow:auto; font-size:12px; color:#bcd; max-height:220px; }
+  .muted { color:var(--mut); }
+  button { background:var(--accent); color:#08122e; border:0; border-radius:9px; padding:8px 14px; font-weight:650; cursor:pointer; }
+  footer { padding:16px 26px; color:var(--mut); font-size:12px; border-top:1px solid var(--line); }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>\ud83e\udde0 AI Suite · Control Panel</h1>
+    <div class="sub">Self-hosted AI features running on your own GPUs. Live status below.</div>
+  </div>
+  <div class="summary" id="summary"></div>
+</header>
+<main>
+  <div style="margin-bottom:14px; display:flex; gap:10px; align-items:center;">
+    <button onclick="load()">Refresh</button>
+    <span class="muted" id="updated"></span>
+  </div>
+  <div class="grid" id="grid"></div>
+</main>
+<footer>SuperSender Pro — AI Suite. Each feature is self-hosted (Ollama). Green = installed & healthy, red = installed but unreachable, grey = not installed.</footer>
+<script>
+async function load() {
+  const grid = document.getElementById('grid');
+  const sum = document.getElementById('summary');
+  grid.innerHTML = '<div class="muted">Loading\u2026</div>';
+  try {
+    const r = await fetch('../ai-suite/health').then(x => x.json()).catch(() => null)
+            || await fetch('/api/ai-suite/health').then(x => x.json());
+    const f = r.features || [];
+    sum.innerHTML =
+      '<span class="pill">Features <b>' + r.total + '</b></span>' +
+      '<span class="pill">Installed <b>' + r.installed + '</b></span>' +
+      '<span class="pill">Healthy <b>' + r.up + '</b></span>';
+    document.getElementById('updated').textContent = 'Updated ' + new Date(r.generatedAt).toLocaleTimeString();
+    grid.innerHTML = '';
+    for (const x of f) {
+      const state = !x.installed ? 'off' : (x.ok ? 'ok' : 'bad');
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML =
+        '<div class="top"><span class="name">' + x.label + '</span><span class="dot ' + state + '"></span></div>' +
+        '<div class="path">' + x.path + '</div>' +
+        '<details><summary>details</summary><pre>' + escapeHtml(JSON.stringify(x.detail, null, 2)) + '</pre></details>';
+      grid.appendChild(card);
+    }
+  } catch (e) {
+    grid.innerHTML = '<div class="muted">Could not load health: ' + escapeHtml(e.message) + '</div>';
+  }
+}
+function escapeHtml(s) { return String(s == null ? '' : s).replace(/[&<>]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[c])); }
+load();
+setInterval(load, 30000);
+</script>
+</body>
+</html>
