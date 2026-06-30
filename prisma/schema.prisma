@@ -26,6 +26,11 @@ model Tenant {
   txns      Txn[]
   webhooks  WebhookEndpoint[]
   followUps FollowUp[]
+  users     User[]
+  subscriptions Subscription[]
+  usage     UsageRecord[]
+  deals     Deal[]
+  carts     Cart[]
 
   @@map("tenants")
 }
@@ -160,4 +165,111 @@ model FollowUp {
   @@index([tenantId])
   @@index([tenantId, status, scheduledAt])
   @@map("follow_ups")
+}
+
+// ---- Added: auth users (matches lib/auth 'users' collection) ----
+model User {
+  id              String   @id @default(cuid())
+  tenantId        String
+  email           String
+  name            String?
+  role            String   @default("agent") // owner | admin | agent | viewer
+  passwordHash    String
+  status          String   @default("active")
+  resetTokenHash  String?
+  resetExpiresAt  DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, email])
+  @@index([tenantId])
+  @@map("users")
+}
+
+// ---- Added: billing subscriptions (matches lib/billing 'subscriptions') ----
+model Subscription {
+  id                   String   @id @default(cuid())
+  tenantId             String
+  planId               String   @default("free")
+  status               String   @default("active") // active | past_due | canceled | grace
+  provider             String?
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  currentPeriodEnd     DateTime?
+  graceUntil           DateTime?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@map("subscriptions")
+}
+
+// ---- Added: usage metering (matches lib/billing 'usage') ----
+model UsageRecord {
+  id        String   @id @default(cuid())
+  tenantId  String
+  period    String   // YYYY-MM
+  metric    String
+  value     Float    @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, period, metric])
+  @@index([tenantId, period])
+  @@map("usage_records")
+}
+
+// ---- Added: sales pipeline deals (matches lib/salesPipeline 'deals') ----
+model Deal {
+  id             String   @id @default(cuid())
+  tenantId       String
+  title          String?
+  phone          String?
+  contactName    String?
+  stage          String   @default("NEW_LEAD")
+  value          Float    @default(0)
+  currency       String   @default("PKR")
+  source         String   @default("whatsapp")
+  ownerId        String?
+  outcome        String?
+  lostReason     String?
+  items          Json     @default("[]")
+  tags           String[] @default([])
+  stageEnteredAt DateTime @default(now())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([tenantId, stage])
+  @@map("deals")
+}
+
+// ---- Added: abandoned carts (matches lib/salesPipeline 'carts') ----
+model Cart {
+  id           String   @id @default(cuid())
+  tenantId     String
+  cartId       String
+  phone        String?
+  contactName  String?
+  items        Json     @default("[]")
+  value        Float    @default(0)
+  status       String   @default("active") // active | recovered | purchased | abandoned
+  recoveryStep Int      @default(0)
+  idleSince    DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, cartId])
+  @@index([tenantId, status])
+  @@map("carts")
 }
