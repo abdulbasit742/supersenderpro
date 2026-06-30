@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Win-Back — SuperSender Pro</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#0b141a;color:#e9edef;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:24px;max-width:1080px;margin:0 auto}
+  a.back{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.05);border:1px solid #2a3942;color:#8696a0;padding:7px 12px;border-radius:7px;text-decoration:none;font-size:12px;margin-bottom:16px}
+  a.back:hover{border-color:#00a884;color:#00a884}
+  h1{font-size:22px;font-weight:800;margin-bottom:2px}
+  .sub{color:#8696a0;font-size:13px;margin-bottom:18px}
+  .bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
+  button{background:#00a884;color:#04231b;border:0;font-weight:700;padding:9px 16px;border-radius:8px;cursor:pointer;font-size:13px}
+  button:hover{filter:brightness(1.08)}
+  button.ghost{background:rgba(255,255,255,.05);color:#e9edef;border:1px solid #2a3942}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  .pill{font-size:11px;padding:3px 9px;border-radius:11px;font-weight:700}
+  .pill.dry{background:rgba(83,189,235,.15);color:#53bdeb}
+  .pill.live{background:rgba(239,68,68,.15);color:#ef4444}
+  .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+  .kpi{background:#1f2c34;border:1px solid #2a3942;border-radius:12px;padding:14px}
+  .kv{font-size:22px;font-weight:800;color:#00a884;line-height:1.1}
+  .kl{font-size:10px;color:#8696a0;text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-top:4px}
+  .card{background:#1f2c34;border:1px solid #2a3942;border-radius:12px;padding:16px;margin-bottom:14px}
+  .ct{font-size:10px;color:#8696a0;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th{text-align:left;padding:7px 8px;border-bottom:1px solid #2a3942;font-size:10px;font-weight:700;color:#8696a0;text-transform:uppercase}
+  td{padding:9px 8px;border-bottom:1px solid rgba(255,255,255,.03);vertical-align:top}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .tg{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
+  .tg-r{background:rgba(239,68,68,.14);color:#ef4444}.tg-y{background:rgba(245,158,11,.14);color:#f59e0b}
+  .msg{color:#cfe9e0;background:rgba(0,168,132,.06);border:1px solid rgba(0,168,132,.15);border-radius:8px;padding:8px 10px;font-size:12px;line-height:1.45;max-width:420px}
+  .why{color:#8696a0;font-size:11px}
+  .empty{color:#8696a0;text-align:center;padding:18px;font-size:13px}
+  .banner{font-size:12px;padding:9px 12px;border-radius:9px;margin-bottom:14px}
+  .banner.dry{background:rgba(83,189,235,.08);border:1px solid rgba(83,189,235,.25);color:#9fd7f2}
+  .banner.live{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);color:#f3b0b0}
+  @media(max-width:760px){.kpi-row{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+  <a class="back" href="/founder-analytics.html">&larr; Analytics</a>
+  <h1>Win-Back Campaigns</h1>
+  <div class="sub">Acts on the churn brain: re-engages high-value customers slipping away.</div>
+
+  <div class="banner" id="banner"></div>
+
+  <div class="kpi-row">
+    <div class="kpi"><div class="kv" id="kTarget">&mdash;</div><div class="kl">Targeted today</div></div>
+    <div class="kpi"><div class="kv" id="kRisk">&mdash;</div><div class="kl">Revenue at risk</div></div>
+    <div class="kpi"><div class="kv" id="kSkip">&mdash;</div><div class="kl">Skipped (safety)</div></div>
+    <div class="kpi"><div class="kv" id="kCap">&mdash;</div><div class="kl">Daily cap left</div></div>
+  </div>
+
+  <div class="bar">
+    <button id="btnPlan" class="ghost">Refresh plan</button>
+    <button id="btnExec" disabled>Execute</button>
+    <span class="pill dry" id="modePill">dry-run</span>
+    <span id="status" style="color:#8696a0;font-size:12px"></span>
+  </div>
+
+  <div class="card">
+    <div class="ct">Who we'd reach out to &mdash; highest revenue-at-risk first</div>
+    <table><thead><tr><th>Customer</th><th class="num">Risk</th><th class="num">At risk</th><th>Message</th><th>Why</th></tr></thead><tbody id="rows"></tbody></table>
+  </div>
+
+<script>
+(function(){
+  var PKR=function(n){return 'PKR '+Number(n||0).toLocaleString();};
+  var el=function(id){return document.getElementById(id);};
+  var current=null;
+
+  function mask(p){var s=String(p||'');return s.length>5?s.slice(0,4)+'****'+s.slice(-2):'****';}
+  function riskTag(b){return '<span class="tg '+(b==='high'?'tg-r':'tg-y')+'">'+b+'</span>';}
+
+  function renderBanner(mode){
+    var b=el('banner');
+    if(mode==='live'){ b.className='banner live'; b.innerHTML='<b>LIVE mode.</b> Executing will queue real WhatsApp follow-ups.'; el('modePill').className='pill live'; el('modePill').textContent='live'; }
+    else { b.className='banner dry'; b.innerHTML='<b>Dry-run.</b> Executing previews only &mdash; nothing is sent. Set <code>REENGAGE_LIVE=true</code> on PC #2 to go live.'; el('modePill').className='pill dry'; el('modePill').textContent='dry-run'; }
+  }
+
+  function render(c){
+    current=c;
+    renderBanner(c.mode);
+    el('kTarget').textContent=c.summary.targeted;
+    el('kRisk').textContent=PKR(c.summary.revenueAtRiskTargeted);
+    el('kSkip').textContent=c.summary.skipped;
+    el('kCap').textContent=Math.max(0,(c.summary.dailyCap||0)-(c.summary.sentToday||0));
+    el('btnExec').disabled=c.summary.targeted===0;
+    el('btnExec').textContent=c.mode==='live'?('Queue '+c.summary.targeted+' follow-ups'):('Preview '+c.summary.targeted+' (dry-run)');
+    var rows=(c.targets||[]).map(function(t){
+      return '<tr><td><b>'+(t.name||mask(t.phone))+'</b><br><span class="why">'+mask(t.phone)+' &middot; '+t.recencyDays+'d quiet</span></td>'
+        +'<td class="num">'+riskTag(t.band)+' '+t.churnRisk+'</td>'
+        +'<td class="num">'+PKR(t.revenueAtRisk)+'</td>'
+        +'<td><div class="msg">'+t.message.replace(/</g,'&lt;')+'</div></td>'
+        +'<td class="why">'+((t.reasons||[]).join(', '))+'</td></tr>';
+    }).join('');
+    el('rows').innerHTML=rows||'<tr><td colspan="5" class="empty">Nobody to win back right now \uD83C\uDF89</td></tr>';
+  }
+
+  async function plan(){
+    el('status').textContent='Planning\u2026';
+    try{
+      var r=await fetch('/api/reengage/plan',{cache:'no-store'});
+      var j=await r.json();
+      if(!j.success) throw new Error(j.error||'failed');
+      render(j.campaign); el('status').textContent='Plan ready '+new Date().toLocaleTimeString();
+    }catch(e){ el('status').textContent='Could not plan: '+e.message+' (is the API mounted?)'; }
+  }
+
+  async function exec(){
+    if(!current) return;
+    el('btnExec').disabled=true; el('status').textContent='Executing\u2026';
+    try{
+      var r=await fetch('/api/reengage/campaigns/'+current.id+'/execute',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
+      var j=await r.json();
+      if(!j.success) throw new Error(j.error||'failed');
+      var c=j.campaign;
+      el('status').textContent = c.status==='queued' ? ('Queued '+c.queuedCount+' follow-ups \u2705') : 'Previewed (dry-run, nothing sent)';
+    }catch(e){ el('status').textContent='Execute failed: '+e.message; el('btnExec').disabled=false; }
+  }
+
+  el('btnPlan').onclick=plan;
+  el('btnExec').onclick=exec;
+  plan();
+})();
+</script>
+</body>
+</html>

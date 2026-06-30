@@ -1,0 +1,60 @@
+{
+  "generatedAt": "2026-06-30T03:00:00.000Z",
+  "scope": "all_stores",
+  "stores": ["default_store"],
+  "headline": { "revenue": 487500, "mrr": 42000, "customers": 318, "orders": 214, "revenueAtRisk": 96400 },
+  "primary": {
+    "storeId": "default_store",
+    "generatedAt": "2026-06-30T03:00:00.000Z",
+    "headline": { "revenue": 487500, "mrr": 42000, "customers": 318, "orders": 214, "leadToCustomerPct": 67.3, "predictedChurnRatePct": 18.2, "revenueAtRisk": 96400 },
+    "revenue": {
+      "totalRevenue": 487500, "revenueLast7Days": 61200, "revenueLast30Days": 238900, "wowGrowthPct": 12.4,
+      "mrr": 42000, "arr": 504000, "totalOrders": 214, "avgOrderValue": 2278, "arpu": 2107,
+      "dailySeries": [
+        {"date":"2026-06-01","revenue":5200},{"date":"2026-06-02","revenue":6100},{"date":"2026-06-03","revenue":4800},
+        {"date":"2026-06-04","revenue":7300},{"date":"2026-06-05","revenue":6900},{"date":"2026-06-06","revenue":8200},
+        {"date":"2026-06-07","revenue":5600},{"date":"2026-06-08","revenue":7100},{"date":"2026-06-09","revenue":9400},
+        {"date":"2026-06-10","revenue":8800},{"date":"2026-06-11","revenue":6700},{"date":"2026-06-12","revenue":10200},
+        {"date":"2026-06-13","revenue":9100},{"date":"2026-06-14","revenue":7800},{"date":"2026-06-15","revenue":11300},
+        {"date":"2026-06-16","revenue":8900},{"date":"2026-06-17","revenue":7400},{"date":"2026-06-18","revenue":9800},
+        {"date":"2026-06-19","revenue":12100},{"date":"2026-06-20","revenue":10600},{"date":"2026-06-21","revenue":8300},
+        {"date":"2026-06-22","revenue":9200},{"date":"2026-06-23","revenue":11800},{"date":"2026-06-24","revenue":13400},
+        {"date":"2026-06-25","revenue":10900},{"date":"2026-06-26","revenue":9600},{"date":"2026-06-27","revenue":12700},
+        {"date":"2026-06-28","revenue":11200},{"date":"2026-06-29","revenue":8700},{"date":"2026-06-30","revenue":9100}
+      ]
+    },
+    "conversion": {
+      "funnel": [
+        {"stage":"Contacts","count":318,"pctOfTop":100},
+        {"stage":"Engaged","count":271,"pctOfTop":85.2},
+        {"stage":"Ordered","count":214,"pctOfTop":67.3},
+        {"stage":"Repeat buyers","count":118,"pctOfTop":37.1}
+      ],
+      "leadToCustomerPct": 67.3, "repeatPurchasePct": 55.1, "engagementPct": 85.2,
+      "subscription": { "totalUsers": 96, "paidUsers": 31, "freeToPaidPct": 32.3 }
+    },
+    "channels": [
+      {"channel":"whatsapp","customers":201,"revenue":312400,"orders":148,"conversionPct":71.6,"avgOrderValue":2111,"revenueSharePct":64.1},
+      {"channel":"instagram","customers":63,"revenue":98600,"orders":41,"conversionPct":58.7,"avgOrderValue":2405,"revenueSharePct":20.2},
+      {"channel":"facebook","customers":34,"revenue":52300,"orders":18,"conversionPct":47.1,"avgOrderValue":2906,"revenueSharePct":10.7},
+      {"channel":"referral","customers":20,"revenue":24200,"orders":7,"conversionPct":40.0,"avgOrderValue":3457,"revenueSharePct":5.0}
+    ],
+    "churn": {
+      "customersScored": 318,
+      "predictedChurnRatePct": 18.2,
+      "revenueAtRisk": 96400,
+      "bands": { "high": 58, "medium": 74, "low": 186 },
+      "saveList": [
+        {"phone":"92300****101","name":"Ayesha K.","channel":"whatsapp","tier":"Gold","recencyDays":71,"frequency":6,"monetary":28400,"churnRisk":82,"band":"high","revenueAtRisk":28400,"reasons":["No contact in 71d","Was a repeat buyer"]},
+        {"phone":"92301****447","name":"Bilal R.","channel":"instagram","tier":"Silver","recencyDays":64,"frequency":4,"monetary":19200,"churnRisk":76,"band":"high","revenueAtRisk":19200,"reasons":["No contact in 64d","Was a repeat buyer"]},
+        {"phone":"92302****889","name":"Hina S.","channel":"whatsapp","tier":"Silver","recencyDays":48,"frequency":3,"monetary":14100,"churnRisk":63,"band":"medium","revenueAtRisk":14100,"reasons":["Quiet for 48d","Was a repeat buyer"]},
+        {"phone":"92303****210","name":"Usman T.","channel":"facebook","tier":"Bronze","recencyDays":52,"frequency":2,"monetary":9800,"churnRisk":58,"band":"medium","revenueAtRisk":9800,"reasons":["Quiet for 52d"]},
+        {"phone":"92304****675","name":"Sana M.","channel":"whatsapp","tier":"Bronze","recencyDays":44,"frequency":1,"monetary":6400,"churnRisk":51,"band":"medium","revenueAtRisk":6400,"reasons":["Quiet for 44d"]}
+      ],
+      "topRisk": [],
+      "subscription": { "active": 31, "churned": 9, "churnRatePct": 22.5 }
+    }
+  },
+  "perStore": [],
+  "meta": { "generatedBy": "sample", "note": "Demo data — replace by running scripts/analytics-batch.js" }
+}
