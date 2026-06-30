@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Alerts — SuperSender Pro</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#0b141a;color:#e9edef;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:24px;max-width:880px;margin:0 auto}
+  a.back{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.05);border:1px solid #2a3942;color:#8696a0;padding:7px 12px;border-radius:7px;text-decoration:none;font-size:12px;margin-bottom:16px}
+  a.back:hover{border-color:#00a884;color:#00a884}
+  h1{font-size:22px;font-weight:800;margin-bottom:2px}
+  .sub{color:#8696a0;font-size:13px;margin-bottom:18px}
+  .bar{display:flex;gap:10px;align-items:center;margin-bottom:16px}
+  button{background:#00a884;color:#04231b;border:0;font-weight:700;padding:8px 14px;border-radius:8px;cursor:pointer;font-size:12px}
+  button.ghost{background:rgba(255,255,255,.05);color:#e9edef;border:1px solid #2a3942}
+  .status{color:#8696a0;font-size:12px}
+  .alert{display:flex;gap:12px;align-items:flex-start;background:#1f2c34;border:1px solid #2a3942;border-left-width:4px;border-radius:10px;padding:14px;margin-bottom:10px}
+  .alert.critical{border-left-color:#ef4444}
+  .alert.warning{border-left-color:#f59e0b}
+  .alert.notice{border-left-color:#53bdeb}
+  .alert.positive{border-left-color:#00a884}
+  .alert.ack{opacity:.5}
+  .ico{font-size:20px;line-height:1}
+  .body{flex:1}
+  .hl{font-size:13px;font-weight:600;color:#e9edef;margin-bottom:3px}
+  .meta{font-size:11px;color:#8696a0}
+  .sev{display:inline-block;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;padding:2px 7px;border-radius:9px;margin-right:6px}
+  .sev.critical{background:rgba(239,68,68,.16);color:#ef4444}
+  .sev.warning{background:rgba(245,158,11,.16);color:#f59e0b}
+  .sev.notice{background:rgba(83,189,235,.16);color:#53bdeb}
+  .sev.positive{background:rgba(0,168,132,.16);color:#00a884}
+  .ack-btn{background:rgba(255,255,255,.05);border:1px solid #2a3942;color:#8696a0;padding:5px 10px;font-size:11px;border-radius:6px;cursor:pointer}
+  .ack-btn:hover{border-color:#00a884;color:#00a884}
+  .empty{color:#8696a0;text-align:center;padding:30px;font-size:14px}
+</style>
+</head>
+<body>
+  <a class="back" href="/founder-analytics.html">&larr; Analytics</a>
+  <h1>Alerts</h1>
+  <div class="sub">The watchdog. Flags when revenue, orders, conversion or churn move in ways that aren't normal.</div>
+  <div class="bar">
+    <button id="scan">Scan now</button>
+    <button class="ghost" id="toggle">Show all</button>
+    <span class="status" id="status"></span>
+  </div>
+  <div id="feed"><div class="empty">Loading\u2026</div></div>
+
+<script>
+(function(){
+  var el=function(id){return document.getElementById(id);};
+  var showAck=true;
+  var ICONS={critical:'\uD83D\uDD34',warning:'\uD83D\uDFE0',notice:'\uD83D\uDD35',positive:'\uD83D\uDFE2'};
+
+  async function loadFeed(){
+    // Static batch feed first, then live API.
+    var tries=[{u:'/alerts/feed.json',pick:function(j){return j.alerts||[];}},{u:'/api/alerts',pick:function(j){return j.alerts||[];},live:true}];
+    for(var i=0;i<tries.length;i++){
+      try{ var r=await fetch(tries[i].u,{cache:'no-store'}); if(!r.ok) continue; var j=await r.json(); return {alerts:tries[i].pick(j),live:tries[i].live}; }catch(e){}
+    }
+    return null;
+  }
+
+  function render(alerts){
+    if(!showAck) alerts=alerts.filter(function(a){return !a.acknowledged;});
+    if(!alerts.length){ el('feed').innerHTML='<div class="empty">All clear \uD83C\uDF89 nothing unusual right now.</div>'; return; }
+    el('feed').innerHTML=alerts.map(function(a){
+      var canAck=a.key&&!a.acknowledged;
+      return '<div class="alert '+a.severity+(a.acknowledged?' ack':'')+'">'
+        +'<div class="ico">'+(ICONS[a.severity]||'\u2022')+'</div>'
+        +'<div class="body"><div class="hl">'+a.headline+'</div>'
+        +'<div class="meta"><span class="sev '+a.severity+'">'+a.severity+'</span>'
+        +(a.label||a.metric)+' \u00b7 '+(a.date||'')+(a.z!=null?' \u00b7 z='+a.z:'')+'</div></div>'
+        +(canAck?'<button class="ack-btn" data-k="'+a.key+'">Dismiss</button>':'')
+        +'</div>';
+    }).join('');
+    Array.prototype.forEach.call(document.querySelectorAll('.ack-btn'),function(b){
+      b.onclick=async function(){
+        b.disabled=true; b.textContent='\u2026';
+        try{ await fetch('/api/alerts/'+b.getAttribute('data-k')+'/ack',{method:'POST'}); refresh(); }catch(e){ b.textContent='Dismiss'; b.disabled=false; }
+      };
+    });
+  }
+
+  async function refresh(){
+    var res=await loadFeed();
+    if(!res){ el('feed').innerHTML='<div class="empty">No alert feed yet. Run: node scripts/alerts-batch.js on PC #2.</div>'; return; }
+    if(res.live) el('status').textContent='Live'; 
+    render(res.alerts);
+  }
+
+  el('scan').onclick=async function(){
+    el('scan').disabled=true; el('status').textContent='Scanning\u2026';
+    try{ var r=await fetch('/api/alerts/scan',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}); var j=await r.json(); el('status').textContent=j.success?('Scan done \u2014 '+j.scanned+' active, '+(j.fresh?j.fresh.length:0)+' new'):'Scan failed'; refresh(); }
+    catch(e){ el('status').textContent='Scan needs the API mounted'; }
+    el('scan').disabled=false;
+  };
+  el('toggle').onclick=function(){ showAck=!showAck; el('toggle').textContent=showAck?'Show all':'Hide dismissed'; refresh(); };
+
+  refresh();
+})();
+</script>
+</body>
+</html>
