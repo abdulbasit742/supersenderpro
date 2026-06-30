@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Product Affinity — SuperSender Pro</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#0b141a;color:#e9edef;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:24px;max-width:1000px;margin:0 auto}
+  a.back{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.05);border:1px solid #2a3942;color:#8696a0;padding:7px 12px;border-radius:7px;text-decoration:none;font-size:12px;margin-bottom:16px}
+  a.back:hover{border-color:#00a884;color:#00a884}
+  h1{font-size:22px;font-weight:800;margin-bottom:2px}
+  .sub{color:#8696a0;font-size:13px;margin-bottom:18px}
+  .banner{font-size:12px;padding:9px 12px;border-radius:9px;margin-bottom:14px;display:none}
+  .banner.show{display:block;background:rgba(83,189,235,.08);border:1px solid rgba(83,189,235,.25);color:#9fd7f2}
+  .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+  .kpi{background:#1f2c34;border:1px solid #2a3942;border-radius:12px;padding:14px}
+  .kv{font-size:21px;font-weight:800;color:#00a884;line-height:1.1}
+  .kl{font-size:10px;color:#8696a0;text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-top:4px}
+  .card{background:#1f2c34;border:1px solid #2a3942;border-radius:12px;padding:16px;margin-bottom:14px}
+  .ct{font-size:10px;color:#8696a0;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th{text-align:left;padding:7px 8px;border-bottom:1px solid #2a3942;font-size:10px;font-weight:700;color:#8696a0;text-transform:uppercase}
+  td{padding:9px 8px;border-bottom:1px solid rgba(255,255,255,.03)}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .pair{font-weight:600}
+  .lift{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;background:rgba(0,168,132,.15);color:#00a884}
+  .lift.mid{background:rgba(83,189,235,.14);color:#53bdeb}
+  .dir{color:#8696a0;font-size:11px}
+  .empty{color:#8696a0;text-align:center;padding:18px;font-size:13px}
+  .hint{color:#8696a0;font-size:11px;margin-top:10px;line-height:1.5}
+</style>
+</head>
+<body>
+  <a class="back" href="/founder-analytics.html">&larr; Analytics</a>
+  <h1>Product Affinity &amp; Bundles</h1>
+  <div class="sub">Which products sell together. Turn these into bundles and cross-sell prompts.</div>
+  <div class="banner" id="banner"></div>
+
+  <div class="kpi-row">
+    <div class="kpi"><div class="kv" id="kBask">&mdash;</div><div class="kl">Baskets</div></div>
+    <div class="kpi"><div class="kv" id="kProd">&mdash;</div><div class="kl">Products</div></div>
+    <div class="kpi"><div class="kv" id="kPairs">&mdash;</div><div class="kl">Pairs found</div></div>
+    <div class="kpi"><div class="kv" id="kStrong">&mdash;</div><div class="kl">Strong affinities</div></div>
+  </div>
+
+  <div class="card">
+    <div class="ct">Top product pairs &mdash; ranked by lift (how much more they sell together than by chance)</div>
+    <table><thead><tr><th>Pair</th><th class="num">Together</th><th class="num">Confidence</th><th class="num">Lift</th><th>Pitch as</th></tr></thead><tbody id="rows"></tbody></table>
+    <div class="hint"><b>Lift &gt; 1</b> = real affinity (sell together more than their popularity predicts). <b>Confidence</b> = if they buy the first, how often they also buy the second. Use the highest-lift pairs as bundles; use "pitch as" for cross-sell prompts.</div>
+  </div>
+
+<script>
+(function(){
+  var el=function(id){return document.getElementById(id);};
+  var snap=null;
+
+  async function loadData(){
+    var tries=[{u:'/basket/snapshot.json',pick:function(j){return j.primary||j;}},{u:'/api/basket/all',pick:function(j){return j.snapshot.primary||j.snapshot;},live:true}];
+    for(var i=0;i<tries.length;i++){
+      try{ var r=await fetch(tries[i].u,{cache:'no-store'}); if(!r.ok) continue; var j=await r.json(); var s=tries[i].pick(j); if(s&&s.topPairs){ return {snap:s,live:tries[i].live}; } }catch(e){}
+    }
+    return null;
+  }
+
+  function render(){
+    var s=snap.summary;
+    el('kBask').textContent=s.baskets;
+    el('kProd').textContent=s.products;
+    el('kPairs').textContent=s.pairs;
+    el('kStrong').textContent=s.strongPairs;
+
+    var pairs=snap.topPairs||[];
+    el('rows').innerHTML=pairs.length?pairs.map(function(p){
+      var liftCls=p.lift>=2?'lift':'lift mid';
+      return '<tr><td class="pair">'+p.a+' + '+p.b+'</td>'
+        +'<td class="num">'+p.bothCount+'\u00d7</td>'
+        +'<td class="num">'+Math.round(p.bestConfidence*100)+'%</td>'
+        +'<td class="num"><span class="'+liftCls+'">'+p.lift+'\u00d7</span></td>'
+        +'<td class="dir">'+p.bestDirection+'</td></tr>';
+    }).join(''):'<tr><td colspan="5" class="empty">No co-purchase pairs yet. Run the batch on PC #2 (needs customers who bought 2+ products).</td></tr>';
+  }
+
+  loadData().then(function(res){
+    if(!res){ el('banner').className='banner show'; el('banner').textContent='No affinity data found. Run: node scripts/basket-batch.js on PC #2.'; return; }
+    snap=res.snap;
+    if(res.live){ el('banner').className='banner show'; el('banner').textContent='Live data (computed on request).'; }
+    render();
+  });
+})();
+</script>
+</body>
+</html>
