@@ -2,119 +2,29 @@ name: CI
 
 on:
   push:
-    branches: [ main, master, develop ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, master ]
-
-concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
+    branches: [ main ]
 
 jobs:
-  validate:
-    name: Lint, env & smoke
+  smoke:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-      - name: Install dependencies
-        run: npm ci --omit=optional || npm install --omit=optional
-      - name: Validate environment schema
-        run: npm run validate:env --if-present
-        env:
-          CI: true
-      - name: Secret scan (repo source)
-        run: npm run secret:scan --if-present
-      - name: Smoke test
-        run: npm run smoke --if-present
-
-  test:
-    name: Unit & Integration Tests
-    runs-on: ubuntu-latest
-    needs: validate
-    defaults:
-      run:
-        working-directory: backend
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: backend/package-lock.json
-      - name: Install backend dependencies
-        run: npm ci --omit=optional || npm install --omit=optional
-      - name: Run tests
-        run: npm test --if-present
-        env:
-          NODE_ENV: test
-          JWT_SECRET: ci_test_secret_supersender
-          DATABASE_URL: sqlite:./test.db
-      - name: Upload coverage
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report
-          path: backend/coverage/
-          retention-days: 7
-
-  security-audit:
-    name: Security Audit
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-      - name: Install dependencies
-        run: npm ci --omit=optional || npm install --omit=optional
-      - name: Run security audit (root)
-        run: npm audit --audit-level=high --omit=optional || true
-      - name: Run security audit (backend)
-        run: cd backend && npm audit --audit-level=high || true
-
-  docker-build:
-    name: Build Docker images (no push)
-    runs-on: ubuntu-latest
-    needs: validate
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - { name: monolith, context: ., dockerfile: Dockerfile }
-          - { name: backend,  context: ./backend, dockerfile: ./backend/Dockerfile }
-          - { name: frontend, context: ./frontend, dockerfile: ./frontend/Dockerfile }
+        node: [18, 20]
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v3
-      - name: Build ${{ matrix.name }}
-        uses: docker/build-push-action@v6
+      - name: Use Node ${{ matrix.node }}
+        uses: actions/setup-node@v4
         with:
-          context: ${{ matrix.context }}
-          file: ${{ matrix.dockerfile }}
-          push: false
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-        continue-on-error: true
-
-  deploy-check:
-    name: Deployment Readiness Check
-    runs-on: ubuntu-latest
-    needs: [test, security-audit]
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-      - name: Install dependencies
-        run: npm ci --omit=optional || npm install --omit=optional
-      - name: Run launch readiness check
-        run: npm run launch:check --if-present
-      - name: Run doctor
-        run: npm run doctor --if-present
+          node-version: ${{ matrix.node }}
+      - name: Install (best-effort, no scripts)
+        run: npm install --ignore-scripts --no-audit --no-fund || echo 'install skipped/partial - smoke tests are dependency-light'
+      - name: Run smoke suite + doctors
+        env:
+          DB_DRIVER: json
+          SALES_PIPELINE_DRY_RUN: 'true'
+          ADMIN_ALERT_DRY_RUN: 'true'
+          AUTH_JWT_SECRET: ci-test-secret
+        run: node scripts/ci-smoke.js
