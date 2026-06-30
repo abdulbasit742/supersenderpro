@@ -1,0 +1,50 @@
+name: Content Autopilot CI
+
+on:
+  push:
+    branches: ['**']
+    paths:
+      - 'lib/contentAutopilot/**'
+      - 'routes/contentAutopilotRoutes.js'
+      - 'scripts/test-content-autopilot.js'
+      - '.github/workflows/content-autopilot-ci.yml'
+  pull_request:
+    paths:
+      - 'lib/contentAutopilot/**'
+      - 'routes/contentAutopilotRoutes.js'
+      - 'scripts/test-content-autopilot.js'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [18, 20]
+    name: smoke (node ${{ matrix.node }})
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node ${{ matrix.node }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Syntax check (node --check)
+        run: |
+          set -e
+          for f in \
+            lib/contentAutopilot/index.js \
+            lib/contentAutopilot/publishers.js \
+            lib/contentAutopilot/scheduler.js \
+            lib/contentAutopilot/videoHook.js \
+            lib/contentAutopilot/analytics.js \
+            lib/contentAutopilot/campaigns.js \
+            routes/contentAutopilotRoutes.js \
+            scripts/test-content-autopilot.js; do
+            echo "checking $f"
+            node --check "$f"
+          done
+
+      - name: Run smoke test
+        run: node scripts/test-content-autopilot.js

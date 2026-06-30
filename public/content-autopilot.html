@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Content Autopilot — SuperSender Pro</title>
+  <style>
+    :root { --bg:#0b0f14; --card:#141b24; --line:#243140; --txt:#e6edf3; --mut:#8aa0b3; --acc:#00a884; --bad:#e5534b; }
+    * { box-sizing:border-box; }
+    body { margin:0; font:15px/1.5 system-ui,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--txt); }
+    header { padding:18px 22px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; }
+    header h1 { font-size:18px; margin:0; }
+    .pill { font-size:12px; color:var(--mut); }
+    main { padding:22px; max-width:1000px; margin:0 auto; display:grid; gap:18px; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px; }
+    .stat { font-size:28px; font-weight:700; }
+    .stat.bad { color:var(--bad); } .stat.good { color:var(--acc); }
+    .lbl { font-size:12px; color:var(--mut); text-transform:uppercase; letter-spacing:.04em; }
+    label { display:block; font-size:13px; color:var(--mut); margin:8px 0 4px; }
+    input, select, textarea, button { font:inherit; }
+    input,select,textarea { width:100%; padding:9px 11px; background:#0d141c; border:1px solid var(--line); border-radius:8px; color:var(--txt); }
+    .row { display:flex; gap:10px; flex-wrap:wrap; }
+    .row > * { flex:1; min-width:140px; }
+    button { background:var(--acc); color:#04150f; border:0; border-radius:8px; padding:10px 16px; font-weight:600; cursor:pointer; }
+    button.ghost { background:transparent; color:var(--txt); border:1px solid var(--line); }
+    table { width:100%; border-collapse:collapse; font-size:14px; }
+    th,td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--line); }
+    th { color:var(--mut); font-weight:600; font-size:12px; text-transform:uppercase; }
+    .tag { font-size:11px; padding:2px 8px; border-radius:999px; border:1px solid var(--line); }
+    .tag.ok { color:var(--acc); border-color:var(--acc); } .tag.no { color:var(--bad); border-color:var(--bad); }
+    .muted { color:var(--mut); font-size:13px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🚀 Content Autopilot</h1>
+    <span class="pill" id="schedPill">scheduler: …</span>
+  </header>
+  <main>
+    <section class="grid" id="stats"></section>
+
+    <section class="card">
+      <div class="lbl">Generate new content</div>
+      <label>Topic</label>
+      <input id="topic" placeholder="e.g. 5 AI tools every student should use" />
+      <div class="row">
+        <div>
+          <label>Platforms (comma-separated)</label>
+          <input id="platforms" value="instagram,facebook,linkedin" />
+        </div>
+        <div>
+          <label>Tone</label>
+          <input id="tone" value="friendly" />
+        </div>
+      </div>
+      <label>Media URL (optional, needed for Instagram/TikTok)</label>
+      <input id="mediaUrl" placeholder="https://…/video.mp4" />
+      <div class="row" style="margin-top:12px">
+        <button onclick="generate()">Generate + Queue</button>
+        <button class="ghost" onclick="publishAll()">Publish due now</button>
+        <button class="ghost" onclick="toggleSched()" id="schedBtn">Start autopilot</button>
+      </div>
+      <p class="muted" id="msg"></p>
+    </section>
+
+    <section class="card">
+      <div class="lbl">Recent activity</div>
+      <table>
+        <thead><tr><th>Platform</th><th>Topic</th><th>Status</th><th>Note</th><th>When</th></tr></thead>
+        <tbody id="recent"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <script>
+    // Zero-dependency dashboard. Talks to /api/content-autopilot/* on same origin.
+    const API = '/api/content-autopilot';
+    const $ = (id) => document.getElementById(id);
+    const msg = (t, bad) => { const m = $('msg'); m.textContent = t; m.style.color = bad ? '#e5534b' : '#8aa0b3'; };
+
+    async function api(path, method, body) {
+      const opt = { method: method || 'GET', headers: { 'Content-Type': 'application/json' } };
+      if (body) opt.body = JSON.stringify(body);
+      const r = await fetch(API + path, opt);
+      return r.json();
+    }
+
+    async function refresh() {
+      try {
+        const s = await api('/status');
+        const a = s.analytics || (await api('/analytics')).analytics || null;
+        renderStats(s, a);
+        renderSched(s.scheduler);
+        const rec = await api('/analytics?recent=20');
+        renderRecent((rec && rec.recent) || []);
+      } catch (e) { msg('Cannot reach API. Is the route mounted + server running?', true); }
+    }
+
+    function renderStats(s, a) {
+      const t = (a && a.totals) || (s.analytics && s.analytics.totals) || { posted:0, failed:0, queued:0, successRate:null };
+      const cards = [
+        ['Queued', t.queued, ''],
+        ['Posted', t.posted, 'good'],
+        ['Failed', t.failed, 'bad'],
+        ['Success rate', t.successRate == null ? '—' : t.successRate + '%', t.successRate >= 50 ? 'good' : 'bad'],
+      ];
+      $('stats').innerHTML = cards.map(([l,v,c]) => `<div class="card"><div class="stat ${c}">${v}</div><div class="lbl">${l}</div></div>`).join('');
+    }
+
+    function renderSched(sc) {
+      const active = sc && sc.active;
+      $('schedPill').textContent = 'scheduler: ' + (active ? ('ON · every ' + sc.intervalMinutes + 'm') : 'OFF');
+      $('schedBtn').textContent = active ? 'Stop autopilot' : 'Start autopilot';
+      $('schedBtn').dataset.active = active ? '1' : '';
+    }
+
+    function renderRecent(rows) {
+      $('recent').innerHTML = rows.length ? rows.map((r) => `
+        <tr>
+          <td>${r.platform || ''}</td>
+          <td>${(r.topic || '').slice(0,40)}</td>
+          <td><span class="tag ${r.ok ? 'ok' : 'no'}">${r.ok ? 'posted' : 'failed'}</span></td>
+          <td class="muted">${(r.note ? String(r.note) : '').slice(0,50)}</td>
+          <td class="muted">${r.updatedAt ? new Date(r.updatedAt).toLocaleString() : ''}</td>
+        </tr>`).join('') : '<tr><td colspan="5" class="muted">No activity yet.</td></tr>';
+    }
+
+    async function generate() {
+      const topic = $('topic').value.trim();
+      if (!topic) return msg('Enter a topic first.', true);
+      const platforms = $('platforms').value.split(',').map((x) => x.trim()).filter(Boolean);
+      const body = { topic, platforms, tone: $('tone').value.trim(), mediaUrl: $('mediaUrl').value.trim() || undefined };
+      msg('Generating…');
+      const r = await api('/generate', 'POST', body);
+      msg(r.ok ? ('Queued ' + r.created + ' job(s).') : ('Error: ' + (r.error || 'unknown')), !r.ok);
+      refresh();
+    }
+
+    async function publishAll() {
+      msg('Publishing due jobs…');
+      const r = await api('/publish', 'POST', {});
+      msg(r.ok ? ('Ran ' + r.ran + ' job(s).') : ('Error: ' + (r.error || 'unknown')), !r.ok);
+      refresh();
+    }
+
+    async function toggleSched() {
+      const active = $('schedBtn').dataset.active === '1';
+      msg(active ? 'Stopping autopilot…' : 'Starting autopilot…');
+      const r = await api(active ? '/scheduler/stop' : '/scheduler/start', 'POST', active ? {} : { minutes: 5 });
+      msg(r.ok ? 'Done.' : 'Error.', !r.ok);
+      refresh();
+    }
+
+    refresh();
+    setInterval(refresh, 15000);
+  </script>
+</body>
+</html>
