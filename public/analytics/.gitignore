@@ -1,0 +1,3 @@
+# Real, freshly-computed snapshot contains customer data — never commit it.
+# Written at runtime by scripts/analytics-batch.js.
+insights.json
