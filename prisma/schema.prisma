@@ -1,0 +1,163 @@
+// Phase 1 - Postgres schema for SuperSender Pro multi-tenant SaaS.
+// Every business table carries tenantId and is indexed by it. One source of truth.
+// Generate client: npx prisma generate ; migrate: npx prisma migrate dev -n init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id        String   @id @default(cuid())
+  name      String
+  status    String   @default("active") // active | suspended
+  planId    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  customers Customer[]
+  orders    Order[]
+  quotes    Quote[]
+  inbox     InboxMessage[]
+  txns      Txn[]
+  webhooks  WebhookEndpoint[]
+  followUps FollowUp[]
+
+  @@map("tenants")
+}
+
+model Customer {
+  id          String   @id @default(cuid())
+  tenantId    String
+  phone       String
+  name        String?
+  city        String?
+  tier        String   @default("Bronze")
+  totalOrders Int      @default(0)
+  totalSpent  Float    @default(0)
+  tags        String[] @default([])
+  status      String   @default("active")
+  promoOptIn  Boolean  @default(true)
+  source      String   @default("whatsapp")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, phone])
+  @@index([tenantId])
+  @@map("customers")
+}
+
+model Order {
+  id          String   @id @default(cuid())
+  tenantId    String
+  customerId  String?
+  phone       String?
+  amount      Float    @default(0)
+  status      String   @default("pending") // pending | paid | fulfilled | cancelled
+  productName String?
+  paymentRef  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([tenantId, status])
+  @@map("orders")
+}
+
+model Quote {
+  id         String   @id @default(cuid())
+  tenantId   String
+  number     String
+  type       String   @default("quote") // quote | invoice
+  dealId     String?
+  phone      String?
+  subtotal   Float    @default(0)
+  tax        Float    @default(0)
+  total      Float    @default(0)
+  currency   String   @default("PKR")
+  status     String   @default("draft")
+  items      Json     @default("[]")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, number])
+  @@index([tenantId])
+  @@map("quotes")
+}
+
+model InboxMessage {
+  id        String   @id @default(cuid())
+  tenantId  String
+  phone     String
+  direction String   // in | out
+  body      String
+  meta      Json     @default("{}")
+  createdAt DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([tenantId, phone])
+  @@map("inbox_messages")
+}
+
+model Txn {
+  id        String   @id @default(cuid())
+  tenantId  String
+  ref       String
+  amount    Float    @default(0)
+  status    String   @default("pending")
+  provider  String?
+  meta      Json     @default("{}")
+  createdAt DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, ref])
+  @@index([tenantId])
+  @@map("txns")
+}
+
+model WebhookEndpoint {
+  id        String   @id @default(cuid())
+  tenantId  String
+  url       String
+  events    String[] @default([])
+  active    Boolean  @default(true)
+  secret    String?
+  createdAt DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@map("webhook_endpoints")
+}
+
+model FollowUp {
+  id          String   @id @default(cuid())
+  tenantId    String
+  dealId      String?
+  phone       String?
+  stage       String?
+  step        Int      @default(0)
+  status      String   @default("pending")
+  scheduledAt DateTime
+  message     String?
+  createdAt   DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([tenantId, status, scheduledAt])
+  @@map("follow_ups")
+}
