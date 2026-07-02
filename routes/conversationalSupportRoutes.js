@@ -7,8 +7,8 @@
  * Safety:
  * - Read endpoints are open; contact phone numbers are masked in output.
  * - Write endpoints require an admin secret (x-admin-secret / ?secret / body.secret) matching
- *   CONV_SUPPORT_ADMIN_SECRET / ADMIN_TOKEN / CHANNEL_ADMIN_SECRET when set. If none configured,
- *   allowed in dev with a warning (repo convention).
+ * CONV_SUPPORT_ADMIN_SECRET / ADMIN_TOKEN / CHANNEL_ADMIN_SECRET when set. If none configured,
+ * allowed in dev with a warning (repo convention).
  * - /simulate runs the engine in FORCED dry-run (never sends) for safe testing.
  * - /inbound respects CONV_SUPPORT_DRY_RUN (default true). Point your WhatsApp webhook here.
  */
@@ -19,12 +19,12 @@ const { maskPhone } = require('../lib/conversationalSupport/util');
 const router = express.Router();
 
 function adminGuard(req, res, next) {
-  if (!CS.config.requireAdmin) return next();
-  const configured = process.env.CONV_SUPPORT_ADMIN_SECRET || process.env.ADMIN_TOKEN || process.env.CHANNEL_ADMIN_SECRET || '';
-  if (!configured) { console.warn('[ConvSupport] no admin secret set - write allowed in dev mode'); return next(); }
-  const provided = req.get('x-admin-secret') || req.query.secret || (req.body && req.body.secret);
-  if (provided && provided === configured) return next();
-  return res.status(401).json({ success: false, error: 'Unauthorized', fix: 'Send x-admin-secret matching CONV_SUPPORT_ADMIN_SECRET' });
+ if (!CS.config.requireAdmin) return next();
+ const configured = process.env.CONV_SUPPORT_ADMIN_SECRET || process.env.ADMIN_TOKEN || process.env.CHANNEL_ADMIN_SECRET || '';
+ if (!configured) { console.warn('[ConvSupport] no admin secret set - write allowed in dev mode'); return next(); }
+ const provided = req.get('x-admin-secret') || req.query.secret || (req.body && req.body.secret);
+ if (provided && provided === configured) return next();
+ return res.status(401).json({ success: false, error: 'Unauthorized', fix: 'Send x-admin-secret matching CONV_SUPPORT_ADMIN_SECRET' });
 }
 
 const ok = (res, d) => res.json(Object.assign({ success: true }, d));
@@ -36,6 +36,10 @@ const maskHandoff = (h) => (h ? Object.assign({}, h, { contact: Object.assign({}
 /* ---------------- Status / Doctor ---------------- */
 router.get('/status', (req, res) => { try { ok(res, { dryRun: CS.config.dryRun, aiAvailable: CS.brain.hubAvailable(), orderPipeline: CS.orderFlow.pipelineAvailable(), products: CS.kb.listProducts(tid(req)).length, faqs: CS.kb.listFaqs(tid(req)).length }); } catch (e) { fail(res, e); } });
 router.get('/doctor', (req, res) => { try { ok(res, { doctor: CS.doctor.run() }); } catch (e) { fail(res, e); } });
+
+/* ---------------- Analytics (read-only, phone-free aggregates) ---------------- */
+// Optional rolling window: ?days=7 (0 / omitted = all time). Never exposes phone numbers or text.
+router.get('/analytics', (req, res) => { try { const days = req.query.days ? Number(req.query.days) : 0; ok(res, { analytics: CS.analytics.overview(tid(req), { days }) }); } catch (e) { fail(res, e); } });
 
 /* ---------------- Knowledge base: settings ---------------- */
 router.get('/settings', (req, res) => { try { ok(res, { settings: CS.kb.settings(tid(req)) }); } catch (e) { fail(res, e); } });
@@ -55,17 +59,17 @@ router.post('/seed-example', adminGuard, (req, res) => { try { ok(res, CS.seedEx
 /* ---------------- Run / Test ---------------- */
 // Safe test harness: forces dry-run, never sends.
 router.post('/simulate', (req, res) => {
-  (async () => {
-    try { const b = req.body || {}; ok(res, { result: await CS.handleMessage(tid(req), { phone: b.phone || 'sim_' + Date.now(), name: b.name, text: b.text || '' }, { forceDryRun: true }) }); }
-    catch (e) { fail(res, e); }
-  })();
+ (async () => {
+ try { const b = req.body || {}; ok(res, { result: await CS.handleMessage(tid(req), { phone: b.phone || 'sim_' + Date.now(), name: b.name, text: b.text || '' }, { forceDryRun: true }) }); }
+ catch (e) { fail(res, e); }
+ })();
 });
 // Real inbound webhook (respects CONV_SUPPORT_DRY_RUN). Point your WhatsApp provider here.
 router.post('/inbound', adminGuard, (req, res) => {
-  (async () => {
-    try { const b = req.body || {}; if (!b.phone) return fail(res, new Error('phone required'), 400); ok(res, { result: await CS.handleMessage(tid(req), { phone: b.phone, name: b.name, text: b.text || '' }) }); }
-    catch (e) { fail(res, e); }
-  })();
+ (async () => {
+ try { const b = req.body || {}; if (!b.phone) return fail(res, new Error('phone required'), 400); ok(res, { result: await CS.handleMessage(tid(req), { phone: b.phone, name: b.name, text: b.text || '' }) }); }
+ catch (e) { fail(res, e); }
+ })();
 });
 
 /* ---------------- Conversations ---------------- */
