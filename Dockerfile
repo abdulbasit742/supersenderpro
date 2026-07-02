@@ -2,7 +2,7 @@
 # ============================================================
 # SuperSender Pro - Hardened production image (monolith)
 # ============================================================
-FROM node:18-slim AS base
+FROM node:26-slim AS base
 
 # Chromium + fonts for whatsapp-web.js / puppeteer, tini for PID 1 signal handling
 RUN apt-get update && apt-get install -y --no-install-recommends \
