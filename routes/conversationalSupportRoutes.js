@@ -32,10 +32,15 @@ const fail = (res, e, c = 500) => res.status(c).json({ success: false, error: e 
 const tid = (req) => req.params.tenantId || (req.body && req.body.tenantId) || req.query.tenantId || 'default';
 const maskConvo = (c) => (c ? Object.assign({}, c, { contact: Object.assign({}, c.contact, { phone: maskPhone(c.contact && c.contact.phone) }) }) : c);
 const maskHandoff = (h) => (h ? Object.assign({}, h, { contact: Object.assign({}, h.contact, { phone: maskPhone(h.contact && h.contact.phone) }) }) : h);
+const sinceHours = (req) => (req.query.sinceHours ? Number(req.query.sinceHours) : undefined);
 
 /* ---------------- Status / Doctor ---------------- */
 router.get('/status', (req, res) => { try { ok(res, { dryRun: CS.config.dryRun, aiAvailable: CS.brain.hubAvailable(), orderPipeline: CS.orderFlow.pipelineAvailable(), products: CS.kb.listProducts(tid(req)).length, faqs: CS.kb.listFaqs(tid(req)).length }); } catch (e) { fail(res, e); } });
 router.get('/doctor', (req, res) => { try { ok(res, { doctor: CS.doctor.run() }); } catch (e) { fail(res, e); } });
+
+/* ---------------- Analytics / Insights (read-only) ---------------- */
+router.get('/analytics', (req, res) => { try { ok(res, { analytics: CS.analytics.summarize(tid(req), { sinceHours: sinceHours(req) }) }); } catch (e) { fail(res, e); } });
+router.get('/insights', (req, res) => { try { ok(res, { insights: CS.analytics.insights(tid(req), { sinceHours: sinceHours(req) }) }); } catch (e) { fail(res, e); } });
 
 /* ---------------- Knowledge base: settings ---------------- */
 router.get('/settings', (req, res) => { try { ok(res, { settings: CS.kb.settings(tid(req)) }); } catch (e) { fail(res, e); } });
